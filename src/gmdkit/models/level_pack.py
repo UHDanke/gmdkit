@@ -9,7 +9,7 @@ from gmdkit.models.object import Object, ObjectList
 from gmdkit.models.types import ListClass, DictClass
 from gmdkit.models.serialization import PlistDictDecoderMixin, PlistArrayDecoderMixin, dict_cast
 from gmdkit.casting.level_props import LIST_ENCODERS, LIST_DECODERS
-
+from gmdkit.mappings import lvl_id
 
 class LevelPack(PlistDictDecoderMixin,DictClass):
     
@@ -23,7 +23,7 @@ class LevelPack(PlistDictDecoderMixin,DictClass):
         path = Path(path)
         
         if not path.suffix:
-            path = (path / self[lvl_id.level.name]).with_suffix('.' + extension.lstrip('.'))
+            path = (path / self[lvl_id.list.name]).with_suffix('.' + extension.lstrip('.'))
             
         super().to_file(path=path, **kwargs)
                 
