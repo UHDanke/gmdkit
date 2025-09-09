@@ -1,0 +1,196 @@
+id,alias,props,name
+0,level_start,,
+10,portal.gravity_normal,trigger,Blue Gravity Portal
+11,portal.gravity_inverted,trigger,Yellow Gravity Portal
+12,portal.cube,trigger,Cube Portal
+13,portal.ship,trigger.gamemode_portal,Ship Portal
+22,trigger.enter_preset.fade_only,trigger.enter_preset,No Enter Effect
+23,trigger.enter_preset.fade_bottom,trigger.enter_preset,Fade Bottom Enter Effect
+24,trigger.enter_preset.fade_top,trigger.enter_preset,Fade Top Enter Effect
+25,trigger.enter_preset.fade_left,trigger.enter_preset,Fade Left Enter Effect
+26,trigger.enter_preset.fade_right,trigger.enter_preset,Fade Right Enter Effect
+27,trigger.enter_preset.scale_up,trigger.enter_preset,Small to Big Enter Effect
+28,trigger.enter_preset.scale_down,trigger.enter_preset,Big to Small Enter Effect
+29,trigger.old_color.ground,trigger.old_color,Ground 1 Color Trigger
+30,trigger.old_color.background,trigger.old_color,Background Color Trigger
+31,trigger.start_pos,start_pos,start pos
+32,trigger.trail_enable,trigger,enable trail
+33,trigger.trail_disable,trigger,disable trail
+35,pad.yellow,trigger,Yellow Jump Pad
+36,orb.yellow,trigger,Yellow Jump Orb
+45,portal.mirror_enter,trigger,Orange Mirror Portal
+46,portal.mirror_exit,trigger,Blue Mirror Portal
+47,portal.ball,trigger.gamemode_portal,Ball Portal
+55,trigger.enter_preset.chaotic,trigger.enter_preset,Chaotic Enter Effect
+56,trigger.enter_preset.half_left,trigger.enter_preset,Halve Left Enter Effect
+57,trigger.enter_preset.half_right,trigger.enter_preset,Halve Right Enter Effect
+58,trigger.enter_preset.half,trigger.enter_preset,Halve Enter Effect
+59,trigger.enter_preset.half_invert,trigger.enter_preset,Inverse Halve Enter Effect
+67,pad.blue,trigger,Blue Gravity Pad
+84,orb.blue,trigger,Blue Gravity Orb
+99,portal.size_normal,trigger,Green Size Portal
+101,portal.size_small,trigger,Pink Size Portal
+104,deprecated.old_color_line,deprecated,Old Line Color Trigger
+105,trigger.old_color.outline,trigger.old_color,Outline Color Trigger
+111,portal.ufo,trigger.gamemode_portal,UFO Portal
+140,pad.pink,,Pink Jump Pad
+141,orb.pink,,Pink Jump Orb
+142,collectible.secret_coin,,
+200,speed.slow,,Yellow Slow Speed Portal
+201,speed.normal,,Blue Normal Speed Portal
+202,speed.fast,,Green Fast Speed Portal
+203,speed.very_fast,,Pink Fast Speed Portal
+221,deprecated.old_color_1,deprecated,Old Color 1 Trigger
+286,portal.dual_enter,,Dual Portal
+287,portal.dual_exit,,Exit Dual Portal
+660,portal.wave,,Wave Portal
+717,deprecated.old_color_2,deprecated,Old Color 2 Trigger
+718,deprecated.old_color_3,deprecated,Old Color 3 Trigger
+734,deprecated.old_color_4,deprecated,Old Color 4 Trigger
+744,trigger.color,trigger.color,3DL Color Trigger
+745,portal.robot,,Robot Portal
+747,portal.teleport.linked,,Linked Teleport Portals
+899,trigger.color,trigger.color,Color Trigger
+900,trigger.old_color.ground_2,trigger.old_color,Ground 2 Color Trigger
+901,trigger.move,trigger.move,Move Trigger
+914,text,,Text
+915,trigger.old_color.line,trigger.color,Line Color Trigger
+1006,trigger.pulse,trigger.pulse,Pulse Trigger
+1007,trigger.alpha,trigger.alpha,Alpha Trigger
+1022,orb.green,,Green Gravity Orb
+1049,trigger.toggle,trigger.toggle,Toggle Trigger
+1268,trigger.spawn,trigger.spawn,Spawn Trigger
+1275,collectible.key,,Key Collectable
+1329,collectible.user_coin,,User Coin
+1330,orb.black,,Black Drop Orb
+1331,portal.spider,,Spider Portal
+1332,pad.red,,Red Jump Pad
+1333,orb.red,,Red Jump Orb
+1334,speed.super_fast,,Red Fast Speed Portal
+1346,trigger.rotate,trigger.rotate,Rotate Trigger
+1347,trigger.follow,trigger.follow,Follow Trigger
+1520,trigger.shake,trigger.shake,Shake Trigger
+1585,trigger.animate,trigger.animate,Animate Trigger
+1594,orb.toggle,,Toggle Orb
+1595,trigger.touch,trigger.touch,Touch Trigger
+1611,trigger.count,trigger.count,Count Trigger
+1612,trigger.player_hide,trigger,Hide Player Trigger
+1613,trigger.player_show,trigger,Show Player Trigger
+1614,collectible.small_coin,,Small Coin Collectable
+1615,item_label,,item label
+1616,trigger.stop,trigger.stop,Stop Trigger
+1704,orb.dash_green,,Green Dash Orb
+1751,orb.dash_pink,,Pink Gravity Dash Orb
+1755,modifier.wave_collision,,Allow Wave Drag Modifier
+1811,trigger.instant_count,trigger.instant_count,Instant Count Trigger
+1812,trigger.on_death,trigger.on_death,On Death Trigger
+1813,modifier.stop_jump,,Stop Jump Buffer Modifier
+1814,trigger.follow_player_y,trigger.follow_player_y,Follow Player Y Trigger
+1815,trigger.collision,trigger.collision,Collision Trigger
+1816,trigger.collision_block,,collision block
+1817,trigger.pickup,trigger.pickup,Pickup Trigger
+1818,trigger.bg_effect_enable,trigger,Background Effect On Trigger
+1819,trigger.bg_effect_disable,trigger,Background Effect Off Trigger
+1829,modifier.stop_dash,,Stop Dash Modifier
+1859,modifier.head_collision,,Allow Head Collision Modifier
+1912,trigger.random,trigger.random,Random Trigger
+1913,trigger.zoom_camera,trigger.zoom_camera,Zoom Camera Trigger
+1914,trigger.static_camera,trigger.static_camera,Static Camera Trigger
+1915,trigger.enter_preset.no_fade,trigger.enter_preset,No Enter Effect Trigger
+1916,trigger.offset_camera,trigger.offset_camera,Offset Camera Trigger
+1917,trigger.reverse,trigger.reverse,Reverse Trigger
+1931,trigger.end_wall,trigger.end_wall,Classic End Trigger
+1932,trigger.player_control,trigger.player_control,Player Control Trigger
+1933,portal.swing,,Swing Portal
+1934,trigger.song,trigger.song,Song Trigger
+1935,trigger.timewarp,trigger.timewarp,TimeWarp Trigger
+2015,trigger.rotate_camera,trigger.rotate_camera,Rotate Camera Trigger
+2016,trigger.camera_guide,,camera guide
+2062,trigger.camera_edge,trigger.camera_edge,Edge Camera Trigger
+2063,trigger.checkpoint,,Checkpoint
+2064,portal.teleport.exit,,Unlinked Orange Teleport Portal
+2065,particle_object,,Custom Particles
+2066,trigger.gravity,trigger.gravity,Gravity Trigger
+2067,trigger.scale,trigger.scale,Scale Trigger
+2068,trigger.adv_random,trigger.adv_random,Advanced Random Trigger
+2069,trigger.force_block,,Force Block
+2866,modifier.gravity_flip,,Gravity Flip Modifier
+2899,trigger.options,trigger.options,Options Trigger
+2900,trigger.arrow,trigger.arrow,Gameplay Rotation Trigger
+2901,trigger.gameplay_offset,trigger.gameplay_offset,Gameplay Offset Camera Trigger
+2902,portal.teleport.enter,,Unlinked Blue Teleport Portal
+2903,trigger.gradient,trigger.gradient,Gradient Trigger
+2904,trigger.shader.options,trigger.shader,Shader Trigger
+2905,trigger.shader.shockwave,trigger.shader,Shock Wave Shader Trigger
+2907,trigger.shader.shockline,trigger.shader,Shock Line Shader Trigger
+2909,trigger.shader.glitch,trigger.shader,Glitch Shader Trigger
+2910,trigger.shader.chromatic,trigger.shader,Chromatic Aberration Shader Trigger
+2911,trigger.shader.chromatic_glitch,trigger.shader,Chromatic Glitch Shader Trigger
+2912,trigger.shader.pixelate,trigger.shader,Pixelate Shader Trigger
+2913,trigger.shader.lens_circle,trigger.shader,Lens Circle Shader Trigger
+2914,trigger.shader.radial_blur,trigger.shader,Radial Blur Shader Trigger
+2915,trigger.shader.motion_blur,trigger.shader,Motion Blur Shader Trigger
+2916,trigger.shader.bulge,trigger.shader,Bulge Shader Trigger
+2917,trigger.shader.pinch,trigger.shader,Pinch Shader Trigger
+2919,trigger.shader.gray_scale,trigger.shader,Grayscale Shader Trigger
+2920,trigger.shader.sepia,trigger.shader,Sepia Shader Trigger
+2921,trigger.shader.invert_color,trigger.shader,Invert Color Trigger
+2922,trigger.shader.hue,trigger.shader,Hue Shader Trigger
+2923,trigger.shader.edit_color,trigger.shader,Edit Color Shader Trigger
+2924,trigger.shader.split_screen,trigger.shader,Split Screen Shader Trigger
+2925,trigger.camera_mode,trigger.camera_mode,Mode Camera Trigger
+2926,portal.gravity_toggle,,Green Gravity Portal
+2999,trigger.mg_edit,trigger.mg_edit,Edit Middleground Trigger
+3004,orb.spider,,Spider Orb
+3005,pad.spider,,Spider Pad
+3006,trigger.area.move,trigger.effect,Area Move Trigger
+3007,trigger.area.rotate,trigger.effect,Area Rotate Trigger
+3008,trigger.area.scale,trigger.effect,Area Scale Trigger
+3009,trigger.area.fade,trigger.effect,Area Fade Trigger
+3010,trigger.area.tint,trigger.effect,Area Tint Trigger
+3011,trigger.area.move_edit,trigger.effect,Edit Area Move Trigger
+3012,trigger.area.rotate_edit,trigger.effect,Edit Area Rotate Trigger
+3013,trigger.area.scale_edit,trigger.effect,Edit Area Scale Trigger
+3014,trigger.area.fade_edit,trigger.effect,Edit Area Fade Trigger
+3015,trigger.area.tint_edit,trigger.effect,Edit Area Tint Trigger
+3016,trigger.adv_follow,trigger.adv_follow,Advanced Follow Trigger
+3017,trigger.enter.move,trigger.effect,Enter Move Trigger
+3018,trigger.enter.rotate,trigger.effect,Enter Rotate Trigger
+3019,trigger.enter.scale,trigger.effect,Enter Scale Trigger
+3020,trigger.enter.fade,trigger.effect,Enter Fade Trigger
+3021,trigger.enter.tint,trigger.effect,Enter Tint Trigger
+3022,trigger.teleport,trigger.effect,Teleport Trigger
+3023,trigger.enter.stop,trigger.effect,Enter Stop Trigger
+3024,trigger.area.stop,trigger.effect,Area Stop Trigger
+3027,orb.teleport,,Teleport Orb
+3029,trigger.change_bg,trigger.change_bg,Change Background Trigger
+3030,trigger.change_g,trigger.change_g,Change Ground Trigger
+3031,trigger.change_mg,trigger.change_mg,Change Middleground Trigger
+3032,trigger.keyframe,,keyframe
+3033,trigger.animate_keyframe,trigger.animate_keyframe,Keyframe Animation Trigger
+3600,trigger.end,trigger.end,End Trigger
+3602,trigger.sfx,trigger.sfx,SFX Trigger
+3603,trigger.sfx_edit,trigger.sfx,Edit SFX Trigger
+3604,trigger.event,trigger.event,Event Trigger
+3605,trigger.song_edit,trigger.song,Edit Song Trigger
+3606,trigger.bg_speed,trigger.bg_speed,Background Speed Trigger
+3607,trigger.sequence,trigger.sequence,Sequence Trigger
+3608,trigger.spawn_particle,trigger.spawn_particle,Spawn Particle Trigger
+3609,trigger.instant_collision,trigger.instant_collision,Instant Collision Trigger
+3612,trigger.mg_speed,trigger.mg_speed,Middleground Speed Trigger
+3613,trigger.ui,trigger.ui,UI Trigger
+3614,trigger.time,trigger.time,Time Trigger
+3615,trigger.time_event,trigger.time_event,Time Event Trigger
+3617,trigger.time_control,trigger.time_control,Time Control Trigger
+3618,trigger.reset,trigger.reset,Reset Trigger
+3619,trigger.item_edit,trigger.item_edit,Item Edit Trigger
+3620,trigger.item_compare,trigger.item_compare,Item Compare Trigger
+3640,trigger.state_block,,state block
+3641,trigger.item_persist,trigger.item_persist,Persistent Item Setup Trigger
+3642,trigger.bpm,trigger.bpm,BPM Trigger
+3643,trigger.toggle_block,,toggle block
+3645,trigger.force_circle,,Force Circle
+3655,trigger.object_control,trigger.object_control,Object Control
+3660,trigger.edit_adv_follow,trigger.edit_adv_follow,Edit Advanced Follow Trigger
+3661,trigger.retarget_adv_follow,trigger.edit_adv_follow,Re-Target Advanced Follow Trigger
+3662,trigger.link_visible,trigger.link_visible,Link Visible Trigger

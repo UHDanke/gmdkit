@@ -1,0 +1,645 @@
+type,object id,property id,condition,function,replace,default,min,max,remappable,iterable
+color id,obj_id.trigger.color,prop_id.trigger.color.channel,,,,,1,999,FALSE,FALSE
+color id,obj_id.trigger.color,prop_id.trigger.color.copy_id,,,,,1,999,FALSE,FALSE
+color id,obj_id.trigger.shader.gray_scale,prop_id.trigger.shader.gray_scale_tint_channel,,,,,1,999,TRUE,FALSE
+color id,obj_id.trigger.shader.lens_circle,prop_id.trigger.shader.lens_circle_tint_channel,,,,,1,999,TRUE,FALSE
+color id,obj_id.trigger.shader.radial_blur,prop_id.trigger.shader.radial_blur_ref_channel,,,,,1,999,TRUE,FALSE
+color id,obj_id.trigger.shader.motion_blur,prop_id.trigger.shader.motion_blur_ref_channel,,,,,1,999,TRUE,FALSE
+color id,,prop_id.color_1,,,,"lambda x: COLOR_1_DEFAULT.get(x,0)",1,999,FALSE,FALSE
+color id,,prop_id.color_2,,,,"lambda x: COLOR_2_DEFAULT.get(x,0)",1,999,FALSE,FALSE
+color id,obj_id.trigger.pulse,prop_id.trigger.pulse.copy_id,,,,,1,999,FALSE,FALSE
+color id,obj_id.trigger.pulse,prop_id.trigger.pulse.target_id,"lambda x: x.get(prop_id.trigger.pulse.target_type,0) == 0",,,,1,999,TRUE,FALSE
+color id,obj_id.trigger.area.tint,prop_id.trigger.effect.tint_channel,,,,,1,999,FALSE,FALSE
+color id,obj_id.trigger.enter.tint,prop_id.trigger.effect.tint_channel,,,,,1,999,FALSE,FALSE
+color id,obj_id.level_start,prop_id.level.colors,,lambda x: x.unique_values(lambda i: i.channels),"lambda x, kvm: x.apply(lambda i: i.remap(kvm))",,1,999,FALSE,TRUE
+group id,obj_id.trigger.move,prop_id.trigger.move.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.move,prop_id.trigger.move.target_pos,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.move,prop_id.trigger.move.target_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.alpha,prop_id.trigger.alpha.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.toggle,prop_id.trigger.toggle.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.toggle_block,prop_id.trigger.toggle_block.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.orb.toggle,prop_id.trigger.toggle_block.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.on_death,prop_id.trigger.on_death.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.spawn,prop_id.trigger.spawn.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.teleport,prop_id.trigger.teleport.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.song,prop_id.trigger.song.group_id_1,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.song,prop_id.trigger.song.group_id_2,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.song_edit,prop_id.trigger.song.group_id_1,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.song_edit,prop_id.trigger.song.group_id_2,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sfx,prop_id.trigger.sfx.group_id_1,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sfx,prop_id.trigger.sfx.group_id_2,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sfx,prop_id.trigger.sfx.group,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sfx_edit,prop_id.trigger.sfx.group_id_1,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sfx_edit,prop_id.trigger.sfx.group_id_2,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sfx_edit,prop_id.trigger.sfx.group,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.rotate_target,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.aim_target,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.min_x_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.min_y_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.max_x_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.rotate,prop_id.trigger.rotate.max_y_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.follow,prop_id.trigger.follow.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.follow,prop_id.trigger.follow.follow_target,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.animate,prop_id.trigger.animate.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.touch,prop_id.trigger.touch.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.count,prop_id.trigger.count.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.instant_count,prop_id.trigger.instant_count.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.follow_player_y,prop_id.trigger.follow_player_y.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.collision,prop_id.trigger.collision.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.random,prop_id.trigger.random.true_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.random,prop_id.trigger.random.false_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.end_wall,prop_id.trigger.end_wall.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.camera_edge,prop_id.trigger.camera_edge.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.checkpoint,prop_id.trigger.checkpoint.spawn_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.checkpoint,prop_id.trigger.checkpoint.target_pos,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.checkpoint,prop_id.trigger.checkpoint.respawn_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.scale,prop_id.trigger.scale.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.scale,prop_id.trigger.scale.center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.adv_follow,prop_id.trigger.adv_follow.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.adv_follow,prop_id.trigger.adv_follow.follow_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.adv_follow,prop_id.trigger.adv_follow.max_range_ref,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.adv_follow,prop_id.trigger.adv_follow.start_speed_ref,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.adv_follow,prop_id.trigger.adv_follow.start_dir_ref,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.keyframe,prop_id.trigger.keyframe.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.keyframe,prop_id.trigger.keyframe.spawn_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.animate_keyframe,prop_id.trigger.animate_keyframe.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.animate_keyframe,prop_id.trigger.animate_keyframe.parent_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.animate_keyframe,prop_id.trigger.animate_keyframe.animation_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.end,prop_id.trigger.end.spawn_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.end,prop_id.trigger.end.target_pos,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.event,prop_id.trigger.event.spawn_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.spawn_particle,prop_id.trigger.spawn_particle.particle_group,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.spawn_particle,prop_id.trigger.spawn_particle.position_group,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.instant_collision,prop_id.trigger.instant_collision.true_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.instant_collision,prop_id.trigger.instant_collision.false_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.ui,prop_id.trigger.ui.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.ui,prop_id.trigger.ui.ui_target,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.time,prop_id.trigger.time.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.time_event,prop_id.trigger.time_event.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.reset,prop_id.trigger.reset.group_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.object_control,prop_id.trigger.object_control.target_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.link_visible,prop_id.trigger.link_visible.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.item_compare,prop_id.trigger.item_compare.true_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.item_compare,prop_id.trigger.item_compare.false_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.state_block,prop_id.trigger.state_block.state_on,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.state_block,prop_id.trigger.state_block.state_off,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.static_camera,prop_id.trigger.static_camera.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.gradient,prop_id.trigger.gradient.u,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.gradient,prop_id.trigger.gradient.d,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.gradient,prop_id.trigger.gradient.l,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.gradient,prop_id.trigger.gradient.r,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.shader.shockwave,prop_id.trigger.shader.shockwave_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.shader.shockline,prop_id.trigger.shader.shockline_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.shader.lens_circle,prop_id.trigger.shader.lens_circle_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.shader.radial_blur,prop_id.trigger.shader.radial_blur_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.shader.motion_blur,prop_id.trigger.shader.motion_blur_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.shader.bulge,prop_id.trigger.shader.bulge_center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.shader.pinch,prop_id.trigger.shader.pinch_center_id,,,,,1,9999,TRUE,FALSE
+group id,,prop_id.groups,,,"lambda x, kvm: x.remap(kvm)",,1,9999,FALSE,TRUE
+group id,,prop_id.parent_groups,,,"lambda x, kvm: x.remap(kvm)",,1,9999,FALSE,TRUE
+group id,obj_id.trigger.pulse,prop_id.trigger.pulse.target_id,"lambda x: x.get(prop_id.trigger.pulse.target_type,0) == 1",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.stop,prop_id.trigger.stop.target_id,"lambda x: x.get(prop_id.trigger.stop.use_control_id,0)== 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.sequence,prop_id.trigger.sequence.sequence,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,1,9999,FALSE,TRUE
+group id,obj_id.trigger.adv_random,prop_id.trigger.adv_random.targets,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,1,9999,FALSE,TRUE
+group id,obj_id.trigger.edit_adv_follow,prop_id.trigger.edit_adv_follow.target_id,"lambda x: x.get(prop_id.trigger.edit_adv_follow.use_control_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.edit_adv_follow,prop_id.trigger.edit_adv_follow.speed_ref,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.edit_adv_follow,prop_id.trigger.edit_adv_follow.dir_ref,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.retarget_adv_follow,prop_id.trigger.edit_adv_follow.target_id,"lambda x: x.get(prop_id.trigger.edit_adv_follow.use_control_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.retarget_adv_follow,prop_id.trigger.edit_adv_follow.follow_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.collectible.user_coin,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.collectible.user_coin,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,obj_id.collectible.key,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.collectible.key,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,1587,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,1587,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,1589,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,1589,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,1598,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,1598,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,obj_id.collectible.small_coin,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,obj_id.collectible.small_coin,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,3601,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,3601,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4401,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4401,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4402,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4402,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4403,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4403,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4404,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4404,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4405,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4405,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4406,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4406,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4407,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4407,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4408,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4408,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4409,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4409,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4410,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4410,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4411,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4411,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4412,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4412,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4413,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4413,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4414,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4414,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4415,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4415,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4416,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4416,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4417,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4417,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4418,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4418,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4419,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4419,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4420,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4420,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4421,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4421,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4422,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4422,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4423,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4423,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4424,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4424,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4425,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4425,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4426,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4426,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4427,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4427,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4428,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4428,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4429,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4429,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4430,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4430,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4431,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4431,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4432,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4432,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4433,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4433,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4434,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4434,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4435,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4435,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4436,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4436,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4437,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4437,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4438,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4438,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4439,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4439,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4440,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4440,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4441,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4441,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4442,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4442,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4443,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4443,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4444,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4444,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4445,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4445,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4446,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4446,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4447,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4447,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4448,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4448,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4449,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4449,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4450,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4450,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4451,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4451,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4452,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4452,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4453,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4453,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4454,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4454,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4455,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4455,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4456,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4456,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4457,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4457,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4458,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4458,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4459,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4459,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4460,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4460,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4461,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4461,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4462,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4462,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4463,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4463,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4464,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4464,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4465,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4465,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4466,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4466,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4467,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4467,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4468,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4468,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4469,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4469,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4470,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4470,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4471,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4471,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4472,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4472,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4473,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4473,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4474,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4474,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4475,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4475,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4476,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4476,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4477,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4477,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4478,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4478,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4479,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4479,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4480,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4480,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4481,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4481,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4482,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4482,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4483,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4483,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4484,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4484,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4485,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4485,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4486,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4486,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4487,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4487,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4488,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4488,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4538,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4538,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4489,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4489,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4490,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4490,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4491,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4491,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4492,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4492,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4493,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4493,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4494,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4494,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4495,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4495,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4496,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4496,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4497,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4497,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4537,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4537,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4498,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4498,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4499,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4499,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4500,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4500,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4501,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4501,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4502,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4502,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4503,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4503,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4504,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4504,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4505,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4505,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4506,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4506,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4507,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4507,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4508,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4508,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4509,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4509,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4510,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4510,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4511,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4511,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4512,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4512,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4513,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4513,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4514,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4514,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4515,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4515,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4516,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4516,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4517,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4517,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4518,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4518,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4519,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4519,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4520,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4520,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4521,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4521,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4522,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4522,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4523,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4523,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4524,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4524,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4525,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4525,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4526,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4526,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4527,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4527,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4528,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4528,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4529,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4529,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4530,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4530,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4531,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4531,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4532,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4532,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4533,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4533,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4534,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4534,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4535,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4535,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4536,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4536,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,4539,prop_id.trigger.collectible.group_id,,,,,1,9999,FALSE,FALSE
+group id,4539,prop_id.trigger.collectible.particle   ,,,,,1,9999,FALSE,FALSE
+group id,obj_id.trigger.area.move,prop_id.trigger.effect.center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.scale,prop_id.trigger.effect.center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.rotate,prop_id.trigger.effect.center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.fade,prop_id.trigger.effect.center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.tint,prop_id.trigger.effect.center_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.move,prop_id.trigger.effect.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.scale,prop_id.trigger.effect.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.rotate,prop_id.trigger.effect.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.fade,prop_id.trigger.effect.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.tint,prop_id.trigger.effect.target_id,,,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.move_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.scale_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.rotate_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.fade_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.trigger.area.tint_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 0",,,,1,9999,TRUE,FALSE
+group id,obj_id.level_start,prop_id.level.player_spawn,,,,,1,9999,FALSE,FALSE
+item id,obj_id.trigger.item_edit,prop_id.trigger.item_edit.target_item_id,"lambda x: x.get(prop_id.trigger.item_edit.item_type_3,0) in (0,1)",,,,1,9999,TRUE,FALSE
+time id,obj_id.trigger.item_edit,prop_id.trigger.item_edit.target_item_id,"lambda x: x.get(prop_id.trigger.item_edit.item_type_3,0) == 2",,,,1,9999,TRUE,FALSE
+item id,obj_id.trigger.item_edit,prop_id.trigger.item_edit.item_id_1,"lambda x: x.get(prop_id.trigger.item_edit.item_type_1,0) in (0,1)",,,,1,9999,TRUE,FALSE
+time id,obj_id.trigger.item_edit,prop_id.trigger.item_edit.item_id_1,"lambda x: x.get(prop_id.trigger.item_edit.item_type_1,0) == 2",,,,1,9999,TRUE,FALSE
+item id,obj_id.trigger.item_edit,prop_id.trigger.item_edit.item_id_2,"lambda x: x.get(prop_id.trigger.item_edit.item_type_2,0) in (0,1)",,,,1,9999,TRUE,FALSE
+time id,obj_id.trigger.item_edit,prop_id.trigger.item_edit.item_id_2,"lambda x: x.get(prop_id.trigger.item_edit.item_type_2,0) == 2",,,,1,9999,TRUE,FALSE
+item id,obj_id.trigger.count,prop_id.trigger.count.item_id,,,,0,0,9999,TRUE,FALSE
+item id,obj_id.item_label,prop_id.item_label.item_id,"lambda x: x.get(prop_id.item_label.time_counter,0) == 0",,,0,0,9999,FALSE,FALSE
+time id,obj_id.item_label,prop_id.item_label.item_id,"lambda x: x.get(prop_id.item_label.time_counter,0) == 1",,,0,0,9999,FALSE,FALSE
+item id,obj_id.trigger.instant_count,prop_id.trigger.instant_count.item_id,,,,0,0,9999,TRUE,FALSE
+item id,obj_id.trigger.pickup,prop_id.trigger.pickup.item_id,,,,0,0,9999,TRUE,FALSE
+time id,obj_id.trigger.time,prop_id.trigger.time.item_id,,,,0,,,TRUE,FALSE
+time id,obj_id.trigger.time_event,prop_id.trigger.time_event.item_id,,,,0,,,TRUE,FALSE
+time id,obj_id.trigger.time_control,prop_id.trigger.time_control.item_id,,,,0,,,TRUE,FALSE
+item id,obj_id.trigger.item_compare,prop_id.trigger.item_compare.item_id_1,"lambda x: x.get(prop_id.trigger.item_compare.item_type_1,0) in (0,1)",,,0,0,9999,TRUE,FALSE
+time id,obj_id.trigger.item_compare,prop_id.trigger.item_compare.item_id_1,"lambda x: x.get(prop_id.trigger.item_compare.item_type_1,0) == 2",,,0,0,9999,TRUE,FALSE
+item id,obj_id.trigger.item_compare,prop_id.trigger.item_compare.item_id_2,"lambda x: x.get(prop_id.trigger.item_compare.item_type_2,0) in (0,1)",,,0,1,9999,TRUE,FALSE
+time id,obj_id.trigger.item_compare,prop_id.trigger.item_compare.item_id_2,"lambda x: x.get(prop_id.trigger.item_compare.item_type_2,0) == 2",,,0,1,9999,TRUE,FALSE
+item id,obj_id.trigger.item_persist,prop_id.trigger.item_persist.item_id,"lambda x: x.get(prop_id.trigger.item_persist.timer,0) == 0",,,0,0,9999,TRUE,FALSE
+time id,obj_id.trigger.item_persist,prop_id.trigger.item_persist.item_id,"lambda x: x.get(prop_id.trigger.item_persist.timer,0) == 1",,,0,,,TRUE,FALSE
+item id,obj_id.collectible.user_coin,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,obj_id.collectible.key,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,1587,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,1589,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,1598,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,obj_id.collectible.small_coin,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,3601,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4401,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4402,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4403,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4404,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4405,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4406,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4407,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4408,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4409,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4410,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4411,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4412,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4413,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4414,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4415,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4416,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4417,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4418,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4419,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4420,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4421,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4422,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4423,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4424,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4425,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4426,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4427,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4428,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4429,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4430,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4431,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4432,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4433,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4434,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4435,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4436,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4437,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4438,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4439,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4440,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4441,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4442,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4443,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4444,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4445,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4446,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4447,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4448,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4449,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4450,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4451,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4452,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4453,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4454,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4455,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4456,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4457,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4458,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4459,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4460,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4461,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4462,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4463,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4464,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4465,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4466,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4467,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4468,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4469,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4470,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4471,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4472,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4473,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4474,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4475,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4476,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4477,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4478,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4479,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4480,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4481,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4482,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4483,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4484,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4485,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4486,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4487,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4488,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4538,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4489,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4490,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4491,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4492,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4493,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4494,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4495,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4496,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4497,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4537,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4498,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4499,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4500,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4501,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4502,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4503,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4504,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4505,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4506,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4507,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4508,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4509,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4510,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4511,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4512,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4513,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4514,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4515,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4516,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4517,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4518,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4519,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4520,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4521,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4522,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4523,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4524,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4525,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4526,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4527,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4528,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4529,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4530,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4531,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4532,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4533,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4534,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4535,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4536,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+item id,4539,prop_id.trigger.collectible.item_id,,,,0,0,9999,FALSE,FALSE
+collision id,obj_id.trigger.collision,prop_id.trigger.collision.block_a,,,,,1,9999,TRUE,FALSE
+collision id,obj_id.trigger.collision,prop_id.trigger.collision.block_b,,,,,1,9999,TRUE,FALSE
+collision id,obj_id.trigger.instant_collision,prop_id.trigger.instant_collision.block_a,,,,,1,9999,TRUE,FALSE
+collision id,obj_id.trigger.instant_collision,prop_id.trigger.instant_collision.block_b,,,,,1,9999,TRUE,FALSE
+collision id,obj_id.trigger.collision_block,prop_id.trigger.collision_block.block_id,,,,,1,9999,FALSE,FALSE
+linked id,,prop_id.linked_group,,,,,1,,FALSE,FALSE
+trigger channel,obj_id.trigger.arrow,prop_id.trigger.arrow.target_channel,,,,0,,,FALSE,FALSE
+trigger channel,obj_id.trigger.start_pos,prop_id.start_pos.target_channel,,,,0,,,FALSE,FALSE
+trigger channel,,prop_id.trigger.channel,,,,0,,,FALSE,FALSE
+gradient id,obj_id.trigger.gradient,prop_id.trigger.gradient.gradient_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.stop,prop_id.trigger.effect.target_id,,,,0,,,TRUE,FALSE
+effect id,obj_id.trigger.enter.move,prop_id.trigger.effect.effect_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.enter.scale,prop_id.trigger.effect.effect_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.enter.rotate,prop_id.trigger.effect.effect_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.enter.fade,prop_id.trigger.effect.effect_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.enter.tint,prop_id.trigger.effect.effect_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.enter.stop,prop_id.trigger.effect.effect_id,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.move_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 1",,,0,,,TRUE,FALSE
+effect id,obj_id.trigger.area.scale_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 1",,,0,,,TRUE,FALSE
+effect id,obj_id.trigger.area.rotate_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 1",,,0,,,TRUE,FALSE
+effect id,obj_id.trigger.area.fade_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 1",,,0,,,TRUE,FALSE
+effect id,obj_id.trigger.area.tint_edit,prop_id.trigger.effect.target_id,"lambda x: x.get(prop_id.trigger.effect.use_effect_id,0) == 1",,,0,,,TRUE,FALSE
+enter channel,,prop_id.enter_channel,,,,0,-32768,32767,FALSE,FALSE
+enter channel,22,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,24,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,23,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,25,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,26,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,27,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,28,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,55,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,56,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,57,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,58,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,59,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,1915,prop_id.trigger.enter_preset.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,obj_id.trigger.enter.move,prop_id.trigger.effect.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,obj_id.trigger.enter.scale,prop_id.trigger.effect.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,obj_id.trigger.enter.rotate,prop_id.trigger.effect.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,obj_id.trigger.enter.fade,prop_id.trigger.effect.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,obj_id.trigger.enter.tint,prop_id.trigger.effect.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+enter channel,obj_id.trigger.enter.stop,prop_id.trigger.effect.enter_channel,,,,0,-32768,32767,TRUE,FALSE
+keyframe id,obj_id.trigger.keyframe,prop_id.trigger.keyframe.key_id,,,,0,0,,FALSE,FALSE
+song id,obj_id.trigger.song,prop_id.trigger.song.song_id,,,,0,,,TRUE,FALSE
+sfx id,obj_id.trigger.sfx,prop_id.trigger.sfx.sfx_id,,,,0,,,TRUE,FALSE
+unique sfx id,obj_id.trigger.sfx,prop_id.trigger.sfx.unique_id,,,,,,,TRUE,FALSE
+unique sfx id,obj_id.trigger.sfx_edit,prop_id.trigger.sfx.unique_id,,,,,,,TRUE,FALSE
+song channel,obj_id.trigger.song,prop_id.trigger.song.channel,,,,0,0,4,TRUE,FALSE
+song channel,obj_id.trigger.song_edit,prop_id.trigger.song.channel,,,,0,0,4,TRUE,FALSE
+sfx group,obj_id.trigger.sfx,prop_id.trigger.sfx.group_id,,,,,,,TRUE,FALSE
+sfx group,obj_id.trigger.sfx_edit,prop_id.trigger.sfx.group_id,,,,,,,TRUE,FALSE
+force id,obj_id.trigger.force_block,prop_id.trigger.force_block.force_id,,,,0,,,FALSE,FALSE
+force id,obj_id.trigger.force_circle,prop_id.trigger.force_block.force_id,,,,0,-32768,32767,FALSE,FALSE
+material id,,prop_id.material,,,,0,-32768,32767,FALSE,FALSE
+material id,obj_id.trigger.event,prop_id.trigger.event.extra_id_1,,,,0,,,TRUE,FALSE
+control id,,prop_id.trigger.control_id,,,,0,,,TRUE,FALSE
+control id,obj_id.trigger.stop,prop_id.trigger.stop.target_id,"lambda x: x.get(prop_id.trigger.stop.use_control_id,0) == 1",,,0,,,TRUE,FALSE
+control id,obj_id.trigger.edit_adv_follow,prop_id.trigger.edit_adv_follow.target_id,"lambda x: x.get(prop_id.trigger.edit_adv_follow.use_control_id,0) == 1",,,0,,,TRUE,FALSE
+control id,obj_id.trigger.retarget_adv_follow,prop_id.trigger.edit_adv_follow.target_id,"lambda x: x.get(prop_id.trigger.edit_adv_follow.use_control_id,0) == 1",,,0,,,TRUE,FALSE
+remap base,obj_id.trigger.spawn,prop_id.trigger.spawn.remaps,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,,FALSE,TRUE
+remap target,obj_id.trigger.spawn,prop_id.trigger.spawn.remaps,"lambda x: x.get(prop_id.trigger.spawn.reset_remap,0) == 1",lambda x: x.values(),"lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm))",,,,FALSE,TRUE
+remap target,obj_id.trigger.spawn,prop_id.trigger.spawn.remaps,"lambda x: x.get(prop_id.trigger.spawn.reset_remap,0) == 0",lambda x: x.values(),"lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm))",,,,TRUE,TRUE
