@@ -68,5 +68,4 @@ if __name__ == "__main__":
     levels = level_data.levels
     binary = level_data.binary
     lists = level_data.lists
-    published_list = Level.from_plist("D:\Downloads\Sour Punch.gmdl")
     

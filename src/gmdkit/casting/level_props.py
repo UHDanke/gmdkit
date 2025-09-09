@@ -17,15 +17,15 @@ LEVEL_DECODERS = {
 
 
 LEVEL_ENCODERS = {
-    'k104': IntList.to_string,
-    'k105': IntList.to_string,
-    'k109': IntList.to_string,
-    'k110': IntList.to_string,
+    'k104': lambda x: x.to_string(),
+    'k105': lambda x: x.to_string(),
+    'k109': lambda x: x.to_string(),
+    'k110': lambda x: x.to_string(),
     'k15': lambda x: str(int(x)),
     'k34': str,
     'k4': str,
-    'k88': IntList.to_string,
-    'k91': IntList.to_string,
+    'k88': lambda x: x.to_string(),
+    'k91': lambda x: x.to_string(),
 }
 
 
@@ -37,5 +37,5 @@ LIST_DECODERS = {
 
 LIST_ENCODERS = {
     'k15': lambda x: str(int(x)),
-    'k96': IntList.to_string,
+    'k96': lambda x: x.to_string(),
 }

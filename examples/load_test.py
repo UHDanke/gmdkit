@@ -7,5 +7,5 @@ from gmdkit.models.object import ObjectList
 
 
 test_level = LevelPack.from_file('d:/Downloads/Chill Dash.gmdl')
-
-test_level.to_file('d:/Downloads/')
+test_dict = test_level.to_plist()
+test_level.to_file('d:/Downloads/test.gmdl')

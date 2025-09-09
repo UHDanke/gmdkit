@@ -116,20 +116,20 @@ def read_plist(node):
 
 def write_plist_elem(parent, value):
     
-    if isinstance(value, int):
+    if isinstance(value, bool) and value:
+        ET.SubElement(parent, "t")
+        
+    elif isinstance(value, int):
         ET.SubElement(parent, "i").text = str(value)
     
     elif isinstance(value, float):
         ET.SubElement(parent, "r").text = str(value)
     
     elif isinstance(value, str):
-        ET.SubElement(parent, "s").text = value
-    
-    elif isinstance(value, bool) and value:
-        ET.SubElement(parent, "t")
+        ET.SubElement(parent, "s").text = str(value)
     
     elif isinstance(value, (dict, list, tuple)):
-        write_plist(value, ET.SubElement(parent, "d"))
+        write_plist(ET.SubElement(parent, "d"),value)
     
     elif value is None:
         pass
@@ -192,6 +192,7 @@ def from_plist_file(path:str|PathLike):
 
 def to_plist_file(data:dict|list|tuple, path:str|PathLike):
     
+    #print(data)
     root = ET.Element("plist", version="1.0", gjver="2.0")
    
     dict_elem = ET.SubElement(root, "dict")
@@ -215,7 +216,7 @@ def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None):
             
         elif default is not None and callable(default):
             value = default(value)
-            
+        
         return (key,value)
             
     return cast_func
@@ -260,14 +261,15 @@ class PlistDecoderMixin:
             fkwargs:dict=None
             ) -> Any:
         
-        encoder = encoder or self.ENCODER
+        encoder = encoder or self.ENCODER or (lambda x: x)
         plist_format = plist_format or self.PLIST_FORMAT
         fkwargs = fkwargs or {}
         
         if encoder is None or not callable(encoder) or plist_format is None or not callable(plist_format):
             return self
         
-        new = plist_format(data, encoder, **fkwargs)
+        new = plist_format(self, encoder, **fkwargs)
+        #print(new)
         
         return new
     
@@ -282,7 +284,7 @@ class PlistDecoderMixin:
     
     def to_file(self, path:str|PathLike, **kwargs):
             
-        data = self.to_plist(self, **kwargs)
+        data = self.to_plist(**kwargs)
         
         to_plist_file(data, path)
     
@@ -302,7 +304,7 @@ class PlistDecoderMixin:
         return to_plist_string(data)
 
 
-dict_formatter = lambda data, func, **kwargs: {k: v for k, v in (func(k, v) for k, v in data.items())}
+dict_formatter = lambda data, func, **kwargs: {k: v for k, v in (func(k, v, **kwargs) for k, v in data.items())}
 
 class PlistDictDecoderMixin(PlistDecoderMixin):
     
@@ -312,7 +314,7 @@ class PlistDictDecoderMixin(PlistDecoderMixin):
     SELF_FORMAT = staticmethod(dict_formatter)
 
 
-list_formatter = lambda data, func, **kwargs: [encoder(v,**kwargs) for v in data]
+list_formatter = lambda data, func, **kwargs: [func(v,**kwargs) for v in data]
 
 class PlistArrayDecoderMixin(PlistDecoderMixin):
     
@@ -481,7 +483,7 @@ class ArrayDecoderMixin:
     
     SEPARATOR = ','
     GROUP_SIZE = 1
-    ENCODER = serialize
+    ENCODER = staticmethod(serialize)
     DECODER = None
         
     @classmethod
@@ -529,5 +531,5 @@ class ArrayDecoderMixin:
         
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER or str
-            
+        
         return separator.join([encoder(x) for x in self])
