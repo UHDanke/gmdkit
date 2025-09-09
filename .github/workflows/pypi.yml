@@ -1,32 +1,37 @@
-name: Publish to PyPI
+name: Publish Python Package
 
 on:
   push:
     tags:
-      - "v*"   # run only when you push a version tag like v1.2.3
+      - "v*"  # Runs on tags like v1.2.3
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install build backend
+      # 3. Install build tools and setuptools-scm
+      - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install build
+          pip install build setuptools wheel setuptools-scm
 
-      - name: Build wheel and sdist
+      # 4. Build wheel and sdist (version taken from git tag)
+      - name: Build package
         run: python -m build
 
-      - name: Publish package to PyPI
+      # 5. Publish to PyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.9.0
         with:
           user: __token__
