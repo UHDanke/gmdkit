@@ -1,32 +1,48 @@
-name: Build Docs
+name: Build and Deploy Docs
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: [ main ]   # build docs on push to main
+  workflow_dispatch:     # allow manual trigger
 
 jobs:
-  build-docs:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for setuptools-scm to detect tags
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      # Step 3: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install sphinx sphinx-rtd-theme setuptools setuptools-scm
-      
+          
       - name: Install package for autodoc
         run: |
           python -m pip install -e .
       
-      - name: Build HTML docs
+      # Step 4: Build the docs
+      - name: Build HTML documentation
         run: |
           cd docs
           make html
+
+      # Step 5: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}   # or use PAT: ${{ secrets.PERSONAL_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs/build/html
+          keep_files: true
