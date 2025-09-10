@@ -41,7 +41,7 @@ jobs:
       contents: read
     environment:
       name: PyPi
-      url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
+      url: https://pypi.org/project/gmdkit/${{ github.event.release.name }}
 
     steps:
       - name: Retrieve release distributions
