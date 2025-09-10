@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gmdkit"
+dynamic = ["version"]
 description = "A toolkit for handling Geometry Dash level data."
 readme = "README.md"
 license = { text = "MIT" }
