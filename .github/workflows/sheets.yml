@@ -1,0 +1,37 @@
+name: Update CSVs from Google Sheets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download-sheets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download CSVs from Google Sheets
+        run: |
+          echo '${{ secrets.SHEET_CONFIG }}' > config.json
+
+          # Loop through the array of dicts
+          jq -c '.[]' config.json | while read row; do
+            sheet_id=$(echo "$row" | jq -r '.sheet_id')
+            gid=$(echo "$row" | jq -r '.gid')
+            filename=$(echo "$row" | jq -r '.filename')
+
+            echo "Downloading sheet_id=$sheet_id gid=$gid → $filename"
+            curl -s -L \
+              "https://docs.google.com/spreadsheets/d/$sheet_id/export?format=csv&gid=$gid" \
+              -o "$filename"
+          done
+        shell: bash
+        
+      - name: Commit and push changes
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git add data/csv/*.csv
+          git commit -m "Update CSVs from Google Sheets" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
