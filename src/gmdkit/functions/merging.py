@@ -108,7 +108,7 @@ def replace_ids(
             
 def get_ids(
         obj:Object,
-        rule_dict:Dict[Any,RULE_FORMAT]=ID_RULES
+        rule_dict:dict[Any,RULE_FORMAT]=ID_RULES
         ) -> Iterable[ID_FORMAT]:
     """
     Compiles unique ID data referenced by an object.
@@ -299,8 +299,8 @@ def compile_ids(ids:Iterable[ID_FORMAT]):
 def regroup(
         level_list:LevelList,
         ids:Iterable[ID_FORMAT]=ID_LIST,
-        ignore_ids:Dict[str,Iterable]=IGNORE_IDS, 
-        reserved_ids:Dict[str,Iterable]=None,
+        ignore_ids:dict[str,Iterable]=IGNORE_IDS, 
+        reserved_ids:dict[str,Iterable]=None,
         ignore_spawn_remaps:bool=False,
         remap_all:bool=False
         ):
@@ -313,9 +313,9 @@ def regroup(
         DESCRIPTION.
     ids : ID_FORMAT, optional
         DESCRIPTION. The default is ID_LIST.
-    ignore_ids : Dict[str,Iterable], optional
+    ignore_ids : dict[str,Iterable], optional
         DESCRIPTION. The default is IGNORE_IDS.
-    reserved_ids : Dict[str,Iterable], optional
+    reserved_ids : dict[str,Iterable], optional
         DESCRIPTION. The default is None.
     ignore_spawn_remaps : bool, optional
         DESCRIPTION. The default is False.
