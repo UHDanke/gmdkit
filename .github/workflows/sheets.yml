@@ -23,12 +23,12 @@ jobs:
           pip install requests numpy pandas
 
       - name: Download CSVs from Google Sheets
-        run: python build/download_sheets.py
+        run: python scripts/download_sheets.py
         env:
           SHEETS_JSON: ${{ secrets.SHEETS_JSON }}
 
       - name: Run post-processing script
-        run: python build/build_files.py
+        run: python scripts/build_files.py
 
       - name: Commit and push changes
         run: |
