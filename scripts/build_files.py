@@ -156,7 +156,7 @@ def encode_level_props(gd_type, gd_format, key):
 
 
 # Open property table
-prop_table = pd.read_csv("../data/csv/prop_table.csv")
+prop_table = pd.read_csv("data/csv/prop_table.csv")
 #prop_table['sort_key'] = prop_table['id'].map(sort_id)
 #print(prop_table['sort_key'] )
 #prop_table = prop_table.sort_values(by='sort_key').reset_index(drop=True)
@@ -178,7 +178,7 @@ prop_class = (
 prop_class = prop_class.where(pd.notnull(prop_class), None)
 
 # Write casting/object_properties.py
-file = LineWriter(path="../src/gmdkit/casting/object_props.py")
+file = LineWriter(path="src/gmdkit/casting/object_props.py")
 file.write("""
 # Package Imports
 from gmdkit.models.prop.string import TextString
@@ -215,13 +215,13 @@ root = tree()
 build_tree(root, aliases)
 
 # Write mappings/object_properties.py
-file = LineWriter(path="../src/gmdkit/mappings/object_props.py")
+file = LineWriter(path="src/gmdkit/mappings/object_props.py")
 file.write("class prop_id:")
 file.write(*render_tree(root, indent=1))
 file.close()
 
 # Open level table
-level_table = pd.read_csv("../data/csv/level_table.csv")
+level_table = pd.read_csv("data/csv/level_table.csv")
 #level_table['sort_key'] = level_table['id'].map(sort_id)
 #level_table = level_table.sort_values(by='sort_key').reset_index(drop=True)
 #level_table = level_table.drop(columns=['sort_key'])
@@ -259,7 +259,7 @@ list_class = (
 
 level_class = level_class.where(pd.notnull(level_class), None)
 # Write casting/level_properties.py
-file = LineWriter(path="../src/gmdkit/casting/level_props.py")
+file = LineWriter(path="src/gmdkit/casting/level_props.py")
 file.write("""
 # Package Imports
 from gmdkit.models.prop.list import IntList
@@ -308,13 +308,13 @@ root = tree()
 build_tree(root, aliases)
 
 # Write mappings/object_properties.py
-file = LineWriter(path="../src/gmdkit/mappings/level_props.py")
+file = LineWriter(path="src/gmdkit/mappings/level_props.py")
 file.write("class lvl_id:")
 file.write(*render_tree(root, indent=1))
 file.close()
 
 # Open object id table
-obj_id_table = pd.read_csv("../data/csv/object_table.csv")
+obj_id_table = pd.read_csv("data/csv/object_table.csv")
 
 
 obj_alias_ids = obj_id_table[['id','alias']]
@@ -326,13 +326,13 @@ build_tree(obj_root, obj_aliases)
 
 
 # Write mappings/object_ids.py
-file = LineWriter(path="../src/gmdkit/mappings/object_ids.py")
+file = LineWriter(path="src/gmdkit/mappings/object_ids.py")
 file.write("class obj_id:")
 file.write(*render_tree(obj_root, indent=1))
 file.close()
 
 
-remap_table = pd.read_csv("../data/csv/remap_table.csv")
+remap_table = pd.read_csv("data/csv/remap_table.csv")
 
 def convert_condition(data):
     
@@ -378,7 +378,7 @@ for _, row in remap_table.iterrows():
     entry = row.drop(labels='object_id').to_dict()
     result[obj_id].append(entry)
     
-file = LineWriter(path="../src/gmdkit/casting/id_rules.py")
+file = LineWriter(path="src/gmdkit/casting/id_rules.py")
 file.write("""
 # Package Imports
 from gmdkit.mappings import obj_id, prop_id, color_prop
