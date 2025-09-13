@@ -12,6 +12,7 @@ from gmdkit.models.serialization import PlistDictDecoderMixin, dict_cast, decode
 
 LOCALPATH = Path(getenv("LOCALAPPDATA")) / "GeometryDash"
 
+
 class LevelSave(PlistDictDecoderMixin, DictClass):
     
     DECODER = staticmethod(dict_cast({"LLM_01": LevelList.from_plist,"LLM_03": LevelPackList.from_plist}, key_kwargs=True))   

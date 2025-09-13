@@ -5,7 +5,7 @@ from gmdkit.models.prop.color import Color
 from gmdkit.models.object import ObjectList, Object
 
 
-def create_color_triggers(level:Level, offset_x:float=0, offset_y:float=-30, color_filter:callable=None) -> ObjectList:
+def create_color_triggers(level:Level, pos_x:float=0, pos_y:float=0, offset_x:float=0, offset_y:float=-30, color_filter:callable=None) -> ObjectList:
     """
     Converts a level's default colors into color triggers.
 
@@ -40,7 +40,8 @@ def create_color_triggers(level:Level, offset_x:float=0, offset_y:float=-30, col
         
     pool = ObjectList()
     
-    x = y = 0
+    x = pos_x
+    y = pos_y
     
     if (colors := level.start.get(prop_id.level.colors)) is not None:
         
@@ -77,3 +78,7 @@ def create_color_triggers(level:Level, offset_x:float=0, offset_y:float=-30, col
     
     
     return pool
+        
+        
+        
+        
