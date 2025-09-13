@@ -103,7 +103,7 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
         fkwargs.setdefault('load', load_levels)
         fkwargs.setdefault('load_keys', load_keys)
         
-        return super.from_plist(data, **kwargs)
+        return super().from_plist(data, **kwargs)
         
     
     def to_plist(self, path:str|PathLike, save_levels:bool=True, save_keys:Iterable=None, **kwargs):
@@ -111,7 +111,5 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
         fkwargs = kwargs.setdefault('fkwargs', {})
         fkwargs.setdefault('save', save_levels)
         fkwargs.setdefault('save_keys', save_keys)
-        
-        kwargs.setdefault('fkwargs', {}).setdefault('save', save)
 
         super().to_plist(path, **kwargs)

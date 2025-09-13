@@ -204,7 +204,7 @@ def to_plist_file(data:dict|list|tuple, path:str|PathLike):
     tree.write(path, xml_declaration=True)
 
 
-def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None):
+def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None, key_kwargs:bool=False):
     
     def cast_func(key:str, value:Any, **kwargs):
         
@@ -212,6 +212,9 @@ def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None):
             key = int(key)
         
         if (func:=dictionary.get(key)) is not None and callable(func):
+            
+            if key_kwargs: kwargs = kwargs.get(key, {})
+                
             value = func(value, **kwargs)
             
         elif default is not None and callable(default):
