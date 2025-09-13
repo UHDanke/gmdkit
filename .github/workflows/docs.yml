@@ -34,6 +34,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install sphinx sphinx-rtd-theme setuptools setuptools-scm
 
+      - name: Generate API docs
+        run: |
+          cd docs
+          sphinx-apidoc -o source/api ../src/gmdkit
+
       - name: Build HTML documentation
         run: |
           cd docs
