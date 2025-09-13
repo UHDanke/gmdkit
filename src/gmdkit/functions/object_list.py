@@ -4,8 +4,8 @@ from collections.abc import Callable
 from statistics import mean, median
 
 # Package Imports
-from level_tools.mappings import prop_id, color_id, obj_id, color_prop
-from level_tools.classes.object import ObjectList, Object
+from gmdkit.mappings import prop_id, color_id, obj_id, color_prop
+from gmdkit.models.object import ObjectList, Object
 
 
 def clean_gid_parents(obj_list:ObjectList) -> None:
