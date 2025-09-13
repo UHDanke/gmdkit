@@ -26,7 +26,7 @@ jobs:
       - name: Download CSVs from Google Sheets
         run: python scripts/download_sheets.py
         env:
-          SHEETS_JSON: ${{ variable.SHEETS_JSON }}
+          SHEETS_JSON: ${{ vars.SHEETS_JSON }}
 
       - name: Run post-processing script
         run: python scripts/build_files.py
