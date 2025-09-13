@@ -42,6 +42,8 @@ jobs:
         run: |
           cd docs
           sphinx-build -b html source ../site
+        env:
+          LOCALAPPDATA: /tmp
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
