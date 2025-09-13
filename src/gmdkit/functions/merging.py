@@ -7,7 +7,7 @@ from collections.abc import Iterable
 
 # Package Imports
 from gmdkit.mappings import prop_id, color_id, obj_id, color_prop
-from gmdkit.casting import ID_RULES, filter_rules
+from gmdkit.casting.id_rules import ID_RULES, filter_rules
 from gmdkit.models.level import Level, LevelList
 from gmdkit.models.object import ObjectList, Object
 import gmdkit.functions.object as obj_func
