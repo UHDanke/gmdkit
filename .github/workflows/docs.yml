@@ -36,8 +36,7 @@ jobs:
 
       - name: Generate API docs
         run: |
-          cd docs
-          sphinx-apidoc -o source/api ../src/gmdkit
+          sphinx-apidoc -f -o docs/source/api src/gmdkit
 
       - name: Build HTML documentation
         run: |
