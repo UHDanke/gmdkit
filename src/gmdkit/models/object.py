@@ -15,7 +15,7 @@ class Object(DictDecoderMixin,DictClass):
     
     SEPARATOR = ","
     DECODER = staticmethod(dict_cast(PROPERTY_DECODERS,numkey=True))
-    ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,numkey=True,default=serialize))
+    ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,default=serialize))
     DEFAULTS = OBJECT_DEFAULT
     
     def __init__(self, *args, **kwargs):

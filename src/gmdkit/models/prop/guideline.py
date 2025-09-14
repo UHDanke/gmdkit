@@ -13,8 +13,8 @@ class Guideline(DataclassDecoderMixin):
     SEPARATOR = "~"
     LIST_FORMAT = True
     
-    color: int
-    time: float
+    color: int = 0
+    time: float = 0
     
 Guideline.DECODER = dict_cast(get_type_hints(Guideline))
 

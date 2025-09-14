@@ -207,7 +207,7 @@ def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None, key_kwa
     
     def cast_func(key:str, value:Any, **kwargs):
         
-        if numkey and key.isdigit():
+        if numkey and isinstance(key, str) and key.isdigit():
             key = int(key)
         
         if (func:=dictionary.get(key)) is not None and callable(func):
@@ -218,6 +218,8 @@ def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None, key_kwa
             
         elif default is not None and callable(default):
             value = default(value)
+        
+        if not numkey: key = str(key)
         
         return (key,value)
             
@@ -409,12 +411,12 @@ class DataclassDecoderMixin:
     def to_string(
             self, 
             separator:str=None, 
-            dict_format:bool=None, 
+            list_format:bool=None, 
             encoder:Callable[[str,Any],str]=None
             ) -> str:
         
         separator = separator or self.SEPARATOR
-        dict_format = dict_format or self.DICT_FORMAT
+        list_format = list_format or self.LIST_FORMAT
         encoder = encoder or self.ENCODER
         
         parts = []
@@ -424,18 +426,17 @@ class DataclassDecoderMixin:
             key = field.name
             value = getattr(self, key, None)
             
-            key, value = encoder(field.name, gettattr(self,key))
+            key, value = encoder(field.name, getattr(self,key))
             
-            if dict_format:
-                string = separator.join((key,value))
-            else:
+            if list_format:
                 string = value
+            else:
+                string = separator.join((key,value))
             
             parts.append(string)
             
         return separator.join(parts)
 
-import inspect
 
 class DictDecoderMixin:
 

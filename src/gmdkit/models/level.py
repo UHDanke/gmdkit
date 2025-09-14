@@ -27,8 +27,8 @@ LEVEL_DEFAULT = {
 
 class Level(PlistDictDecoderMixin,DictClass):
     
-    DECODER = staticmethod(dict_cast(LEVEL_DECODERS, numkey=True))
-    ENCODER = staticmethod(dict_cast(LEVEL_ENCODERS, numkey=True))
+    DECODER = staticmethod(dict_cast(LEVEL_DECODERS))
+    ENCODER = staticmethod(dict_cast(LEVEL_ENCODERS))
     
     
     def __init__(self, *args, load:bool=False, load_keys:Iterable=None,**kwargs):

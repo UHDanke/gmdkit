@@ -124,7 +124,7 @@ class ListClass(list):
         print(new_list)  # Output: [2, 4, 6]
 
         """        
-        f_kw = filter_kwargs(*conditions, **kwargs)
+        f_kw = filter_kwargs(*functions, **kwargs)
             
         for i, item in enumerate(self):
             for function, nkwargs in f_kw:
