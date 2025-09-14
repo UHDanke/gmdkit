@@ -18,6 +18,14 @@ extensions = [
     "sphinx.ext.autosummary",
 ]
 
+autodoc_default_options = {
+    'members': True,            # include class/method members
+    'undoc-members': True,      # include members without docstrings
+    'inherited-members': True,
+    'show-inheritance': True,
+    'exclude-members': '__dict__,__weakref__',  # skip huge defaults
+}
+
 autosummary_generate = True
 
 templates_path = ['_templates']
