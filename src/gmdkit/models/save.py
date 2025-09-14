@@ -11,6 +11,8 @@ from gmdkit.models.serialization import PlistDictDecoderMixin, dict_cast, decode
 
 
 LOCALPATH = Path(getenv("LOCALAPPDATA")) / "GeometryDash"
+LOCALLEVELSPATH = LOCALPATH / "CCLocalLevels.dat"
+GAMEMANAGERPATH = LOCALPATH / "CCGameManager.dat"
 
 
 class LevelSave(PlistDictDecoderMixin, DictClass):
@@ -19,24 +21,26 @@ class LevelSave(PlistDictDecoderMixin, DictClass):
     ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))
     
     @classmethod
-    def from_file(cls, path:str|PathLike=None, **kwargs):
-        
-        if path is None:
-            path = LOCALPATH / "CCLocalLevels.dat"
-            
+    def from_file(cls, path:str|PathLike=LOCALLEVELSPATH, encoded:bool=True, **kwargs):
+                    
         with open(path, "r") as file:
-            string = decode_save(file.read())
+            
+            string = file.read()
+            
+            if encoded: string = decode_save(string)
+            
             return super().from_string(string, **kwargs)
     
     
     @classmethod
-    def to_file(self, path:str|PathLike=None, **kwargs):
-        
-        if path is None:
-            path = LOCALPATH / "CCLocalLevels.dat"
-            
+    def to_file(self, path:str|PathLike=LOCALLEVELSPATH, encoded:bool=True, **kwargs):
+                    
         with open(path, "w") as file:
-            string = encode_save(super().to_string(**kwargs))
+            
+            string = super().to_string(**kwargs)
+            
+            if encoded: string = encode_save(string)
+            
             file.write(string)
     
     
@@ -60,6 +64,31 @@ class LevelSave(PlistDictDecoderMixin, DictClass):
 
         super().to_plist(path, **kwargs)
     
+
+class GameSave(PlistDictDecoderMixin, DictClass):
+
+    @classmethod
+    def from_file(cls, path:str|PathLike=GAMEMANAGERPATH, encoded:bool=True, **kwargs):
+                    
+        with open(path, "r") as file:
+            
+            string = file.read()
+            
+            if encoded: string = decode_save(string)
+            
+            return super().from_string(string, **kwargs)
+    
+    
+    @classmethod
+    def to_file(self, path:str|PathLike=GAMEMANAGERPATH, encoded:bool=True, **kwargs):
+                    
+        with open(path, "w") as file:
+            
+            string = super().to_string(**kwargs)
+            
+            if encoded: string = encode_save(string)
+            
+            file.write(string)
             
             
 if __name__ == "__main__":
@@ -68,3 +97,7 @@ if __name__ == "__main__":
     binary = level_data['LLM_02']
     lists = level_data['LLM_03']
     
+    game_data = GameSave.from_file()
+    for data in game_data["GLM_01"]:
+        new_level = Level.from_plist(data)
+        new_level.to_file("D:/Downloads/official_levels/")

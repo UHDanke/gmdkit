@@ -22,7 +22,7 @@ class ObjectString(GzipString):
             if instance is not None:
                 instance.start = start
                 instance.objects = objects
-            
+                
             return start, objects
         
         return Object(), ObjectList()

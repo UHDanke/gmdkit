@@ -31,8 +31,8 @@ def decode_string(string:str) -> str:
     base64_decoded = base64.urlsafe_b64decode(string.encode())
     
     decompressed = gzip.decompress(base64_decoded)
-        
-    return decompressed.decode()
+    
+    return decompressed.decode("utf-8",errors='replace')
 
 
 def encode_string(string:str) -> str:
@@ -192,7 +192,6 @@ def from_plist_file(path:str|PathLike):
 
 def to_plist_file(data:dict|list|tuple, path:str|PathLike):
     
-    #print(data)
     root = ET.Element("plist", version="1.0", gjver="2.0")
    
     dict_elem = ET.SubElement(root, "dict")
@@ -272,7 +271,6 @@ class PlistDecoderMixin:
             return self
         
         new = plist_format(self, encoder, **fkwargs)
-        #print(new)
         
         return new
     
