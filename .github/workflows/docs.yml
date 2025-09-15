@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints autodoc-dataclass setuptools setuptools-scm
+          pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints setuptools setuptools-scm
 
       - name: Generate API docs
         run: |
