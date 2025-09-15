@@ -1,7 +1,7 @@
 # GMD Toolkit
 
 ![PyPI](https://img.shields.io/pypi/v/gmdkit?style=flat-square)
-![Python](https://img.shields.io/pypi/pyversions/projectname?style=flat-square)
+![Python](https://img.shields.io/pypi/pyversions/gmdkit?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
 Python toolkit for modifying & creating Geometry Dash plist files, including gmd, gmdl and the encoded dat format.
