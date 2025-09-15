@@ -16,9 +16,28 @@ Python toolkit for modifying & creating Geometry Dash plist files, including gmd
 
 # Installation
 
+Install the latest release from PyPI:
+
+```bash
+pip install projectname
+```
+
+Install the latest development version from GitHub:
+
+```bash
+pip install git+https://github.com/yourusername/reponame.git
+```
+
+Clone and install in editable mode:
+
+```bash
+git clone https://github.com/yourusername/reponame.git
+cd reponame
+pip install -e .
+```
+
 # Basic Usage
 
-Basic usage:
 ```python
 # import level
 from gmdkit.models.level import Level
