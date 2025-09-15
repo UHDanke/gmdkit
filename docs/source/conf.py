@@ -16,6 +16,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
+    "sphinx_autodoc_typehints",
+    "autodoc_dataclass"
 ]
 
 autodoc_default_options = {
