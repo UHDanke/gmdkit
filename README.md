@@ -38,11 +38,13 @@ pip install -e .
 
 ## Basic Usage
 
+Importing, modifying a level and saving it:
+
 ```python
 # import level
 from gmdkit.models.level import Level
-# import object property mappings
-from gmdkit.mappings import prop_id
+# import property mappings
+from gmdkit.mappings import prop_id, lvl_id
 # import object functions
 import gmdkit.functions.object as obj_func
 
@@ -59,8 +61,11 @@ obj_list = level.objects
 after_origin = obj_list.where(lambda obj: obj.get(prop_id.x, 0) > 0)
 
 # apply functions, kwargs are filtered for each called function
-# ex: obj_func.fix_lighter has replacement as a key argument
+# ex: obj_func.fix_lighter has 'replacement' as a key argument
 after_origin.apply(obj_func.clean_duplicate_groups, obj_func.fix_lighter, replacement=0)
+
+# export level
+level.to_file("example.gmd")
 ```
 
 ## Documentation
