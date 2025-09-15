@@ -1,4 +1,12 @@
-TODO README
+# GMDkit Documentation
+
+> [!WARNING]
+> 
+
+> [!NOTICE]
+> Editing levels does not ensure safe round-trip if nothing was changed, the library does not save objects in the same way GD does (different order, duplicates).
+> If you do not want to modify any objects, use ``load=False``.
+
 
 THIS LIBRARY IS NOT FULLY TESTED, DO NOT EDIT LEVELS WITHOUT BACKUPS.
 
