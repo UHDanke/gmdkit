@@ -147,7 +147,7 @@ class GlobedScript:
             tail:bytes=None
             ):
         
-        self.object = obj
+        self.object = text_object
         self.prefix = prefix
         self.main = main
         self.filename = filename
