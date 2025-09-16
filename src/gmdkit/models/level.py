@@ -50,12 +50,6 @@ class Level(PlistDictDecoderMixin,DictClass):
         
         return super().to_plist(**kwargs)
 
-    
-    @property
-    def object_string(self):
-        
-        return decode_string(self.get(lvl_id.level.object_string))
-        
         
     def load(self, keys:Iterable=None, copy_attributes:bool=True):
         
@@ -120,19 +114,19 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     
         
     @classmethod
-    def from_plist(cls, data, load_levels:bool=False, load_keys:Iterable=None,**kwargs):
+    def from_plist(cls, data, load:bool=False, load_keys:Iterable=None,**kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
-        fkwargs.setdefault('load', load_levels)
+        fkwargs.setdefault('load', load)
         fkwargs.setdefault('load_keys', load_keys)
         
         return super().from_plist(data, **kwargs)
         
     
-    def to_plist(self, path:str|PathLike, save_levels:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable=None, **kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
-        fkwargs.setdefault('save', save_levels)
+        fkwargs.setdefault('save', save)
         fkwargs.setdefault('save_keys', save_keys)
 
         super().to_plist(path, **kwargs)

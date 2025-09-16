@@ -17,7 +17,7 @@ GAMEMANAGERPATH = LOCALPATH / "CCGameManager.dat"
 
 class LevelSave(PlistDictDecoderMixin, DictClass):
     
-    DECODER = staticmethod(dict_cast({"LLM_01": LevelList.from_plist,"LLM_03": LevelPackList.from_plist}, key_kwargs=True))   
+    DECODER = staticmethod(dict_cast({"LLM_01": LevelList.from_plist,"LLM_03": LevelPackList.from_plist}))   
     ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))
     
     @classmethod
@@ -45,22 +45,20 @@ class LevelSave(PlistDictDecoderMixin, DictClass):
     
     
     @classmethod
-    def from_plist(cls, data, load_levels:bool=False, load_keys:Iterable=None,**kwargs):
+    def from_plist(cls, data, load:bool=False, load_keys:Iterable=None,**kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
-        lvl_kwargs = fkwargs.setdefault('LLM_01',{})
-        lvl_kwargs.setdefault('load_levels', load_levels)
-        lvl_kwargs.setdefault('load_keys', load_keys)
+        fkwargs.setdefault('load', load)
+        fkwargs.setdefault('load_keys', load_keys)
         
         return super().from_plist(data, **kwargs)
         
     
-    def to_plist(self, path:str|PathLike, save_levels:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable=None, **kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
-        lvl_kwargs = fkwargs.setdefault('LLM_01',{})
-        lvl_kwargs.setdefault('save_levels', save_levels)
-        lvl_kwargs.setdefault('save_keys', save_keys)
+        fkwargs.setdefault('save', save)
+        fkwargs.setdefault('save_keys', save_keys)
 
         super().to_plist(path, **kwargs)
     
