@@ -21,7 +21,7 @@ def decode_obj_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'base64':
-                    return 'decode_text_data'
+                    return 'decode_text'
                 
                 case 'hsv':
                     return 'HSV.from_string'
@@ -64,7 +64,7 @@ def encode_obj_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'base64':
-                    return 'encode_text_data'
+                    return 'encode_text'
                 
                 case 'hsv':
                     return 'lambda x: x.to_string()'
