@@ -22,8 +22,8 @@ LEVEL_ENCODERS = {
     'k109': lambda x: x.to_string(),
     'k110': lambda x: x.to_string(),
     'k15': lambda x: str(int(x)),
-    'k34': str,
-    'k4': str,
+    'k34': lambda x: x.save(),
+    'k4': lambda x: x.save(),
     'k88': lambda x: x.to_string(),
     'k91': lambda x: x.to_string(),
 }
