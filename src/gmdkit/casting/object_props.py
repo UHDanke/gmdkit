@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.models.prop.string import decode_text_data, encode_text_data
+from gmdkit.models.prop.string import decode_text, encode_text
 from gmdkit.models.prop.list import IDList, IntPairList, RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
