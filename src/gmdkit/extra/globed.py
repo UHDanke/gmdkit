@@ -6,16 +6,11 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.models.prop.string import TextString
 from gmdkit.mappings import prop_id, obj_id
+
 
 MAGIC = b'\xc4\x19\x7b\xfa'
 PREFIX = "GLOBED_SCRIPT"
-
-
-
-import zstandard as zstd
-import struct
 
 
 def check_magic(data:bytes):
@@ -170,8 +165,9 @@ class GlobedScript:
         
     def load(self):
         try:
-            string = self.object.get(prop_id.text.data)                
-            pre, main, fn, content, sig, tail = decode_script(string.to_bytes())
+            string = self.object.get(prop_id.text.data)
+            string_bytes = string.encode("utf-8", errors="surrogateescape")              
+            pre, main, fn, content, sig, tail = decode_script(string_bytes)
             self.prefix = pre
             self.main = main
             self.filename = fn
@@ -185,7 +181,7 @@ class GlobedScript:
     
     def save(self):
         try:
-            data = encode_script(
+            string_bytes = encode_script(
                 prefix=self.prefix,
                 is_main=self.main,
                 filename=self.filename,
@@ -194,7 +190,7 @@ class GlobedScript:
                 tail=self.tail
                 )
             
-            string = TextString().from_bytes(data)
+            string = string_bytes.decode("utf-8", errors="surrogateescape")
             self.object[prop_id.text.data] = string
             
         except Exception as e:

@@ -21,7 +21,7 @@ def decode_obj_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'base64':
-                    return 'TextString.decode_string'
+                    return 'decode_text_data'
                 
                 case 'hsv':
                     return 'HSV.from_string'
@@ -64,7 +64,7 @@ def encode_obj_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'base64':
-                    return 'lambda x: x.encode_string()'
+                    return 'encode_text_data'
                 
                 case 'hsv':
                     return 'lambda x: x.to_string()'
@@ -181,7 +181,7 @@ prop_class = prop_class.where(pd.notnull(prop_class), None)
 file = LineWriter(path="src/gmdkit/casting/object_props.py")
 file.write("""
 # Package Imports
-from gmdkit.models.prop.string import TextString
+from gmdkit.models.prop.string import decode_text_data, encode_text_data
 from gmdkit.models.prop.list import IDList, IntPairList, RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
