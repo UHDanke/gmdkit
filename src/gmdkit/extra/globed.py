@@ -156,7 +156,7 @@ class GlobedScript:
         self.tail = tail
         
         if self.object is None:
-            new_obj = Object.default(obj_id.text)
+            self.object = Object.default(obj_id.text)
             self.save()
             
         else:
