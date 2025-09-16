@@ -12,17 +12,30 @@ version = release
 
 # -- General configuration ---------------------------------------------------
 extensions = [
-    "sphinx.ext.autodoc",      # pull in docstrings
-    "sphinx.ext.napoleon",     # Google/Numpy style docstrings
-    "sphinx.ext.viewcode",     # links to highlighted source
-    "sphinx.ext.autosummary",  # generates API index
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
+    "sphinx_autodoc_typehints",
 ]
 
-autosummary_generate = True   # auto-generate .rst files from docstrings
+autodoc_default_options = {
+    'members': True,            # include class/method members
+    'undoc-members': True,      # include members without docstrings
+    'inherited-members': True,
+    'show-inheritance': True,
+    'exclude-members': '__dict__,__weakref__',  # skip huge defaults
+}
+
+autosummary_generate = True
 
 templates_path = ['_templates']
 exclude_patterns = []
 language = 'en'
+
+add_module_names = False
+autodoc_typehints = "description"
+python_use_unqualified_type_names = True
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
