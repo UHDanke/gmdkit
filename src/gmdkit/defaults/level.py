@@ -1,0 +1,9 @@
+LEVEL_DEFAULT = {
+    'kCEK': 4,
+    'k4': 'H4sIAAAAAAAACqWT0W3EMAxDF3IBUZITB_26GW4ADnAr3PCNzAD9SZEU9yPGIfUiGcjrGaOBaXTCO4PeOwGJS_Qy-QUuhJlxJYheZdA4iDc4Eeb3EPgcsZ0iKqOGWxBn9Z-B_nUl-_lzRp4ysPnvQp5XC_U_F9LNYBTIrjDLBeb2BZ8t1V4PRLOSLlkk2faq53VWP3ydMEqescmbVZxpPHJWuTCFlHLFXAlfGypuEkh8igvlooS8kBcaLQVLwbKrXV6EkinR-KHv1Z9Wsk3BsYX6_BgXGn6X7x_T2S7pmwMAAA==',
+    'k13': True,
+    'k21': 2,
+    'k16': 1,
+    'k50': 45,
+    'k47': True
+    }
