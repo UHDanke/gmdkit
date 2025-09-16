@@ -248,12 +248,3 @@ if __name__ == "__main__":
     example_script = """function hello_world()\n\tprint("Hello, world!")\nend\n\nhello_world()"""
 
     binary = encode_script(filename="hello.lua", content=example_script)
-    import base64
-
-    base_64 = base64.urlsafe_b64encode(binary).decode()
-
-    decoded = decode_script(binary)
-    
-    globed = b'R0xPQkVEX1NDUklQVADEGXv6IwAAACi1L_0gIxkBAAAKAHNjcmlwdC5sdWERAAAALS0gWW91ciBjb2RlIGhlcmUA'
-    
-    globed_decode = decode_script(base64.urlsafe_b64decode(globed))
