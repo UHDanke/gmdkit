@@ -207,7 +207,7 @@ class GlobedScript:
             self.content = file.read()
         
         if include_name:
-            self.filename = Path(path).name
+            self.filename = str(Path(path).name)
     
     
     def export_script(self, path:str|PathLike, extension:str="lua"):
