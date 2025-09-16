@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.models.prop.string import TextString
+from gmdkit.models.prop.string import decode_text_data, encode_text_data
 from gmdkit.models.prop.list import IDList, IntPairList, RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
@@ -35,7 +35,7 @@ PROPERTY_DECODERS = {
     28: float,
     29: float,
     30: int,
-    31: TextString.decode_string,
+    31: decode_text_data,
     32: float,
     34: lambda x: bool(int(x)),
     35: float,
@@ -633,7 +633,7 @@ PROPERTY_ENCODERS = {
     15: lambda x: str(int(x)),
     16: lambda x: str(int(x)),
     17: lambda x: str(int(x)),
-    31: lambda x: x.encode_string(),
+    31: encode_text_data,
     34: lambda x: str(int(x)),
     36: lambda x: str(int(x)),
     41: lambda x: str(int(x)),
