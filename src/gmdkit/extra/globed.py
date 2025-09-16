@@ -6,7 +6,7 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.models.prop.text import EncodedString
+from gmdkit.models.prop.string import TextString
 from gmdkit.mappings import prop_id, obj_id
 
 MAGIC = b'\xc4\x19\x7b\xfa'
@@ -59,7 +59,7 @@ def decode_script(data:bytes):
     j += 4
     content = mv[j:j+content_size].tobytes().decode("utf-8")
     j += content_size
-    print(mv[j:].tobytes())
+    
     has_signature = bool(mv[j])
     j += 1
     
@@ -134,65 +134,50 @@ def encode_script(
     result.extend(compressed)
     
     return result
-
-
-def is_text_object(obj:Object):
-    
-    if not isinstance(obj, dict):
-        raise ValueError(f"Object is of type <{type(obj)}>, not a dict-like object.")
-    
-    if (val:=obj.get(prop_id.id)) != obj_id.text:
-        raise ValueError(f"Object ID {val} is not a text object {obj_id.text}")
-    
-    return True
         
            
 class GlobedScript:
     
-    __slots__ = ("bytes","object","prefix","main","filename","content","signature","tail")
+    __slots__ = ("object","prefix","main","filename","content","signature","tail")
     
     
-    def __init__(self, obj:Object=None):
+    def __init__(
+            self,
+            text_object:Object=None, 
+            prefix:str=PREFIX, 
+            main:bool=False, 
+            filename:str=None, 
+            content:str=None,
+            signature:bytes=None, 
+            tail:bytes=None
+            ):
         
-        self.bytes: bytes = None
-        self.object: Object = obj
-        self.prefix: str = None
-        self.main: str = None
-        self.filename: str = None
-        self.content: str = None
-        self.signature: bytes = None
-        self.tail: bytes = None
-        
-        if self.object is not None:
-            self.load()
-        
-    
-    def decode(self):
-        pre, main, fn, content, sig, tail = decode_script(self.bytes)
-        self.prefix = pre
+        self.object = obj
+        self.prefix = prefix
         self.main = main
-        self.filename = fn
+        self.filename = filename
         self.content = content
-        self.signature  = sig
+        self.signature = signature
         self.tail = tail
         
-    def encode(self):
-        data = encode_script(
-            prefix=self.prefix,
-            is_main=self.main,
-            filename=self.filename,
-            content=self.content,
-            signature=self.signature,
-            tail=self.tail
-            )
-        self.bytes = data
-
+        if self.object is None:
+            new_obj = Object.default(obj_id.text)
+            self.save()
+            
+        else:
+            self.load()
+        
+        
     def load(self):
         try:
-            is_text_object(self.object)
-            string = self.object.get(prop_id.text.data)
-            self.bytes = string.to_bytes()
-            self.decode()
+            string = self.object.get(prop_id.text.data)                
+            pre, main, fn, content, sig, tail = decode_script(string.to_bytes())
+            self.prefix = pre
+            self.main = main
+            self.filename = fn
+            self.content = content
+            self.signature  = sig
+            self.tail = tail
     
         except Exception as e:
             raise RuntimeError(f"Error while loading script data: {e}") from e
@@ -200,16 +185,23 @@ class GlobedScript:
     
     def save(self):
         try:
-            is_text_object(self.object)
-            self.encode()
-            string = EncodedString().from_bytes(self.bytes)
+            data = encode_script(
+                prefix=self.prefix,
+                is_main=self.main,
+                filename=self.filename,
+                content=self.content,
+                signature=self.signature,
+                tail=self.tail
+                )
+            
+            string = TextString().from_bytes(data)
             self.object[prop_id.text.data] = string
             
         except Exception as e:
             raise RuntimeError(f"Error while saving script data to object: {e}") from e
 
 
-    def import_script(self, path:str|PathLike, include_name:bool=False):
+    def import_script(self, path:str|PathLike, include_name:bool=True):
         
         with open(path,"r") as file:
             self.content = file.read()
