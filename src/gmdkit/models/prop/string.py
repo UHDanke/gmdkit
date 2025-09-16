@@ -33,18 +33,23 @@ class TextString(StrClass):
         return self.encode("utf-8", errors="surrogateescape")
     
     
-class GzipString(StrClass):
+class GzipString:
     
-    __slots__ = ()
+    __slots__ = ("string")
     
-    def decompress(self) -> str:
+    
+    def __init__(self, string:str=""):
         
-        return decode_string(self)
+        self.string = string
+    
+    def load(self) -> str:
         
-    def compress(self, string) -> None:
+        return decode_string(self.string)
+        
+    def save(self, string) -> None:
         
         new = encode_string(string)
         
-        self[:] = new
+        self.string = new
 
-        return new
+        return self.string

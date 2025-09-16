@@ -5,60 +5,48 @@ from gmdkit.models.object import Object, ObjectList
 
 class ObjectString(GzipString):
     
-    __slots__ = ()
-    
-    
-    def decompress(self, instance=None):
+    def load(self):
         
-        string = super().decompress()
+        string = super().load()
         
         obj_list = ObjectList.from_string(string)
         
         if obj_list:
             
-            start = obj_list.pop(0)
-            objects = obj_list
-            
-            if instance is not None:
-                instance.start = start
-                instance.objects = objects
-                
-            return start, objects
+            self.start = obj_list.pop(0)
+            self.objects = obj_list
         
         return Object(), ObjectList()
     
         
-    def compress(self, instance=None, start=None, objects=None):
+    def save(self, start=None, objects=None):
         
-        start = (None if instance is None else getattr(instance, "start", None)) or start
-        objects = (None if instance is None else getattr(instance, "objects", None)) or objects
+        start = start or getattr(self, "start", None)
+        objects =  objects or getattr(self, "objects", None)
         
         if start is None or objects is None:
             return None
     
-        string = (ObjectList(start) + objects).to_string()
+        string = (ObjectList((start,)) + objects).to_string()
         
-        return super().compress(string)
+        return super().save(string)
 
 
 class ReplayString(GzipString):
     
-    __slots__ = ()
-    
-    def decompress(self, instance=None):
+    def load(self, instance=None):
         
-        string = super().decompress()
+        string = super().load()
         
-        if instance is not None:
-            instance.replay_data = string
+        self.replay_data = string
             
-    def compress(self, instance=None, replay_data=None):
+    def save(self, replay_data=None):
         
-        replay_data = (None if instance is None else getattr(instance, "replay_data", None)) or replay_data
+        replay_data = replay_data or getattr(self, "replay_data", None)
         
         if replay_data is None:
             return None
         
         string = replay_data
         
-        return super().compress(string)
+        return super().save(string)

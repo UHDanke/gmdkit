@@ -98,6 +98,3 @@ if __name__ == "__main__":
     lists = level_data['LLM_03']
     
     game_data = GameSave.from_file()
-    for data in game_data["GLM_01"]:
-        new_level = Level.from_plist(data)
-        new_level.to_file("D:/Downloads/official_levels/")

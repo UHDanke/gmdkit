@@ -146,7 +146,7 @@ def encode_level_props(gd_type, gd_format, key):
                     return 'lambda x: x.to_string()'
                 
                 case 'gzip':
-                    return 'str'
+                    return 'lambda x: x.save()'
                 
                 case _: 
                     return

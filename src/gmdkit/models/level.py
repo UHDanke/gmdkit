@@ -48,7 +48,7 @@ class Level(PlistDictDecoderMixin,DictClass):
         
         if save: self.save(keys=save_keys)
         
-        super().to_plist(**kwargs)
+        return super().to_plist(**kwargs)
 
     
     @property
@@ -57,7 +57,7 @@ class Level(PlistDictDecoderMixin,DictClass):
         return decode_string(self.get(lvl_id.level.object_string))
         
         
-    def load(self, keys:Iterable=None):
+    def load(self, keys:Iterable=None, copy_attributes:bool=True):
         
         keys = keys or self.keys()
         
@@ -66,7 +66,16 @@ class Level(PlistDictDecoderMixin,DictClass):
             value = self.get(key)
             
             if issubclass(type(value), GzipString):
-                value.decompress(instance=self)            
+                value.load()
+                
+                if not copy_attributes: continue
+                
+                for attr, value in vars(value).items():
+                    
+                    if attr.startswith("_"): continue
+                    if attr == "string": continue
+                    
+                    setattr(self, attr, value)
     
             
     def save(self, keys:Iterable=None):
@@ -82,7 +91,8 @@ class Level(PlistDictDecoderMixin,DictClass):
             value = self.get(key)
                         
             if issubclass(type(value), GzipString):
-                self[key] = value.compress(instance=self)
+                value.save()
+        
     
     @classmethod
     def default(cls, name:str,load:bool=True):

@@ -1,5 +1,5 @@
 # Imports
-from typing import Self
+from typing import Self, Callable
 from os import PathLike
 
 # Package Imports
@@ -18,24 +18,30 @@ class Object(DictDecoderMixin,DictClass):
     ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,default=serialize))
     DEFAULTS = OBJECT_DEFAULT
     
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-    @classmethod
-    def from_string(cls, string, key_format:dict=None) -> Self:
-        try:      
-            return super().from_string(string.rstrip(";"))
-        except:
-            raise ValueError
     
-    def to_string(self, key_format:dict=None) -> str:
+    @classmethod
+    def from_string(cls, string, **kwargs) -> Self:
         
-        return super().to_string(encoder=key_format) + ";"
+        return super().from_string(string=string.rstrip(";"), **kwargs)
+    
+    
+    def to_string(self, **kwargs) -> str:
+        
+        return super().to_string(**kwargs) + ";"
+
 
     @classmethod
-    def default(cls, object_id) -> Self:
+    def default(cls, object_id:int, decoder:Callable=None) -> Self:
         
-        return cls(cls.DEFAULTS.get(object_id,{}))
+        decoder = decoder or cls.DECODER
+        
+        data = cls.DEFAULTS.get(object_id,{})
+        
+        return cls(decoder(k, v) for k, v in data.items())
 
 
 class ObjectList(ArrayDecoderMixin,ListClass):
@@ -52,22 +58,17 @@ class ObjectList(ArrayDecoderMixin,ListClass):
     
     
     @classmethod
-    def from_string(cls, string, encoded:bool=False, key_format:dict=None):
+    def from_string(cls, string, encoded:bool=False, **kwargs):
         
         if encoded:
             string = decode_string(string)
-        
-        if key_format:
-            decoder = lambda string: Object.from_string(string,key_format=key_format) 
-        else:
-            decoder = cls.DECODER
             
-        return super().from_string(string.strip(";"),decoder=decoder)
+        return super().from_string(string.strip(";"), **kwargs)
 
 
-    def to_string(self, encoded:bool=False, key_format:dict=None) -> str:
+    def to_string(self, encoded:bool=False, **kwargs) -> str:
                 
-        string = "".join([obj.to_string(key_format=key_format) for obj in self])
+        string = super().to_string(separator="", **kwargs)
         
         if encoded:
             string = encode_string(string)
