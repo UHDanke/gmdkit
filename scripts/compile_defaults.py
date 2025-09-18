@@ -1,5 +1,5 @@
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.mappings import obj_id, prop_id
+from gmdkit.mappings import obj_id, obj_prop
 
 
 pool = ObjectList.from_file("../data/txt/default.txt")
@@ -7,14 +7,14 @@ pool = ObjectList.from_file("../data/txt/default.txt")
 
 def clean_obj(obj):
     
-    obj.pop(prop_id.color_1_index,None)
-    obj.pop(prop_id.color_2_index,None)
+    obj.pop(obj_prop.COLOR_1_INDEX,None)
+    obj.pop(obj_prop.COLOR_2_INDEX,None)
     
-    if prop_id.x in obj:
-        obj[prop_id.x] = 0
+    if obj_prop.X in obj:
+        obj[obj_prop.X] = 0
     
-    if prop_id.y in obj:
-        obj[prop_id.y] = 0
+    if obj_prop.Y in obj:
+        obj[obj_prop.Y] = 0
         
     for k,v in obj.items():
         if isinstance(v,(int,bool,float)):
@@ -22,9 +22,9 @@ def clean_obj(obj):
         else:
             obj[k] = str(v)
     
-    if obj.get(prop_id.id) == obj_id.particle_object:
+    if obj.get(obj_prop.ID) == obj_id.PARTICLE_OBJECT:
         
-        obj[prop_id.particle.data] = "30a-1a1a0.3a30a90a90a29a0a11a0a0a0a0a0a0a0a2a1a0a0a1a0a1a0a1a0a1a0a1a1a0a0a1a0a1a0a1a0a1a0a0a0a0a0a0a0a0a0a0a0a0a2a1a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0"
+        obj[obj_prop.particle.DATA] = "30a-1a1a0.3a30a90a90a29a0a11a0a0a0a0a0a0a0a2a1a0a0a1a0a1a0a1a0a1a0a1a1a0a0a1a0a1a0a1a0a1a0a0a0a0a0a0a0a0a0a0a0a0a2a1a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0"
         
         
 pool.apply(clean_obj)
@@ -33,10 +33,10 @@ pool.apply(clean_obj)
 default = dict()
 
 for obj in pool:
-    obj_id = obj.get(1)
-    default.setdefault(obj_id,dict())
+    object_id = obj.get(obj_prop.ID)
+    default.setdefault(object_id, dict())
     
-    default[obj_id].update(obj)
+    default[object_id].update(obj)
 
 
 lines = list()
