@@ -63,8 +63,8 @@ start = level.start
 # object lists subclass list() so they can use all list methods alongside the ones defined by ListClass
 # level.objects WILL throw AttributeError() if the level lacks an object string,
 # or if you passed load = False to Level.from_file(), which skips loading objects
-# LevelSave by default passes load = False to the level class,
-# so any level you want to work on the object string must call level.load() first
+# LevelSave by default does not load the objects of levels
+# so for any level you want to edit the objects of you must call level.load() first
 obj_list = level.objects
 
 # filter by condition
