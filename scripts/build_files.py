@@ -1,6 +1,6 @@
 import pandas as pd
 
-from scripts.build_utils import *
+from build_utils import *
 
 # Map CSV types to library types
 def decode_obj_props(gd_type, gd_format, key):
