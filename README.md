@@ -68,7 +68,7 @@ after_origin.apply(obj_func.clean_duplicate_groups, obj_func.fix_lighter, replac
 level.to_file("example.gmd")
 ```
 
-## Documentation
+## Documentation (WIP)
 
-You can find the documentation here:
+You can find the work-in-progress documentation here:
 https://UHDanke.github.io/gmdkit/
