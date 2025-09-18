@@ -1,0 +1,14 @@
+red = 7
+green = 8
+blue = 9
+duration = 10
+tint_ground = 14
+player_1 = 15
+player_2 = 16
+blending = 17
+channel = 23
+opacity = 35
+hsv = 49
+copy_id = 50
+copy_opacity = 60
+disable_legacy_hsv = 210

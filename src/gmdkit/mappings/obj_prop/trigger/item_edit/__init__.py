@@ -1,0 +1,14 @@
+target_item_id = 51
+item_id_1 = 80
+item_id_2 = 95
+item_type_1 = 476
+item_type_2 = 477
+item_type_3 = 478
+mod = 479
+item_op_1 = 480
+item_op_2 = 481
+item_op_3 = 482
+round_op_1 = 485
+round_op_2 = 486
+sign_op_1 = 578
+sign_op_2 = 579

@@ -1,0 +1,15 @@
+red = 7
+green = 8
+blue = 9
+fade_in = 45
+hold = 46
+fade_out = 47
+use_hsv = 48
+hsv = 49
+copy_id = 50
+target_id = 51
+target_type = 52
+main_only = 65
+detail_only = 66
+exclusive = 86
+disable_static_hsv = 210

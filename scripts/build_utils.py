@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from pathlib import Path
 
 # idk why it doesnt work
 def sort_id(s):
@@ -43,39 +44,28 @@ def build_tree(root, aliases):
         node[parts[-1]] = val
 
 
-def render_tree(node, indent=0):
-    lines = []
-    indent_str = '    ' * indent
-    
-    
-    val_keys = [k for k, v in node.items() if not isinstance(v, defaultdict)]
-    dd_keys = [k for k, v in node.items() if isinstance(v, defaultdict)]
-    
-    def sort_key(k):
-        v = node[k]
-        if isinstance(v, int):
-            return (0, v)
-        if isinstance(v, str) and v.isdigit():
-            return (0, int(v))
-        return (1, str(v))
-    
-    
-    for key in sorted(val_keys, key=sort_key):
-        val = node[key]
-        
-        lines.append(f"{indent_str}{key} = {repr(val)}")
+def render_tree(node, base_path) -> None:
+    base_path = Path(base_path)
+    base_path.mkdir(parents=True, exist_ok=True)
 
-    for key in sorted(dd_keys):
+    # Separate leaves (values) and nested modules
+    val_keys = [k for k, v in node.items() if not isinstance(v, dict)]
+    dict_keys = [k for k, v in node.items() if isinstance(v, dict)]
+
+    # Write __init__.py
+    init_lines = []
+    for key in val_keys:
         val = node[key]
-        lines.append('')
-        lines.append(f"{indent_str}class {key}:")
-        children = render_tree(val, indent + 1)
-        if children:
-            lines.extend(children)
-        else:
-            lines.append(f"{indent_str}    pass")
-            
-    return lines
+        init_lines.append(f"{key} = {repr(val)}")
+
+    for key in dict_keys:
+        init_lines.append(f"from . import {key}")
+
+    (base_path / "__init__.py").write_text("\n".join(init_lines) + "\n")
+
+    # Recursively write submodules
+    for key in dict_keys:
+        render_tree(node[key], base_path / key)
 
 
 def dict_repr(d, keys):

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from build_utils import *
+from scripts.build_utils import *
 
 # Map CSV types to library types
 def decode_obj_props(gd_type, gd_format, key):
@@ -215,10 +215,7 @@ root = tree()
 build_tree(root, aliases)
 
 # Write mappings/object_properties.py
-file = LineWriter(path="src/gmdkit/mappings/object_props.py")
-file.write("class prop_id:")
-file.write(*render_tree(root, indent=1))
-file.close()
+render_tree(root, "src/gmdkit/mappings/obj_prop/")
 
 # Open level table
 level_table = pd.read_csv("data/csv/level_table.csv")
@@ -307,11 +304,8 @@ aliases = dict(zip(alias_ids['alias'],alias_ids['id']))
 root = tree()
 build_tree(root, aliases)
 
-# Write mappings/object_properties.py
-file = LineWriter(path="src/gmdkit/mappings/level_props.py")
-file.write("class lvl_id:")
-file.write(*render_tree(root, indent=1))
-file.close()
+# Write level mappings
+render_tree(root, "src/gmdkit/mappings/lvl_prop/")
 
 # Open object id table
 obj_id_table = pd.read_csv("data/csv/object_table.csv")
@@ -325,11 +319,8 @@ obj_root = tree()
 build_tree(obj_root, obj_aliases)
 
 
-# Write mappings/object_ids.py
-file = LineWriter(path="src/gmdkit/mappings/object_ids.py")
-file.write("class obj_id:")
-file.write(*render_tree(obj_root, indent=1))
-file.close()
+# Write mappings
+render_tree(obj_root, "src/gmdkit/mappings/obj_id/")
 
 
 remap_table = pd.read_csv("data/csv/remap_table.csv")

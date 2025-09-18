@@ -1,0 +1,9 @@
+_10 = 10
+target_id = 51
+activate_group = 56
+block_a = 80
+exit = 93
+block_b = 95
+player_1 = 138
+player_2 = 200
+between_players = 201

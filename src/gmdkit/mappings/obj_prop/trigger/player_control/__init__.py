@@ -1,0 +1,9 @@
+_58 = 58
+_59 = 59
+player_1 = 138
+_141 = 141
+player_2 = 200
+stop_jump = 540
+stop_move = 541
+stop_rotation = 542
+stop_slide = 543

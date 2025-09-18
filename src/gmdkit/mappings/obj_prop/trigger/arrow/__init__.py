@@ -1,0 +1,11 @@
+dir_y = 166
+dir_x = 167
+edit_velocity = 169
+change_channel = 171
+channel_only = 172
+target_channel = 173
+instant_offset = 368
+velocity_mod_x = 582
+velocity_mod_y = 583
+override_velocity = 584
+dont_slide = 585

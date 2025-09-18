@@ -1,0 +1,11 @@
+move = 3006
+rotate = 3007
+scale = 3008
+fade = 3009
+tint = 3010
+move_edit = 3011
+rotate_edit = 3012
+scale_edit = 3013
+fade_edit = 3014
+tint_edit = 3015
+stop = 3024

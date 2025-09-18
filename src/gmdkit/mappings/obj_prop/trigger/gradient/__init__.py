@@ -1,0 +1,15 @@
+blending = 174
+layer = 202
+u = 203
+bl = 203
+d = 204
+br = 204
+l = 205
+tl = 205
+r = 206
+tr = 206
+vertex_mode = 207
+disable = 208
+gradient_id = 209
+preview_opacity = 456
+disable_all = 508

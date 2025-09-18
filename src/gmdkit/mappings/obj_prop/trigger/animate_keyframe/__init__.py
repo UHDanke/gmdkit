@@ -1,0 +1,9 @@
+target_id = 51
+parent_id = 71
+animation_id = 76
+time_mod = 520
+pos_x_mod = 521
+rotation_mod = 522
+scale_x_mod = 523
+pos_y_mod = 545
+scale_y_mod = 546

@@ -1,0 +1,7 @@
+camera_x = 'kI1'
+camera_y = 'kI2'
+camera_zoom = 'kI3'
+build_tab_page = 'kI4'
+build_tab = 'kI5'
+build_tab_pages = 'kI6'
+layer = 'kI7'

@@ -1,0 +1,13 @@
+fade_only = 22
+fade_bottom = 23
+fade_top = 24
+fade_left = 25
+fade_right = 26
+scale_up = 27
+scale_down = 28
+chaotic = 55
+half_left = 56
+half_right = 57
+half = 58
+half_invert = 59
+no_fade = 1915

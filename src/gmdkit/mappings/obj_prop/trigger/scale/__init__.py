@@ -1,0 +1,12 @@
+duration = 10
+easing = 30
+target_id = 51
+center_id = 71
+ease_rate = 85
+only_move = 133
+scale_by_x = 150
+scale_by_y = 151
+div_by_x = 153
+div_by_y = 154
+relative_rotation = 452
+relative_scale = 577

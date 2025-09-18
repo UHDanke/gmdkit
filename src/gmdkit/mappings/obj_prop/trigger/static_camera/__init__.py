@@ -1,0 +1,9 @@
+easing = 30
+target_id = 71
+ease_rate = 85
+exit = 110
+follow_group = 212
+follow_easing = 213
+smooth_velocity = 453
+velocity_mod = 454
+exit_instant = 465

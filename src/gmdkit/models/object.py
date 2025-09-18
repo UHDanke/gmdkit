@@ -33,6 +33,18 @@ class Object(DictDecoderMixin,DictClass):
         
         return super().to_string(**kwargs) + ";"
 
+    
+    def update_decode(self, decoder:Callable=None, **kwargs) -> Self:
+        
+        decoder = decoder or self.DECODER
+        
+        if decoder is None or not callable(decoder):
+            return super().update(**kwargs)
+        
+        new = {k: v for k, v in (decoder(k, v, **kwargs) for k, v in kwargs.items())}
+        
+        return super().update(**new)
+
 
     @classmethod
     def default(cls, object_id:int, decoder:Callable=None) -> Self:
@@ -42,7 +54,8 @@ class Object(DictDecoderMixin,DictClass):
         data = cls.DEFAULTS.get(object_id,{})
         
         return cls(decoder(k, v) for k, v in data.items())
-
+    
+    
 
 class ObjectList(ArrayDecoderMixin,ListClass):
     

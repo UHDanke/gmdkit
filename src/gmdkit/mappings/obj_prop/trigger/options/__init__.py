@@ -1,0 +1,14 @@
+streak_additive = 159
+unlink_dual_gravity = 160
+hide_ground = 161
+hide_p1 = 162
+hide_p2 = 163
+disable_p1_controls = 165
+hide_mg = 195
+disable_controls_p1 = 199
+hide_attempts = 532
+edit_respawn_time = 573
+respawn_time = 574
+audio_on_death = 575
+disable_death_sfx = 576
+boost_slide = 593

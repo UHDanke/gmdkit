@@ -1,0 +1,11 @@
+particle_group = 51
+position_group = 71
+offset_x = 547
+offset_y = 548
+offvar_x = 549
+offvar_y = 550
+match_rot = 551
+rotation = 552
+rotation_rand = 553
+scale = 554
+scale_rand = 555

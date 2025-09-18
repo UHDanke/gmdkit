@@ -1,0 +1,11 @@
+yellow = 36
+blue = 84
+pink = 141
+green = 1022
+black = 1330
+red = 1333
+toggle = 1594
+dash_green = 1704
+dash_pink = 1751
+spider = 3004
+teleport = 3027
