@@ -44,7 +44,7 @@ Importing, modifying a level and saving it:
 # import level
 from gmdkit.models.level import Level
 # import property mappings
-from gmdkit.mappings import prop_id, lvl_id
+from gmdkit.mappings import obj_prop
 # import object functions
 import gmdkit.functions.object as obj_func
 
@@ -58,7 +58,7 @@ start = level.start
 obj_list = level.objects
 
 # filter by condition
-after_origin = obj_list.where(lambda obj: obj.get(prop_id.x, 0) > 0)
+after_origin = obj_list.where(lambda obj: obj.get(obj_prop.X, 0) > 0)
 
 # apply functions, kwargs are filtered for each called function
 # ex: obj_func.fix_lighter has 'replacement' as a key argument
