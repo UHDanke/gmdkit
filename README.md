@@ -59,7 +59,12 @@ level = Level.from_file("example.gmd")
 # get inner level properties
 start = level.start
 
-# get level objects
+# get level objects as an ObjectList()
+# object lists subclass list() so they can use all list methods alongside the ones defined by ListClass
+# level.objects WILL throw AttributeError() if the level lacks an object string,
+# or if you passed load = False to Level.from_file(), which skips loading objects
+# LevelSave by default passes load = False to the level class,
+# so any level you want to work on the object string must call level.load() first
 obj_list = level.objects
 
 # filter by condition
@@ -71,6 +76,8 @@ after_origin.apply(obj_func.clean_duplicate_groups, obj_func.fix_lighter, replac
 
 # create new object
 new_obj = Object.default(1)
+# set properties of object
+# objects subclass dict() so they can use all dict methods alongside the ones defined by DictClass
 new_obj.update(
   {
     obj_prop.X: 100,
