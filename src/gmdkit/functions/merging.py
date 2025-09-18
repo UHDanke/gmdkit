@@ -6,7 +6,7 @@ from typing import Any
 from collections.abc import Iterable
 
 # Package Imports
-from gmdkit.mappings import prop_id, color_id, obj_id, color_prop
+from gmdkit.mappings import obj_prop, color_prop
 from gmdkit.casting.id_rules import ID_RULES, filter_rules
 from gmdkit.models.level import Level, LevelList
 from gmdkit.models.object import ObjectList, Object
@@ -81,7 +81,7 @@ def replace_ids(
 
     """
     
-    rules = compile_rules(obj.get(prop_id.id,0),rule_dict=rule_dict)
+    rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
     
     for rule in rules:
         
@@ -140,7 +140,7 @@ def get_ids(
     """
     result = set()
 
-    rules = compile_rules(obj.get(prop_id.id,0),rule_dict=rule_dict)
+    rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
     
     for rule in rules:
 
@@ -169,7 +169,7 @@ def get_ids(
                 data = (
                     value,
                     rule.get('type','none'),
-                    (rule.get('remappable',False) and obj.get(prop_id.trigger.spawn_triggered,False)),
+                    (rule.get('remappable',False) and obj.get(obj_prop.trigger.SPAWN_TRIGGER,False)),
                     rule.get('min',-2**31),
                     rule.get('max',2**31-1)
                     )
@@ -428,14 +428,14 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
 def combine_levels(level_list:LevelList, override_colors:bool=True):
     
     main_level = level_list[0]
-    main_colors = main_level.start[prop_id.level.colors]
-    main_channels = main_colors.unique_values(lambda color: [color.get(color_prop.channel)])
+    main_colors = main_level.start[obj_prop.level.COLORS]
+    main_channels = main_colors.unique_values(lambda color: [color.get(color_prop.CHANNEL)])
 
     def delete_color(color_id):
         nonlocal main_colors
         main_colors[:] = [
             color for color in main_colors
-            if color.get(color_prop.channel) != color_id
+            if color.get(color_prop.CHANNEL) != color_id
         ]
         
         
@@ -443,11 +443,11 @@ def combine_levels(level_list:LevelList, override_colors:bool=True):
         
         main_level.objects += level.objects
         
-        colors = level.start[prop_id.level.colors]
-        group_colors = colors.where(lambda color: 1 <= color[color_prop.channel] <= 999)
+        colors = level.start[obj_prop.level.COLORS]
+        group_colors = colors.where(lambda color: 1 <= color[color_prop.CHANNEL] <= 999)
         
         for color in group_colors:
-            color_channel = color.get(color_prop.channel)
+            color_channel = color.get(color_prop.CHANNEL)
             
             if override_colors:
                 if color_channel in main_channels:

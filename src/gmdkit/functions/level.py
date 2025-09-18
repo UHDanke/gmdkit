@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.mappings import prop_id, color_id, obj_id, color_prop
+from gmdkit.mappings import obj_prop, color_id, obj_id, color_prop
 from gmdkit.models.level import Level
 from gmdkit.models.prop.color import Color
 from gmdkit.models.object import ObjectList, Object
@@ -25,31 +25,31 @@ def create_color_triggers(level:Level, pos_x:float=0, pos_y:float=0, offset_x:fl
     """
 
     mapping = {
-        color_prop.red: prop_id.trigger.color.red,
-        color_prop.green: prop_id.trigger.color.green,
-        color_prop.blue: prop_id.trigger.color.blue,
-        color_prop.blending: prop_id.trigger.color.blending,
-        color_prop.channel: prop_id.trigger.color.channel,
-        color_prop.copy_id: prop_id.trigger.color.copy_id,
-        color_prop.opacity: prop_id.trigger.color.opacity,
-        color_prop.hsv: prop_id.trigger.color.hsv,
-        color_prop.copy_opacity: prop_id.trigger.color.copy_opacity,
+        color_prop.RED: obj_prop.trigger.color.RED,
+        color_prop.GREEN: obj_prop.trigger.color.GREEN,
+        color_prop.BLUE: obj_prop.trigger.color.BLUE,
+        color_prop.BLENDING: obj_prop.trigger.color.BLENDING,
+        color_prop.CHANNEL: obj_prop.trigger.color.CHANNEL,
+        color_prop.COPY_ID: obj_prop.trigger.color.COPY_ID,
+        color_prop.OPACITY: obj_prop.trigger.color.OPACITY,
+        color_prop.HSV: obj_prop.trigger.color.HSV,
+        color_prop.COPY_OPACITY: obj_prop.trigger.color.COPY_OPACITY,
         }
     
-    filter_predefined = lambda color: color[color_prop.channel] not in [color_id.black, color_id.white, color_id.lighter, color_id.player_1, color_id.player_2]
+    filter_predefined = lambda color: color[color_prop.CHANNEL] not in [color_id.BLACK, color_id.WHITE, color_id.LIGHTER, color_id.PLAYER_1, color_id.PLAYER_2]
         
     pool = ObjectList()
     
     x = pos_x
     y = pos_y
     
-    if (colors := level.start.get(prop_id.level.colors)) is not None:
+    if (colors := level.start.get(obj_prop.level.COLORS)) is not None:
         
         color_filter = color_filter or filter_predefined
         
         for color in colors.where(color_filter):
             
-            obj = Object.default(obj_id.trigger.color)
+            obj = Object.default(obj_id.trigger.COLOR)
             
             pool.append(obj)
             
@@ -58,20 +58,20 @@ def create_color_triggers(level:Level, pos_x:float=0, pos_y:float=0, offset_x:fl
                 if color_key in color:
                     obj[obj_key] = color[color_key]
                 
-                match color.get(color_prop.copy_id):
+                match color.get(color_prop.COPY_ID):
                     case 1:
-                        obj[prop_id.trigger.color.player_1] = True
+                        obj[obj_prop.trigger.color.PLAYER_1] = True
                     
                     case 2:
-                        obj[prop_id.trigger.color.player_2] = True
+                        obj[obj_prop.trigger.color.PLAYER_2] = True
                     
                     case _:
                         pass
             
-            obj[prop_id.trigger.color.duration] = 0
+            obj[obj_prop.trigger.color.DURATION] = 0
             
-            obj[prop_id.x] = x
-            obj[prop_id.y] = y
+            obj[obj_prop.X] = x
+            obj[obj_prop.Y] = y
             
             x += offset_x
             y += offset_y

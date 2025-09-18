@@ -4,7 +4,7 @@ from typing import Any
 
 # Package Imports
 from gmdkit.models.object import Object
-from gmdkit.mappings import color_id, prop_id, obj_id
+from gmdkit.mappings import color_id, obj_prop, obj_id
     
 
 def clean_duplicate_groups(obj:Object) -> None:
@@ -22,9 +22,9 @@ def clean_duplicate_groups(obj:Object) -> None:
     None.
 
     """
-    if (groups:=obj.get(prop_id.groups)) is not None:
+    if (groups:=obj.get(obj_prop.GROUPS)) is not None:
         
-        obj[prop_id.groups][:] = set(groups)
+        obj[obj_prop.GROUPS][:] = set(groups)
 
 
 def clean_remaps(obj:Object) -> None:
@@ -42,8 +42,9 @@ def clean_remaps(obj:Object) -> None:
     None.
 
     """    
-    if obj.get(prop_id.id) == obj_id.trigger.spawn and (remaps:=obj.get(prop_id.trigger.spawn.remaps)) is not None:
+    if obj.get(obj_prop.ID) == obj_id.trigger.SPAWN and (remaps:=obj.get(obj_prop.trigger.spawn.REMAPS)) is not None:
         remaps.clean()
+
 
 def recolor_shaders(obj:Object) -> None:
     """
@@ -61,15 +62,15 @@ def recolor_shaders(obj:Object) -> None:
     """
     shader_triggers = [2904,2905,2907,2909,2910,2911,2912,2913,2914,2915,2916,2917,2919,2920,2921,2922,2923,2924]
     
-    if obj.get(prop_id.id) in shader_triggers:
+    if obj.get(obj_prop.ID) in shader_triggers:
         
-        if prop_id.color_1 not in obj:
+        if obj_prop.COLOR_1 not in obj:
             
-            obj[prop_id.color_1] = color_id.white
+            obj[obj_prop.COLOR_1] = color_id.WHITE
 
 
 
-def fix_lighter(obj:Object, replacement:int=color_id.white) -> None:
+def fix_lighter(obj:Object, replacement:int=color_id.WHITE) -> None:
     """
     Replaces the base lighter color of an object (which crashes the game) with another color.
 
@@ -85,9 +86,9 @@ def fix_lighter(obj:Object, replacement:int=color_id.white) -> None:
     None.
 
     """
-    if obj.get(prop_id.color_1) == color_id.lighter:
+    if obj.get(obj_prop.COLOR_1) == color_id.LIGHTER:
         
-        obj[prop_id.color_1] = replacement
+        obj[obj_prop.COLOR_1] = replacement
     
 
 def pop_zeros(obj:Object) -> None:
@@ -132,11 +133,11 @@ def offset_position(
     None.
 
     """
-    if obj.get(prop_id.x) is not None:
-        obj[prop_id.x] += offset_x
+    if obj.get(obj_prop.X) is not None:
+        obj[obj_prop.X] += offset_x
         
-    if obj.get(prop_id.y) is not None:
-        obj[prop_id.y] += offset_y
+    if obj.get(obj_prop.Y) is not None:
+        obj[obj_prop.Y] += offset_y
 
 
 def scale_position(
@@ -147,14 +148,14 @@ def scale_position(
         ) -> None:
     
     if not only_move:
-        obj[prop_id.scale_x] = obj.get(prop_id.scale_x, 1.00) * scale_x
-        obj[prop_id.scale_y] = obj.get(prop_id.scale_y, 1.00) * scale_y
+        obj[obj_prop.SCALE_X] = obj.get(obj_prop.SCALE_X, 1.00) * scale_x
+        obj[obj_prop.SCALE_Y] = obj.get(obj_prop.SCALE_Y, 1.00) * scale_y
     
-    if center_x is not None and (x:=obj.get(prop_id.x)) is not None:
-        obj[prop_id.x] = scale_x * (x - center_x)
+    if center_x is not None and (x:=obj.get(obj_prop.X)) is not None:
+        obj[obj_prop.X] = scale_x * (x - center_x)
      
-    if center_y is not None and (x:=obj.get(prop_id.x)) is not None:
-        obj[prop_id.y] = scale_y * (y - center_y)
+    if center_y is not None and (x:=obj.get(obj_prop.X)) is not None:
+        obj[obj_prop.Y] = scale_y * (y - center_y)
 
 
 def rotate_position(
@@ -165,28 +166,28 @@ def rotate_position(
         ):
     
     if not only_move:
-        skew_x = obj.get(prop_id.skew_x)
-        skew_y = obj.get(prop_id.skew_y)
+        skew_x = obj.get(obj_prop.SKEW_X)
+        skew_y = obj.get(obj_prop.SKEW_Y)
         
         if skew_x is None and skew_y is None:
-            obj[prop_id.rotation] = obj.get(prop_id.rotation,0) + angle
+            obj[obj_prop.ROTATION] = obj.get(obj_prop.ROTATION,0) + angle
         
         else:
-            obj[prop_id.skew_x] = skew_x or 0 + angle
-            obj[prop_id.skew_y] = skew_y or 0 + angle
+            obj[obj_prop.SKEW_X] = skew_x or 0 + angle
+            obj[obj_prop.SKEW_Y] = skew_y or 0 + angle
 
     if (
             center_x is not None and center_y is not None 
-            and (x:=obj.get(prop_id.x)) is not None 
-            and (y:=obj.get(prop_id.y)) is not None
+            and (x:=obj.get(obj_prop.X)) is not None 
+            and (y:=obj.get(obj_prop.Y)) is not None
             ):
         th = math.radians(angle)
 
         dx = x - center_x
         dy = y - center_y
 
-        obj[prop_id.x] = dx * math.cos(th) - dy * math.sin(th)
-        obj[prop_id.y] = dx * math.sin(th) + dy * math.cos(th)
+        obj[obj_prop.X] = dx * math.cos(th) - dy * math.sin(th)
+        obj[obj_prop.Y] = dx * math.sin(th) + dy * math.cos(th)
 
 
 def remap_keys(obj:Object, keys:int|str, value_map:dict[Any,Any]):
@@ -206,34 +207,34 @@ def delete_keys(obj:Object, keys:int|str):
             
 def to_user_coins(obj:Object) -> None:
     
-    if obj.get(prop_id.id) == 142:
+    if obj.get(obj_prop.ID) == obj_id.collectible.SECRET_COIN:
         
-        obj[prop_id.id] = obj_id.collectible.user_coin
+        obj[obj_prop.ID] = obj_id.collectible.USER_COIN
         
-        obj.pop(prop_id.trigger.collectible.coin.coin_id, None)
+        obj.pop(obj_prop.trigger.collectible.coin.COIN_ID, None)
 
 
 def fix_transform(obj) -> None:
 
-    if (scale_x:=obj.get(prop_id.scale_x,1.00)) < -1:
-        obj[prop_id.scale_x] = -scale_x
+    if (scale_x:=obj.get(obj_prop.SCALE_X,1.00)) < -1:
+        obj[obj_prop.SCALE_X] = -scale_x
         
-        if not (flip_x:=obj.get(prop_id.flip_x, False)):
-            obj[prop_id.flip_x] = not flip_x
+        if not (flip_x:=obj.get(obj_prop.FLIP_X, False)):
+            obj[obj_prop.FLIP_X] = not flip_x
         else:
-            obj.pop(prop_id.flip_x, None)
+            obj.pop(obj_prop.FLIP_X, None)
             
-    if (scale_y:=obj.get(prop_id.scale_y,1.00)) < -1:
-        obj[prop_id.scale_y] = -scale_y
+    if (scale_y:=obj.get(obj_prop.SCALE_Y,1.00)) < -1:
+        obj[obj_prop.SCALE_Y] = -scale_y
         
-        if not (flip_y:=obj.get(prop_id.flip_y, False)):
-            obj[prop_id.flip_y] = not flip_y
+        if not (flip_y:=obj.get(obj_prop.FLIP_y, False)):
+            obj[obj_prop.FLIP_y] = not flip_y
         else:
-            obj.pop(prop_id.flip_y, None)
+            obj.pop(obj_prop.FLIP_Y, None)
     
-    skew_x = obj.get(prop_id.skew_x,0) % 360
-    skew_y = obj.get(prop_id.skew_y,0) % 360
-    rotation = obj.get(prop_id.rotation,0) % 360
+    skew_x = obj.get(obj_prop.SKEW_X,0) % 360
+    skew_y = obj.get(obj_prop.SKEW_Y,0) % 360
+    rotation = obj.get(obj_prop.ROTATION,0) % 360
     
     if skew_x == skew_y:
         rotation += skew_x
@@ -248,15 +249,15 @@ def fix_transform(obj) -> None:
         rotation = 0
     
     if skew_x == skew_y == 0:
-        obj.pop(prop_id.skew_x, None)
-        obj.pop(prop_id.skew_y, None)
+        obj.pop(obj_prop.SKEW_X, None)
+        obj.pop(obj_prop.SKEW_Y, None)
     else:
-        obj[prop_id.skew_x] = skew_x
-        obj[prop_id.skew_y] = skew_y
+        obj[obj_prop.SKEW_X] = skew_x
+        obj[obj_prop.SKEW_Y] = skew_y
         
     if rotation == 0:
-        obj.pop(prop_id.rotation, None)
+        obj.pop(obj_prop.ROTATION, None)
     else:
-        obj[prop_id.rotation] = rotation
+        obj[obj_prop.ROTATION] = rotation
     
 

@@ -12,7 +12,7 @@ from gmdkit.models.prop.string import GzipString
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS
 from gmdkit.defaults.level import LEVEL_DEFAULT
-from gmdkit.mappings import lvl_id
+from gmdkit.mappings import lvl_prop
 
 
 class Level(PlistDictDecoderMixin,DictClass):
@@ -39,7 +39,7 @@ class Level(PlistDictDecoderMixin,DictClass):
         path = Path(path)
         
         if not path.suffix:
-            path = (path / self[lvl_id.level.name]).with_suffix('.' + extension.lstrip('.'))
+            path = (path / self[lvl_prop.level.NAME]).with_suffix('.' + extension.lstrip('.'))
             
         super().to_file(path=path, save=save, save_keys=save_keys, **kwargs)
 
@@ -92,7 +92,7 @@ class Level(PlistDictDecoderMixin,DictClass):
     def default(cls, name:str,load:bool=True):
         
         data = LEVEL_DEFAULT.copy()        
-        data[lvl_id.level.name] = name
+        data[lvl_prop.level.NAME] = name
         
         kwargs = {}
         kwargs["load"] = load

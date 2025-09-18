@@ -6,7 +6,7 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.mappings import prop_id, obj_id
+from gmdkit.mappings import obj_prop, obj_id
 
 
 MAGIC = b'\xc4\x19\x7b\xfa'
@@ -156,7 +156,7 @@ class GlobedScript:
         self.tail = tail
         
         if self.object is None:
-            self.object = Object.default(obj_id.text)
+            self.object = Object.default(obj_id.TEXT)
             self.save()
             
         else:
@@ -165,7 +165,7 @@ class GlobedScript:
         
     def load(self):
         try:
-            string = self.object.get(prop_id.text.data)
+            string = self.object.get(obj_prop.text.DATA)
             string_bytes = string.encode("utf-8", errors="surrogateescape")              
             pre, main, fn, content, sig, tail = decode_script(string_bytes)
             self.prefix = pre
@@ -191,7 +191,7 @@ class GlobedScript:
                 )
             
             string = string_bytes.decode("utf-8", errors="surrogateescape")
-            self.object[prop_id.text.data] = string
+            self.object[obj_prop.text.DATA] = string
             
         except Exception as e:
             raise RuntimeError(f"Error while saving script data to object: {e}") from e
@@ -223,10 +223,10 @@ def get_globed_scripts(obj_list:ObjectList):
     
     for obj in ObjectList:
         
-        if obj_id.text != obj.get(prop_id.id):
+        if obj_id.TEXT != obj.get(obj_prop.ID):
             continue
         
-        string = obj.get(prop_id.text.data)
+        string = obj.get(obj_prop.text.DATA)
         
         if string is None:
             continue

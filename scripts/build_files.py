@@ -372,7 +372,7 @@ for _, row in remap_table.iterrows():
 file = LineWriter(path="src/gmdkit/casting/id_rules.py")
 file.write("""
 # Package Imports
-from gmdkit.mappings import obj_id, prop_id, color_prop
+from gmdkit.mappings import obj_id, obj_prop, color_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 """.strip())
 file.write(*[""]*2)
