@@ -43,8 +43,13 @@ Importing, modifying a level and saving it:
 ```python
 # import level
 from gmdkit.models.level import Level
+
+# import object
+from gmdkit.models.object import Object
+
 # import property mappings
 from gmdkit.mappings import obj_prop
+
 # import object functions
 import gmdkit.functions.object as obj_func
 
@@ -64,6 +69,21 @@ after_origin = obj_list.where(lambda obj: obj.get(obj_prop.X, 0) > 0)
 # ex: obj_func.fix_lighter has 'replacement' as a key argument
 after_origin.apply(obj_func.clean_duplicate_groups, obj_func.fix_lighter, replacement=0)
 
+# create new object
+new_obj = Object.default(1)
+new_obj.update(
+  {
+    obj_prop.X: 100,
+    obj_prop.Y: 200,
+    obj_prop.SCALE_X: 2,
+    obj_prop.SCALE_Y: 2
+  }
+)
+
+# append object to the level's object list
+# can also be done directly to level.objects or level[lvl_prop.level.OBJECT_STRING].objects (which level.objects references)
+obj_list.append(new_obj)
+    
 # export level
 level.to_file("example.gmd")
 ```
