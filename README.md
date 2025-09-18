@@ -81,7 +81,8 @@ new_obj.update(
 )
 
 # append object to the level's object list
-# can also be done directly to level.objects or level[lvl_prop.level.OBJECT_STRING].objects (which level.objects references)
+# can also be done directly to level.objects or level['k4'].objects (which level.objects references)
+# lvl_prop.level.OBJECT_STRING also maps to 'k4'
 obj_list.append(new_obj)
     
 # export level
