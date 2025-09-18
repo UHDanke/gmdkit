@@ -70,5 +70,6 @@ level.to_file("example.gmd")
 
 ## Documentation (WIP)
 
-You can find the work-in-progress documentation here:
+You can find the work-in-progress documentation at:  
+
 https://UHDanke.github.io/gmdkit/
