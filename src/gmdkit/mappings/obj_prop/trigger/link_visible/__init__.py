@@ -1,1 +1,1 @@
-group_id = 51
+GROUP_ID = 51

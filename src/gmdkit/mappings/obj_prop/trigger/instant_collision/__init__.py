@@ -1,7 +1,7 @@
-true_id = 51
-false_id = 71
-block_a = 80
-block_b = 95
-player_1 = 138
-player_2 = 200
-between_players = 201
+TRUE_ID = 51
+FALSE_ID = 71
+BLOCK_A = 80
+BLOCK_B = 95
+PLAYER_1 = 138
+PLAYER_2 = 200
+BETWEEN_PLAYERS = 201

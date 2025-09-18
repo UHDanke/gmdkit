@@ -1,5 +1,5 @@
-yellow = 35
-blue = 67
-pink = 140
-red = 1332
-spider = 3005
+YELLOW = 35
+BLUE = 67
+PINK = 140
+RED = 1332
+SPIDER = 3005

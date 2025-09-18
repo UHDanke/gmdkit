@@ -1,2 +1,2 @@
-target_id = 51
-animation_id = 76
+TARGET_ID = 51
+ANIMATION_ID = 76

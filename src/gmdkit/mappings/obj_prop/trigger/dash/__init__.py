@@ -1,5 +1,5 @@
-speed = 586
-collide = 587
-end_boost = 588
-stop_slide = 589
-max_duration = 590
+SPEED = 586
+COLLIDE = 587
+END_BOOST = 588
+STOP_SLIDE = 589
+MAX_DURATION = 590

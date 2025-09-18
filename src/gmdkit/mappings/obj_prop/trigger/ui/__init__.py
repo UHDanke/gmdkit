@@ -1,6 +1,6 @@
-group_id = 51
-ui_target = 71
-ref_x = 385
-ref_y = 386
-relative_x = 387
-relative_y = 388
+GROUP_ID = 51
+UI_TARGET = 71
+REF_X = 385
+REF_Y = 386
+RELATIVE_X = 387
+RELATIVE_Y = 388

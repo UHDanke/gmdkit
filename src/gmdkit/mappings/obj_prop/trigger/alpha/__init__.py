@@ -1,3 +1,3 @@
-duration = 10
-opacity = 35
-group_id = 51
+DURATION = 10
+OPACITY = 35
+GROUP_ID = 51

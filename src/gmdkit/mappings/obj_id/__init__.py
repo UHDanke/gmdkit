@@ -1,7 +1,7 @@
-level_start = 0
-text = 914
-item_label = 1615
-particle_object = 2065
+LEVEL_START = 0
+TEXT = 914
+ITEM_LABEL = 1615
+PARTICLE_OBJECT = 2065
 from . import portal
 from . import trigger
 from . import pad

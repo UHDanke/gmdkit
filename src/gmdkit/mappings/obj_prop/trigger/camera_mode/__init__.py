@@ -1,4 +1,4 @@
-free_mode = 111
-edit_settings = 112
-easing = 113
-padding = 114
+FREE_MODE = 111
+EDIT_SETTINGS = 112
+EASING = 113
+PADDING = 114

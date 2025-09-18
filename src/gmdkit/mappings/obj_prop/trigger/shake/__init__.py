@@ -1,3 +1,3 @@
-duration = 10
-strength = 75
-interval = 84
+DURATION = 10
+STRENGTH = 75
+INTERVAL = 84

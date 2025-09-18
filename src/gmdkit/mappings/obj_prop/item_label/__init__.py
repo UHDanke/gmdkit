@@ -1,6 +1,6 @@
-item_id = 80
-seconds_only = 389
-special_id = 390
-alignment = 391
-time_counter = 466
-kerning = 488
+ITEM_ID = 80
+SECONDS_ONLY = 389
+SPECIAL_ID = 390
+ALIGNMENT = 391
+TIME_COUNTER = 466
+KERNING = 488

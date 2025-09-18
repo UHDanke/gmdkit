@@ -1,2 +1,2 @@
-rotation_speed = 97
-disable_rotation = 98
+ROTATION_SPEED = 97
+DISABLE_ROTATION = 98

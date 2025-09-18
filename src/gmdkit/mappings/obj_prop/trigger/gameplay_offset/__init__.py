@@ -1,4 +1,4 @@
-offset_x = 28
-offset_y = 29
-dont_zoom_x = 58
-dont_zoom_y = 59
+OFFSET_X = 28
+OFFSET_Y = 29
+DONT_ZOOM_X = 58
+DONT_ZOOM_Y = 59

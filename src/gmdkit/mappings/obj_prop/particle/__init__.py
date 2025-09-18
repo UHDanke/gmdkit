@@ -1,4 +1,4 @@
-data = 145
-use_obj_color = 146
-uniform_obj_color = 147
-quick_start = 211
+DATA = 145
+USE_OBJ_COLOR = 146
+UNIFORM_OBJ_COLOR = 147
+QUICK_START = 211

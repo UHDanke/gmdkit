@@ -1,2 +1,2 @@
-required_coins = 'k37'
-is_unlocked = 'k38'
+REQUIRED_COINS = 'k37'
+IS_UNLOCKED = 'k38'

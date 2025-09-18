@@ -1,2 +1,2 @@
-enter_only = 217
-enter_channel = 344
+ENTER_ONLY = 217
+ENTER_CHANNEL = 344

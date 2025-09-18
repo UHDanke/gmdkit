@@ -1,5 +1,5 @@
-offset_x = 28
-offset_y = 29
-easing = 30
-ease_rate = 85
-axis = 101
+OFFSET_X = 28
+OFFSET_Y = 29
+EASING = 30
+EASE_RATE = 85
+AXIS = 101

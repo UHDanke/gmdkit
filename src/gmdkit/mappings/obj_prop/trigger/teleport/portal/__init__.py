@@ -1,1 +1,1 @@
-distance = 54
+DISTANCE = 54

@@ -1,6 +1,6 @@
-value = 149
-value_min = 526
-value_max = 527
-relative = 528
-range = 529
-force_id = 530
+VALUE = 149
+VALUE_MIN = 526
+VALUE_MAX = 527
+RELATIVE = 528
+RANGE = 529
+FORCE_ID = 530

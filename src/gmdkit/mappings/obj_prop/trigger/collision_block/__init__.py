@@ -1,2 +1,2 @@
-block_id = 80
-dynamic = 94
+BLOCK_ID = 80
+DYNAMIC = 94

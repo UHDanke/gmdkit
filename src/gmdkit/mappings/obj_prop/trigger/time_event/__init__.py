@@ -1,3 +1,3 @@
-target_id = 473
-item_id = 80
-multi_activate = 475
+TARGET_ID = 473
+ITEM_ID = 80
+MULTI_ACTIVATE = 475

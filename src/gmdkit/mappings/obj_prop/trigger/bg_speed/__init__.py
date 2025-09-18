@@ -1,2 +1,2 @@
-x_mod = 143
-y_mod = 144
+X_MOD = 143
+Y_MOD = 144

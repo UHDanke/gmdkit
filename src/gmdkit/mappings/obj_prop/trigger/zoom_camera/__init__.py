@@ -1,4 +1,4 @@
-duration = 10
-easing = 30
-ease_rate = 85
-zoom = 371
+DURATION = 10
+EASING = 30
+EASE_RATE = 85
+ZOOM = 371

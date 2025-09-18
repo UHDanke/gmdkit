@@ -1,2 +1,2 @@
-group_id = 51
-activate_group = 56
+GROUP_ID = 51
+ACTIVATE_GROUP = 56

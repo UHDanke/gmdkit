@@ -1,2 +1,2 @@
-item_id = 80
-stop = 472
+ITEM_ID = 80
+STOP = 472

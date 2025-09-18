@@ -1,2 +1,2 @@
-target_id = 51
-direction = 164
+TARGET_ID = 51
+DIRECTION = 164

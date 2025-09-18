@@ -1,5 +1,5 @@
-slow = 200
-normal = 201
-fast = 202
-very_fast = 203
-super_fast = 1334
+SLOW = 200
+NORMAL = 201
+FAST = 202
+VERY_FAST = 203
+SUPER_FAST = 1334

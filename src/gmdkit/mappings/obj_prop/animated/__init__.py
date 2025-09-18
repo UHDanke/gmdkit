@@ -1,9 +1,9 @@
-randomize_start = 106
-animation_speed = 107
-use_speed = 122
-animate_on_trigger = 123
-delayed_loop = 126
-animate_active_only = 214
-single_frame = 462
-offset_anim = 592
+RANDOMIZE_START = 106
+ANIMATION_SPEED = 107
+USE_SPEED = 122
+ANIMATE_ON_TRIGGER = 123
+DELAYED_LOOP = 126
+ANIMATE_ACTIVE_ONLY = 214
+SINGLE_FRAME = 462
+OFFSET_ANIM = 592
 from . import explosion

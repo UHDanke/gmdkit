@@ -1,4 +1,4 @@
-red = 'kS7'
-green = 'kS8'
-blue = 'kS9'
-player_color = 'kS18'
+RED = 'kS7'
+GREEN = 'kS8'
+BLUE = 'kS9'
+PLAYER_COLOR = 'kS18'

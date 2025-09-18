@@ -1,6 +1,6 @@
-duration = 10
-easing = 30
-degrees = 68
-add = 70
-ease_rate = 85
-snap_360 = 394
+DURATION = 10
+EASING = 30
+DEGREES = 68
+ADD = 70
+EASE_RATE = 85
+SNAP_360 = 394

@@ -1,1 +1,1 @@
-coin_id = 12
+COIN_ID = 12

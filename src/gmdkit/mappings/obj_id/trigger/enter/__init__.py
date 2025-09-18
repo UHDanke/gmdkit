@@ -1,6 +1,6 @@
-move = 3017
-rotate = 3018
-scale = 3019
-fade = 3020
-tint = 3021
-stop = 3023
+MOVE = 3017
+ROTATE = 3018
+SCALE = 3019
+FADE = 3020
+TINT = 3021
+STOP = 3023

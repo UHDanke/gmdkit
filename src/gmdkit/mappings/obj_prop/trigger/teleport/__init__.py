@@ -1,18 +1,18 @@
-target_id = 51
-smooth_ease = 55
-use_force = 345
-force = 346
-redirect_force = 347
-force_min = 348
-force_max = 349
-force_mod = 350
-keep_offset = 351
-ignore_x = 352
-ignore_y = 353
-gravity = 354
-additive_force = 443
-instant_camera = 464
-snap_ground = 510
-redirect_dash = 591
+TARGET_ID = 51
+SMOOTH_EASE = 55
+USE_FORCE = 345
+FORCE = 346
+REDIRECT_FORCE = 347
+FORCE_MIN = 348
+FORCE_MAX = 349
+FORCE_MOD = 350
+KEEP_OFFSET = 351
+IGNORE_X = 352
+IGNORE_Y = 353
+GRAVITY = 354
+ADDITIVE_FORCE = 443
+INSTANT_CAMERA = 464
+SNAP_GROUND = 510
+REDIRECT_DASH = 591
 from . import portal
 from . import exit_portal

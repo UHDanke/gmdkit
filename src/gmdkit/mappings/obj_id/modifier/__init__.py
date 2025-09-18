@@ -1,5 +1,5 @@
-wave_collision = 1755
-stop_jump = 1813
-stop_dash = 1829
-head_collision = 1859
-gravity_flip = 2866
+WAVE_COLLISION = 1755
+STOP_JUMP = 1813
+STOP_DASH = 1829
+HEAD_COLLISION = 1859
+GRAVITY_FLIP = 2866

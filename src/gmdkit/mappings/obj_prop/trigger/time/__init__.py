@@ -1,8 +1,8 @@
-target_id = 473
-item_id = 80
-start_time = 467
-dont_override = 468
-ignore_timewarp = 469
-mod = 470
-start_paused = 471
-stop = 474
+TARGET_ID = 473
+ITEM_ID = 80
+START_TIME = 467
+DONT_OVERRIDE = 468
+IGNORE_TIMEWARP = 469
+MOD = 470
+START_PAUSED = 471
+STOP = 474

@@ -1,6 +1,6 @@
-sequence = 435
-mode = 436
-min_interval = 437
-reset_time = 438
-reset_type = 439
-unique_remap = 505
+SEQUENCE = 435
+MODE = 436
+MIN_INTERVAL = 437
+RESET_TIME = 438
+RESET_TYPE = 439
+UNIQUE_REMAP = 505

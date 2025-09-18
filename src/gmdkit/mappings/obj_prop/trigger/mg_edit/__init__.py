@@ -1,4 +1,4 @@
-duration = 10
-offset_y = 29
-easing = 30
-ease_rate = 85
+DURATION = 10
+OFFSET_Y = 29
+EASING = 30
+EASE_RATE = 85

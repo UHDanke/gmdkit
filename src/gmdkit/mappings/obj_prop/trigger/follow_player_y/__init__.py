@@ -1,6 +1,6 @@
-duration = 10
-target_id = 51
-speed = 90
-delay = 91
-offset = 92
-max_speed = 105
+DURATION = 10
+TARGET_ID = 51
+SPEED = 90
+DELAY = 91
+OFFSET = 92
+MAX_SPEED = 105

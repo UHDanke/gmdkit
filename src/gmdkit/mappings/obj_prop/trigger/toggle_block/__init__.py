@@ -1,4 +1,4 @@
-group_id = 51
-activate_group = 56
-claim_touch = 445
-spawn_only = 504
+GROUP_ID = 51
+ACTIVATE_GROUP = 56
+CLAIM_TOUCH = 445
+SPAWN_ONLY = 504

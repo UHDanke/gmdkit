@@ -1,4 +1,4 @@
-offset_x = 28
-offset_y = 29
-zoom = 371
-preview_opacity = 506
+OFFSET_X = 28
+OFFSET_Y = 29
+ZOOM = 371
+PREVIEW_OPACITY = 506

@@ -1,5 +1,5 @@
-duration = 10
-target_id = 51
-follow_target = 71
-mod_x = 72
-mod_y = 73
+DURATION = 10
+TARGET_ID = 51
+FOLLOW_TARGET = 71
+MOD_X = 72
+MOD_Y = 73

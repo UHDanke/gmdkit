@@ -1,18 +1,18 @@
-touch_triggered = 11
-editor_preview = 13
-interactible = 36
-spawn_triggered = 62
-multi_trigger = 87
-multi_activate = 99
-order = 115
-reverse = 117
-channel = 170
-ignore_gparent = 280
-ignore_linked = 281
-single_ptouch = 284
-center_effect = 369
-disable_multi_activate = 444
-control_id = 534
+TOUCH_TRIGGER = 11
+EDITOR_PREVIEW = 13
+INTERACTIBLE = 36
+SPAWN_TRIGGER = 62
+MULTI_TRIGGER = 87
+MULTI_ACTIVATE = 99
+ORDER = 115
+REVERSE = 117
+CHANNEL = 170
+IGNORE_GPARENT = 280
+IGNORE_LINKED = 281
+SINGLE_PTOUCH = 284
+CENTER_EFFECT = 369
+DISABLE_MULTI_ACTIVATE = 444
+CONTROL_ID = 534
 from . import color
 from . import pulse
 from . import move
@@ -88,6 +88,6 @@ from . import gradient
 from . import enter_preset
 from . import sequence
 from . import change_bg
-from . import change_g
+from . import change_gr
 from . import change_mg
 from . import dash

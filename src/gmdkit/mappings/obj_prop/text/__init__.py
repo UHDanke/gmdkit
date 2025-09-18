@@ -1,2 +1,2 @@
-data = 31
-kerning = 488
+DATA = 31
+KERNING = 488

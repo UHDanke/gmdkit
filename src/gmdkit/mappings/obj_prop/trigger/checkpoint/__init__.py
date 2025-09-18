@@ -1,4 +1,4 @@
-spawn_id = 51
-target_pos = 71
-player_pos = 138
-respawn_id = 448
+SPAWN_ID = 51
+TARGET_POS = 71
+PLAYER_POS = 138
+RESPAWN_ID = 448

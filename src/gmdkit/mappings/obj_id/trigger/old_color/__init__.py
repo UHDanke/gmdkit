@@ -1,5 +1,5 @@
-ground = 29
-background = 30
-outline = 105
-ground_2 = 900
-line = 915
+GROUND = 29
+BACKGROUND = 30
+OUTLINE = 105
+GROUND_2 = 900
+LINE = 915

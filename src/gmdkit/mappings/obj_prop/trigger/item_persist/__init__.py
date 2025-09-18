@@ -1,5 +1,5 @@
-item_id = 80
-set_persistent = 491
-target_all = 492
-reset = 493
-timer = 494
+ITEM_ID = 80
+SET_PERSISTENT = 491
+TARGET_ALL = 492
+RESET = 493
+TIMER = 494

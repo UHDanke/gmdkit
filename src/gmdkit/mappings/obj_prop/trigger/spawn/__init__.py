@@ -1,7 +1,7 @@
-group_id = 51
-duration = 63
-disable_preview = 102
-ordered = 441
-remaps = 442
-delay_rand = 556
-reset_remap = 581
+GROUP_ID = 51
+DURATION = 63
+DISABLE_PREVIEW = 102
+ORDERED = 441
+REMAPS = 442
+DELAY_RAND = 556
+RESET_REMAP = 581

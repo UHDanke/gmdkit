@@ -1,3 +1,3 @@
-chance = 10
-true_id = 51
-false_id = 71
+CHANCE = 10
+TRUE_ID = 51
+FALSE_ID = 71

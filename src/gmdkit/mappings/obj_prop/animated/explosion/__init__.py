@@ -1,1 +1,1 @@
-disable_shine = 127
+DISABLE_SHINE = 127

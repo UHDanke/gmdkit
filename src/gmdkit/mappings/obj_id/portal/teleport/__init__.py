@@ -1,3 +1,3 @@
-linked = 747
-exit = 2064
-enter = 2902
+LINKED = 747
+EXIT = 2064
+ENTER = 2902

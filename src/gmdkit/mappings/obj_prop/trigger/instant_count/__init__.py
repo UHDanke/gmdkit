@@ -1,5 +1,5 @@
-target_id = 51
-activate_group = 56
-count = 77
-item_id = 80
-mode = 88
+TARGET_ID = 51
+ACTIVATE_GROUP = 56
+COUNT = 77
+ITEM_ID = 80
+MODE = 88

@@ -1,5 +1,5 @@
-count = 77
-item_id = 80
-mode = 88
-override = 139
-mod = 449
+COUNT = 77
+ITEM_ID = 80
+MODE = 88
+OVERRIDE = 139
+MOD = 449

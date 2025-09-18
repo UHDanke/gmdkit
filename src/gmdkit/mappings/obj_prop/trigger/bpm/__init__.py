@@ -1,5 +1,5 @@
-duration = 10
-bpm = 498
-speed = 499
-disable = 500
-bpb = 501
+DURATION = 10
+BPM = 498
+SPEED = 499
+DISABLE = 500
+BPB = 501

@@ -1,4 +1,4 @@
-player_1 = 138
-value = 148
-player_2 = 200
-player_touch = 201
+PLAYER_1 = 138
+VALUE = 148
+PLAYER_2 = 200
+PLAYER_TOUCH = 201

@@ -1,5 +1,5 @@
-spawn_id = 51
-target_pos = 71
-no_effects = 460
-no_sfx = 461
-instant = 487
+SPAWN_ID = 51
+TARGET_POS = 71
+NO_EFFECTS = 460
+NO_SFX = 461
+INSTANT = 487

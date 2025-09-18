@@ -1,3 +1,3 @@
-group_id = 51
-lock_y = 59
-reverse = 118
+GROUP_ID = 51
+LOCK_Y = 59
+REVERSE = 118
