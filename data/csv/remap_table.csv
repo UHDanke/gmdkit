@@ -28,7 +28,6 @@ group id,obj_id.trigger.SONG_EDIT,obj_prop.trigger.song.GROUP_ID_1,,,,,1,9999,TR
 group id,obj_id.trigger.SONG_EDIT,obj_prop.trigger.song.GROUP_ID_2,,,,,1,9999,TRUE,FALSE
 group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,1,9999,TRUE,FALSE
 group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,1,9999,TRUE,FALSE
-group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP,,,,,1,9999,TRUE,FALSE
 group id,obj_id.trigger.SFX_EDIT,obj_prop.trigger.sfx.GROUP_ID_1,,,,,1,9999,TRUE,FALSE
 group id,obj_id.trigger.SFX_EDIT,obj_prop.trigger.sfx.GROUP_ID_2,,,,,1,9999,TRUE,FALSE
 group id,obj_id.trigger.SFX_EDIT,obj_prop.trigger.sfx.GROUP,,,,,1,9999,TRUE,FALSE
@@ -586,11 +585,16 @@ collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_B,,,,,1,9
 collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_A,,,,,1,9999,TRUE,FALSE
 collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_B,,,,,1,9999,TRUE,FALSE
 collision id,obj_id.trigger.COLLISION_BLOCK,obj_prop.trigger.collision_block.BLOCK_ID,,,,,1,9999,FALSE,FALSE
-linked id,,obj_prop.LINKED_GROUP,,,,,1,,FALSE,FALSE
+link id,,obj_prop.LINKED_GROUP,,,,,1,,FALSE,FALSE
 trigger channel,obj_id.trigger.ARROW,obj_prop.trigger.arrow.TARGET_CHANNEL,,,,0,,,FALSE,FALSE
 trigger channel,obj_id.trigger.START_POS,obj_prop.start_pos.TARGET_CHANNEL,,,,0,,,FALSE,FALSE
 trigger channel,,obj_prop.trigger.CHANNEL,,,,0,,,FALSE,FALSE
 gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
+effect id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
 effect id,obj_id.trigger.area.STOP,obj_prop.trigger.effect.TARGET_ID,,,,0,,,TRUE,FALSE
 effect id,obj_id.trigger.enter.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
 effect id,obj_id.trigger.enter.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
