@@ -372,7 +372,7 @@ class DataclassDecoderMixin:
             decoder:Callable[[int|str,Any],Any]=None
             ) -> Self:
         
-        separator = separator or cls.SEPARATOR
+        separator = separator if separator is not None else cls.SEPARATOR
         list_format = list_format or cls.LIST_FORMAT
         decoder = decoder or cls.DECODER or dict_cast(get_type_hints(cls))
         
@@ -415,7 +415,7 @@ class DataclassDecoderMixin:
             encoder:Callable[[str,Any],str]=None
             ) -> str:
         
-        separator = separator or self.SEPARATOR
+        separator = separator if separator is not None else self.SEPARATOR
         list_format = list_format or self.LIST_FORMAT
         encoder = encoder or self.ENCODER
         
@@ -454,7 +454,7 @@ class DictDecoderMixin:
             decoder:Callable[[int|str,Any],Any]=None
             ) -> Self:
         
-        separator = separator or cls.SEPARATOR
+        separator = separator if separator is not None else cls.SEPARATOR
         decoder = decoder or cls.DECODER or (lambda key, value: (key, value))
         
         result = cls()
@@ -497,7 +497,7 @@ class ArrayDecoderMixin:
             decoder:Callable[[str],Any]=None
             ) -> Self:
         
-        separator = separator or cls.SEPARATOR
+        separator = separator if separator is not None else cls.SEPARATOR
         group_size = group_size or cls.GROUP_SIZE
         decoder = decoder or cls.DECODER or (lambda x: x)
         
@@ -531,7 +531,7 @@ class ArrayDecoderMixin:
             encoder:Callable[[Any],str]=None
             ) -> str:
         
-        separator = separator or self.SEPARATOR
+        separator = separator if separator is not None else self.SEPARATOR
         encoder = encoder or self.ENCODER or str
         
         return separator.join([encoder(x) for x in self])
