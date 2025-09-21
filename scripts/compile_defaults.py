@@ -2,7 +2,7 @@ from gmdkit.models.object import Object, ObjectList
 from gmdkit.mappings import obj_id, obj_prop
 
 
-pool = ObjectList.from_file("../data/txt/default.txt")
+pool = ObjectList.from_file("data/txt/default.txt")
 
 
 def clean_obj(obj):
@@ -15,12 +15,6 @@ def clean_obj(obj):
     
     if obj_prop.Y in obj:
         obj[obj_prop.Y] = 0
-        
-    for k,v in obj.items():
-        if isinstance(v,(int,bool,float)):
-            pass
-        else:
-            obj[k] = str(v)
     
     if obj.get(obj_prop.ID) == obj_id.PARTICLE_OBJECT:
         

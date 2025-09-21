@@ -65,7 +65,7 @@ for key, data in game_data["GLM_01"].items():
     except FileNotFoundError:
         print(f"No object string file found, skipping.")
         continue
-
+    
     print(f"Saved {name}.gmd")
     out_file = output_path / f"{name}.gmd"
     

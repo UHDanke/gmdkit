@@ -97,7 +97,7 @@ class RemapList(IntPairList):
         result = cls()
         
         for key, value in data.items():
-            result.append(Pair(key,value))
+            result.append(IntPair(key,value))
         
         return result
     

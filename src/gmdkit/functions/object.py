@@ -93,7 +93,7 @@ def fix_lighter(obj:Object, replacement:int=color_id.WHITE) -> None:
 
 def pop_zeros(obj:Object) -> None:
     """
-    Removes object properties with value 0 in-place.
+    Removes object properties with value 0.
 
     Parameters
     ----------
@@ -195,7 +195,6 @@ def remap_keys(obj:Object, keys:int|str, value_map:dict[Any,Any]):
     for key in set(keys) & obj.keys():
     
         obj[key] = value_map.get(obj[key], obj[key])
-
 
     
 def delete_keys(obj:Object, keys:int|str):
