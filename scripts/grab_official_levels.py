@@ -48,7 +48,7 @@ for key, data in game_data["GLM_01"].items():
     
     seen.add(name)
         
-    print(f"Processing {name}.gmd")
+    print(f"Processing level with ID {data['k1']}")
         
     try:
         with open(level_file, "r", encoding="utf-8", errors="ignore") as f:
@@ -63,9 +63,10 @@ for key, data in game_data["GLM_01"].items():
             data["k4"] = object_string
     
     except FileNotFoundError:
-        pass
+        print(f"No object string file found, skipping.")
+        continue
 
-
+    print(f"Saved {name}.gmd")
     out_file = output_path / f"{name}.gmd"
     
     to_plist_file(data, out_file)
