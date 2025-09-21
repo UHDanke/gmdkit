@@ -28,7 +28,7 @@ ID_RULES = {
             {'type': 'color_id', 'property_id': obj_prop.COLOR_2, 'default': lambda x: COLOR_2_DEFAULT.get(x,0), 'min': 1, 'max': 999, 'remappable': False, 'iterable': False},
             {'type': 'group_id', 'property_id': obj_prop.GROUPS, 'replace': lambda x, kvm: x.remap(kvm), 'min': 1, 'max': 9999, 'remappable': False, 'iterable': True},
             {'type': 'group_id', 'property_id': obj_prop.PARENT_GROUPS, 'replace': lambda x, kvm: x.remap(kvm), 'min': 1, 'max': 9999, 'remappable': False, 'iterable': True},
-            {'type': 'linked_id', 'property_id': obj_prop.LINKED_GROUP, 'min': 1, 'max': 2147483647, 'remappable': False, 'iterable': False},
+            {'type': 'link_id', 'property_id': obj_prop.LINKED_GROUP, 'min': 1, 'max': 2147483647, 'remappable': False, 'iterable': False},
             {'type': 'trigger_channel', 'property_id': obj_prop.trigger.CHANNEL, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': False, 'iterable': False},
             {'type': 'enter_channel', 'property_id': obj_prop.ENTER_CHANNEL, 'default': 0, 'min': -32768, 'max': 32767, 'remappable': False, 'iterable': False},
             {'type': 'material_id', 'property_id': obj_prop.MATERIAL, 'default': 0, 'min': -32768, 'max': 32767, 'remappable': False, 'iterable': False},
@@ -555,7 +555,8 @@ ID_RULES = {
     obj_id.trigger.area.TINT: [
             {'type': 'color_id', 'property_id': obj_prop.trigger.effect.TINT_CHANNEL, 'min': 1, 'max': 999, 'remappable': False, 'iterable': False},
             {'type': 'group_id', 'property_id': obj_prop.trigger.effect.CENTER_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
-            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False}
+            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
+            {'type': 'effect_id', 'property_id': obj_prop.trigger.effect.EFFECT_ID, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': False, 'iterable': False}
         ],
     obj_id.trigger.enter.TINT: [
             {'type': 'color_id', 'property_id': obj_prop.trigger.effect.TINT_CHANNEL, 'min': 1, 'max': 999, 'remappable': False, 'iterable': False},
@@ -608,7 +609,6 @@ ID_RULES = {
     obj_id.trigger.SFX: [
             {'type': 'group_id', 'property_id': obj_prop.trigger.sfx.GROUP_ID_1, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
             {'type': 'group_id', 'property_id': obj_prop.trigger.sfx.GROUP_ID_2, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
-            {'type': 'group_id', 'property_id': obj_prop.trigger.sfx.GROUP, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
             {'type': 'sfx_id', 'property_id': obj_prop.trigger.sfx.SFX_ID, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': True, 'iterable': False},
             {'type': 'unique_sfx_id', 'property_id': obj_prop.trigger.sfx.UNIQUE_ID, 'min': -2147483648, 'max': 2147483647, 'remappable': True, 'iterable': False},
             {'type': 'sfx_group', 'property_id': obj_prop.trigger.sfx.GROUP_ID, 'min': -2147483648, 'max': 2147483647, 'remappable': True, 'iterable': False}
@@ -1515,19 +1515,23 @@ ID_RULES = {
         ],
     obj_id.trigger.area.MOVE: [
             {'type': 'group_id', 'property_id': obj_prop.trigger.effect.CENTER_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
-            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False}
+            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
+            {'type': 'effect_id', 'property_id': obj_prop.trigger.effect.EFFECT_ID, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': False, 'iterable': False}
         ],
     obj_id.trigger.area.SCALE: [
             {'type': 'group_id', 'property_id': obj_prop.trigger.effect.CENTER_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
-            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False}
+            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
+            {'type': 'effect_id', 'property_id': obj_prop.trigger.effect.EFFECT_ID, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': False, 'iterable': False}
         ],
     obj_id.trigger.area.ROTATE: [
             {'type': 'group_id', 'property_id': obj_prop.trigger.effect.CENTER_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
-            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False}
+            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
+            {'type': 'effect_id', 'property_id': obj_prop.trigger.effect.EFFECT_ID, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': False, 'iterable': False}
         ],
     obj_id.trigger.area.FADE: [
             {'type': 'group_id', 'property_id': obj_prop.trigger.effect.CENTER_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
-            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False}
+            {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False},
+            {'type': 'effect_id', 'property_id': obj_prop.trigger.effect.EFFECT_ID, 'default': 0, 'min': -2147483648, 'max': 2147483647, 'remappable': False, 'iterable': False}
         ],
     obj_id.trigger.area.MOVE_EDIT: [
             {'type': 'group_id', 'property_id': obj_prop.trigger.effect.TARGET_ID, 'condition': lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 0, 'min': 1, 'max': 9999, 'remappable': True, 'iterable': False}
