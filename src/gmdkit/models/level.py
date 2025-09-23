@@ -112,7 +112,7 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
         
         super().__init__(*args)      
     
-        
+
     @classmethod
     def from_plist(cls, data, load:bool=False, load_keys:Iterable=None,**kwargs):
         
