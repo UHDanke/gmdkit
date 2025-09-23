@@ -7,8 +7,6 @@ on:
       - main
     paths:
       - "scripts/build_files.py" 
-  schedule:
-    - cron: "0 6 * * *" # run daily at 6 AM UTC
 
 jobs:
   update:

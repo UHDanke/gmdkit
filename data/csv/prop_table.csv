@@ -163,7 +163,7 @@ id,alias,type,format,bounds,values,map to,comment
 60,trigger.color.COPY_OPACITY,bool,,,,,
 61,EDITOR_L2,int,,,,,
 62,trigger.SPAWN_TRIGGER,bool,,,,,
-63,trigger.spawn.DURATION,float,,,,,
+63,trigger.spawn.DELAY,float,,,,,
 64,DONT_FADE,bool,,,,,
 65,trigger.pulse.MAIN_ONLY,bool,,,,,
 65,trigger.effect.MAIN_ONLY,bool,,,,,
