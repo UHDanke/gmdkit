@@ -1,0 +1,3 @@
+NONE = 0
+ENTER = 1
+EXIT = 2

@@ -1,0 +1,3 @@
+STOP = 0
+LOOP = 1
+LAST = 2

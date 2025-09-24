@@ -1,0 +1,3 @@
+INIT = 0
+SET = 1
+ADD = 2

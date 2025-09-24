@@ -1,0 +1,3 @@
+MAINTIME = -1
+POINTS = -2
+ATTEMPTS = -3

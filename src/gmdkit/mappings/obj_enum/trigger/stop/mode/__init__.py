@@ -1,0 +1,3 @@
+STOP = 0
+PAUSE = 1
+RESUME = 2

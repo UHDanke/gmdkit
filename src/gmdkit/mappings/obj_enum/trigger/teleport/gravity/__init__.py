@@ -1,0 +1,4 @@
+NONE = 0
+NORMAL = 1
+FLIPPED = 2
+TOGGLE = 3

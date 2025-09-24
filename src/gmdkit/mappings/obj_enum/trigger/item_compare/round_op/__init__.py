@@ -1,0 +1,4 @@
+NONE = 0
+ROUND = 1
+FLOOR = 2
+CEILING = 3
