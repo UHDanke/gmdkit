@@ -1,2 +1,2 @@
 ROTATION_SPEED = 97
-from . import disable
+DISABLE_ROTATION = 98

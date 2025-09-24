@@ -255,7 +255,7 @@ id,alias,type,format,bounds,values,map to,comment
 97,saw.ROTATION_SPEED,float,,,,,
 97,trigger.orb_saw.ROTATION_SPEED,float,,,,,
 98,saw.DISABLE_ROTATION,bool,,,,,
-98,trigger.orb_saw.disable.ROTATION,bool,,,,,
+98,trigger.orb_saw.DISABLE_ROTATION,bool,,,,,
 99,trigger.MULTI_ACTIVATE,bool,,,,,
 100,trigger.move.TARGET_MODE,bool,,,,,
 100,trigger.rotate.AIM_MODE,bool,,,,,
