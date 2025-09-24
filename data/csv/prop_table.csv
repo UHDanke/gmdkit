@@ -28,6 +28,7 @@ id,alias,type,format,bounds,values,map to,comment
 10,trigger.keyframe.DURATION,float,seconds,,,,
 10,trigger.sfx.DURATION,float,seconds,,,,
 10,trigger.bpm.DURATION,float,seconds,,,,
+10,trigger.static_camera.DURATION,float,seconds,,,,
 10,trigger.random.CHANCE,float,percent,,,,percent chance of random trigger
 10,trigger.shader.FADE_TIME,float,,,,,
 11,trigger.TOUCH_TRIGGER,bool,,,,,

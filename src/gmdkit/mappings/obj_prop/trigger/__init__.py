@@ -31,13 +31,13 @@ from . import effect
 from . import keyframe
 from . import sfx
 from . import bpm
+from . import static_camera
 from . import random
 from . import shader
 from . import collectible
 from . import offset_camera
 from . import camera_guide
 from . import gameplay_offset
-from . import static_camera
 from . import toggle
 from . import toggle_block
 from . import on_death
