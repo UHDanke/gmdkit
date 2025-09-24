@@ -74,7 +74,6 @@ from . import time_control
 from . import item_persist
 from . import collision_block
 from . import orb_saw
-from . import static
 from . import offset_gameplay
 from . import gamemode_portal
 from . import camera_mode
