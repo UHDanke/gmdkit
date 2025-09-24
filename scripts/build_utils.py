@@ -1,6 +1,8 @@
 import re
 from collections import defaultdict
 from pathlib import Path
+import os
+import shutil
 
 # idk why it doesnt work
 def sort_id(s):
@@ -43,6 +45,10 @@ def build_tree(root, aliases):
             node = node[part]
         node[parts[-1]] = val
 
+class clear_folder(folder_path):
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+    os.makedirs(folder_path)
 
 def render_tree(node, base_path) -> None:
     base_path = Path(base_path)
