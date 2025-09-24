@@ -34,9 +34,12 @@ class Level(PlistDictDecoderMixin,DictClass):
         return super().from_file(path, load=load, load_keys=load_keys, **kwargs)
     
     
-    def to_file(self, path:str|PathLike, extension:str="gmd", save:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_file(self, path:str|PathLike=None, extension:str="gmd", save:bool=True, save_keys:Iterable=None, **kwargs):
         
-        path = Path(path)
+        if path is None: 
+            path = Path()
+        else:
+            path = Path(path)
         
         if not path.suffix:
             path = (path / self[lvl_prop.level.NAME]).with_suffix('.' + extension.lstrip('.'))
