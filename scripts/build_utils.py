@@ -45,7 +45,7 @@ def build_tree(root, aliases):
             node = node[part]
         node[parts[-1]] = val
 
-class clear_folder(folder_path):
+def clear_folder(folder_path):
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
     os.makedirs(folder_path)
