@@ -1,5 +1,5 @@
 import pandas as pd
-
+import shutil
 from build_utils import *
 
 # Map CSV types to library types
@@ -215,6 +215,7 @@ root = tree()
 build_tree(root, aliases)
 
 # Write mappings/object_properties.py
+clear_folder("src/gmdkit/mappings/obj_prop/")
 render_tree(root, "src/gmdkit/mappings/obj_prop/")
 
 # Open level table
@@ -305,6 +306,7 @@ root = tree()
 build_tree(root, aliases)
 
 # Write level mappings
+clear_folder("src/gmdkit/mappings/lvl_prop/")
 render_tree(root, "src/gmdkit/mappings/lvl_prop/")
 
 # Open object id table
@@ -320,6 +322,7 @@ build_tree(obj_root, obj_aliases)
 
 
 # Write mappings
+clear_folder("src/gmdkit/mappings/obj_id/")
 render_tree(obj_root, "src/gmdkit/mappings/obj_id/")
 
 
