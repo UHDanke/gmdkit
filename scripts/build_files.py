@@ -345,7 +345,6 @@ def convert_default(data):
 
 remap_table.columns = remap_table.columns.str.replace(' ', '_')
 remap_table["type"] = remap_table["type"].str.replace(' ', '_')
-remap_table["object_id"].fillna(None, inplace=True)
 remap_table = remap_table.where(pd.notnull(remap_table), None)
 
 def try_convert_int(val):
