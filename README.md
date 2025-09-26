@@ -2,6 +2,10 @@
 ![Python](https://img.shields.io/pypi/pyversions/gmdkit?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
+
+[![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/XDghA4gUVH)
+
+
 # GMD Toolkit
 
 Python toolkit for modifying & creating Geometry Dash plist files, including gmd & gmdl (GDShare level & level list export) and the encoded dat format (GD savefiles).
