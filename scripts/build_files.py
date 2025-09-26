@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import shutil
 from build_utils import *
 
@@ -368,6 +369,7 @@ result = defaultdict(list)
 
 for _, row in remap_table.iterrows():
     obj_id = row['object_id']
+    if np.isnan(obj_id): obj_id = None
     entry = row.drop(labels='object_id').to_dict()
     result[obj_id].append(entry)
     
@@ -384,7 +386,7 @@ from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 @dataclass(frozen=True)
 class IDRule:
     type: str
-    obj_prop: int
+    prop: int
     min: int = -2147483648
     max: int = 2147483647
     remappable: bool = False
@@ -406,6 +408,7 @@ def render_rule(d):
         if v is not None:
             key_str = k
             val_str = repr(v) if k in keys else str(v)
+            if val_str = 'nan': continue
             parts.append(f"{key_str}={val_str}")
     return "IDRule(" + ", ".join(parts) + ")"
 

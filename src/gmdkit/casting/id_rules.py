@@ -9,7 +9,7 @@ from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 @dataclass(frozen=True)
 class IDRule:
     type: str
-    obj_prop: int
+    prop: int
     min: int = -2147483648
     max: int = 2147483647
     remappable: bool = False
