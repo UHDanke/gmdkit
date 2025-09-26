@@ -587,7 +587,7 @@ collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision
 collision id,obj_id.trigger.COLLISION_BLOCK,obj_prop.trigger.collision_block.BLOCK_ID,,,,,1,9999,FALSE,FALSE
 link id,,obj_prop.LINKED_GROUP,,,,,1,,FALSE,FALSE
 trigger channel,obj_id.trigger.ARROW,obj_prop.trigger.arrow.TARGET_CHANNEL,,,,0,,,FALSE,FALSE
-trigger channel,obj_id.trigger.START_POS,obj_prop.start_pos.TARGET_CHANNEL,,,,0,,,FALSE,FALSE
+trigger channel,obj_id.trigger.START_POSITION,obj_prop.start_pos.TARGET_CHANNEL,,,,0,,,FALSE,FALSE
 trigger channel,,obj_prop.trigger.CHANNEL,,,,0,,,FALSE,FALSE
 gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,0,,,FALSE,FALSE
 effect id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,0,,,FALSE,FALSE
