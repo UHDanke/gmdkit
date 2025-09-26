@@ -1091,7 +1091,7 @@ ID_RULES = {
     obj_id.trigger.ARROW: [
             IDRule(type='trigger_channel', prop=obj_prop.trigger.arrow.TARGET_CHANNEL, default=0, remappable=False, iterable=False)
         ],
-    obj_id.trigger.START_POS: [
+    obj_id.trigger.START_POSITION: [
             IDRule(type='trigger_channel', prop=obj_prop.start_pos.TARGET_CHANNEL, default=0, remappable=False, iterable=False)
         ],
     obj_id.trigger.area.STOP: [

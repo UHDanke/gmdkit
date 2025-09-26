@@ -19,8 +19,6 @@ import gmdkit.functions.level as level_func
 
 RULE_FORMAT = list[dict[str,Any]]
 
-ID_LIST = ["color_id","group_id","item_id","time_id","collision_id","linked_id","gradient_id","effect_id","keyframe_id","unique_sfx_id","sfx_group","force_id","control_id"]
-
 IGNORE_IDS = {
     "effect_id":{0}
     }

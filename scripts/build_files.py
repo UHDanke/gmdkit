@@ -355,9 +355,9 @@ def try_convert_int(val):
 
 # First convert strings to int where possible
 remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
-remap_table['min'] = remap_table['min']
-remap_table['max'] = remap_table['max']
-
+remap_table['min'] = remap_table['min'].astype("Int64")
+remap_table['max'] = remap_table['max'].astype("Int64")
+remap_table.replace(False, np.nan, inplace=True)
 remap_table = remap_table.rename(columns={
     "property_id": "prop"    
     })
