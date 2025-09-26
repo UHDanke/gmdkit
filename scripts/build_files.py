@@ -362,7 +362,7 @@ remap_table.rename(columns={
     "property_id": "prop"    
     })
 
-unique_types = df["type"].dropna().unique().tolist()
+unique_types = remap_table["type"].dropna().unique().tolist()
 
 result = defaultdict(list)
 
