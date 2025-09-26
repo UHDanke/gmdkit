@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import shutil
 from build_utils import *
 
@@ -369,7 +368,7 @@ result = defaultdict(list)
 
 for _, row in remap_table.iterrows():
     obj_id = row['object_id']
-    if np.isnan(obj_id): obj_id = None
+    if pd.isna(obj_id): obj_id = None
     entry = row.drop(labels='object_id').to_dict()
     result[obj_id].append(entry)
     
