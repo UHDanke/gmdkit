@@ -358,7 +358,7 @@ remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
 remap_table['min'] = remap_table['min'].apply(try_convert_int)
 remap_table['max'] = remap_table['max'].apply(try_convert_int)
 
-remap_table.rename(columns={
+remap_table = remap_table.rename(columns={
     "property_id": "prop"    
     })
 
