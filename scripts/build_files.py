@@ -319,14 +319,13 @@ obj_alias_ids.sort_values(by='id')
 obj_aliases = dict(zip(obj_alias_ids['alias'],obj_alias_ids['id']))
 obj_root = tree()
 build_tree(obj_root, obj_aliases)
-
-
 # Write mappings
 clear_folder("src/gmdkit/mappings/obj_id/")
 render_tree(obj_root, "src/gmdkit/mappings/obj_id/")
 
 
 remap_table = pd.read_csv("data/csv/remap_table.csv")
+remap_table = remap_table.dropna(how="all")
 
 def convert_condition(data):
     
@@ -346,9 +345,7 @@ def convert_default(data):
 
 remap_table.columns = remap_table.columns.str.replace(' ', '_')
 remap_table["type"] = remap_table["type"].str.replace(' ', '_')
-remap_table["object_id"].fillna("'any'", inplace=True)
-remap_table["min"].fillna(-2**31, inplace=True)
-remap_table["max"].fillna(2**31-1, inplace=True)
+remap_table["object_id"].fillna(None, inplace=True)
 remap_table = remap_table.where(pd.notnull(remap_table), None)
 
 def try_convert_int(val):
@@ -362,8 +359,11 @@ remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
 remap_table['min'] = remap_table['min'].astype(int)
 remap_table['max'] = remap_table['max'].astype(int)
 
+remap_table.rename(columns={
+    "property_id": "prop"    
+    })
 
-
+unique_types = df["type"].dropna().unique().tolist()
 
 result = defaultdict(list)
 
@@ -374,44 +374,51 @@ for _, row in remap_table.iterrows():
     
 file = LineWriter(path="src/gmdkit/casting/id_rules.py")
 file.write("""
+# Imports
+from typing import Callable
+from dataclasses import dataclass
+
 # Package Imports
 from gmdkit.mappings import obj_id, obj_prop, color_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
+
+@dataclass(frozen=True)
+class IDRule:
+    type: str
+    obj_prop: int
+    min: int = -2147483648
+    max: int = 2147483647
+    remappable: bool = False
+    iterable: bool = False
+    condition: Callable = None
+    default: Callable = None
+    replace: Callable = None                
 """.strip())
 file.write(*[""]*2)
+file.write(f"ID_TYPES = {repr(unique_types)}")
+file.write(*[""]*2)
 file.write("ID_RULES = {")
+
+def render_rule(d):
+    parts = []
+    keys = ['type']
+    
+    for k, v in d.items():
+        if v is not None:
+            key_str = repr(k)
+            val_str = repr(v) if k in keys else str(v)
+            parts.append(f"{key_str}={val_str}")
+    return "IDRule(" + ", ".join(parts) + ")"
+
 
 mlist = []
 for key, value in result.items():
     nlist = []
     for item in value:
-        nlist.append("    "*3+dict_repr(item,['type']))
+        nlist.append("    "*3+render_rule(item))
     mlist.append("    "+f"{key}: "+"[\n"+',\n'.join(nlist)+"\n"+"    "*2+"]")
 
 file.write(',\n'.join(mlist))
 
 file.write("    "+"}")
-file.write(*[""]*2)
-file.write(
-"""
-def filter_rules(condition:callable, rule_list=ID_RULES):
-    
-    new_dict = {}
-    
-    for key, value in rule_list.items():
-        
-        new_list = []
-        
-        for item in value:
-            
-            if condition(item):
-                
-                new_list.append(item)
-            
-        if new_list != []:
-            
-            new_dict[key] = new_list
-            
-    return new_dict
-""".strip())
 file.close()

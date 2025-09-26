@@ -72,13 +72,3 @@ def render_tree(node, base_path) -> None:
     # Recursively write submodules
     for key in dict_keys:
         render_tree(node[key], base_path / key)
-
-
-def dict_repr(d, keys):
-    parts = []
-    for k, v in d.items():
-        if v is not None:
-            key_str = repr(k)
-            val_str = repr(v) if k in keys else str(v)
-            parts.append(f"{key_str}: {val_str}")
-    return "{" + ", ".join(parts) + "}"

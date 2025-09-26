@@ -1,7 +1,24 @@
+# Imports
+from typing import Callable
+from dataclasses import dataclass
+
 # Package Imports
 from gmdkit.mappings import obj_id, obj_prop, color_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 
+@dataclass(frozen=True)
+class IDRule:
+    type: str
+    prop: int
+    min: int = -2147483648
+    max: int = 2147483647
+    remappable: bool = False
+    iterable: bool = False
+    condition: Callable = None
+    default: Callable = None
+    replace: Callable = None
+
+ID_LIST = []
 
 ID_RULES = {
     obj_id.trigger.COLOR: [

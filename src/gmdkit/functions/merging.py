@@ -4,7 +4,8 @@ import math
 from pathlib import Path
 from typing import Any
 from collections.abc import Iterable
-
+from copy import deepcopy
+from dataclasses import dataclass
 # Package Imports
 from gmdkit.mappings import obj_prop, color_prop
 from gmdkit.casting.id_rules import ID_RULES, filter_rules
@@ -16,7 +17,6 @@ import gmdkit.functions.level as level_func
 
 
 
-ID_FORMAT = tuple[int|str,str,bool,int,int]
 RULE_FORMAT = list[dict[str,Any]]
 
 ID_LIST = ["color_id","group_id","item_id","time_id","collision_id","linked_id","gradient_id","effect_id","keyframe_id","unique_sfx_id","sfx_group","force_id","control_id"]
@@ -25,6 +25,22 @@ IGNORE_IDS = {
     "effect_id":{0}
     }
 
+
+@dataclass(frozen=True)
+class Identifier:
+    obj_id: int
+    obj_prop: int
+    id_val: int
+    id_type: str
+    remappable: bool
+    min_limit: int
+    max_limt: int
+
+@dataclass
+class IDList:
+    values: list
+    remappable: list
+    
 
 def compile_rules(
         object_id:int, 
@@ -109,7 +125,7 @@ def replace_ids(
 def get_ids(
         obj:Object,
         rule_dict:dict[Any,RULE_FORMAT]=ID_RULES
-        ) -> Iterable[ID_FORMAT]:
+        ) -> Iterable[Identifier]:
     """
     Compiles unique ID data referenced by an object.
 
@@ -123,24 +139,12 @@ def get_ids(
         
     Yields
     ------
-    id : int
-        The found ID value
-        
-    id_type : str
-        The type of ID found (group, collision, item, etc).
-        
-    is_remappable : bool
-        Whether the found ID is potentially remappable.
-        
-    min_limit : int
-        The minimum value to which the ID can be reassigned.  
-    
-    max_limit : int
-        The maximum value to which the ID can be reassigned.
+    id : Identifier
+        A read-only class containing info about the ID.
     """
-    result = set()
-
-    rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
+    oid = obj.get(obj_prop.ID,0)
+    
+    rules = compile_rules(oid,rule_dict=rule_dict)
     
     for rule in rules:
 
@@ -154,147 +158,125 @@ def get_ids(
 
             if (func:=rule.get("function")) and callable(func):
                 val = func(val)
+                
+            id_type = rule.get('type')
+            remappable = rule.get('remappable',False) and obj.get(obj_prop.trigger.SPAWN_TRIGGER,False)
+            min_limit = rule.get('min',-2**31)
+            max_limit = rule.get('max',2**31-1)
             
-            def id_dict(value):
+            if not rule.get("iterable"): val = val,
+            
+            for v in val:
                 
-                if value is None:
+                if v is None:
                     if callable(default):
-                        value = default(value)
+                         v = default(v)
                     elif default is not None:
-                        value = default
+                        v = default
                 
-                if value is None:
-                    return
+                if v is None: continue
                 
-                data = (
-                    value,
-                    rule.get('type','none'),
-                    (rule.get('remappable',False) and obj.get(obj_prop.trigger.SPAWN_TRIGGER,False)),
-                    rule.get('min',-2**31),
-                    rule.get('max',2**31-1)
-                    )
-                
-                result.add(data)
-
-            if rule.get("iterable"):
-                for v in val:
-                    id_dict(v)
-                
-            else:
-                id_dict(val)
-                
-    yield from result
+                yield Identifier(
+                        obj_id = oid,
+                        obj_prop = pid,
+                        id_type = id_type,
+                        remappable = remappable,
+                        min_limit = min_limit,
+                        max_limt = max_limit
+                        )
 
 
 def next_free(
-        values,
-        current:int=None,
-        vmin:int=None,
-        vmax:int=None,
+        values:Iterable[int],
+        start:int=0,
+        vmin:int=-2147483648,
+        vmax:int=2147483647,
         count:int=1
         ) -> list[int]:
     """
     Returns the next unused integer from a list, within the given limits.
-    Positive integers will be returned first, starting from either 0 or vmin up to vmax.
-    If no positive integers are available, return negative ones starting from -1 down to vmin.
+    Negative numbers are returned counting down from -1.
 
     Parameters
     ----------
-    values : TYPE
+    values : Iterable[int]
         Currently used values.
         
-    current : int, optional
-        The current next free value, used to speed up iterative searches over large lists. Defaults to None.
+    start : int, optional
+        The current next free value, used to speed up iterative searches over large lists. Defaults to 0.
     
     vmin : int, optional
-        DESCRIPTION. The default is None.
+        The minimum value that can be returned. Defaults to -2147483648.
     
     vmax : int, optional
-        DESCRIPTION. The default is None.
+        The maximum value that can be returned. Defaults to 2147483647.
     
     count : int, optional
-        DESCRIPTION. The default is 1.
-
+        The number of values to return. Defaults to 1.
+        
     Returns
     -------
-    new_ids : list
-        DESCRIPTION.
-
+    new_ids : list[int]
+        A list of ids returned.
     """
-    vmin = -math.inf if vmin is None else vmin
-    vmax = math.inf if vmax is None else vmax
-    
-    start = current
-           
-    if start is None:
-        if vmin <= 0 <= vmax:
-            start = 0
-        elif 0 <= vmin <= vmax:
-            start = vmin
-        elif vmin <= vmax <= 0:
-            start = vmax
-    
-    if not (vmin <= start <= vmax):
-        raise ValueError(f"start index {start} not in range [{vmin},{vmax}]")
-        
-    candidate = start
     used = set(values)
     result = []
-    
-    # search positive integers first
-    if candidate >= 0:
-        while len(result) < count:
-            if (vmax is None or candidate <= vmax) and candidate not in used:
-                result.append(candidate)
-            candidate += 1
-            
-            if vmax is not None and candidate > vmax:
-                break
-    
-    # search negative integers if no positive ones exist
-    if len(result) < count or candidate < 0:
+
+    def range_search(start,stop,step):
         
-        if candidate > 0: candidate = min(vmax,-1)
+        nonlocal result
+        
+        for i in range(start,stop+step,step):
             
-        while len(result) < count:
-            if (vmin is None or candidate >= vmin) and candidate not in used:
-                result.append(candidate)
-            candidate -= 1
-            
-            if vmin is not None and candidate > vmin:
+            if len(result) > count: 
                 break
+            
+            if i not in used: 
+                result.append(i)
     
+    if start >= 0:
+        range_search(start, vmax, 1)
+    
+    if start < 0 or len(result) < count: 
+        range_search(start, vmin, -1)
+
     return result
-
-
-def compile_ids(ids:Iterable[ID_FORMAT]):
+  
+    
+def compile_ids(ids:Iterable[Identifier()]):
     
     result = {}
     
     for i in ids:
-        
-        id_val = i[0]
-        id_type = i[1]
-        is_remappable = i[2]
-        id_min = i[3]
-        id_max = i[4]
-        
-        data = {'list':set(),'remap':set(),'min':id_min,'max':id_max}
-        g = result.setdefault(id_type,data)
-            
-        g = result.setdefault(id_type,data)
-        
-        if g['min']<= id_val <= g['max']: 
-            g['list'].add(id_val)
-        
-        if is_remappable:
-            g['remap'].add(id_val)
 
-        g['min'] = max(id_min, g['min'])
-        g['max'] = min(id_max, g['max'])
+        data = {'list':set(),'remap':set(),'min':i.min_limit,'max':i.max_limit}
+        g = result.setdefault(i.id_type,data)
+        
+        if g['min']<= i.id_val <= g['max']: 
+            g['list'].add(i.id_val)
+        
+        if i.remappable:
+            g['remap'].add(i.id_val)
+
+        g['min'] = max(i.min_limit, g['min'])
+        g['max'] = min(i.min_limit, g['max'])
 
     return result
 
+
+
+def regroup(
+        objects:ObjectList,
+        id_context,
+        references: Iterable[tuple[int|None,int|None]]:None,
+        
+        
+        
+        )
+
+def build_helper():
+    
+    
 
 def regroup(
         level_list:LevelList,
@@ -304,32 +286,6 @@ def regroup(
         ignore_spawn_remaps:bool=False,
         remap_all:bool=False
         ):
-    """
-    
-
-    Parameters
-    ----------
-    level_list : LevelList
-        DESCRIPTION.
-    ids : ID_FORMAT, optional
-        DESCRIPTION. The default is ID_LIST.
-    ignore_ids : dict[str,Iterable], optional
-        DESCRIPTION. The default is IGNORE_IDS.
-    reserved_ids : dict[str,Iterable], optional
-        DESCRIPTION. The default is None.
-    ignore_spawn_remaps : bool, optional
-        DESCRIPTION. The default is False.
-
-    Raises
-    ------
-    ValueError
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    """
 
     seen_ids = {}
     ignore_ids = ignore_ids or {}
@@ -425,19 +381,11 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
         i = i // 30 * 30
 
 
-def combine_levels(level_list:LevelList, override_colors:bool=True):
+def merge_levels(level_list:LevelList, override_colors:bool=True):
     
-    main_level = level_list[0]
+    main_level = deepcopy(level_list[0])
     main_colors = main_level.start[obj_prop.level.COLORS]
     main_channels = main_colors.unique_values(lambda color: [color.get(color_prop.CHANNEL)])
-
-    def delete_color(color_id):
-        nonlocal main_colors
-        main_colors[:] = [
-            color for color in main_colors
-            if color.get(color_prop.CHANNEL) != color_id
-        ]
-        
         
     for level in level_list[1:]:
         
@@ -451,7 +399,10 @@ def combine_levels(level_list:LevelList, override_colors:bool=True):
             
             if override_colors:
                 if color_channel in main_channels:
-                    delete_color(color)
+                    main_colors[:] = [
+                        c for c in main_colors
+                        if c.get(color_prop.CHANNEL) != color
+                    ]
                 
                 main_colors.append(color)
                 main_channels.add(color_channel)

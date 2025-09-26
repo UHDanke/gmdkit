@@ -15,8 +15,9 @@ class IntList(ArrayDecoderMixin,ListClass):
     GROUP_SIZE = 1
     DECODER = int
     
-    def __init__(self, *iterable):
-        super().__init__(*iterable)
+    def __init__(self, *ids):
+        
+        super().__init__(ids)
         
     
 class IDList(ArrayDecoderMixin,ListClass):
@@ -27,8 +28,9 @@ class IDList(ArrayDecoderMixin,ListClass):
     GROUP_SIZE = 1
     DECODER = int
     
-    def __init__(self, *iterable):
-        super().__init__(*iterable)
+    def __init__(self, *ids):
+        
+        super().__init__(ids)
     
     def remap(self, key_value_map:dict=None):
         
@@ -74,8 +76,9 @@ class IntPairList(ArrayDecoderMixin,ListClass):
     DECODER = staticmethod(lambda array: IntPair.from_args(*array))
     ENCODER = staticmethod(lambda pair, s=SEPARATOR: pair.to_string(separator=s))
     
-    def __init__(self, *iterable):
-        super().__init__(*iterable)
+    def __init__(self, **kwargs):
+        items = [IntPair(k,v) for k,v in kwargs.items()]
+        super().__init__(items)
    
     def keys(self):
         return self.unique_values(lambda x: x.key)
@@ -88,9 +91,6 @@ class RemapList(IntPairList):
     
     __slots__ = ()
     
-    def __init__(self, *iterable):
-        super().__init__(*iterable)
-        
     @classmethod
     def from_dict(cls, data:dict):
         
