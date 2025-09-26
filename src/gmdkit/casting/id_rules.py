@@ -14,6 +14,7 @@ class IDRule:
     max: int = 2147483647
     remappable: bool = False
     iterable: bool = False
+    function: Callable = None
     condition: Callable = None
     default: Callable = None
     replace: Callable = None
