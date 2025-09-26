@@ -1,7 +1,6 @@
 ![PyPI](https://img.shields.io/pypi/v/gmdkit?style=flat-square)
 ![Python](https://img.shields.io/pypi/pyversions/gmdkit?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
-[![Discord](https://cdn.simpleicons.org/discord/5865F2)](https://discord.gg/XDghA4gUVH)
 
 # GMD Toolkit
 
