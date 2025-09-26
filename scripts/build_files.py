@@ -408,7 +408,7 @@ def render_rule(d):
         if v is not None:
             key_str = k
             val_str = repr(v) if k in keys else str(v)
-            if val_str = 'nan': continue
+            if val_str == 'nan': continue
             parts.append(f"{key_str}={val_str}")
     return "IDRule(" + ", ".join(parts) + ")"
 
