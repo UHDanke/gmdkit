@@ -227,14 +227,20 @@ def compile_keyframe_ids(obj_list:ObjectList) -> dict[int,ObjectList]:
     return result
 
 
-def compile_keyframe_groups(obj_list:ObjectList) -> dict[int|None,list[int]]:
+def compile_keyframe_groups(
+        obj_list:ObjectList, 
+        function:Callable=lambda obj: obj.get(obj_prop.trigger.keyframe.KEY_ID, 0) 
+        ) -> dict[int|None,list[Any]]:
     """
-    Compiles keyframe IDs by group IDs that reference them.
+    Compiles keyframe properties by group IDs that reference them.
 
     Parameters
     ----------
     obj_list : ObjectList
         The object list to compile.
+        
+    function: Callable
+        A function that takes in an object and returns a value
 
     Returns
     -------
@@ -251,16 +257,16 @@ def compile_keyframe_groups(obj_list:ObjectList) -> dict[int|None,list[int]]:
         if obj_id.trigger.KEYFRAME != obj.get(obj_prop.ID):
             continue
         
-        if (key_id:=obj.get(obj_prop.trigger.keyframe.KEY_ID, 0)) is not None:
+        if function is not None and callable(function) and (value:=function(obj)) is not None:
             
             groups = obj.get(obj_prop.GROUPS)
             
             if groups:
-                no_group.pop(key_id)
+                no_group.pop(value,None)
                 
                 for group in groups:
                     key_list = result.setdefault(group,set())
-                    key_list.add(key_id)
+                    key_list.add(value)
             else:
                 no_group.add(key_id)
     
@@ -272,7 +278,7 @@ def compile_keyframe_groups(obj_list:ObjectList) -> dict[int|None,list[int]]:
         result[key] = list(result[key]).sort()
         
     return result
-
+    
 
 def compile_links(obj_list:ObjectList) -> tuple[dict[int, ObjectList],dict[int,Object],dict[int,Object]]:
     """

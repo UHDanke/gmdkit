@@ -2,22 +2,19 @@
 import glob
 import math
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from collections.abc import Iterable
 from copy import deepcopy
 from dataclasses import dataclass
 # Package Imports
 from gmdkit.mappings import obj_prop, color_prop
-from gmdkit.casting.id_rules import ID_RULES, filter_rules
+from gmdkit.casting.id_rules import ID_RULES, IDRule, ID_TYPES
 from gmdkit.models.level import Level, LevelList
 from gmdkit.models.object import ObjectList, Object
-import gmdkit.functions.object as obj_func
-import gmdkit.functions.object_list as objlist_func
-import gmdkit.functions.level as level_func
+import gmdkit.functions.object as func_obj
+import gmdkit.functions.object_list as func_objlist
+import gmdkit.functions.level as func_level
 
-
-
-RULE_FORMAT = list[dict[str,Any]]
 
 IGNORE_IDS = {
     "effect_id":{0}
@@ -42,8 +39,8 @@ class IDList:
 
 def compile_rules(
         object_id:int, 
-        rule_dict:dict[int|str,RULE_FORMAT]=ID_RULES
-        ) -> RULE_FORMAT:
+        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
+        ) -> list[IDRule]:
     """
     Compiles a set of rules by object ID.
 
@@ -62,7 +59,7 @@ def compile_rules(
     """
     rules = list()
     
-    for oid in ("any", object_id):
+    for oid in (None, object_id):
         if (val:=rule_dict.get(oid)) is not None:
             rules.extend(val)
             
@@ -72,7 +69,7 @@ def compile_rules(
 def replace_ids(
         obj:Object, 
         key_value_map:dict[str,dict[int,int]],
-        rule_dict:dict[int|str,RULE_FORMAT]=ID_RULES
+        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
         ) -> None:
     """
     Remaps an object's IDs to new values.
@@ -99,21 +96,18 @@ def replace_ids(
     
     for rule in rules:
         
-        pid = rule.get("property_id")
+        pid = rule.prop
         
-        if pid is not None and (val:=obj.get(pid)) is not None:
+        if (val:=obj.get(rule.prop)) is not None:
 
-            if (cond:=rule.get("condition")) and callable(cond) and not cond(obj):
+            if (cond:=rule.condition) and callable(cond) and not cond(obj):
                 continue
+                        
+            kv_map = key_value_map.get(rule.type)
+
+            if kv_map is None: continue
             
-            id_type = rule.get('type','none')
-            
-            kv_map = key_value_map.get(id_type)
-            
-            if kv_map is None:
-                continue
-            
-            if (func:=rule.get("replace")) and callable(func):
+            if (func:=rule.replace) and callable(func):
                 func(val, kv_map)
             
             else:
@@ -122,7 +116,7 @@ def replace_ids(
             
 def get_ids(
         obj:Object,
-        rule_dict:dict[Any,RULE_FORMAT]=ID_RULES
+        rule_dict:dict[Any,list[IDRule]]=ID_RULES
         ) -> Iterable[Identifier]:
     """
     Compiles unique ID data referenced by an object.
@@ -146,23 +140,22 @@ def get_ids(
     
     for rule in rules:
 
-        pid = rule.get("property_id")
-        if pid is None: continue
+        pid = rule.prop
         
-        if (val:=obj.get(pid)) is not None or (default:=rule.get("default")) is not None:
+        if (val:=obj.get(pid)) is not None or (default:=rule.default) is not None:
             
-            if (cond:=rule.get("condition")) and callable(cond) and not cond(obj):
+            if (cond:=rule.condition) and callable(cond) and not cond(obj):
                 continue
 
-            if (func:=rule.get("function")) and callable(func):
+            if (func:=rule.function) and callable(func):
                 val = func(val)
                 
-            id_type = rule.get('type')
-            remappable = rule.get('remappable',False) and obj.get(obj_prop.trigger.SPAWN_TRIGGER,False)
-            min_limit = rule.get('min',-2**31)
-            max_limit = rule.get('max',2**31-1)
+            id_type = rule.type
+            remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER,False)
+            min_limit = rule.min
+            max_limit = rule.max
             
-            if not rule.get("iterable"): val = val,
+            if not rule.iterable: val = val,
             
             for v in val:
                 
@@ -187,8 +180,8 @@ def get_ids(
 def next_free(
         values:Iterable[int],
         start:int=0,
-        vmin:int=-2147483648,
-        vmax:int=2147483647,
+        vmin:int=-math.inf,
+        vmax:int=math.inf,
         count:int=1
         ) -> list[int]:
     """
@@ -204,10 +197,10 @@ def next_free(
         The current next free value, used to speed up iterative searches over large lists. Defaults to 0.
     
     vmin : int, optional
-        The minimum value that can be returned. Defaults to -2147483648.
+        The minimum value that can be returned. Defaults to -inf.
     
     vmax : int, optional
-        The maximum value that can be returned. Defaults to 2147483647.
+        The maximum value that can be returned. Defaults to inf.
     
     count : int, optional
         The number of values to return. Defaults to 1.
@@ -230,7 +223,7 @@ def next_free(
                 break
             
             if i not in used: 
-                result.append(i)
+                result.add(i)
     
     if start >= 0:
         range_search(start, vmax, 1)
@@ -240,45 +233,48 @@ def next_free(
 
     return result
   
+
+def remap_search(obj_list:ObjectList):
     
-def compile_ids(ids:Iterable[Identifier()]):
+    keyframe_spawns = func_objlist.compile_keyframe_groups(obj_list, lambda obj: obj.get(obj_prop.trigger.keyframe.SPAWN_ID))
+    
+    
+
+def compile_ids(ids:Iterable[Identifier], filter_limit:bool=True, filter_condition:Callable=None):
     
     result = {}
     
     for i in ids:
-
-        data = {'list':set(),'remap':set(),'min':i.min_limit,'max':i.max_limit}
-        g = result.setdefault(i.id_type,data)
         
-        if g['min']<= i.id_val <= g['max']: 
-            g['list'].add(i.id_val)
+        if filter_condition is not None and callable(filter_condition) and filter_condition(i):
+            continue
+        
+        group = result.setdefault(i.id_type, {})        
+        group.setdefault('values',set())
+        group.setdefault('remappable',set())
+        group.setdefault('min',i.min_limit)
+        group.setdefault('max',i.max_limit)
+
+        g['values'].add(i.id_val)
         
         if i.remappable:
-            g['remap'].add(i.id_val)
+            g['remappable'].add(i.id_val)
 
         g['min'] = max(i.min_limit, g['min'])
         g['max'] = min(i.min_limit, g['max'])
-
+    
+    
+    if filter_limit:
+        for id_type, group in result.items():
+            for key in ['values','remappable']:
+                group['key'] = {v for v in group['key'] if group['min'] < v < group['max']}
+            
     return result
 
 
-
-def regroup(
-        objects:ObjectList,
-        id_context,
-        references: Iterable[tuple[int|None,int|None]]:None,
-        
-        
-        
-        )
-
-def build_helper():
-    
-    
-
 def regroup(
         level_list:LevelList,
-        ids:Iterable[ID_FORMAT]=ID_LIST,
+        ids:Iterable=ID_TYPES,
         ignore_ids:dict[str,Iterable]=IGNORE_IDS, 
         reserved_ids:dict[str,Iterable]=None,
         ignore_spawn_remaps:bool=False,
@@ -357,7 +353,7 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
     
     for level in level_list:
     
-        bounds = objlist_func.boundaries(level.objects)
+        bounds = func_objlist.boundaries(level.objects)
         
         if vertical_stack:
             
@@ -365,7 +361,7 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
                 i = bounds[3]
             
             else:
-                level.objects.apply(obj_func.offset_position, offset_y = i)
+                level.objects.apply(func_obj.offset_position, offset_y = i)
                 i += bounds[3]-bounds[1] + block_offset * 30
             
         else:
@@ -373,7 +369,7 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
                 i = bounds[2]
             
             else:
-                level.objects.apply(obj_func.offset_position, offset_x = i)
+                level.objects.apply(func_obj.offset_position, offset_x = i)
                 i += bounds[2]-bounds[0] + block_offset * 30
     
         i = i // 30 * 30

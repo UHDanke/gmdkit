@@ -55,14 +55,14 @@ class IntPair(DataclassDecoderMixin):
     
     def remap(self, *keys:str, value_map:dict=None, key_map:dict=None):
         
-        if keys and pair.key not in keys:
+        if keys and self.key not in keys:
             return
 
         if key_map is not None:
-            pair.key = key_map.get(pair.key, pair.key)
+            self.key = key_map.get(self.key, self.key)
             
         if value_map is not None:
-            pair.value = value_map.get(pair.value, pair.value)
+            self.value = value_map.get(self.value, self.value)
                 
 IntPair.DECODER = staticmethod(dict_cast(get_type_hints(IntPair)))
 
