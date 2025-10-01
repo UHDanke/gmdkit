@@ -116,8 +116,8 @@ def read_plist(node):
 
 def write_plist_elem(parent, value):
     
-    if isinstance(value, bool) and value:
-        ET.SubElement(parent, "t")
+    if isinstance(value, bool):
+        if value: ET.SubElement(parent, "t")
         
     elif isinstance(value, int):
         ET.SubElement(parent, "i").text = str(value)
@@ -132,7 +132,7 @@ def write_plist_elem(parent, value):
         write_plist(ET.SubElement(parent, "d"),value)
     
     elif value is None:
-        pass
+        ET.SubElement(parent, "d")
     
     else:
         ET.SubElement(parent, "s").text = str(value)
@@ -159,6 +159,9 @@ def write_plist(node, obj):
             ET.SubElement(node, "k").text = f"k_{i}"
             
             write_plist_elem(node, value)
+    
+    else:
+        write_plist_elem(node, obj)
             
     
 def from_plist_string(string:str):
@@ -174,7 +177,7 @@ def to_plist_string(data:dict|list|tuple) -> str:
     
     dict_elem = ET.SubElement(root, "dict")
     
-    write_xml(dict_elem, data)
+    write_plist(dict_elem, data)
     
     return ET.tostring(root, encoding='unicode') 
 

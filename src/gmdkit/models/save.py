@@ -15,7 +15,7 @@ LOCALLEVELSPATH = LOCALPATH / "CCLocalLevels.dat"
 GAMEMANAGERPATH = LOCALPATH / "CCGameManager.dat"
 
 
-class LevelSave(PlistDictDecoderMixin, DictClass):
+class LevelSave(DictClass,PlistDictDecoderMixin):
     
     DECODER = staticmethod(dict_cast({"LLM_01": LevelList.from_plist,"LLM_03": LevelPackList.from_plist}))   
     ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))
@@ -63,12 +63,12 @@ class LevelSave(PlistDictDecoderMixin, DictClass):
         super().to_plist(path, **kwargs)
     
 
-class GameSave(PlistDictDecoderMixin, DictClass):
+class GameSave(DictClass,PlistDictDecoderMixin):
 
     @classmethod
     def from_file(cls, path:str|PathLike=GAMEMANAGERPATH, encoded:bool=True, **kwargs):
                     
-        with open(path, "r") as file:
+        with open(path, mode="r", encoding="utf-8") as file:
             
             string = file.read()
             
@@ -77,10 +77,9 @@ class GameSave(PlistDictDecoderMixin, DictClass):
             return super().from_string(string, **kwargs)
     
     
-    @classmethod
     def to_file(self, path:str|PathLike=GAMEMANAGERPATH, encoded:bool=True, **kwargs):
                     
-        with open(path, "w") as file:
+        with open(path, mode="w", encoding="utf-8") as file:
             
             string = super().to_string(**kwargs)
             
