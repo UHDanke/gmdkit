@@ -16,21 +16,14 @@ class IntList(ArrayDecoderMixin,ListClass):
     DECODER = int
     
     def __init__(self, *ids):
-        
-        super().__init__(ids)
+        super().__init__(*ids)
         
     
-class IDList(ArrayDecoderMixin,ListClass):
+class IDList(IntList):
     
     __slots__ = ()
     
     SEPARATOR = "."
-    GROUP_SIZE = 1
-    DECODER = int
-    
-    def __init__(self, *ids):
-        
-        super().__init__(ids)
     
     def remap(self, key_value_map:dict=None):
         

@@ -22,41 +22,78 @@ def serialize(value:Any) -> str:
     elif isinstance(value, float):           
         return str(value)
     
+    elif isinstance(value, str):
+        return str(value)
+    
+    elif hasattr(value, "to_string") and callable(getattr(value, "to_string")):
+        return value.to_string()
+    
     else:
         return str(value)
 
 
-def decode_string(string:str) -> str:
-
-    base64_decoded = base64.urlsafe_b64decode(string.encode())
-    
-    decompressed = gzip.decompress(base64_decoded)
-    
-    return decompressed.decode("utf-8",errors='replace')
+def xor(data:bytes, key:bytes) -> bytes:
+    l = len(key)
+    return bytes(data[i] ^ key[i % l] for i in range(len(data)))
 
 
-def encode_string(string:str) -> str:
+def decode_string(
+        string:str,
+        xor_key:bytes=None,
+        compression:Literal[None,"zlib","gzip","deflate","auto"]="auto"
+        ) -> str:
     
-    gzipped = gzip.compress(string.encode(),mtime=0)
+    byte_stream = string.encode()
+    
+    if xor_key is not None:
+        byte_stream = xor(byte_stream, key=xor_key)
+    
+    byte_stream = base64.urlsafe_b64decode(byte_stream)
+    
+    match compression:
+        case 'zlib':
+            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
+            wbits = zlib.MAX_WBITS
+        case 'gzip':
+            byte_stream = gzip.decompress(byte_stream)
+        case 'deflate':
+            byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
+        case 'auto':
+            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS|32)
+        case None:
+            pass            
+        case _:
+            raise ValueError(f"Unsupported decompression method: {method}")
+
+    return byte_stream.decode("utf-8",errors='replace')
+
+
+def encode_string(
+        string:str,
+        xor_key:bytes=None,
+        compression:Literal[None,"zlib","gzip","deflate"]="gzip"
+        ) -> str:
+    
+    byte_stream = string.encode()
         
-    base64_encoded = base64.urlsafe_b64encode(gzipped)
+    match compression:
+        case 'zlib':
+            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
+        case 'gzip':
+            byte_stream = gzip.compress(byte_stream,mtime=0)
+        case 'deflate':
+            byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
+        case None:
+            pass
+        case _:
+            raise ValueError(f"Unsupported compression method: {method}")
+            
+    byte_stream = base64.urlsafe_b64encode(byte_stream)
     
-    return base64_encoded.decode()
-
-
-def xor(string: str, key: int) -> str:
+    if xor_key is not None:
+        byte_stream = xor(byte_stream, key=xor_key)
     
-    return ("").join(chr(ord(char) ^ key) for char in string)
-
-
-def decode_save(data: str) -> str:
-
-    return decode_string(xor(data, key=11))
-
-
-def encode_save(data: str) -> str:
-
-    return xor(encode_string(data), key=11)
+    return byte_stream.decode()
 
 
 def read_plist_elem(elem):
@@ -79,7 +116,7 @@ def read_plist(node):
     nodes = len(node)
         
     if nodes == 0:
-        return None
+        return {}
       
     if (    
             nodes > 0 and
@@ -132,7 +169,7 @@ def write_plist_elem(parent, value):
         write_plist(ET.SubElement(parent, "d"),value)
     
     elif value is None:
-        ET.SubElement(parent, "d")
+        pass
     
     else:
         ET.SubElement(parent, "s").text = str(value)
@@ -359,9 +396,11 @@ class DataclassDecoderMixin:
         
         for key, value in kwargs.items():
                 
-                if not hasattr(cls, key): continue
-                
-                class_args[key] = value
+            if not hasattr(cls, key): continue
+        
+            key, value = decoder(key,value)    
+            
+            class_args[key] = value
         
         return cls(**class_args)
     
@@ -402,8 +441,9 @@ class DataclassDecoderMixin:
             for token in tokens:
                 
                 value = next(tokens)
-                key, _ = decoder(token,value)
                 
+                key, value = decoder(token,value)
+                    
                 if not hasattr(cls, key): continue
                 
                 class_args[key] = value
@@ -487,6 +527,7 @@ class ArrayDecoderMixin:
     __slots__ = ()
     
     SEPARATOR = ','
+    END_SEP = False
     GROUP_SIZE = 1
     ENCODER = staticmethod(serialize)
     DECODER = None
@@ -495,25 +536,26 @@ class ArrayDecoderMixin:
     def from_string(
             cls, 
             string:str, 
-            separator:str=None, 
+            separator:str=None,
+            end_sep:bool=None,
             group_size:int=None, 
             decoder:Callable[[str],Any]=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
+        end_sep = end_sep or cls.END_SEP
         group_size = group_size or cls.GROUP_SIZE
         decoder = decoder or cls.DECODER or (lambda x: x)
         
         result = cls()
         
-        if string == '':
-            return result
+        if string == '': return result
         
         tokens = iter(string.split(separator))
         
         while True:
             if group_size > 1:
-                item = list(islice(tokens, group_size))
+                item = [i+separator if end_sep else i for i in islice(tokens, group_size)]
             else:
                 try:
                     item = next(tokens)
@@ -530,11 +572,105 @@ class ArrayDecoderMixin:
         
     def to_string(
             self, 
-            separator:str=None, 
+            separator:str=None,
+            end_sep:bool=None,
             encoder:Callable[[Any],str]=None
             ) -> str:
         
-        separator = separator if separator is not None else self.SEPARATOR
+        end_sep = end_sep or self.END_SEP
+        separator = '' if end_sep else separator if separator is not None else self.SEPARATOR
         encoder = encoder or self.ENCODER or str
-        
+
         return separator.join([encoder(x) for x in self])
+    
+    
+class DelimiterMixin:
+    
+    START_DELIMITER = None
+    END_DELIMITER = None
+    
+    @classmethod
+    def from_string(
+            cls,
+            string:str,
+            *args,
+            start_delimiter:str=None,
+            end_delimiter:str=None,
+            **kwargs
+            ) -> Self:
+        
+        start_delimiter = start_delimiter or cls.START_DELIMITER
+        end_delimiter = end_delimiter or cls.END_DELIMITER
+        
+        if start_delimiter: string = string.lstrip(start_delimiter)
+        if end_delimiter: string = string.rstrip(end_delimiter)
+        
+        return super().from_string(string, *args, **kwargs)
+    
+    
+    def to_string(
+            self,
+            *args,
+            start_delimiter:str=None,
+            end_delimiter:str=None,
+            **kwargs
+            ) -> Self:
+        
+        start_delimiter = start_delimiter or self.START_DELIMITER
+        end_delimiter = end_delimiter or self.END_DELIMITER
+        
+        string = super().to_string(*args, **kwargs)
+        
+        if start_delimiter: string = start_delimiter + string
+        if end_delimiter: string = string + end_delimiter
+        
+        return string
+
+
+class LoadFileMixin:
+    
+    DEFAULT_PATH = None
+    COMPRESSION = None
+    CYPHER = None
+    
+    @classmethod
+    def from_file(
+            cls, 
+            path:str|PathLike=None, 
+            encoded:bool=True, 
+            compression:str=None, 
+            cypher:bytes=None,
+            **kwargs
+            ) -> Self:
+        
+        path = path or cls.DEFAULT_PATH
+        compression = compression or cls.COMPRESSION
+        cypher = cypher or cls.CYPHER
+        
+        with open(path, "r", encoding="utf-8") as file:
+            
+            string = file.read()
+            
+            if encoded: string = decode_string(string, compression=compression, xor_key=cypher)
+            
+            return super().from_string(string, **kwargs)
+        
+    
+    def to_file(
+            self,
+            path:str|PathLike=None, 
+            encoded:bool=True, 
+            **kwargs
+            ):
+        
+        path = path or self.DEFAULT_PATH
+        compression = compression or self.COMPRESSION
+        cypher = cypher or self.CYPHER
+        
+        with open(path, "w", encoding="utf-8") as file:
+            
+            string = super().to_string(**kwargs)
+            
+            if encoded: string = encode_string(string, compression=compression, xor_key=cypher)
+            
+            file.write(string)
