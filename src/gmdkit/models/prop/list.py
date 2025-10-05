@@ -15,8 +15,12 @@ class IntList(ArrayDecoderMixin,ListClass):
     GROUP_SIZE = 1
     DECODER = int
     
-    def __init__(self, *ids):
-        super().__init__(*ids)
+    def __init__(self, *items):
+        
+        if len(items) == 1 and isinstance(items[0], (list, tuple, set)):
+            super().__init__(items[0])
+        else:
+            super().__init__(items)
         
     
 class IDList(IntList):
