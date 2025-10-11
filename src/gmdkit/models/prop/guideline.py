@@ -13,8 +13,8 @@ class Guideline(DataclassDecoderMixin):
     SEPARATOR = "~"
     LIST_FORMAT = True
     
-    color: int = 0
     time: float = 0
+    color: float = 0
     
 Guideline.DECODER = dict_cast(get_type_hints(Guideline))
 
@@ -25,7 +25,7 @@ class GuidelineList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = "~"
     GROUP_SIZE = 2
-    DECODER = staticmethod(lambda array: Guideline(*array))
+    DECODER = staticmethod(lambda array: Guideline.from_args(*array))
     ENCODER = staticmethod(lambda pair, s=SEPARATOR: pair.to_string(separator=s))
     
     def clean(self):
