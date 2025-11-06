@@ -29,7 +29,7 @@ class Identifier:
     id_type: str
     remappable: bool
     min_limit: int
-    max_limt: int
+    max_limit: int
 
 @dataclass
 class IDList:
@@ -170,10 +170,11 @@ def get_ids(
                 yield Identifier(
                         obj_id = oid,
                         obj_prop = pid,
+                        id_val = v,
                         id_type = id_type,
                         remappable = remappable,
                         min_limit = min_limit,
-                        max_limt = max_limit
+                        max_limit = max_limit
                         )
 
 
@@ -255,19 +256,19 @@ def compile_ids(ids:Iterable[Identifier], filter_limit:bool=True, filter_conditi
         group.setdefault('min',i.min_limit)
         group.setdefault('max',i.max_limit)
 
-        g['values'].add(i.id_val)
+        group['values'].add(i.id_val)
         
         if i.remappable:
-            g['remappable'].add(i.id_val)
+            group['remappable'].add(i.id_val)
 
-        g['min'] = max(i.min_limit, g['min'])
-        g['max'] = min(i.min_limit, g['max'])
+        group['min'] = max(i.min_limit, group['min'])
+        group['max'] = min(i.min_limit, group['max'])
     
     
     if filter_limit:
         for id_type, group in result.items():
             for key in ['values','remappable']:
-                group['key'] = {v for v in group['key'] if group['min'] < v < group['max']}
+                group[key] = {v for v in group[key] if group['min'] < v < group['max']}
             
     return result
 
@@ -308,7 +309,7 @@ def regroup(
             
             seen = seen_ids.get(k,set())
             
-            values = v['list']
+            values = v['values']
             collisions = set()
             
             if seen:
@@ -358,19 +359,19 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
         if vertical_stack:
             
             if i == None:
-                i = bounds[3]
+                i = bounds[5]
             
             else:
                 level.objects.apply(func_obj.offset_position, offset_y = i)
-                i += bounds[3]-bounds[1] + block_offset * 30
+                i += bounds[5]-bounds[1] + block_offset * 30
             
         else:
             if i == None:
-                i = bounds[2]
+                i = bounds[4]
             
             else:
                 level.objects.apply(func_obj.offset_position, offset_x = i)
-                i += bounds[2]-bounds[0] + block_offset * 30
+                i += bounds[4]-bounds[0] + block_offset * 30
     
         i = i // 30 * 30
 
@@ -386,7 +387,7 @@ def merge_levels(level_list:LevelList, override_colors:bool=True):
         main_level.objects += level.objects
         
         colors = level.start[obj_prop.level.COLORS]
-        group_colors = colors.where(lambda color: 1 <= color[color_prop.CHANNEL] <= 999)
+        group_colors = colors.where(lambda color: 1 <= color.get(color_prop.CHANNEL,0) <= 999)
         
         for color in group_colors:
             color_channel = color.get(color_prop.CHANNEL)
@@ -419,8 +420,8 @@ def load_folder(path, extension:str='.gmd') -> LevelList:
     files = glob.glob(folder_path)
     
     for file in files:
-        
-        level = Level.from_plist(file)
+        print(file)
+        level = Level.from_file(file)
         
         level_list.append(level)
     
