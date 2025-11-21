@@ -241,7 +241,7 @@ def remap_search(obj_list:ObjectList):
     
     
 
-def compile_ids(ids:Iterable[Identifier], filter_limit:bool=True, filter_condition:Callable=None):
+def compile_ids(ids:Iterable[Identifier], filter_limit:bool=False, filter_condition:Callable=None):
     
     result = {}
     
@@ -347,6 +347,25 @@ def regroup(
         level.objects.apply(replace_ids,key_value_map=remaps)
         replace_ids(level.start,key_value_map=remaps)
 
+
+def offset_ids(level:Level(),offset_all:int=0, offset_map:dict=None):
+    
+    offset_map = offset_map or {}
+    
+    all_ids = level.objects.unique_values(get_ids)
+    #print(all_ids)
+    compiled = compile_ids(all_ids)
+    keys = set(compiled.keys())
+    
+    remaps = {}
+    
+    for k in keys:
+        offset = offset_all + offset_map.get(k, 0)
+        
+        id_list = compiled[k]["values"]
+        remaps[k] = {i: i + offset for i in compiled[k]["values"] if i != 0 and offset != 0}
+    print(remaps)
+    level.objects.apply(replace_ids,key_value_map=remaps)
 
 def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:int=30):
     
