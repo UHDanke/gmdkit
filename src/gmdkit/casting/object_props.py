@@ -347,7 +347,7 @@ PROPERTY_DECODERS = {
     393: lambda x: bool(int(x)),
     394: lambda x: bool(int(x)),
     395: int,
-    396: int,
+    396: float,
     397: lambda x: bool(int(x)),
     399: lambda x: bool(int(x)),
     400: lambda x: bool(int(x)),
