@@ -760,7 +760,7 @@ id,alias,type,format,bounds,values,map to,comment
 394,trigger.rotate.FOLLOW_MODE,bool,,,,,
 394,trigger.rotate_camera.SNAP_360,bool,,,,,
 395,trigger.move.TARGET_CENTER_ID,int,group id,,,,
-396,trigger.move.TARGET_DISTANCE,int,units,,,,
+396,trigger.move.TARGET_DISTANCE,float,units,,,,
 397,trigger.move.DYNAMIC_MODE,bool,,,,,
 397,trigger.rotate.DYNAMIC_MODE,bool,,,,,
 398,,,,,,,
