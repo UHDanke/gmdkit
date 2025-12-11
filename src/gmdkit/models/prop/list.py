@@ -110,7 +110,7 @@ class RemapList(IntPairList):
     def clean(self):
         
         new = {p.key: p.value for p in self}
-        new.sort(key=lambda p: p.key)
+        new.sort(key=lambda p: (p.key, p.value))
         self[:] = new
         
     

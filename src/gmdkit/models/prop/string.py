@@ -1,6 +1,5 @@
 # Imports
 import base64
-from typing import Self
 
 # Package Imports
 from gmdkit.models.serialization import decode_string, encode_string
