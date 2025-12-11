@@ -109,8 +109,11 @@ class RemapList(IntPairList):
     
     def clean(self):
         
-        new = {p.key: p.value for p in self}
-        new.sort(key=lambda p: (p.key, p.value))
-        self[:] = new
+        ref = {}
+        for p in self:
+            ref[p.key] = max(ref.get(p.key, p.value), p.value)
+    
+        self[:] = [p for p in self if p.value == ref[p.key]]
+        self.sort(key=lambda p: (p.key, p.value))
         
     
