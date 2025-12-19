@@ -1,15 +1,12 @@
 # Imports
-from typing import Self
 from collections.abc import Iterable
 from pathlib import Path
 from os import PathLike
 
 # Package Imports
-from gmdkit.models.object import Object, ObjectList
 from gmdkit.models.types import ListClass, DictClass
-from gmdkit.models.serialization import decode_string, PlistDictDecoderMixin, PlistArrayDecoderMixin, dict_cast
+from gmdkit.models.serialization import PlistDictDecoderMixin, PlistArrayDecoderMixin, dict_cast
 from gmdkit.models.prop.string import GzipString
-from gmdkit.models.prop.gzip import ObjectString, ReplayString
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop

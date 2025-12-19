@@ -98,14 +98,16 @@ class RemapList(IntPairList):
         
         return result
     
+    
     def to_dict(self):
         
         result = {}
         
-        for pair in self:
-            result[pair.key] = pair.value
+        for p in self:
+            result[p.key] = max(result.get(p.key, p.value), p.value)
         
         return result
+    
     
     def clean(self):
         

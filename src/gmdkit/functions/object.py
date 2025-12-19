@@ -27,24 +27,6 @@ def clean_duplicate_groups(obj:Object) -> None:
         obj[obj_prop.GROUPS][:] = set(groups)
 
 
-def clean_remaps(obj:Object) -> None:
-    """
-    Cleans remaps with keys assigned to multiple values. 
-    While this is allowed by the game and the remaps are serialized as lists and not as dictionaries, remap keys are unique and only the last key-value pair is used in remap logic.
-
-    Parameters
-    ----------
-    obj : Object
-        The object to modify.
-
-    Returns
-    -------
-    None.
-
-    """    
-    if obj.get(obj_prop.ID) == obj_id.trigger.SPAWN and (remaps:=obj.get(obj_prop.trigger.spawn.REMAPS)) is not None:
-        remaps.clean()
-
 
 def recolor_shaders(obj:Object) -> None:
     """
@@ -154,7 +136,7 @@ def scale_position(
     if center_x is not None and (x:=obj.get(obj_prop.X)) is not None:
         obj[obj_prop.X] = scale_x * (x - center_x)
      
-    if center_y is not None and (x:=obj.get(obj_prop.X)) is not None:
+    if center_y is not None and (y:=obj.get(obj_prop.X)) is not None:
         obj[obj_prop.Y] = scale_y * (y - center_y)
 
 

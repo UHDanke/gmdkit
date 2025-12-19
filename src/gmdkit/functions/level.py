@@ -1,7 +1,6 @@
 # Package Imports
 from gmdkit.mappings import obj_prop, color_id, obj_id, color_prop
 from gmdkit.models.level import Level
-from gmdkit.models.prop.color import Color
 from gmdkit.models.object import ObjectList, Object
 
 

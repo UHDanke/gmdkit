@@ -176,63 +176,6 @@ def get_ids(
                         min_limit = min_limit,
                         max_limit = max_limit
                         )
-
-
-def next_free(
-        values:Iterable[int],
-        start:int=0,
-        vmin:int=-math.inf,
-        vmax:int=math.inf,
-        count:int=1
-        ) -> list[int]:
-    """
-    Returns the next unused integer from a list, within the given limits.
-    Negative numbers are returned counting down from -1.
-
-    Parameters
-    ----------
-    values : Iterable[int]
-        Currently used values.
-        
-    start : int, optional
-        The current next free value, used to speed up iterative searches over large lists. Defaults to 0.
-    
-    vmin : int, optional
-        The minimum value that can be returned. Defaults to -inf.
-    
-    vmax : int, optional
-        The maximum value that can be returned. Defaults to inf.
-    
-    count : int, optional
-        The number of values to return. Defaults to 1.
-        
-    Returns
-    -------
-    new_ids : list[int]
-        A list of ids returned.
-    """
-    used = set(values)
-    result = []
-
-    def range_search(start,stop,step):
-        
-        nonlocal result
-        
-        for i in range(start,stop+step,step):
-            
-            if len(result) > count: 
-                break
-            
-            if i not in used: 
-                result.add(i)
-    
-    if start >= 0:
-        range_search(start, vmax, 1)
-    
-    if start < 0 or len(result) < count: 
-        range_search(start, vmin, -1)
-
-    return result
   
 
 def remap_search(obj_list:ObjectList):

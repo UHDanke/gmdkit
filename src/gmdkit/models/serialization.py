@@ -1,9 +1,7 @@
 # Imports
-from dataclasses import fields, dataclass
-from typing import Literal, Callable
+from dataclasses import fields
+from typing import Literal, Callable, get_type_hints, Any, Self
 from itertools import islice
-from typing import get_type_hints, Callable, Any, Self
-from pathlib import Path
 from os import PathLike
 import xml.etree.ElementTree as ET
 import base64
@@ -53,7 +51,6 @@ def decode_string(
     match compression:
         case 'zlib':
             byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
-            wbits = zlib.MAX_WBITS
         case 'gzip':
             byte_stream = gzip.decompress(byte_stream)
         case 'deflate':
@@ -63,7 +60,7 @@ def decode_string(
         case None:
             pass            
         case _:
-            raise ValueError(f"Unsupported decompression method: {method}")
+            raise ValueError(f"Unsupported decompression method: {compression}")
 
     return byte_stream.decode("utf-8",errors='replace')
 
@@ -86,7 +83,7 @@ def encode_string(
         case None:
             pass
         case _:
-            raise ValueError(f"Unsupported compression method: {method}")
+            raise ValueError(f"Unsupported compression method: {compression}")
             
     byte_stream = base64.urlsafe_b64encode(byte_stream)
     
@@ -504,8 +501,12 @@ class DictDecoderMixin:
         tokens = iter(string.split(separator))
     
         for token in tokens:
-            key, value = decoder(token, next(tokens))
-            result[key] = value
+            try:
+                key, value = decoder(token, next(tokens))
+                result[key] = value
+            except Exception as e:
+                print(string)
+                raise e
                 
         return result
     
@@ -658,7 +659,9 @@ class LoadFileMixin:
     
     def to_file(
             self,
-            path:str|PathLike=None, 
+            path:str|PathLike=None,
+            compression:str=None, 
+            cypher:bytes=None,
             encoded:bool=True, 
             **kwargs
             ):

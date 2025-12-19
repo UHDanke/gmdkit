@@ -6,7 +6,7 @@ import re
 # Package Imports
 from gmdkit.models.serialization import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, LoadFileMixin, dict_cast
 from gmdkit.models.types import ListClass
-from gmdkit.constants.paths import MUSIC_LIBRARY_PATH, SFX_LIBRARY_PATH
+from gmdkit.constants.paths import MUSIC_LIBRARY_PATH
  
 
 @dataclass(slots=True)

@@ -1,0 +1,4 @@
+ORANGE = 0
+CLEAR = 0.5
+YELLOW = 0.9
+GREEN = 1.0

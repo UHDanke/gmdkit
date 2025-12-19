@@ -2,6 +2,7 @@
 from typing import Any, Literal
 from collections.abc import Callable
 from statistics import mean, median
+import math
 
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id
@@ -268,10 +269,10 @@ def compile_keyframe_groups(
                     key_list = result.setdefault(group,set())
                     key_list.add(value)
             else:
-                no_group.add(key_id)
+                no_group.add(value)
     
     if no_group:
-        result[None] = no_group
+        result[0] = no_group
     
     for key, value in result.items():
         
@@ -357,35 +358,7 @@ def compile_spawn_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
         group.sort(key=lambda obj: obj.get(obj_prop.X,0))
     
     return spawn_groups
-
-
-def index_objects(obj_list:ObjectList, index_key:int|str=0, start:int=0) -> None:
-    """
-    Adds an index key to all objects in the list.
-    Useful for tracking the load order of an object or for identifying a particular object when using compilation tools.
-    This index is discarded upon loading and saving the level in-game.
-    
-    Parameters
-    ----------
-    obj_list : ObjectList
-        The objects to modify.
-        
-    index_key : int | str, optional
-        The index key used. Defaults to 0.
-        Preferably keep as 0 or use an alphanumeric string key. There isn't an unused'
-        
-    start : TYPE, optional
-        The value to start indexing from. Defaults to 0.
-
-    Returns
-    -------
-    None.
-
-    """
-    for i, obj in enumerate(obj_list, start=start):
-        
-        obj[index_key] = i
-        
+      
       
 def boundaries(
         obj_list:ObjectList, 
@@ -472,7 +445,7 @@ def warp_objects(
         obj_list:ObjectList,
         only_move:bool=False,
         rotation:float=None,
-        skew_:float=None,
+        skew:float=None,
         scale_x:float=None,
         scale_y:float=None,
         center_x:float=None,
@@ -486,8 +459,8 @@ def warp_objects(
     r = math.radians(rotation or 0)
     cos_r = math.cos(r)
     sin_r = math.sin(r)
-    tx = math.tan(math.radians(skew_x or 0))
-    ty = math.tan(math.radians(skew_y or 0))
+    tx = math.tan(math.radians(rotation or 0))
+    ty = math.tan(math.radians(skew or 0))
     
     m00 = cos_r
     m01 = -sin_r + tx
@@ -518,10 +491,10 @@ def warp_objects(
             vx, vy = vx * cos_r - vy * sin_r,  vx * sin_r + vy * cos_r
             wx, wy = wx * cos_r - wy * sin_r, wx * sin_r + wy * cos_r
             
-            wx += t_x * vx
-            wy += t_x * vy
-            vx += t_y * wx
-            vy += t_y * wy
+            wx += tx * vx
+            wy += tx * vy
+            vx += ty * wx
+            vy += ty * wy
         
             obj_scale_x = math.hypot(vx, vy)
             obj_scale_y = math.hypot(wx, wy)
@@ -549,7 +522,7 @@ def warp_objects(
         
         if (x:=obj.get(obj_prop.X)) is not None:
             dx = x - center_x
-            obj[obj_prop.X] = m00 * dx + m01 * dy + center_x
+            obj[obj_prop.X] = m00 * dx + m01 * dx + center_x
                 
         if (y:=obj.get(obj_prop.Y)) is not None:
             dy = y - center_y

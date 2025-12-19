@@ -4,8 +4,8 @@ from typing import Self
 from os import PathLike
 
 # Package Imports
-from gmdkit.models.level import Level, LevelList
-from gmdkit.models.level_pack import LevelPack, LevelPackList
+from gmdkit.models.level import LevelList
+from gmdkit.models.level_pack import LevelPackList
 from gmdkit.models.types import DictClass
 from gmdkit.models.serialization import PlistDictDecoderMixin, LoadFileMixin, dict_cast
 from gmdkit.constants.paths import LOCAL_LEVELS_PATH

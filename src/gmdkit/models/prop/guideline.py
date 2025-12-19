@@ -4,13 +4,14 @@ from typing import get_type_hints
 
 # Package Imports
 from gmdkit.models.types import ListClass
-from gmdkit.models.serialization import ArrayDecoderMixin, DataclassDecoderMixin, dict_cast
+from gmdkit.models.serialization import ArrayDecoderMixin, DataclassDecoderMixin, DelimiterMixin, dict_cast
 
     
 @dataclass(slots=True)
 class Guideline(DataclassDecoderMixin):
     
     SEPARATOR = "~"
+    END_DELIMITER = "~"
     LIST_FORMAT = True
     
     time: float = 0
@@ -19,11 +20,12 @@ class Guideline(DataclassDecoderMixin):
 Guideline.DECODER = dict_cast(get_type_hints(Guideline))
 
 
-class GuidelineList(ArrayDecoderMixin,ListClass):
+class GuidelineList(DelimiterMixin,ArrayDecoderMixin,ListClass):
     
     __slots__ = ()
     
     SEPARATOR = "~"
+    END_DELIMITER = "~"
     GROUP_SIZE = 2
     DECODER = staticmethod(lambda array: Guideline.from_args(*array))
     ENCODER = staticmethod(lambda pair, s=SEPARATOR: pair.to_string(separator=s))
@@ -41,5 +43,3 @@ class GuidelineList(ArrayDecoderMixin,ListClass):
             new.append(p)
         
         self[:] = new
-        
-        
