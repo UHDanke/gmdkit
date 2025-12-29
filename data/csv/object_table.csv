@@ -35,7 +35,7 @@ id,alias,name
 111,portal.UFO,UFO Portal
 140,pad.PINK,Pink Jump Pad
 141,orb.PINK,Pink Jump Orb
-142,collectible.SECRET_COIN,
+142,collectible.SECRET_COIN,Secret Coin
 200,speed.SLOW,Yellow Slow Speed Portal
 201,speed.NORMAL,Blue Normal Speed Portal
 202,speed.FAST,Green Fast Speed Portal
