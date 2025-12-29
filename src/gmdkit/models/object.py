@@ -11,8 +11,6 @@ from gmdkit.defaults.objects import OBJECT_DEFAULT
 
 class Object(DelimiterMixin,DictDecoderMixin,DictClass):
     
-    __slots__ = ()
-    
     SEPARATOR = ","
     END_DELIMITER = ";"
     DECODER = staticmethod(dict_cast(PROPERTY_DECODERS,numkey=True))
@@ -31,8 +29,6 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
     
     
 class ObjectList(ArrayDecoderMixin,ListClass):
-    
-    __slots__ = ()
     
     SEPARATOR = ";"
     END_SEP = True

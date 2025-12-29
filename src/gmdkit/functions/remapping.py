@@ -2,40 +2,182 @@
 from typing import Any, Literal
 from collections.abc import Callable
 from statistics import mean, median
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
+from gmdkit.casting.id_rules import ID_RULES, IDRule
+import gmdkit.functions as gmdfunc
 
-def index_objects(obj_list:ObjectList, index_key:int|str=0, start:int=0) -> None:
-    """
-    Adds an index key to all objects in the list.
-    Useful for tracking the load order of an object or for identifying a particular object when using compilation tools.
-    This index is discarded upon loading and saving the level in-game.
+
+IGNORE_IDS = {
+    "effect_id":{0}
+    }
+
+
+@dataclass(frozen=True)
+class Identifier:
+    obj_id: int
+    obj_prop: int
+    id_val: int
+    id_type: str
+    remappable: bool
+    min_limit: int
+    max_limit: int
+    reference: bool
+
+@dataclass
+class IDList:
+    values: list
+    remappable: list
     
+
+def compile_rules(
+        object_id:int, 
+        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
+        ) -> list[IDRule]:
+    """
+    Compiles a set of rules by object ID.
+
     Parameters
     ----------
-    obj_list : ObjectList
-        The objects to modify.
+    object_id : int
+        The object id for which to return rules.
         
-    index_key : int | str, optional
-        The index key used. Defaults to 0.
-        Preferably keep as 0 or use an alphanumeric string key. There isn't an unused'
-        
-    start : TYPE, optional
-        The value to start indexing from. Defaults to 0.
+    rule_dict : dict[int|str,RULE_FORMAT], optional
+        A dictionary containing rules used to compile IDs. Defaults to ID_RULES.
 
     Returns
     -------
-    None.
+    rules : RULE_FORMAT
+        The compiled rules for the given ID.
+    """
+    rules = list()
+    
+    for oid in (None, object_id):
+        if (val:=rule_dict.get(oid)) is not None:
+            rules.extend(val)
+            
+    return rules
+
+        
+def replace_ids(
+        obj:Object, 
+        key_value_map:dict[str,dict[int,int]],
+        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
+        ) -> None:
+    """
+    Remaps an object's IDs to new values.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+        
+    key_value_map : dict[str,dict[int,int]]
+        A dictionary mapping ID types to dictionaries mapping old to new values.
+        
+    rule_dict : dict[int|str,RULE_FORMAT], optional
+        dictionary containing rules used to replace IDs. Defaults to ID_RULES.
+
+    Returns
+    -------
+    None
+    
 
     """
-    for i, obj in enumerate(obj_list, start=start):
+    
+    rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
+    
+    for rule in rules:
         
-        obj[index_key] = i
+        pid = rule.prop
         
+        if (val:=obj.get(rule.prop)) is not None:
 
-def compile_remaps(objs:ObjectList) -> dict[int,dict[int,int]]:
+            if (cond:=rule.condition) and callable(cond) and not cond(obj):
+                continue
+                        
+            kv_map = key_value_map.get(rule.type)
+
+            if kv_map is None: continue
+            
+            if (func:=rule.replace) and callable(func):
+                func(val, kv_map)
+            
+            else:
+                obj[pid] = kv_map.get(val, val)
+                
+            
+def get_ids(
+        obj:Object,
+        rule_dict:dict[Any,list[IDRule]]=ID_RULES
+        ) -> Iterable[Identifier]:
+    """
+    Compiles unique ID data referenced by an object.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to search for IDs.
+        
+    rule_dict : dict
+        A dictionary containing rules used to compile IDs.
+        
+    Yields
+    ------
+    id : Identifier
+        A read-only class containing info about the ID.
+    """
+    oid = obj.get(obj_prop.ID,0)
+    
+    rules = compile_rules(oid,rule_dict=rule_dict)
+    
+    for rule in rules:
+
+        pid = rule.prop
+        
+        if (val:=obj.get(pid)) is not None or (default:=rule.default) is not None:
+            
+            if (cond:=rule.condition) and callable(cond) and not cond(obj):
+                continue
+
+            if (func:=rule.function) and callable(func):
+                val = func(val)
+                
+            id_type = rule.type
+            remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False)
+            reference = rule.reference
+            min_limit = rule.min
+            max_limit = rule.max
+            
+            if not rule.iterable: val = val,
+            
+            for v in val:
+                
+                if v is None:
+                    if callable(default):
+                         v = default(v)
+                    elif default is not None:
+                        v = default
+                
+                if v is None: continue
+                
+                yield Identifier(
+                        obj_id = oid,
+                        obj_prop = pid,
+                        id_val = v,
+                        id_type = id_type,
+                        remappable = remappable,
+                        reference = reference,
+                        min_limit = min_limit,
+                        max_limit = max_limit
+                        )
+ 
+
+def compile_remap_ids(objs:ObjectList) -> dict[int,dict[int,int]]:
     
     remaps = {}
     
@@ -46,14 +188,56 @@ def compile_remaps(objs:ObjectList) -> dict[int,dict[int,int]]:
             continue
         if (r:=obj.get(obj_prop.trigger.spawn.REMAPS)):
             remaps[i] = r.to_dict()
-            obj["remap_id"] = i
+            obj.spawn_remap_id = i
             i+=1
         else:
-            obj["remap_id"] = 0
+            obj.spawn_remap_id = 0
 
     return remaps
 
 
+def compile_keyframe_spawn_ids(obj_list:ObjectList):
+    
+    func = lambda obj: obj.get(obj_prop.trigger.keyframe.S, 0)
+    
+    return gmdfunc.object_list.compile_keyframe_groups(obj_list,func)
+
+
+SPAWN_TRIGGERS = []
+
+
+def compile_spawn_groups(obj_list:ObjectList):
+    
+    spawn_groups = { 0: ObjectList() }
+    
+    for obj in obj_list:
+        if not obj.get(obj_prop.trigger.SPAWN_TRIGGER):
+            continue
+        if (groups:=obj.get(obj_prop.GROUPS)):
+            
+            for i in set(groups):
+                spawn_groups.setdefault(i,ObjectList())
+                spawn_groups[i].add(obj)
+        else:
+            spawn_groups[0].add(obj)
+        
+    return spawn_groups
+
+# compile all ids
+# compile remaps
+# if remaps:
+#   compile spawn groups
+#   compile ids per spawn group
+#   filter only remappable
+#   compile spawns per group
+#   compile keyframe per anim id
+#   compile timers & time events
+#   
+
+def compile_groups(obj_list:ObjectList):
+    
+    
+    return
 def clean_remaps(objs:ObjectList) -> None:
     """
     Cleans remaps with keys assigned to multiple values. 

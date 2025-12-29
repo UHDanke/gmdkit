@@ -106,7 +106,10 @@ def decode_level_props(gd_type, gd_format, key):
                 case 'bool': 
                     return 'lambda x: bool(int(x))'
                 
-                case _: return
+                case _: return 'int'
+                
+        case 'float' | 'real':
+            return 'float'
         
         case 'str' | 'string':
             match gd_format:              
@@ -123,7 +126,7 @@ def decode_level_props(gd_type, gd_format, key):
                         case 'k34':
                             return 'ReplayString'
                         
-                case _: return
+                case _: return 'str'
                 
         case _: return
         
@@ -138,7 +141,10 @@ def encode_level_props(gd_type, gd_format, key):
                 
                 case 'bool': 
                     return 'lambda x: str(int(x))'
-                
+        
+        case 'float' | 'real':
+            return 'float'
+        
         case 'str' | 'string':
             match gd_format:              
                 
@@ -149,7 +155,7 @@ def encode_level_props(gd_type, gd_format, key):
                     return 'lambda x: x.save()'
                 
                 case _: 
-                    return
+                    return 'str'
                 
         case _: return
 
@@ -390,10 +396,11 @@ class IDRule:
     max: int = 2147483647
     remappable: bool = False
     iterable: bool = False
+    reference: bool = False
     function: Callable = None
     condition: Callable = None
     default: Callable = None
-    replace: Callable = None                
+    replace: Callable = None              
 """.strip())
 file.write(*[""]*2)
 file.write(f"ID_TYPES = {repr(unique_types)}")

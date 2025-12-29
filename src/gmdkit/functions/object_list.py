@@ -9,6 +9,28 @@ from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
 
 
+def index_objects(obj_list:ObjectList, start:int=0) -> None:
+    """
+    Adds an index key to all objects in the list.
+    Useful for tracking the load order of an object or for identifying a particular object when using compilation tools.
+    
+    Parameters
+    ----------
+    obj_list : ObjectList
+        The objects to modify.
+        
+    start : TYPE, optional
+        The value to start indexing from. Defaults to 0.
+
+    Returns
+    -------
+    None.
+
+    """
+    for i, obj in enumerate(obj_list, start=start):
+        obj.index = i
+
+
 def clean_gid_parents(obj_list:ObjectList) -> None:
     """
     Removes invisible group ID parents and removes any duplicate references found.
@@ -241,7 +263,7 @@ def compile_keyframe_groups(
         The object list to compile.
         
     function: Callable
-        A function that takes in an object and returns a value
+        A function that takes in an object and returns a value.
 
     Returns
     -------
@@ -440,6 +462,30 @@ def boundaries(
         
     return min_x, min_y, center_x, center_y, max_x, max_y
 
+def grid_align(
+        obj_list:ObjectList,
+        unit_x:float=None,
+        unit_y:float=None,
+        offset_x:float=0,
+        offset_y:float=0,
+        snap:Literal["round", "floor", "ceil"]="round"
+        ) -> None:
+    
+    if not (unit_x or unit_y): return
+    
+    snap_func = {
+        "round": round,
+        "floor": math.floor,
+        "ceil": math.ceil,
+    }.get(snap,"round")
+    
+    for obj in obj_list:
+        if unit_x is not None:
+            obj.x = snap_func((obj.x - offset_x) / unit_x) * unit_x + offset_x
+
+        if unit_y is not None:
+            obj.y = snap_func((obj.y - offset_y) / unit_y) * unit_y + offset_y
+
 
 def warp_objects(
         obj_list:ObjectList,
@@ -614,7 +660,7 @@ def align_objects(
                 data = d.setdefault(item[ax],[])
                 data.extend(item['data'])
                 
-            l = [{'data':v,ax:k} for k, v in x_dict.items()]
+            l = [{'data':v,ax:k} for k, v in d.items()]
         
         else:
             l = item_list
