@@ -76,11 +76,7 @@ class Level(PlistDictDecoderMixin,DictClass):
         
         keys = keys or self.keys()
         
-        seen = set()
-        
         for key in keys:
-            
-            seen.add(key)
             
             value = self.get(key)
                         

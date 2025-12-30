@@ -9,12 +9,12 @@ class Color(DictDecoderMixin,DictClass):
     __slots__ = ()
     
     SEPARATOR = '_'
-    DECODER = staticmethod(dict_cast(COLOR_DECODERS))
-    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS))
+    DECODER = staticmethod(dict_cast(COLOR_DECODERS,numkey=True))
+    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,numkey=True))
     
     @property
     def channels(self):
-        return self.pluck(6,9,ignore_missing=True)
+        return self.pluck(color_prop.CHANNEL,color_prop.COPY_ID,ignore_missing=True)
     
     def remap(self, key_value_map):
         if (v:=self.get(color_prop.CHANNEL)) is not None: 

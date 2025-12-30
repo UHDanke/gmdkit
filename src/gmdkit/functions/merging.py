@@ -30,6 +30,7 @@ def compile_ids(ids:Iterable[Identifier], filter_limit:bool=False, filter_condit
         group = result.setdefault(i.id_type, {})        
         group.setdefault('values',set())
         group.setdefault('remappable',set())
+        group.setdefault('references',set())
         group.setdefault('min',i.min_limit)
         group.setdefault('max',i.max_limit)
 
@@ -37,6 +38,9 @@ def compile_ids(ids:Iterable[Identifier], filter_limit:bool=False, filter_condit
         
         if i.remappable:
             group['remappable'].add(i.id_val)
+            
+        if i.references:
+            group['references'].add(i.id_val)
 
         group['min'] = max(i.min_limit, group['min'])
         group['max'] = min(i.min_limit, group['max'])

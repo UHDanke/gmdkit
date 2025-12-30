@@ -176,29 +176,79 @@ def get_ids(
                         max_limit = max_limit
                         )
  
+    
+def compile_ids(ids:Iterable[Identifier], filter_limit:bool=False, filter_condition:Callable=None):
+    
+    result = {}
+    
+    for i in ids:
+        
+        if filter_condition is not None and callable(filter_condition) and filter_condition(i):
+            continue
+        
+        group = result.setdefault(i.id_type, {})        
+        group.setdefault('values',set())
+        group.setdefault('remappable',set())
+        group.setdefault('reference',set())
+        group.setdefault('min',i.min_limit)
+        group.setdefault('max',i.max_limit)
 
-def compile_remap_ids(objs:ObjectList) -> dict[int,dict[int,int]]:
+        group['values'].add(i.id_val)
+        
+        if i.remappable:
+            group['remappable'].add(i.id_val)
+            
+        if i.reference:
+            group['reference'].add(i.id_val)
+
+        group['min'] = max(i.min_limit, group['min'])
+        group['max'] = min(i.max_limit, group['max'])
+    
+    
+    if filter_limit:
+        for id_type, group in result.items():
+            for key in ['values','remappable','reference']:
+                group[key] = {v for v in group[key] if group['min'] < v < group['max']}
+            
+    return result
+
+def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
     
     remaps = {}
+    ids = set()
     
     i = 1
     
-    for obj in objs:
+    for obj in obj_list:
         if obj.get(obj_prop.ID) != obj_id.trigger.SPAWN:
             continue
         if (r:=obj.get(obj_prop.trigger.spawn.REMAPS)):
             remaps[i] = r.to_dict()
-            obj.spawn_remap_id = i
+            remap_id = i
             i+=1
         else:
-            obj.spawn_remap_id = 0
-
-    return remaps
+            remap_id = 0
+        
+        identif = Identifier(
+            obj_id=obj_id.trigger.SPAWN,
+            obj_prop=None,
+            id_val=remap_id,
+            id_type="remap_id",
+            remappable=obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
+            min_limit=0,
+            max_limit=2147483647,
+            reference=True
+            )
+        obj.spawn_remap_id = remap_id
+        ids.add(identif)
+        
+    obj_list.remaps = remaps
+    return ids
 
 
 def compile_keyframe_spawn_ids(obj_list:ObjectList):
     
-    func = lambda obj: obj.get(obj_prop.trigger.keyframe.S, 0)
+    func = lambda obj: obj.get(obj_prop.trigger.keyframe.SPAWN_ID, 0)
     
     return gmdfunc.object_list.compile_keyframe_groups(obj_list,func)
 
@@ -222,6 +272,14 @@ def compile_spawn_groups(obj_list:ObjectList):
             spawn_groups[0].add(obj)
         
     return spawn_groups
+
+def compile_object_ids(obj_list:ObjectList, extra_ids):
+    id_list = obj_list.unique_values(get_ids)
+    id_list.update(extra_ids)
+    id_list.update(compile_remap_ids(obj_list))
+    compiled = compile_ids(id_list)
+    return compiled
+    
 
 # compile all ids
 # compile remaps

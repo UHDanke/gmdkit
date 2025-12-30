@@ -78,10 +78,10 @@ class IntPairList(ArrayDecoderMixin,ListClass):
         super().__init__(items)
    
     def keys(self):
-        return self.unique_values(lambda x: x.key)
+        return self.unique_values(lambda x: [x.key])
     
     def values(self):
-        return self.unique_values(lambda x: x.value)
+        return self.unique_values(lambda x: [x.value])
 
 
 class RemapList(IntPairList):
