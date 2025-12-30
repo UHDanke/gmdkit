@@ -148,6 +148,7 @@ def get_ids(
                 val = func(val)
                 
             id_type = rule.type
+            if id_type == "group_id" and val==1.0: print(obj)
             remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False)
             reference = rule.reference
             min_limit = rule.min
@@ -208,7 +209,7 @@ def compile_ids(ids:Iterable[Identifier], filter_limit:bool=False, filter_condit
     if filter_limit:
         for id_type, group in result.items():
             for key in ['values','remappable','reference']:
-                group[key] = {v for v in group[key] if group['min'] < v < group['max']}
+                group[key] = {v for v in group[key] if group['min'] <= v <= group['max']}
             
     return result
 
@@ -273,11 +274,35 @@ def compile_spawn_groups(obj_list:ObjectList):
         
     return spawn_groups
 
-def compile_object_ids(obj_list:ObjectList, extra_ids):
+def compile_object_ids(obj_list:ObjectList, extra_ids:set()=None, fast_remap:bool=True):
     id_list = obj_list.unique_values(get_ids)
-    id_list.update(extra_ids)
+    if extra_ids: id_list.update(extra_ids)
     id_list.update(compile_remap_ids(obj_list))
-    compiled = compile_ids(id_list)
+    compiled = compile_ids(id_list,filter_limit=True)
+    
+    # naive approach, assumes if an ID can get remapped, it will get remapped
+    if fast_remap:
+        remap_id_map = {}
+        for _, rd in obj_list.remaps.items():
+            for old, new in rd.items():
+                remap_id_map.setdefault(old,set()).add(new)
+            
+        remaps = compiled.get('remap_base',{}).get("values")
+        if remaps: 
+            for k, d in compiled.items():
+                remappable = d.get("remappable", set())
+                min_id = d.get("min")
+                max_id = d.get("max")
+                if remappable:
+                    new_groups = set(filter(lambda x: min_id <= x <= max_id, remaps & remappable))
+                    l = []
+                    for n in new_groups:
+                        l.extend(remap_id_map.get(n,[]))
+                    if l:
+                        d.setdefault("remappable",set()).update(l)
+                        d.setdefault("values",set()).update(l)
+                        d.setdefault("remapped",set()).update(l)
+    obj_list.id_context = compiled
     return compiled
     
 
