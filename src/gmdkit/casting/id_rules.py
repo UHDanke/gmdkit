@@ -73,7 +73,7 @@ ID_RULES = {
         ],
     obj_id.LEVEL_START: [
             IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if 0 < i <= 999], replace=lambda x, kvm: x.remap(kvm), min=1, max=1101, iterable=True),
-            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if i > 999], replace=lambda x, kvm: None, reference=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if i > 999], replace=lambda x, kvm: None, min=1, max=1101, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [

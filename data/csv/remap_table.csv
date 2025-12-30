@@ -12,7 +12,7 @@ color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(
 color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,1,1101,FALSE,FALSE,TRUE
 color id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,1,1101,FALSE,FALSE,TRUE
 color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if 0 < i <= 999],"lambda x, kvm: x.remap(kvm)",,1,1101,FALSE,TRUE,FALSE
-color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if i > 999],"lambda x, kvm: None",,,,FALSE,FALSE,TRUE
+color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if i > 999],"lambda x, kvm: None",,1,1101,FALSE,TRUE,TRUE
 group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_ID,,,,,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_POS,,,,,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_CENTER_ID,,,,,1,9999,TRUE,FALSE,FALSE
