@@ -867,7 +867,6 @@ id,alias,type,format,bounds,values,map to,comment
 470,trigger.time.MOD,float,,,,,
 471,trigger.time.START_PAUSED,bool,,,,,
 472,trigger.time_control.STOP,bool,,,,,
-473,trigger.time.TARGET_ID,int,,,,,
 473,trigger.time_event.TARGET_TIME,float,,,,,
 474,trigger.time.STOP,bool,,,,,
 475,trigger.time_event.MULTI_ACTIVATE,bool,,,,,
