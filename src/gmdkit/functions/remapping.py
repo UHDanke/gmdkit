@@ -141,18 +141,25 @@ def get_ids(
             if not val and val is not False:
                 # object id fallback
                 if callable(rule.fallback):
-                    val = rule.fallback(oid)
+                    val = rule.fallback(obj)
 
             if not rule.iterable: val = val,
             
             for v in val:
                 is_default = False
                 if rule.default is not None:
-                    if v is None:
-                        v = rule.default
-                        is_default = True
-                    elif v == rule.default:
-                        is_default = True
+                    if not callable(rule.default):
+                        if v is None:
+                            v = rule.default
+                            is_default = True
+                        elif v == rule.default:
+                            is_default = True
+                    else:
+                        if v is None:
+                            v = rule.default(obj)
+                            is_default = True
+                        elif v == rule.default(obj):
+                            is_default = True
                         
                 if v is None: continue
                     
