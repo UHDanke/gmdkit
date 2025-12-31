@@ -1,6 +1,9 @@
 import pandas as pd
 import shutil
-from build_utils import *
+try:
+    from build_utils import *
+except ImportError:
+    from scripts.build_utils import *
 
 # Map CSV types to library types
 def decode_obj_props(gd_type, gd_format, key):
@@ -354,7 +357,9 @@ remap_table["type"] = remap_table["type"].str.replace(' ', '_')
 remap_table = remap_table.where(pd.notnull(remap_table), None)
 
 def try_convert_int(val):
+    
     try:
+        if val == 0.0: print(int(val))
         return int(val)
     except (ValueError, TypeError):
         return val
@@ -363,8 +368,9 @@ def try_convert_int(val):
 remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
 remap_table['min'] = remap_table['min'].astype("Int64")
 remap_table['max'] = remap_table['max'].astype("Int64")
+remap_table["default"] = remap_table['default'].astype("Int64")
 remap_table.replace(False, pd.NA, inplace=True)
-remap_table["default"] = remap_table["default"].apply(try_convert_int)
+remap_table.replace(float("nan"), pd.NA, inplace=True)
 remap_table = remap_table.rename(columns={
     "property_id": "prop"    
     })

@@ -130,7 +130,7 @@ def get_ids(
 
         pid = rule.prop
         
-        if (val:=obj.get(pid)) is not None or (default:=rule.default) is not None:
+        if (val:=obj.get(pid)) is not None or rule.fallback is not None or rule.default is not None:
             
             if (cond:=rule.condition) and callable(cond) and not cond(obj):
                 continue
@@ -140,20 +140,20 @@ def get_ids(
             
             if not val and val is not False:
                 # object id fallback
-                if (fback:=rule.fallback) is not None and callable(fback):
-                    val = fback(oid)
+                if callable(rule.fallback):
+                    val = rule.fallback(oid)
 
             if not rule.iterable: val = val,
             
             for v in val:
                 is_default = False
-                if v is None:
-                    is_default = True
-                    if callable(default):
-                         v = default(v)
-                    elif default is not None:
-                        v = default
-                
+                if rule.default is not None:
+                    if v is None:
+                        v = rule.default
+                        is_default = True
+                    elif v == rule.default:
+                        is_default = True
+                        
                 if v is None: continue
                     
                 yield Identifier(
@@ -197,8 +197,9 @@ class IDType:
                 continue
             
             if no_defaults and i.default:
+                
                 continue
-            
+            if i.id_val == 0: print(i)
             if remappable is not None and i.remappable != remappable:
                 continue
 
@@ -208,7 +209,6 @@ class IDType:
             if remap and i.remappable:
                 result.update(self.remaps.get(i.id_val,set()))
             
-            if i.id_val == 0.0: print(i.id_val)
             result.add(i.id_val)
                 
         return result
