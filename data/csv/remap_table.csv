@@ -5,8 +5,8 @@ color id,obj_id.trigger.shader.GRAY_SCALE,obj_prop.trigger.shader.GRAY_SCALE_TIN
 color id,obj_id.trigger.shader.LENS_CIRCLE,obj_prop.trigger.shader.LENS_CIRCLE_TINT_CHANNEL,,,,,0,1,1101,TRUE,FALSE,TRUE
 color id,obj_id.trigger.shader.RADIAL_BLUR,obj_prop.trigger.shader.RADIAL_BLUR_REF_CHANNEL,,,,,0,1,1101,TRUE,FALSE,TRUE
 color id,obj_id.trigger.shader.MOTION_BLUR,obj_prop.trigger.shader.MOTION_BLUR_REF_CHANNEL,,,,,0,1,1101,TRUE,FALSE,TRUE
-color id,,obj_prop.COLOR_1,,,,lambda i: COLOR_1_DEFAULT.get(i),0,1,1101,FALSE,FALSE,TRUE
-color id,,obj_prop.COLOR_2,,,,lambda i: COLOR_2_DEFAULT.get(i),0,1,1101,FALSE,FALSE,TRUE
+color id,,obj_prop.COLOR_1,,,,"lambda x: COLOR_1_DEFAULT.get(x.get(obj_prop.ID,0))",0,1,1101,FALSE,FALSE,TRUE
+color id,,obj_prop.COLOR_2,,,,"lambda x: COLOR_2_DEFAULT.get(x.get(obj_prop.ID,0))",0,1,1101,FALSE,FALSE,TRUE
 color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.COPY_ID,,,,,,1,1101,FALSE,FALSE,TRUE
 color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 0",,,,0,1,1101,TRUE,FALSE,FALSE
 color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,1,1101,FALSE,FALSE,TRUE

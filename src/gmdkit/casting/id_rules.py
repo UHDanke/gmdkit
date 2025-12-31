@@ -46,8 +46,8 @@ ID_RULES = {
             IDRule(type='group_id', prop=obj_prop.trigger.shader.MOTION_BLUR_CENTER_ID, default=lambda x: 0 if not (x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_2) or x.get(obj_prop.trigger.shader.MOTION_BLUR_CENTER)) else None, min=1, max=9999, remappable=True)
         ],
     None: [
-            IDRule(type='color_id', prop=obj_prop.COLOR_1, fallback=lambda i: COLOR_1_DEFAULT.get(i), min=1, max=1101, reference=True),
-            IDRule(type='color_id', prop=obj_prop.COLOR_2, fallback=lambda i: COLOR_2_DEFAULT.get(i), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.COLOR_1, fallback=lambda x: COLOR_1_DEFAULT.get(x.get(obj_prop.ID,0)), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.COLOR_2, fallback=lambda x: COLOR_2_DEFAULT.get(x.get(obj_prop.ID,0)), min=1, max=1101, reference=True),
             IDRule(type='group_id', prop=obj_prop.GROUPS, replace=lambda x, kvm: x.remap(kvm), min=1, max=9999, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.PARENT_GROUPS, replace=lambda x, kvm: x.remap(kvm), min=1, max=9999, iterable=True, reference=True),
             IDRule(type='link_id', prop=obj_prop.LINKED_GROUP, min=1, reference=True),
