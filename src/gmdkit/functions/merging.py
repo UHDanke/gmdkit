@@ -106,7 +106,7 @@ def regroup_levels(level_list:LevelList, ignored_ids:dict=None, reserved_ids:dic
     
     for lvl in level_list:
         objs = [lvl.start] + lvl.objects
-        print(regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions))
+        #print(regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions, no_defaults=True))
         print()
         
         for k, v in objs.id_context.items():

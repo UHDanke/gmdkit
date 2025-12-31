@@ -364,6 +364,7 @@ remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
 remap_table['min'] = remap_table['min'].astype("Int64")
 remap_table['max'] = remap_table['max'].astype("Int64")
 remap_table.replace(False, pd.NA, inplace=True)
+remap_table["default"] = remap_table["default"].apply(try_convert_int)
 remap_table = remap_table.rename(columns={
     "property_id": "prop"    
     })

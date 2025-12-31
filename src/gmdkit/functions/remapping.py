@@ -139,15 +139,10 @@ def get_ids(
                 val = func(val)
             
             if not val and val is not False:
+                # object id fallback
                 if (fback:=rule.fallback) is not None and callable(fback):
-                
-                
-                
-            id_type = rule.type
-            remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False)
-            reference = rule.reference
-            min_limit = rule.min
-            max_limit = rule.max
+                    val = fback(oid)
+
             if not rule.iterable: val = val,
             
             for v in val:
@@ -160,45 +155,31 @@ def get_ids(
                         v = default
                 
                 if v is None: continue
-                
+                    
                 yield Identifier(
                         obj_id = oid,
                         obj_prop = pid,
                         id_val = v,
-                        id_type = id_type,
-                        remappable = remappable,
-                        reference = reference,
-                        min_limit = min_limit,
-                        max_limit = max_limit,
+                        id_type = rule.type,
+                        remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
+                        reference = rule.reference,
+                        min_limit = rule.min,
+                        max_limit = rule.max,
                         default = is_default
                         )
  
 
 
-BASE_IDS = {
-    'color_id': 0,
-    'group_id': 0, 
-    'item_id': 0, 
-    'time_id': 0,
-    'collision_id': 0,
-    'trigger_channel': 0,
-    'effect_id': 0, 
-    'enter_channel': 0, 
-    'song_channel': 0,
-    'force_id': 0,
-    'material_id': 0,
-    'control_id': 0,
-    'remap_id': 0
-    }
-
 class IDType:
 
+    
     def __init__(self):
         self.ids = set()
         self.ignored = set()
         self.remaps = dict()
         self.min = -2147483648
         self.max = 2147483647
+    
     
     def get_ids(
         self,
@@ -211,12 +192,6 @@ class IDType:
 
         result = set()
         for i in self.ids:
-
-            if remappable is not None and i.remappable != remappable:
-                continue
-
-            if reference is not None and i.reference != reference:
-                continue
             
             if in_range and not self.min <= i.id_val <= self.max:
                 continue
@@ -224,12 +199,20 @@ class IDType:
             if no_defaults and i.default:
                 continue
             
+            if remappable is not None and i.remappable != remappable:
+                continue
+
+            if reference is not None and i.reference != reference:
+                continue
+            
             if remap and i.remappable:
                 result.update(self.remaps.get(i.id_val,set()))
             
+            if i.id_val == 0.0: print(i.id_val)
             result.add(i.id_val)
                 
         return result
+    
     
     def get_limits(self):
         self.min = -2147483648
@@ -239,6 +222,7 @@ class IDType:
             self.max = min(i.max_limit, self.max)
         
         return self.min, self.max
+    
     
     def add_remaps(self, remaps:dict):
         
@@ -282,7 +266,8 @@ def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
             remappable=obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
             min_limit=0,
             max_limit=2147483647,
-            reference=True
+            reference=True,
+            default=remap_id==0
             )
         obj.spawn_remap_id = remap_id
         ids.add(identif)
