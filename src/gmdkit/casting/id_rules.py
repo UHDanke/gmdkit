@@ -47,7 +47,7 @@ ID_RULES = {
         ],
     None: [
             IDRule(type='color_id', prop=obj_prop.COLOR_1, fallback=lambda i: COLOR_1_DEFAULT.get(i), default=0.0, min=1, max=1101, reference=True),
-            IDRule(type='color_id', prop=obj_prop.COLOR_2, fallback=lambda i: COLOR_1_DEFAULT.get(i), default=0.0, min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.COLOR_2, fallback=lambda i: COLOR_2_DEFAULT.get(i), default=0.0, min=1, max=1101, reference=True),
             IDRule(type='group_id', prop=obj_prop.GROUPS, replace=lambda x, kvm: x.remap(kvm), min=1, max=9999, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.PARENT_GROUPS, replace=lambda x, kvm: x.remap(kvm), min=1, max=9999, iterable=True, reference=True),
             IDRule(type='link_id', prop=obj_prop.LINKED_GROUP, min=1, reference=True),
