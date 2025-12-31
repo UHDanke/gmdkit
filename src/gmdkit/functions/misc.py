@@ -53,7 +53,7 @@ def next_free(
                 break
             
             if i not in used: 
-                result.add(i)
+                result.append(i)
     
     if start >= 0:
         range_search(start, vmax, 1)

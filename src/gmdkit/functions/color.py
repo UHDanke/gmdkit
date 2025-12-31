@@ -30,6 +30,8 @@ def color_to_trigger(color):
         case 1: obj[obj_prop.trigger.color.PLAYER_1] = True
         case 2: obj[obj_prop.trigger.color.PLAYER_2] = True
         case _: pass
+    
+    obj[obj_prop.trigger.color.DURATION] = 0
 
     return obj
 

@@ -519,7 +519,6 @@ class DictDecoderMixin:
         
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
-            
         return separator.join([separator.join(encoder(k,v)) for k,v in self.items()])
     
 

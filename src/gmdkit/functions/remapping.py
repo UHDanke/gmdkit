@@ -1,7 +1,6 @@
 # Imports
 from typing import Any, Literal
 from collections.abc import Callable
-from statistics import mean, median
 from collections.abc import Iterable
 from dataclasses import dataclass
 
@@ -9,12 +8,8 @@ from dataclasses import dataclass
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.casting.id_rules import ID_RULES, IDRule
-import gmdkit.functions as gmdfunc
-
-
-IGNORE_IDS = {
-    "effect_id":{0}
-    }
+from gmdkit.functions.misc import next_free
+from gmdkit.functions.object_list import compile_keyframe_groups
 
 
 @dataclass(frozen=True)
@@ -27,11 +22,7 @@ class Identifier:
     min_limit: int
     max_limit: int
     reference: bool
-
-@dataclass
-class IDList:
-    values: list
-    remappable: list
+    default: bool
     
 
 def compile_rules(
@@ -146,19 +137,23 @@ def get_ids(
 
             if (func:=rule.function) and callable(func):
                 val = func(val)
+            
+            if not val and val is not False:
+                if (fback:=rule.fallback) is not None and callable(fback):
+                
+                
                 
             id_type = rule.type
-            if id_type == "group_id" and val==1.0: print(obj)
             remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False)
             reference = rule.reference
             min_limit = rule.min
             max_limit = rule.max
-            
             if not rule.iterable: val = val,
             
             for v in val:
-                
+                is_default = False
                 if v is None:
+                    is_default = True
                     if callable(default):
                          v = default(v)
                     elif default is not None:
@@ -174,43 +169,92 @@ def get_ids(
                         remappable = remappable,
                         reference = reference,
                         min_limit = min_limit,
-                        max_limit = max_limit
+                        max_limit = max_limit,
+                        default = is_default
                         )
  
+
+
+BASE_IDS = {
+    'color_id': 0,
+    'group_id': 0, 
+    'item_id': 0, 
+    'time_id': 0,
+    'collision_id': 0,
+    'trigger_channel': 0,
+    'effect_id': 0, 
+    'enter_channel': 0, 
+    'song_channel': 0,
+    'force_id': 0,
+    'material_id': 0,
+    'control_id': 0,
+    'remap_id': 0
+    }
+
+class IDType:
+
+    def __init__(self):
+        self.ids = set()
+        self.ignored = set()
+        self.remaps = dict()
+        self.min = -2147483648
+        self.max = 2147483647
     
-def compile_ids(ids:Iterable[Identifier], filter_limit:bool=False, filter_condition:Callable=None):
+    def get_ids(
+        self,
+        remappable:bool = None,
+        reference:bool = None,
+        remap:bool = True,
+        in_range:bool = False,
+        no_defaults:bool=False
+    ) -> set[int]:
+
+        result = set()
+        for i in self.ids:
+
+            if remappable is not None and i.remappable != remappable:
+                continue
+
+            if reference is not None and i.reference != reference:
+                continue
+            
+            if in_range and not self.min <= i.id_val <= self.max:
+                continue
+            
+            if no_defaults and i.default:
+                continue
+            
+            if remap and i.remappable:
+                result.update(self.remaps.get(i.id_val,set()))
+            
+            result.add(i.id_val)
+                
+        return result
+    
+    def get_limits(self):
+        self.min = -2147483648
+        self.max = 2147483647
+        for i in self.ids:
+            self.min = max(i.min_limit, self.min)
+            self.max = min(i.max_limit, self.max)
+        
+        return self.min, self.max
+    
+    def add_remaps(self, remaps:dict):
+        
+        for k,l in remaps.items():                
+            group = self.remaps.setdefault(k,set())
+            group.update(set(l))
+
+   
+def compile_ids(ids:Iterable[Identifier]):
     
     result = {}
     
     for i in ids:
-        
-        if filter_condition is not None and callable(filter_condition) and filter_condition(i):
-            continue
-        
-        group = result.setdefault(i.id_type, {})        
-        group.setdefault('values',set())
-        group.setdefault('remappable',set())
-        group.setdefault('reference',set())
-        group.setdefault('min',i.min_limit)
-        group.setdefault('max',i.max_limit)
-
-        group['values'].add(i.id_val)
-        
-        if i.remappable:
-            group['remappable'].add(i.id_val)
-            
-        if i.reference:
-            group['reference'].add(i.id_val)
-
-        group['min'] = max(i.min_limit, group['min'])
-        group['max'] = min(i.max_limit, group['max'])
-    
-    
-    if filter_limit:
-        for id_type, group in result.items():
-            for key in ['values','remappable','reference']:
-                group[key] = {v for v in group[key] if group['min'] <= v <= group['max']}
-            
+        group = result.setdefault(i.id_type, IDType())  
+        group.ids.add(i)
+                
     return result
 
 def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
@@ -251,10 +295,7 @@ def compile_keyframe_spawn_ids(obj_list:ObjectList):
     
     func = lambda obj: obj.get(obj_prop.trigger.keyframe.SPAWN_ID, 0)
     
-    return gmdfunc.object_list.compile_keyframe_groups(obj_list,func)
-
-
-SPAWN_TRIGGERS = []
+    return compile_keyframe_groups(obj_list,func)
 
 
 def compile_spawn_groups(obj_list:ObjectList):
@@ -274,37 +315,88 @@ def compile_spawn_groups(obj_list:ObjectList):
         
     return spawn_groups
 
-def compile_object_ids(obj_list:ObjectList, extra_ids:set()=None, fast_remap:bool=True):
+
+def compile_id_context(obj_list:ObjectList, extra_ids:set()=None, remaps:Literal["none","naive","search"]="none"):
     id_list = obj_list.unique_values(get_ids)
     if extra_ids: id_list.update(extra_ids)
     id_list.update(compile_remap_ids(obj_list))
-    compiled = compile_ids(id_list,filter_limit=True)
+    compiled = compile_ids(id_list)
     
-    # naive approach, assumes if an ID can get remapped, it will get remapped
-    if fast_remap:
-        remap_id_map = {}
-        for _, rd in obj_list.remaps.items():
-            for old, new in rd.items():
-                remap_id_map.setdefault(old,set()).add(new)
-            
-        remaps = compiled.get('remap_base',{}).get("values")
-        if remaps: 
-            for k, d in compiled.items():
-                remappable = d.get("remappable", set())
-                min_id = d.get("min")
-                max_id = d.get("max")
-                if remappable:
-                    new_groups = set(filter(lambda x: min_id <= x <= max_id, remaps & remappable))
-                    l = []
-                    for n in new_groups:
-                        l.extend(remap_id_map.get(n,[]))
-                    if l:
-                        d.setdefault("remappable",set()).update(l)
-                        d.setdefault("values",set()).update(l)
-                        d.setdefault("remapped",set()).update(l)
+    match remaps:
+        # ignore remapped ids
+        case "none":
+            pass
+        # naive approach, assumes if an ID can get remapped, it will get remapped
+        case "naive":
+            remap_id_map = {}
+            for _, rd in obj_list.remaps.items():
+                for old, new in rd.items():
+                    remap_id_map.setdefault(old,set()).add(new)
+                
+            remaps = compiled.get('remap_base',{}).get_ids()
+    
+            if remaps: 
+                for k, d in compiled.items():
+                    remappable = d.get_ids(remappable=True)
+                    if remappable:
+                        d.add_remaps({k: remap_id_map[k] for k in remaps & remappable})
+                        
     obj_list.id_context = compiled
     return compiled
+
+
+def regroup(
+        obj_list,
+        min_ids:dict=None,
+        max_ids:dict=None,
+        ignored_ids:dict=None,
+        reserved_ids:dict=None,
+        remaps:Literal["none","naive","search"]="none"
+        ):
     
+    min_ids = min_ids or {}
+    max_ids = max_ids or {}
+    ignored_ids = ignored_ids or {}
+    reserved_ids = reserved_ids or {}
+    
+    ids = compile_id_context(obj_list,remaps=remaps)
+    new_remaps = {}
+    
+    for k, v in ids.items():        
+        values = v.get_ids()
+        id_min, id_max = v.get_limits()
+        low = max(min_ids.get(k, id_min),id_min)
+        high = min(max_ids.get(k, id_max),id_max)
+        
+        ignored = set(ignored_ids.get(k,set())) & values
+        reserved = set(reserved_ids.get(k,set())) & values
+        collisions = set(filter(lambda x: not (low <= x <= high), values))
+        collisions -= ignored
+        collisions |= reserved
+        if collisions:
+            new_ids = next_free(
+                values,
+                vmin=low,
+                vmax=high,
+                count=len(collisions)
+                )         
+            new_remaps[k] = dict(zip(collisions,new_ids))
+    obj_list.apply(replace_ids,key_value_map=new_remaps)
+    compile_id_context(obj_list,remaps=remaps)
+    return new_remaps
+
+
+def remap_text_ids(obj_list:ObjectList, filter_func:Callable=None, regex_pattern:str=r"^(?:ID\s+(\d+)|(\d+)\s+(.+))$"):
+    
+    objs = obj_list.where(lambda obj: obj.get(obj_prop.ID)==obj_id.TEXT)
+    
+    if filter_func and callable(filter_func):
+        objs = objs.where(filter_func)
+    
+    if objs:
+        pass
+            
+    return
 
 # compile all ids
 # compile remaps
@@ -317,10 +409,6 @@ def compile_object_ids(obj_list:ObjectList, extra_ids:set()=None, fast_remap:boo
 #   compile timers & time events
 #   
 
-def compile_groups(obj_list:ObjectList):
-    
-    
-    return
 def clean_remaps(objs:ObjectList) -> None:
     """
     Cleans remaps with keys assigned to multiple values. 

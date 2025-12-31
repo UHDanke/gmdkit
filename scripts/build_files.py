@@ -399,7 +399,8 @@ class IDRule:
     reference: bool = False
     function: Callable = None
     condition: Callable = None
-    default: Callable = None
+    fallback: Callable = None
+    default: int = None
     replace: Callable = None              
 """.strip())
 file.write(*[""]*2)

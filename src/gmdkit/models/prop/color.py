@@ -10,7 +10,7 @@ class Color(DictDecoderMixin,DictClass):
     
     SEPARATOR = '_'
     DECODER = staticmethod(dict_cast(COLOR_DECODERS,numkey=True))
-    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,numkey=True))
+    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,default=str))
     
     @property
     def channels(self):
