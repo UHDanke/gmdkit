@@ -173,13 +173,10 @@ def replace_ids(
                 continue
                 
             if rule.get_value("fixed", val): continue
-        
-            if rule.type=="color_id": print(obj.get(obj_prop.ID,0), rule.type)
 
-            if val==rule.get_value("default", val): continue
+            if val==rule.get_value("default", obj): continue
             
             if (new:=kv_map.get(val)) is not None:
-                if rule.type=="color_id": print(obj.get(obj_prop.ID,0), rule.type, new)
                 obj[pid] = new
 
 
