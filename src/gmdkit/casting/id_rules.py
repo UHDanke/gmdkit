@@ -36,27 +36,27 @@ ID_TYPES = ['color_id', 'group_id', 'item_id', 'time_id', 'collision_id', 'link_
 
 ID_RULES = {
     obj_id.trigger.COLOR: [
-            IDRule(type='color_id', prop=obj_prop.trigger.color.CHANNEL, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101),
-            IDRule(type='color_id', prop=obj_prop.trigger.color.COPY_ID, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, reference=True)
+            IDRule(type='color_id', prop=obj_prop.trigger.color.CHANNEL, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101),
+            IDRule(type='color_id', prop=obj_prop.trigger.color.COPY_ID, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, reference=True)
         ],
     obj_id.trigger.shader.GRAY_SCALE: [
-            IDRule(type='color_id', prop=obj_prop.trigger.shader.GRAY_SCALE_TINT_CHANNEL, default=lambda x: 0 if x.get(obj_prop.trigger.shader.GRAY_SCALE_USE_TINT) else None, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True)
+            IDRule(type='color_id', prop=obj_prop.trigger.shader.GRAY_SCALE_TINT_CHANNEL, default=lambda x: 0 if x.get(obj_prop.trigger.shader.GRAY_SCALE_USE_TINT) else None, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True)
         ],
     obj_id.trigger.shader.LENS_CIRCLE: [
-            IDRule(type='color_id', prop=obj_prop.trigger.shader.LENS_CIRCLE_TINT_CHANNEL, default=0, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.shader.LENS_CIRCLE_TINT_CHANNEL, default=0, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.trigger.shader.LENS_CIRCLE_CENTER_ID, default=lambda x: 0 if not (x.get(obj_prop.trigger.shader.LENS_CIRCLE_PLAYER_1) or x.get(obj_prop.trigger.shader.LENS_CIRCLE_PLAYER_2)) else None, fixed=FALSE, min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.shader.RADIAL_BLUR: [
-            IDRule(type='color_id', prop=obj_prop.trigger.shader.RADIAL_BLUR_REF_CHANNEL, default=0, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.shader.RADIAL_BLUR_REF_CHANNEL, default=0, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.trigger.shader.RADIAL_BLUR_CENTER_ID, default=lambda x: 0 if x.get(obj_prop.trigger.shader.RADIAL_BLUR_TARGET) and not (x.get(obj_prop.trigger.shader.RADIAL_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.RADIAL_BLUR_PLAYER_2)) else None, fixed=FALSE, min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.shader.MOTION_BLUR: [
-            IDRule(type='color_id', prop=obj_prop.trigger.shader.MOTION_BLUR_REF_CHANNEL, default=0, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.shader.MOTION_BLUR_REF_CHANNEL, default=0, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, remappable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.trigger.shader.MOTION_BLUR_CENTER_ID, default=lambda x: 0 if not (x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_2) or x.get(obj_prop.trigger.shader.MOTION_BLUR_CENTER)) else None, fixed=FALSE, min=1, max=9999, remappable=True)
         ],
     None: [
-            IDRule(type='color_id', prop=obj_prop.COLOR_1, fallback=lambda x: COLOR_1_DEFAULT.get(x.get(obj_prop.ID,0)), default=0, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, reference=True),
-            IDRule(type='color_id', prop=obj_prop.COLOR_2, fallback=lambda x: COLOR_2_DEFAULT.get(x.get(obj_prop.ID,0)), default=0, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.COLOR_1, fallback=lambda x: COLOR_1_DEFAULT.get(x.get(obj_prop.ID,0)), default=0, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.COLOR_2, fallback=lambda x: COLOR_2_DEFAULT.get(x.get(obj_prop.ID,0)), default=0, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, reference=True),
             IDRule(type='group_id', prop=obj_prop.GROUPS, replace=lambda x, kvm: x.remap(kvm), fixed=FALSE, min=1, max=9999, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.PARENT_GROUPS, replace=lambda x, kvm: x.remap(kvm), fixed=FALSE, min=1, max=9999, iterable=True, reference=True),
             IDRule(type='link_id', prop=obj_prop.LINKED_GROUP, fixed=FALSE, min=1, reference=True),
@@ -66,23 +66,23 @@ ID_RULES = {
             IDRule(type='control_id', prop=obj_prop.trigger.CONTROL_ID, default=0, fixed=FALSE, remappable=True, reference=True)
         ],
     obj_id.trigger.PULSE: [
-            IDRule(type='color_id', prop=obj_prop.trigger.pulse.COPY_ID, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, reference=True),
-            IDRule(type='color_id', prop=obj_prop.trigger.pulse.TARGET_ID, condition=lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 0, default=0, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, remappable=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.pulse.COPY_ID, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.pulse.TARGET_ID, condition=lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 0, default=0, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, remappable=True),
             IDRule(type='group_id', prop=obj_prop.trigger.pulse.TARGET_ID, condition=lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 1, default=0, fixed=FALSE, min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.area.TINT: [
-            IDRule(type='color_id', prop=obj_prop.trigger.effect.TINT_CHANNEL, default=lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.effect.TINT_CHANNEL, default=lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, reference=True),
             IDRule(type='group_id', prop=obj_prop.trigger.effect.CENTER_ID, default=lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None, fixed=FALSE, min=1, max=9999, remappable=True),
             IDRule(type='group_id', prop=obj_prop.trigger.effect.TARGET_ID, default=0, fixed=FALSE, min=1, max=9999, remappable=True),
             IDRule(type='effect_id', prop=obj_prop.trigger.effect.EFFECT_ID, default=0, fixed=FALSE, reference=True)
         ],
     obj_id.trigger.enter.TINT: [
-            IDRule(type='color_id', prop=obj_prop.trigger.effect.TINT_CHANNEL, default=lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None, fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, reference=True),
+            IDRule(type='color_id', prop=obj_prop.trigger.effect.TINT_CHANNEL, default=lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None, fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, reference=True),
             IDRule(type='effect_id', prop=obj_prop.trigger.effect.EFFECT_ID, default=0, fixed=FALSE, reference=True),
             IDRule(type='enter_channel', prop=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, fixed=FALSE, min=-32768, max=32767, remappable=True)
         ],
     obj_id.LEVEL_START: [
-            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.get_channels(), replace=lambda x, kvm: x.remap(kvm), fixed=lambda x: if not (1 <= x <= 999), min=1, max=1101, iterable=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.get_channels(), replace=lambda x, kvm: x.remap(kvm), fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True),
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, default=0, fixed=FALSE, min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [
