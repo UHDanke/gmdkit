@@ -54,7 +54,8 @@ def compile_rules(
             
     return rules
 
-            
+  
+    
 def get_ids(
         obj:Object,
         rule_dict:dict[Any,list[IDRule]]=ID_RULES
@@ -99,21 +100,9 @@ def get_ids(
             if not rule.iterable: val = val,
             
             for v in val:
-                is_default = False
-                if rule.default is not None:
-                    if not callable(rule.default):
-                        if v is None:
-                            v = rule.default
-                            is_default = True
-                        elif v == rule.default:
-                            is_default = True
-                    else:
-                        if v is None:
-                            v = rule.default(obj)
-                            is_default = True
-                        elif v == rule.default(obj):
-                            is_default = True
-                        
+                default = rule.get_value("default", obj)
+                
+                if v is None: v = default
                 if v is None: continue
                     
                 yield Identifier(
@@ -125,8 +114,8 @@ def get_ids(
                         reference = rule.reference,
                         min_limit = rule.min,
                         max_limit = rule.max,
-                        default = is_default,
-                        fixed = rule.fixed or is_default
+                        default = v==default,
+                        fixed = rule.get_value("fixed", v) or v==default
                         )
  
 
@@ -211,9 +200,10 @@ class IDType:
         self,
         remappable:bool = None,
         reference:bool = None,
-        remap:bool = True,
+        remap:bool = None,
+        default:bool = None,
+        fixed:bool = None,
         in_range:bool = False,
-        no_defaults:bool=False
     ) -> set[int]:
 
         result = set()
@@ -222,8 +212,10 @@ class IDType:
             if in_range and not self.min <= i.id_val <= self.max:
                 continue
             
-            if no_defaults and i.default:
-                
+            if default is not None and i.default != default:
+                continue
+            
+            if fixed is not None and i.fixed != fixed:
                 continue
             
             if remappable is not None and i.remappable != remappable:
@@ -293,7 +285,8 @@ def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
             min_limit=0,
             max_limit=2147483647,
             reference=True,
-            default=remap_id==0
+            default=remap_id==0,
+            fixed=False
             )
         obj.spawn_remap_id = remap_id
         ids.add(identif)
@@ -362,7 +355,6 @@ def regroup(
         max_ids:dict=None,
         ignored_ids:dict=None,
         reserved_ids:dict=None,
-        no_defaults:bool=True,
         remaps:Literal["none","naive","search"]="none"
         ):
     
@@ -375,7 +367,7 @@ def regroup(
     new_remaps = {}
     
     for k, v in ids.items():        
-        values = v.get_ids(no_defaults=no_defaults)
+        values = v.get_ids(default=False,fixed=False)
         id_min, id_max = v.get_limits()
         low = max(min_ids.get(k, id_min),id_min)
         high = min(max_ids.get(k, id_max),id_max)

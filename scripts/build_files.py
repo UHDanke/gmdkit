@@ -410,7 +410,16 @@ class IDRule:
     condition: Callable = None
     fallback: Callable = None
     default: Callable = None
-    replace: Callable = None              
+    replace: Callable = None
+
+    def get_value(self, attr, *a, default=None):
+        value = getattr(self, attr, default)
+        
+        if callable(p):
+            return value(*a)
+        
+        return value
+            
 """.strip())
 file.write(*[""]*2)
 file.write(f"ID_TYPES = {repr(unique_types)}")
