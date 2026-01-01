@@ -415,7 +415,7 @@ class IDRule:
     def get_value(self, attr, *a, default=None):
         value = getattr(self, attr, default)
         
-        if callable(p):
+        if callable(value):
             return value(*a)
         
         return value
