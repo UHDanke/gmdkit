@@ -1,4 +1,4 @@
-from gmdkit.models.object import Object, ObjectList
+from gmdkit.models.object import ObjectList
 from gmdkit.mappings import obj_id, obj_prop
 
 

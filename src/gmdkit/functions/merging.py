@@ -8,7 +8,7 @@ from gmdkit.mappings import obj_prop, color_prop, color_id
 from gmdkit.models.level import Level, LevelList
 from gmdkit.functions.object import offset_position
 from gmdkit.functions.object_list import boundaries
-from gmdkit.functions.remapping import compile_id_context, regroup
+from gmdkit.functions.remapping import regroup
 from gmdkit.functions.color import create_color_triggers
 
 def load_folder(path, extension:str='.gmd') -> LevelList:
@@ -105,10 +105,10 @@ def regroup_levels(level_list:LevelList, ignored_ids:dict=None, reserved_ids:dic
     collisions = reserved_ids
     
     for lvl in level_list:
+        #print(collisions)
         objs = [lvl.start] + lvl.objects
-        #print(regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions, no_defaults=True))
+        print(regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions, no_defaults=True))
         print()
-        
         for k, v in objs.id_context.items():
             collisions.setdefault(k,set()).update(v.get_ids())
     

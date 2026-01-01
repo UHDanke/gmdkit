@@ -23,6 +23,7 @@ class Identifier:
     max_limit: int
     reference: bool
     default: bool
+    fixed: bool
     
 
 def compile_rules(
@@ -53,54 +54,6 @@ def compile_rules(
             
     return rules
 
-        
-def replace_ids(
-        obj:Object, 
-        key_value_map:dict[str,dict[int,int]],
-        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
-        ) -> None:
-    """
-    Remaps an object's IDs to new values.
-
-    Parameters
-    ----------
-    obj : Object
-        The object to modify.
-        
-    key_value_map : dict[str,dict[int,int]]
-        A dictionary mapping ID types to dictionaries mapping old to new values.
-        
-    rule_dict : dict[int|str,RULE_FORMAT], optional
-        dictionary containing rules used to replace IDs. Defaults to ID_RULES.
-
-    Returns
-    -------
-    None
-    
-
-    """
-    
-    rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
-    
-    for rule in rules:
-        
-        pid = rule.prop
-        
-        if (val:=obj.get(rule.prop)) is not None:
-
-            if (cond:=rule.condition) and callable(cond) and not cond(obj):
-                continue
-                        
-            kv_map = key_value_map.get(rule.type)
-
-            if kv_map is None: continue
-            
-            if (func:=rule.replace) and callable(func):
-                func(val, kv_map)
-            
-            else:
-                obj[pid] = kv_map.get(val, val)
-                
             
 def get_ids(
         obj:Object,
@@ -172,9 +125,75 @@ def get_ids(
                         reference = rule.reference,
                         min_limit = rule.min,
                         max_limit = rule.max,
-                        default = is_default
+                        default = is_default,
+                        fixed = rule.fixed or is_default
                         )
  
+
+def replace_ids(
+        obj:Object, 
+        key_value_map:dict[str,dict[int,int]],
+        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
+        ) -> None:
+    """
+    Remaps an object's IDs to new values.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+        
+    key_value_map : dict[str,dict[int,int]]
+        A dictionary mapping ID types to dictionaries mapping old to new values.
+        
+    rule_dict : dict[int|str,RULE_FORMAT], optional
+        dictionary containing rules used to replace IDs. Defaults to ID_RULES.
+
+    Returns
+    -------
+    None
+    
+
+    """
+    
+    rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
+    
+    for rule in rules:
+        
+        pid = rule.prop
+        
+        if (val:=obj.get(rule.prop)) is not None or rule.fallback is not None or rule.default is not None:
+
+            if (cond:=rule.condition) and callable(cond) and not cond(obj):
+                continue
+            
+            
+            kv_map = key_value_map.get(rule.type)
+
+            if kv_map is None: continue
+            
+            if not val and val is not False:
+                # object id fallback
+                if callable(rule.fallback):
+                    val = rule.fallback(obj)
+
+            if rule.fixed: continue            
+
+            if rule.default is not None:
+                if val is None:
+                    continue
+                if callable(rule.default) and val == rule.default(obj):
+                    continue
+                if val == rule.default:
+                    continue
+
+            if (func:=rule.replace) and callable(func):
+                func(val, kv_map)
+            
+            elif (new:=kv_map.get(val)) is not None:
+                obj[pid] = new
+
+                
 
 
 class IDType:
@@ -206,7 +225,7 @@ class IDType:
             if no_defaults and i.default:
                 
                 continue
-            if i.id_val == 0: print(i)
+            
             if remappable is not None and i.remappable != remappable:
                 continue
 
@@ -343,6 +362,7 @@ def regroup(
         max_ids:dict=None,
         ignored_ids:dict=None,
         reserved_ids:dict=None,
+        no_defaults:bool=True,
         remaps:Literal["none","naive","search"]="none"
         ):
     
@@ -355,7 +375,7 @@ def regroup(
     new_remaps = {}
     
     for k, v in ids.items():        
-        values = v.get_ids()
+        values = v.get_ids(no_defaults=no_defaults)
         id_min, id_max = v.get_limits()
         low = max(min_ids.get(k, id_min),id_min)
         high = min(max_ids.get(k, id_max),id_max)
@@ -367,11 +387,11 @@ def regroup(
         collisions |= reserved
         if collisions:
             new_ids = next_free(
-                values,
+                v.get_ids(),
                 vmin=low,
                 vmax=high,
                 count=len(collisions)
-                )         
+                )
             new_remaps[k] = dict(zip(collisions,new_ids))
     obj_list.apply(replace_ids,key_value_map=new_remaps)
     compile_id_context(obj_list,remaps=remaps)

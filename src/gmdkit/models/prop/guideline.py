@@ -11,7 +11,6 @@ from gmdkit.models.serialization import ArrayDecoderMixin, DataclassDecoderMixin
 class Guideline(DataclassDecoderMixin):
     
     SEPARATOR = "~"
-    END_DELIMITER = "~"
     LIST_FORMAT = True
     
     time: float = 0

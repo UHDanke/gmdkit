@@ -620,9 +620,9 @@ class DelimiterMixin:
         end_delimiter = end_delimiter or self.END_DELIMITER
         
         string = super().to_string(*args, **kwargs)
-        
-        if start_delimiter: string = start_delimiter + string
-        if end_delimiter: string = string + end_delimiter
+        if string:
+            if start_delimiter: string = start_delimiter + string
+            if end_delimiter: string = string + end_delimiter
         
         return string
 

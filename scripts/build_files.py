@@ -364,16 +364,14 @@ def try_convert_int(val):
         return val
 
 # First convert strings to int where possible
-remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
-remap_table['min'] = remap_table['min'].astype("Int64")
-remap_table['max'] = remap_table['max'].astype("Int64")
-remap_table["default"] = remap_table['default'].apply(try_convert_int)
-print(remap_table["default"] )
 remap_table = remap_table.applymap(
     lambda x: pd.NA if x is False else x
 )
 remap_table.replace(float("nan"), pd.NA, inplace=True)
-print(remap_table["default"] )
+remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
+remap_table['min'] = remap_table['min'].apply(try_convert_int)
+remap_table['max'] = remap_table['max'].apply(try_convert_int)
+remap_table["default"] = remap_table['default'].apply(try_convert_int)
 remap_table = remap_table.rename(columns={
     "property_id": "prop"    
     })
@@ -395,7 +393,7 @@ from typing import Callable
 from dataclasses import dataclass
 
 # Package Imports
-from gmdkit.mappings import obj_id, obj_prop, color_prop
+from gmdkit.mappings import obj_id, obj_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 
 @dataclass(frozen=True)
@@ -407,10 +405,11 @@ class IDRule:
     remappable: bool = False
     iterable: bool = False
     reference: bool = False
+    fixed: bool = False
     function: Callable = None
     condition: Callable = None
     fallback: Callable = None
-    default: int = None
+    default: Callable = None
     replace: Callable = None              
 """.strip())
 file.write(*[""]*2)

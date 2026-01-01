@@ -9,9 +9,9 @@ from gmdkit.constants.game import guideline as guide_color
 
 def next_free(
         values:Iterable[int],
-        start:int=0,
-        vmin:int=-math.inf,
-        vmax:int=math.inf,
+        start:int=None,
+        vmin:int=-2**31,
+        vmax:int=2**31-1,
         count:int=1
         ) -> list[int]:
     """
@@ -41,26 +41,33 @@ def next_free(
         A list of ids returned.
     """
     used = set(values)
+    used.add(0)
     result = []
 
-    def range_search(start,stop,step):
-        
+    def range_search(start: int, stop: int, step: int):
         nonlocal result
-        
-        for i in range(start,stop+step,step):
-            
-            if len(result) > count: 
+        i = start
+        while (i < stop if step > 0 else i > stop):
+            if len(result) >= count:
                 break
-            
-            if i not in used: 
+            if i not in used:
                 result.append(i)
-    
-    if start >= 0:
-        range_search(start, vmax, 1)
-    
-    if start < 0 or len(result) < count: 
-        range_search(start, vmin, -1)
+            i += step
 
+
+    if vmin > vmax: return result
+    if start is None:
+        if vmin <= 0: start = 0
+        else: start = vmin
+    elif start < vmin: start = vmin
+    elif start > vmax and vmin < 0:  start = -1
+        
+    if start is not None and start <= vmax:
+        range_search(start, vmax, 1)
+
+    if len(result) < count and start is not None and start >= vmin:
+        range_search(start, vmin, -1)
+        
     return result
 
 
