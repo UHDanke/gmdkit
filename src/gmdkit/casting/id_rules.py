@@ -22,6 +22,14 @@ class IDRule:
     default: Callable = None
     replace: Callable = None
 
+    def get_value(self, attr, *a, default=None):
+        value = getattr(self, attr, default)
+        
+        if callable(p):
+            return value(*a)
+        
+        return value
+
 
 ID_TYPES = ['color_id', 'group_id', 'item_id', 'time_id', 'collision_id', 'link_id', 'trigger_channel', 'gradient_id', 'effect_id', 'enter_channel', 'keyframe_id', 'song_id', 'sfx_id', 'unique_sfx_id', 'song_channel', 'sfx_group', 'force_id', 'material_id', 'control_id', 'remap_base', 'remap_target']
 
@@ -75,7 +83,7 @@ ID_RULES = {
         ],
     obj_id.LEVEL_START: [
             IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if 0 < i <= 999], replace=lambda x, kvm: x.remap(kvm), min=1, max=1101, iterable=True),
-            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if i > 999], replace=lambda x, kvm: None, min=1, max=1101, fixed=True, iterable=True, reference=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if i > 999], replace=lambda x, kvm: None, fixed=True, min=1, max=1101, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, default=0, min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [
