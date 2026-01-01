@@ -7,7 +7,16 @@ import math
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
+from gmdkit.models.prop.list import IDList
 
+def add_groups(obj_list:ObjectList, groups):
+    
+    for obj in obj_list:
+        g = obj.setdefault(obj_prop.GROUPS, IDList())
+        if len(g) + len(groups) > 10:
+            raise ValueError
+        g.extend(groups)
+        
 
 def index_objects(obj_list:ObjectList, start:int=0) -> None:
     """

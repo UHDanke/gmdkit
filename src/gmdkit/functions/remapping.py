@@ -193,12 +193,12 @@ class IDType:
     
     def get_ids(
         self,
-        remappable:bool = None,
-        reference:bool = None,
-        remap:bool = None,
         default:bool = None,
         fixed:bool = None,
+        remappable:bool = None,
+        reference:bool = None,
         in_range:bool = False,
+        remap:bool = False,
     ) -> set[int]:
 
         result = set()
@@ -223,7 +223,7 @@ class IDType:
                 result.update(self.remaps.get(i.id_val,set()))
             
             result.add(i.id_val)
-                
+        
         return result
     
     
@@ -346,15 +346,13 @@ def compile_id_context(obj_list:ObjectList, extra_ids:set()=None, remaps:Literal
 
 def regroup(
         obj_list,
-        min_ids:dict=None,
-        max_ids:dict=None,
-        ignored_ids:dict=None,
+        new_id_range:dict=None,
         reserved_ids:dict=None,
+        ignored_ids:dict=None,
         remaps:Literal["none","naive","search"]="none"
         ):
     
-    min_ids = min_ids or {}
-    max_ids = max_ids or {}
+    id_range = new_id_range or {}
     ignored_ids = ignored_ids or {}
     reserved_ids = reserved_ids or {}
     
@@ -364,24 +362,29 @@ def regroup(
     for k, v in ids.items():        
         values = v.get_ids(default=False,fixed=False)
         id_min, id_max = v.get_limits()
-        low = max(min_ids.get(k, id_min),id_min)
-        high = min(max_ids.get(k, id_max),id_max)
+        low, high = id_range.get(k, (id_min,id_max))
+        low = max(id_min, low)
+        high = min(id_max, high)
         
-        ignored = set(ignored_ids.get(k,set())) & values
-        reserved = set(reserved_ids.get(k,set())) & values
+        reserved = set(reserved_ids.get(k,set()))
+        ignored = set(ignored_ids.get(k,set()))
+        
         collisions = set(filter(lambda x: not (low <= x <= high), values))
-        collisions -= ignored
         collisions |= reserved
+        collisions -= ignored
+
+        search_space = v.get_ids() | reserved
+        
         if collisions:
             new_ids = next_free(
-                v.get_ids(),
+                search_space,
                 vmin=low,
                 vmax=high,
                 count=len(collisions)
                 )
             new_remaps[k] = dict(zip(collisions,new_ids))
-    obj_list.apply(replace_ids,key_value_map=new_remaps)
-    compile_id_context(obj_list,remaps=remaps)
+    obj_list.apply(replace_ids, key_value_map=new_remaps)
+    compile_id_context(obj_list, remaps=remaps)
     return new_remaps
 
 

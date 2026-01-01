@@ -27,7 +27,6 @@ def clean_duplicate_groups(obj:Object) -> None:
         obj[obj_prop.GROUPS][:] = set(groups)
 
 
-
 def recolor_shaders(obj:Object) -> None:
     """
     Makes shader triggers use white color instead of object outline.

@@ -67,7 +67,7 @@ def next_free(
 
     if len(result) < count and start is not None and start >= vmin:
         range_search(start, vmin, -1)
-        
+    
     return result
 
 

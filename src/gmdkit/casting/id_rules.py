@@ -115,10 +115,10 @@ ID_RULES = {
             IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, min=1, max=9999, remappable=True)
         ],
     747: [
-            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, fixed=FALSE, min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, min=1, max=9999, remappable=True)
         ],
     2902: [
-            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, fixed=FALSE, min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.EDIT_SONG: [
             IDRule(type='group_id', prop=obj_prop.trigger.song.GROUP_ID_1, default=0, min=1, max=9999, remappable=True),
