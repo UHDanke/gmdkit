@@ -15,10 +15,11 @@ class IDRule:
     remappable: bool = False
     iterable: bool = False
     reference: bool = False
+    fixed: bool = False
     function: Callable = None
     condition: Callable = None
     fallback: Callable = None
-    default: int = None
+    default: Callable = None
     replace: Callable = None
 
 
@@ -74,7 +75,7 @@ ID_RULES = {
         ],
     obj_id.LEVEL_START: [
             IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if 0 < i <= 999], replace=lambda x, kvm: x.remap(kvm), min=1, max=1101, iterable=True),
-            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if i > 999], replace=lambda x, kvm: None, min=1, max=1101, iterable=True, reference=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: [i for i in x.get_channels() if i > 999], replace=lambda x, kvm: None, min=1, max=1101, fixed=True, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, default=0, min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [

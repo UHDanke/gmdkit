@@ -1,648 +1,648 @@
-type,object id,property id,condition,function,replace,fallback,default,min,max,remappable,iterable,reference
-color id,obj_id.trigger.COLOR,obj_prop.trigger.color.CHANNEL,,,,,,1,1101,FALSE,FALSE,FALSE
-color id,obj_id.trigger.COLOR,obj_prop.trigger.color.COPY_ID,,,,,,1,1101,FALSE,FALSE,TRUE
-color id,obj_id.trigger.shader.GRAY_SCALE,obj_prop.trigger.shader.GRAY_SCALE_TINT_CHANNEL,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.GRAY_SCALE_USE_TINT) else None,1,1101,TRUE,FALSE,TRUE
-color id,obj_id.trigger.shader.LENS_CIRCLE,obj_prop.trigger.shader.LENS_CIRCLE_TINT_CHANNEL,,,,,0,1,1101,TRUE,FALSE,TRUE
-color id,obj_id.trigger.shader.RADIAL_BLUR,obj_prop.trigger.shader.RADIAL_BLUR_REF_CHANNEL,,,,,0,1,1101,TRUE,FALSE,TRUE
-color id,obj_id.trigger.shader.MOTION_BLUR,obj_prop.trigger.shader.MOTION_BLUR_REF_CHANNEL,,,,,0,1,1101,TRUE,FALSE,TRUE
-color id,,obj_prop.COLOR_1,,,,"lambda x: COLOR_1_DEFAULT.get(x.get(obj_prop.ID,0))",0,1,1101,FALSE,FALSE,TRUE
-color id,,obj_prop.COLOR_2,,,,"lambda x: COLOR_2_DEFAULT.get(x.get(obj_prop.ID,0))",0,1,1101,FALSE,FALSE,TRUE
-color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.COPY_ID,,,,,,1,1101,FALSE,FALSE,TRUE
-color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 0",,,,0,1,1101,TRUE,FALSE,FALSE
-color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,1,1101,FALSE,FALSE,TRUE
-color id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,1,1101,FALSE,FALSE,TRUE
-color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if 0 < i <= 999],"lambda x, kvm: x.remap(kvm)",,,1,1101,FALSE,TRUE,FALSE
-color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if i > 999],"lambda x, kvm: None",,,1,1101,FALSE,TRUE,TRUE
-group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_POS,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ALPHA,obj_prop.trigger.alpha.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.TOGGLE,obj_prop.trigger.toggle.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.TOGGLE_BLOCK,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.orb.TOGGLE,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ON_DEATH,obj_prop.trigger.on_death.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.TELEPORT,obj_prop.trigger.teleport.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_1,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.song.PLAYER_1) or x.get(obj_prop.trigger.song.PLAYER_2) or x.get(obj_prop.trigger.song.CAMERA)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.sfx.PLAYER_1) or x.get(obj_prop.trigger.sfx.PLAYER_2) or x.get(obj_prop.trigger.sfx.CAMERA)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.sfx.PLAYER_1) or x.get(obj_prop.trigger.sfx.PLAYER_2) or x.get(obj_prop.trigger.sfx.CAMERA)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.CENTER_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.AIM_TARGET,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) or x.get(obj_prop.trigger.rotate.FOLLOW_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.FOLLOW,obj_prop.trigger.follow.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.FOLLOW,obj_prop.trigger.follow.FOLLOW_TARGET,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ANIMATE,obj_prop.trigger.animate.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.TOUCH,obj_prop.trigger.touch.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.COUNT,obj_prop.trigger.count.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.INSTANT_COUNT,obj_prop.trigger.instant_count.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.FOLLOW_PLAYER_Y,obj_prop.trigger.follow_player_y.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.RANDOM,obj_prop.trigger.random.TRUE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.RANDOM,obj_prop.trigger.random.FALSE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.END_WALL,obj_prop.trigger.end_wall.GROUP_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.CAMERA_EDGE,obj_prop.trigger.camera_edge.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.SPAWN_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.TARGET_POS,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.RESPAWN_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.SCALE,obj_prop.trigger.scale.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SCALE,obj_prop.trigger.scale.CENTER_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.FOLLOW_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.MAX_RANGE_REF,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_SPEED_REF,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_DIR_REF,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.GROUP_ID,,,,,"lambda x: 0 if x.get(obj_prop.trigger.keyframe.INDEX,0) == 1 else None",1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.SPAWN_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.PARENT_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.ANIMATION_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.END,obj_prop.trigger.end.SPAWN_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.END,obj_prop.trigger.end.TARGET_POS,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EVENT,obj_prop.trigger.event.SPAWN_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SPAWN_PARTICLE,obj_prop.trigger.spawn_particle.PARTICLE_GROUP,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SPAWN_PARTICLE,obj_prop.trigger.spawn_particle.POSITION_GROUP,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.TRUE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.FALSE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.UI,obj_prop.trigger.ui.GROUP_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.UI,obj_prop.trigger.ui.UI_TARGET,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.TIME,obj_prop.trigger.time.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.TIME_EVENT,obj_prop.trigger.time_event.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.RESET,obj_prop.trigger.reset.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.OBJECT_CONTROL,obj_prop.trigger.object_control.TARGET_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.LINK_VISIBLE,obj_prop.trigger.link_visible.GROUP_ID,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.TRUE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.FALSE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.STATE_BLOCK,obj_prop.trigger.state_block.STATE_ON,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.STATE_BLOCK,obj_prop.trigger.state_block.STATE_OFF,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.STATIC_CAMERA,obj_prop.trigger.static_camera.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.U,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.D,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.L,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.R,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.shader.SHOCKWAVE,obj_prop.trigger.shader.SHOCKWAVE_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.SHOCKWAVE_TARGET) and not (x.get(obj_prop.trigger.shader.SHOCKWAVE_PLAYER_1) or x.get(obj_prop.trigger.shader.SHOCKWAVE_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.shader.SHOCKLINE,obj_prop.trigger.shader.SHOCKLINE_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.SHOCKLINE_TARGET) and not (obj_prop.trigger.shader.SHOCKLINE_PLAYER_1 or obj_prop.trigger.shader.SHOCKLINE_PLAYER_2) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.shader.LENS_CIRCLE,obj_prop.trigger.shader.LENS_CIRCLE_CENTER_ID,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.shader.LENS_CIRCLE_PLAYER_1) or x.get(obj_prop.trigger.shader.LENS_CIRCLE_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.shader.RADIAL_BLUR,obj_prop.trigger.shader.RADIAL_BLUR_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.RADIAL_BLUR_TARGET) and not (x.get(obj_prop.trigger.shader.RADIAL_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.RADIAL_BLUR_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.shader.MOTION_BLUR,obj_prop.trigger.shader.MOTION_BLUR_CENTER_ID,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_2) or x.get(obj_prop.trigger.shader.MOTION_BLUR_CENTER)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.shader.BULGE,obj_prop.trigger.shader.BULGE_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.BULGE_TARGET) and not (x.get(obj_prop.trigger.shader.BULGE_PLAYER_1) or x.get(obj_prop.trigger.shader.BULGE_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.shader.PINCH,obj_prop.trigger.shader.PINCH_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.PINCH_TARGET) and not (x.get(obj_prop.trigger.shader.PINCH_PLAYER_1) or x.get(obj_prop.trigger.shader.PINCH_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE
-group id,,obj_prop.GROUPS,,,"lambda x, kvm: x.remap(kvm)",,,1,9999,FALSE,TRUE,TRUE
-group id,,obj_prop.PARENT_GROUPS,,,"lambda x, kvm: x.remap(kvm)",,,1,9999,FALSE,TRUE,TRUE
-group id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 1",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.STOP,obj_prop.trigger.stop.TARGET_ID,"lambda x: x.get(obj_prop.trigger.stop.USE_CONTROL_ID,0)== 0",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.SEQUENCE,obj_prop.trigger.sequence.SEQUENCE,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,1,9999,FALSE,TRUE,FALSE
-group id,obj_id.trigger.ADV_RANDOM,obj_prop.trigger.adv_random.TARGETS,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,1,9999,FALSE,TRUE,FALSE
-group id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 0",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.SPEED_REF,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.DIR_REF,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.RETARGET_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 0",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.RETARGET_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.FOLLOW_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.collectible.USER_COIN,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.collectible.USER_COIN,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.collectible.KEY,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.collectible.KEY,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,1587,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,1587,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,1589,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,1589,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,1598,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,1598,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.collectible.SMALL_COIN,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.collectible.SMALL_COIN,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,3601,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,3601,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4401,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4401,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4402,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4402,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4403,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4403,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4404,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4404,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4405,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4405,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4406,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4406,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4407,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4407,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4408,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4408,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4409,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4409,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4410,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4410,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4411,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4411,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4412,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4412,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4413,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4413,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4414,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4414,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4415,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4415,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4416,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4416,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4417,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4417,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4418,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4418,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4419,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4419,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4420,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4420,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4421,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4421,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4422,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4422,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4423,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4423,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4424,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4424,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4425,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4425,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4426,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4426,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4427,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4427,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4428,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4428,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4429,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4429,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4430,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4430,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4431,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4431,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4432,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4432,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4433,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4433,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4434,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4434,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4435,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4435,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4436,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4436,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4437,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4437,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4438,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4438,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4439,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4439,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4440,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4440,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4441,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4441,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4442,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4442,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4443,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4443,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4444,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4444,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4445,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4445,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4446,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4446,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4447,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4447,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4448,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4448,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4449,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4449,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4450,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4450,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4451,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4451,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4452,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4452,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4453,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4453,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4454,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4454,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4455,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4455,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4456,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4456,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4457,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4457,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4458,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4458,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4459,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4459,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4460,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4460,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4461,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4461,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4462,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4462,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4463,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4463,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4464,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4464,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4465,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4465,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4466,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4466,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4467,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4467,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4468,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4468,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4469,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4469,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4470,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4470,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4471,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4471,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4472,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4472,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4473,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4473,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4474,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4474,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4475,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4475,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4476,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4476,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4477,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4477,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4478,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4478,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4479,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4479,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4480,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4480,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4481,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4481,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4482,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4482,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4483,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4483,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4484,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4484,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4485,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4485,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4486,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4486,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4487,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4487,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4488,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4488,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4538,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4538,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4489,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4489,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4490,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4490,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4491,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4491,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4492,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4492,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4493,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4493,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4494,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4494,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4495,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4495,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4496,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4496,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4497,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4497,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4537,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4537,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4498,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4498,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4499,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4499,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4500,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4500,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4501,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4501,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4502,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4502,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4503,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4503,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4504,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4504,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4505,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4505,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4506,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4506,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4507,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4507,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4508,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4508,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4509,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4509,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4510,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4510,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4511,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4511,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4512,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4512,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4513,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4513,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4514,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4514,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4515,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4515,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4516,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4516,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4517,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4517,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4518,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4518,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4519,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4519,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4520,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4520,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4521,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4521,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4522,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4522,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4523,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4523,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4524,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4524,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4525,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4525,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4526,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4526,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4527,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4527,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4528,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4528,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4529,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4529,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4530,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4530,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4531,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4531,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4532,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4532,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4533,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4533,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4534,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4534,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4535,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4535,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4536,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4536,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,4539,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE
-group id,4539,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE
-group id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_MOVE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 0",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_SCALE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_ROTATE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 2",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_FADE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 3",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_TINT,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 4",,,,0,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.LEVEL_START,obj_prop.level.PLAYER_SPAWN,,,,,0,1,9999,FALSE,FALSE,FALSE
-item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.TARGET_ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) in (0,1)",,,,,1,9999,TRUE,FALSE,FALSE
-time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.TARGET_ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) == 2",,,,,1,9999,TRUE,FALSE,FALSE
-item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) in (0,1)",,,,,1,9999,TRUE,FALSE,TRUE
-time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) == 2",,,,,1,9999,TRUE,FALSE,TRUE
-item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) in (0,1)",,,,,1,9999,TRUE,FALSE,TRUE
-time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) == 2",,,,,1,9999,TRUE,FALSE,TRUE
-item id,obj_id.trigger.COUNT,obj_prop.trigger.count.ITEM_ID,,,,,0,0,9999,TRUE,FALSE,FALSE
-item id,obj_id.ITEM_LABEL,obj_prop.item_label.ITEM_ID,"lambda x: x.get(obj_prop.item_label.TIME_COUNTER,0) == 0",,,,0,0,9999,FALSE,FALSE,TRUE
-time id,obj_id.ITEM_LABEL,obj_prop.item_label.ITEM_ID,"lambda x: x.get(obj_prop.item_label.TIME_COUNTER,0) == 1",,,,0,0,9999,FALSE,FALSE,TRUE
-item id,obj_id.trigger.INSTANT_COUNT,obj_prop.trigger.instant_count.ITEM_ID,,,,,0,0,9999,TRUE,FALSE,TRUE
-item id,obj_id.trigger.PICKUP,obj_prop.trigger.pickup.ITEM_ID,,,,,0,0,9999,TRUE,FALSE,FALSE
-time id,obj_id.trigger.TIME,obj_prop.trigger.time.ITEM_ID,,,,,0,,,TRUE,FALSE,TRUE
-time id,obj_id.trigger.TIME_EVENT,obj_prop.trigger.time_event.ITEM_ID,,,,,0,,,TRUE,FALSE,TRUE
-time id,obj_id.trigger.TIME_CONTROL,obj_prop.trigger.time_control.ITEM_ID,,,,,0,,,TRUE,FALSE,FALSE
-item id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) in (0,1)",,,,0,0,9999,TRUE,FALSE,TRUE
-time id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) == 2",,,,0,0,9999,TRUE,FALSE,TRUE
-item id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) in (0,1)",,,,0,1,9999,TRUE,FALSE,TRUE
-time id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) == 2",,,,0,1,9999,TRUE,FALSE,TRUE
-item id,obj_id.trigger.ITEM_PERSIST,obj_prop.trigger.item_persist.ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_persist.TIMER,0) == 0",,,,0,0,9999,TRUE,FALSE,FALSE
-time id,obj_id.trigger.ITEM_PERSIST,obj_prop.trigger.item_persist.ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_persist.TIMER,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-item id,obj_id.collectible.USER_COIN,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,obj_id.collectible.KEY,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,1587,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,1589,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,1598,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,obj_id.collectible.SMALL_COIN,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,3601,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4401,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4402,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4403,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4404,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4405,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4406,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4407,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4408,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4409,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4410,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4411,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4412,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4413,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4414,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4415,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4416,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4417,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4418,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4419,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4420,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4421,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4422,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4423,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4424,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4425,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4426,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4427,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4428,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4429,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4430,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4431,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4432,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4433,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4434,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4435,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4436,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4437,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4438,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4439,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4440,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4441,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4442,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4443,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4444,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4445,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4446,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4447,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4448,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4449,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4450,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4451,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4452,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4453,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4454,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4455,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4456,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4457,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4458,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4459,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4460,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4461,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4462,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4463,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4464,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4465,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4466,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4467,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4468,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4469,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4470,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4471,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4472,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4473,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4474,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4475,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4476,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4477,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4478,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4479,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4480,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4481,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4482,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4483,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4484,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4485,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4486,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4487,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4488,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4538,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4489,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4490,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4491,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4492,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4493,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4494,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4495,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4496,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4497,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4537,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4498,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4499,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4500,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4501,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4502,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4503,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4504,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4505,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4506,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4507,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4508,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4509,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4510,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4511,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4512,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4513,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4514,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4515,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4516,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4517,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4518,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4519,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4520,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4521,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4522,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4523,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4524,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4525,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4526,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4527,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4528,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4529,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4530,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4531,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4532,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4533,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4534,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4535,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4536,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-item id,4539,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE
-collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_A,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.collision.PLAYER_1) or x.get(obj_prop.trigger.collision.PLAYER_2) or x.get(obj_prop.trigger.collision.BETWEEN_PLAYERS)) else None ,1,9999,TRUE,FALSE,FALSE
-collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_B,,,,,lambda x: 0 if not x.get(obj_prop.trigger.collision.BETWEEN_PLAYERS) else None ,1,9999,TRUE,FALSE,FALSE
-collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_A,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.instant_collision.PLAYER_1) or x.get(obj_prop.trigger.instant_collision.PLAYER_2) or x.get(obj_prop.trigger.instant_collision.BETWEEN_PLAYERS)) else None ,1,9999,TRUE,FALSE,FALSE
-collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_B,,,,,lambda x: 0 if not x.get(obj_prop.trigger.instant_collision.BETWEEN_PLAYERS) else None ,1,9999,TRUE,FALSE,FALSE
-collision id,obj_id.trigger.COLLISION_BLOCK,obj_prop.trigger.collision_block.BLOCK_ID,,,,,0,1,9999,FALSE,FALSE,TRUE
-link id,,obj_prop.LINKED_GROUP,,,,,,1,,FALSE,FALSE,TRUE
-trigger channel,obj_id.trigger.ARROW,obj_prop.trigger.arrow.TARGET_CHANNEL,,,,,0,,,FALSE,FALSE,TRUE
-trigger channel,obj_id.trigger.START_POSITION,obj_prop.start_pos.TARGET_CHANNEL,,,,,0,,,FALSE,FALSE,FALSE
-trigger channel,,obj_prop.trigger.CHANNEL,,,,,0,,,FALSE,FALSE,TRUE
-gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,,0,0,1000,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.area.STOP,obj_prop.trigger.effect.TARGET_ID,,,,,0,,,TRUE,FALSE,TRUE
-effect id,obj_id.trigger.enter.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.enter.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.enter.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.enter.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,TRUE
-effect id,obj_id.trigger.enter.STOP,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_MOVE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_SCALE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_ROTATE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_FADE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_TINT,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-enter channel,,obj_prop.ENTER_CHANNEL,,,,,0,-32768,32767,FALSE,FALSE,TRUE
-enter channel,22,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,24,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,23,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,25,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,26,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,27,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,28,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,55,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,56,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,57,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,58,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,59,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,1915,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,obj_id.trigger.enter.MOVE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,obj_id.trigger.enter.SCALE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,obj_id.trigger.enter.ROTATE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,obj_id.trigger.enter.FADE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-enter channel,obj_id.trigger.enter.STOP,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE
-keyframe id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.KEY_ID,,,,,0,0,,FALSE,FALSE,TRUE
-song id,obj_id.trigger.SONG,obj_prop.trigger.song.SONG_ID,,,,,0,,,TRUE,FALSE,TRUE
-sfx id,obj_id.trigger.SFX,obj_prop.trigger.sfx.SFX_ID,,,,,0,,,TRUE,FALSE,TRUE
-unique sfx id,obj_id.trigger.SFX,obj_prop.trigger.sfx.UNIQUE_ID,,,,,0,,,TRUE,FALSE,TRUE
-unique sfx id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.UNIQUE_ID,,,,,0,,,TRUE,FALSE,FALSE
-song channel,obj_id.trigger.SONG,obj_prop.trigger.song.CHANNEL,,,,,0,0,4,TRUE,FALSE,TRUE
-song channel,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.CHANNEL,,,,,0,0,4,TRUE,FALSE,FALSE
-sfx group,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID,,,,,0,,,TRUE,FALSE,FALSE
-sfx group,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID,,,,,0,,,TRUE,FALSE,FALSE
-force id,obj_id.trigger.FORCE_BLOCK,obj_prop.trigger.force_block.FORCE_ID,,,,,0,,,FALSE,FALSE,TRUE
-force id,obj_id.trigger.FORCE_CIRCLE,obj_prop.trigger.force_block.FORCE_ID,,,,,0,-32768,32767,FALSE,FALSE,TRUE
-material id,,obj_prop.MATERIAL,,,,,0,-32768,32767,FALSE,FALSE,TRUE
-material id,obj_id.trigger.EVENT,obj_prop.trigger.event.EXTRA_ID_1,,,,,0,,,TRUE,FALSE,FALSE
-control id,,obj_prop.trigger.CONTROL_ID,,,,,0,,,TRUE,FALSE,TRUE
-control id,obj_id.trigger.STOP,obj_prop.trigger.stop.TARGET_ID,"lambda x: x.get(obj_prop.trigger.stop.USE_CONTROL_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-control id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-control id,obj_id.trigger.RETARGET_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE
-remap base,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.REMAPS,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,,,FALSE,TRUE,FALSE
-remap target,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.REMAPS,"lambda x: x.get(obj_prop.trigger.spawn.RESET_REMAP,0) == 1",lambda x: x.values(),"lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm))",,,,,FALSE,TRUE,FALSE
-remap target,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.REMAPS,"lambda x: x.get(obj_prop.trigger.spawn.RESET_REMAP,0) == 0",lambda x: x.values(),"lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm))",,,,,TRUE,TRUE,FALSE
+type,object id,property id,condition,function,replace,fallback,default,min,max,remappable,fixed,iterable,reference
+color id,obj_id.trigger.COLOR,obj_prop.trigger.color.CHANNEL,,,,,,1,1101,FALSE,FALSE,FALSE,FALSE
+color id,obj_id.trigger.COLOR,obj_prop.trigger.color.COPY_ID,,,,,,1,1101,FALSE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.shader.GRAY_SCALE,obj_prop.trigger.shader.GRAY_SCALE_TINT_CHANNEL,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.GRAY_SCALE_USE_TINT) else None,1,1101,TRUE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.shader.LENS_CIRCLE,obj_prop.trigger.shader.LENS_CIRCLE_TINT_CHANNEL,,,,,0,1,1101,TRUE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.shader.RADIAL_BLUR,obj_prop.trigger.shader.RADIAL_BLUR_REF_CHANNEL,,,,,0,1,1101,TRUE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.shader.MOTION_BLUR,obj_prop.trigger.shader.MOTION_BLUR_REF_CHANNEL,,,,,0,1,1101,TRUE,FALSE,FALSE,TRUE
+color id,,obj_prop.COLOR_1,,,,"lambda x: COLOR_1_DEFAULT.get(x.get(obj_prop.ID,0))",0,1,1101,FALSE,FALSE,FALSE,TRUE
+color id,,obj_prop.COLOR_2,,,,"lambda x: COLOR_2_DEFAULT.get(x.get(obj_prop.ID,0))",0,1,1101,FALSE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.COPY_ID,,,,,,1,1101,FALSE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 0",,,,0,1,1101,TRUE,FALSE,FALSE,FALSE
+color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,1,1101,FALSE,FALSE,FALSE,TRUE
+color id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,1,1101,FALSE,FALSE,FALSE,TRUE
+color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if 0 < i <= 999],"lambda x, kvm: x.remap(kvm)",,,1,1101,FALSE,FALSE,TRUE,FALSE
+color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: [i for i in x.get_channels() if i > 999],"lambda x, kvm: None",,,1,1101,FALSE,TRUE,TRUE,TRUE
+group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_POS,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ALPHA,obj_prop.trigger.alpha.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.TOGGLE,obj_prop.trigger.toggle.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.TOGGLE_BLOCK,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.orb.TOGGLE,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ON_DEATH,obj_prop.trigger.on_death.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.TELEPORT,obj_prop.trigger.teleport.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_1,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.song.PLAYER_1) or x.get(obj_prop.trigger.song.PLAYER_2) or x.get(obj_prop.trigger.song.CAMERA)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.sfx.PLAYER_1) or x.get(obj_prop.trigger.sfx.PLAYER_2) or x.get(obj_prop.trigger.sfx.CAMERA)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.sfx.PLAYER_1) or x.get(obj_prop.trigger.sfx.PLAYER_2) or x.get(obj_prop.trigger.sfx.CAMERA)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.CENTER_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.AIM_TARGET,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) or x.get(obj_prop.trigger.rotate.FOLLOW_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.FOLLOW,obj_prop.trigger.follow.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.FOLLOW,obj_prop.trigger.follow.FOLLOW_TARGET,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ANIMATE,obj_prop.trigger.animate.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.TOUCH,obj_prop.trigger.touch.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.COUNT,obj_prop.trigger.count.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.INSTANT_COUNT,obj_prop.trigger.instant_count.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.FOLLOW_PLAYER_Y,obj_prop.trigger.follow_player_y.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.RANDOM,obj_prop.trigger.random.TRUE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.RANDOM,obj_prop.trigger.random.FALSE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.END_WALL,obj_prop.trigger.end_wall.GROUP_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.CAMERA_EDGE,obj_prop.trigger.camera_edge.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.SPAWN_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.TARGET_POS,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.RESPAWN_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SCALE,obj_prop.trigger.scale.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SCALE,obj_prop.trigger.scale.CENTER_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.FOLLOW_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.MAX_RANGE_REF,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_SPEED_REF,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_DIR_REF,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.GROUP_ID,,,,,"lambda x: 0 if x.get(obj_prop.trigger.keyframe.INDEX,0) == 1 else None",1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.SPAWN_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.PARENT_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.ANIMATION_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.END,obj_prop.trigger.end.SPAWN_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.END,obj_prop.trigger.end.TARGET_POS,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EVENT,obj_prop.trigger.event.SPAWN_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SPAWN_PARTICLE,obj_prop.trigger.spawn_particle.PARTICLE_GROUP,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SPAWN_PARTICLE,obj_prop.trigger.spawn_particle.POSITION_GROUP,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.TRUE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.FALSE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.UI,obj_prop.trigger.ui.GROUP_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.UI,obj_prop.trigger.ui.UI_TARGET,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.TIME,obj_prop.trigger.time.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.TIME_EVENT,obj_prop.trigger.time_event.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.RESET,obj_prop.trigger.reset.GROUP_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.OBJECT_CONTROL,obj_prop.trigger.object_control.TARGET_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.LINK_VISIBLE,obj_prop.trigger.link_visible.GROUP_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.TRUE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.FALSE_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.STATE_BLOCK,obj_prop.trigger.state_block.STATE_ON,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.STATE_BLOCK,obj_prop.trigger.state_block.STATE_OFF,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.STATIC_CAMERA,obj_prop.trigger.static_camera.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.U,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.D,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.L,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.R,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.SHOCKWAVE,obj_prop.trigger.shader.SHOCKWAVE_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.SHOCKWAVE_TARGET) and not (x.get(obj_prop.trigger.shader.SHOCKWAVE_PLAYER_1) or x.get(obj_prop.trigger.shader.SHOCKWAVE_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.SHOCKLINE,obj_prop.trigger.shader.SHOCKLINE_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.SHOCKLINE_TARGET) and not (obj_prop.trigger.shader.SHOCKLINE_PLAYER_1 or obj_prop.trigger.shader.SHOCKLINE_PLAYER_2) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.LENS_CIRCLE,obj_prop.trigger.shader.LENS_CIRCLE_CENTER_ID,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.shader.LENS_CIRCLE_PLAYER_1) or x.get(obj_prop.trigger.shader.LENS_CIRCLE_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.RADIAL_BLUR,obj_prop.trigger.shader.RADIAL_BLUR_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.RADIAL_BLUR_TARGET) and not (x.get(obj_prop.trigger.shader.RADIAL_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.RADIAL_BLUR_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.MOTION_BLUR,obj_prop.trigger.shader.MOTION_BLUR_CENTER_ID,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_1) or x.get(obj_prop.trigger.shader.MOTION_BLUR_PLAYER_2) or x.get(obj_prop.trigger.shader.MOTION_BLUR_CENTER)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.BULGE,obj_prop.trigger.shader.BULGE_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.BULGE_TARGET) and not (x.get(obj_prop.trigger.shader.BULGE_PLAYER_1) or x.get(obj_prop.trigger.shader.BULGE_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.shader.PINCH,obj_prop.trigger.shader.PINCH_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.shader.PINCH_TARGET) and not (x.get(obj_prop.trigger.shader.PINCH_PLAYER_1) or x.get(obj_prop.trigger.shader.PINCH_PLAYER_2)) else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,,obj_prop.GROUPS,,,"lambda x, kvm: x.remap(kvm)",,,1,9999,FALSE,FALSE,TRUE,TRUE
+group id,,obj_prop.PARENT_GROUPS,,,"lambda x, kvm: x.remap(kvm)",,,1,9999,FALSE,FALSE,TRUE,TRUE
+group id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE,0) == 1",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.STOP,obj_prop.trigger.stop.TARGET_ID,"lambda x: x.get(obj_prop.trigger.stop.USE_CONTROL_ID,0)== 0",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.SEQUENCE,obj_prop.trigger.sequence.SEQUENCE,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,1,9999,FALSE,FALSE,TRUE,FALSE
+group id,obj_id.trigger.ADV_RANDOM,obj_prop.trigger.adv_random.TARGETS,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,1,9999,FALSE,FALSE,TRUE,FALSE
+group id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 0",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.SPEED_REF,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.DIR_REF,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.RETARGET_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 0",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.RETARGET_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.FOLLOW_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.collectible.USER_COIN,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.collectible.USER_COIN,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.collectible.KEY,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.collectible.KEY,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,1587,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,1587,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,1589,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,1589,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,1598,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,1598,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.collectible.SMALL_COIN,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.collectible.SMALL_COIN,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,3601,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,3601,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4401,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4401,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4402,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4402,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4403,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4403,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4404,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4404,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4405,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4405,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4406,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4406,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4407,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4407,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4408,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4408,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4409,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4409,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4410,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4410,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4411,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4411,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4412,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4412,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4413,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4413,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4414,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4414,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4415,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4415,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4416,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4416,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4417,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4417,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4418,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4418,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4419,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4419,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4420,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4420,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4421,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4421,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4422,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4422,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4423,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4423,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4424,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4424,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4425,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4425,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4426,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4426,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4427,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4427,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4428,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4428,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4429,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4429,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4430,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4430,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4431,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4431,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4432,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4432,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4433,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4433,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4434,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4434,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4435,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4435,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4436,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4436,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4437,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4437,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4438,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4438,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4439,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4439,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4440,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4440,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4441,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4441,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4442,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4442,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4443,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4443,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4444,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4444,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4445,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4445,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4446,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4446,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4447,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4447,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4448,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4448,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4449,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4449,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4450,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4450,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4451,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4451,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4452,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4452,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4453,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4453,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4454,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4454,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4455,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4455,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4456,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4456,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4457,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4457,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4458,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4458,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4459,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4459,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4460,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4460,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4461,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4461,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4462,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4462,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4463,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4463,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4464,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4464,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4465,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4465,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4466,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4466,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4467,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4467,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4468,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4468,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4469,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4469,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4470,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4470,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4471,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4471,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4472,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4472,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4473,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4473,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4474,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4474,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4475,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4475,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4476,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4476,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4477,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4477,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4478,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4478,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4479,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4479,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4480,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4480,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4481,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4481,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4482,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4482,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4483,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4483,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4484,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4484,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4485,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4485,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4486,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4486,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4487,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4487,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4488,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4488,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4538,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4538,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4489,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4489,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4490,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4490,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4491,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4491,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4492,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4492,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4493,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4493,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4494,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4494,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4495,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4495,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4496,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4496,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4497,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4497,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4537,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4537,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4498,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4498,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4499,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4499,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4500,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4500,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4501,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4501,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4502,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4502,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4503,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4503,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4504,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4504,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4505,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4505,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4506,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4506,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4507,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4507,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4508,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4508,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4509,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4509,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4510,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4510,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4511,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4511,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4512,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4512,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4513,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4513,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4514,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4514,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4515,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4515,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4516,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4516,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4517,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4517,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4518,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4518,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4519,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4519,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4520,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4520,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4521,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4521,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4522,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4522,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4523,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4523,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4524,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4524,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4525,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4525,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4526,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4526,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4527,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4527,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4528,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4528,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4529,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4529,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4530,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4530,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4531,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4531,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4532,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4532,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4533,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4533,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4534,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4534,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4535,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4535,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4536,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4536,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4539,obj_prop.trigger.collectible.GROUP_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,4539,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TARGET_ID,,,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.EDIT_MOVE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 0",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.EDIT_SCALE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.EDIT_ROTATE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 2",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.EDIT_FADE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 3",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.trigger.area.EDIT_TINT,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 4",,,,0,1,9999,TRUE,FALSE,FALSE,FALSE
+group id,obj_id.LEVEL_START,obj_prop.level.PLAYER_SPAWN,,,,,0,1,9999,FALSE,FALSE,FALSE,FALSE
+item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.TARGET_ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) in (0,1)",,,,,1,9999,TRUE,FALSE,FALSE,FALSE
+time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.TARGET_ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) == 2",,,,,1,9999,TRUE,FALSE,FALSE,FALSE
+item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) in (0,1)",,,,,1,9999,TRUE,FALSE,FALSE,TRUE
+time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) == 2",,,,,1,9999,TRUE,FALSE,FALSE,TRUE
+item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) in (0,1)",,,,,1,9999,TRUE,FALSE,FALSE,TRUE
+time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) == 2",,,,,1,9999,TRUE,FALSE,FALSE,TRUE
+item id,obj_id.trigger.COUNT,obj_prop.trigger.count.ITEM_ID,,,,,0,0,9999,TRUE,FALSE,FALSE,FALSE
+item id,obj_id.ITEM_LABEL,obj_prop.item_label.ITEM_ID,"lambda x: x.get(obj_prop.item_label.TIME_COUNTER,0) == 0",,,,0,0,9999,FALSE,FALSE,FALSE,TRUE
+time id,obj_id.ITEM_LABEL,obj_prop.item_label.ITEM_ID,"lambda x: x.get(obj_prop.item_label.TIME_COUNTER,0) == 1",,,,0,0,9999,FALSE,FALSE,FALSE,TRUE
+item id,obj_id.trigger.INSTANT_COUNT,obj_prop.trigger.instant_count.ITEM_ID,,,,,0,0,9999,TRUE,FALSE,FALSE,TRUE
+item id,obj_id.trigger.PICKUP,obj_prop.trigger.pickup.ITEM_ID,,,,,0,0,9999,TRUE,FALSE,FALSE,FALSE
+time id,obj_id.trigger.TIME,obj_prop.trigger.time.ITEM_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+time id,obj_id.trigger.TIME_EVENT,obj_prop.trigger.time_event.ITEM_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+time id,obj_id.trigger.TIME_CONTROL,obj_prop.trigger.time_control.ITEM_ID,,,,,0,,,TRUE,FALSE,FALSE,FALSE
+item id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) in (0,1)",,,,0,0,9999,TRUE,FALSE,FALSE,TRUE
+time id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_1,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) == 2",,,,0,0,9999,TRUE,FALSE,FALSE,TRUE
+item id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) in (0,1)",,,,0,1,9999,TRUE,FALSE,FALSE,TRUE
+time id,obj_id.trigger.ITEM_COMPARE,obj_prop.trigger.item_compare.ITEM_ID_2,"lambda x: x.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) == 2",,,,0,1,9999,TRUE,FALSE,FALSE,TRUE
+item id,obj_id.trigger.ITEM_PERSIST,obj_prop.trigger.item_persist.ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_persist.TIMER,0) == 0",,,,0,0,9999,TRUE,FALSE,FALSE,FALSE
+time id,obj_id.trigger.ITEM_PERSIST,obj_prop.trigger.item_persist.ITEM_ID,"lambda x: x.get(obj_prop.trigger.item_persist.TIMER,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+item id,obj_id.collectible.USER_COIN,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,obj_id.collectible.KEY,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,1587,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,1589,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,1598,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,obj_id.collectible.SMALL_COIN,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,3601,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4401,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4402,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4403,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4404,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4405,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4406,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4407,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4408,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4409,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4410,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4411,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4412,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4413,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4414,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4415,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4416,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4417,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4418,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4419,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4420,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4421,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4422,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4423,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4424,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4425,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4426,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4427,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4428,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4429,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4430,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4431,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4432,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4433,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4434,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4435,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4436,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4437,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4438,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4439,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4440,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4441,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4442,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4443,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4444,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4445,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4446,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4447,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4448,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4449,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4450,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4451,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4452,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4453,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4454,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4455,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4456,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4457,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4458,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4459,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4460,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4461,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4462,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4463,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4464,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4465,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4466,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4467,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4468,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4469,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4470,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4471,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4472,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4473,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4474,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4475,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4476,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4477,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4478,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4479,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4480,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4481,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4482,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4483,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4484,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4485,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4486,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4487,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4488,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4538,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4489,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4490,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4491,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4492,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4493,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4494,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4495,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4496,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4497,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4537,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4498,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4499,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4500,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4501,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4502,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4503,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4504,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4505,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4506,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4507,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4508,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4509,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4510,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4511,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4512,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4513,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4514,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4515,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4516,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4517,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4518,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4519,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4520,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4521,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4522,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4523,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4524,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4525,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4526,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4527,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4528,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4529,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4530,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4531,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4532,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4533,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4534,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4535,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4536,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+item id,4539,obj_prop.trigger.collectible.ITEM_ID,,,,,0,0,9999,FALSE,FALSE,FALSE,FALSE
+collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_A,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.collision.PLAYER_1) or x.get(obj_prop.trigger.collision.PLAYER_2) or x.get(obj_prop.trigger.collision.BETWEEN_PLAYERS)) else None ,1,9999,TRUE,FALSE,FALSE,FALSE
+collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_B,,,,,lambda x: 0 if not x.get(obj_prop.trigger.collision.BETWEEN_PLAYERS) else None ,1,9999,TRUE,FALSE,FALSE,FALSE
+collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_A,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.instant_collision.PLAYER_1) or x.get(obj_prop.trigger.instant_collision.PLAYER_2) or x.get(obj_prop.trigger.instant_collision.BETWEEN_PLAYERS)) else None ,1,9999,TRUE,FALSE,FALSE,FALSE
+collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_B,,,,,lambda x: 0 if not x.get(obj_prop.trigger.instant_collision.BETWEEN_PLAYERS) else None ,1,9999,TRUE,FALSE,FALSE,FALSE
+collision id,obj_id.trigger.COLLISION_BLOCK,obj_prop.trigger.collision_block.BLOCK_ID,,,,,0,1,9999,FALSE,FALSE,FALSE,TRUE
+link id,,obj_prop.LINKED_GROUP,,,,,,1,,FALSE,FALSE,FALSE,TRUE
+trigger channel,obj_id.trigger.ARROW,obj_prop.trigger.arrow.TARGET_CHANNEL,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+trigger channel,obj_id.trigger.START_POSITION,obj_prop.start_pos.TARGET_CHANNEL,,,,,0,,,FALSE,FALSE,FALSE,FALSE
+trigger channel,,obj_prop.trigger.CHANNEL,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,,0,0,1000,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.area.STOP,obj_prop.trigger.effect.TARGET_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.enter.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.enter.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.enter.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.enter.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+effect id,obj_id.trigger.enter.STOP,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,,FALSE,FALSE,FALSE,FALSE
+effect id,obj_id.trigger.area.EDIT_MOVE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+effect id,obj_id.trigger.area.EDIT_SCALE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+effect id,obj_id.trigger.area.EDIT_ROTATE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+effect id,obj_id.trigger.area.EDIT_FADE,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+effect id,obj_id.trigger.area.EDIT_TINT,obj_prop.trigger.effect.TARGET_ID,"lambda x: x.get(obj_prop.trigger.effect.USE_EFFECT_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+enter channel,,obj_prop.ENTER_CHANNEL,,,,,0,-32768,32767,FALSE,FALSE,FALSE,TRUE
+enter channel,22,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,24,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,23,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,25,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,26,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,27,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,28,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,55,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,56,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,57,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,58,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,59,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,1915,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,obj_id.trigger.enter.MOVE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,obj_id.trigger.enter.SCALE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,obj_id.trigger.enter.ROTATE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,obj_id.trigger.enter.FADE,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+enter channel,obj_id.trigger.enter.STOP,obj_prop.trigger.effect.ENTER_CHANNEL,,,,,0,-32768,32767,TRUE,FALSE,FALSE,FALSE
+keyframe id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.KEY_ID,,,,,0,0,,FALSE,FALSE,FALSE,TRUE
+song id,obj_id.trigger.SONG,obj_prop.trigger.song.SONG_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+sfx id,obj_id.trigger.SFX,obj_prop.trigger.sfx.SFX_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+unique sfx id,obj_id.trigger.SFX,obj_prop.trigger.sfx.UNIQUE_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+unique sfx id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.UNIQUE_ID,,,,,0,,,TRUE,FALSE,FALSE,FALSE
+song channel,obj_id.trigger.SONG,obj_prop.trigger.song.CHANNEL,,,,,0,0,4,TRUE,FALSE,FALSE,TRUE
+song channel,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.CHANNEL,,,,,0,0,4,TRUE,FALSE,FALSE,FALSE
+sfx group,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID,,,,,0,,,TRUE,FALSE,FALSE,FALSE
+sfx group,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID,,,,,0,,,TRUE,FALSE,FALSE,FALSE
+force id,obj_id.trigger.FORCE_BLOCK,obj_prop.trigger.force_block.FORCE_ID,,,,,0,,,FALSE,FALSE,FALSE,TRUE
+force id,obj_id.trigger.FORCE_CIRCLE,obj_prop.trigger.force_block.FORCE_ID,,,,,0,-32768,32767,FALSE,FALSE,FALSE,TRUE
+material id,,obj_prop.MATERIAL,,,,,0,-32768,32767,FALSE,FALSE,FALSE,TRUE
+material id,obj_id.trigger.EVENT,obj_prop.trigger.event.EXTRA_ID_1,,,,,0,,,TRUE,FALSE,FALSE,FALSE
+control id,,obj_prop.trigger.CONTROL_ID,,,,,0,,,TRUE,FALSE,FALSE,TRUE
+control id,obj_id.trigger.STOP,obj_prop.trigger.stop.TARGET_ID,"lambda x: x.get(obj_prop.trigger.stop.USE_CONTROL_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+control id,obj_id.trigger.EDIT_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+control id,obj_id.trigger.RETARGET_ADV_FOLLOW,obj_prop.trigger.edit_adv_follow.TARGET_ID,"lambda x: x.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID,0) == 1",,,,0,,,TRUE,FALSE,FALSE,FALSE
+remap base,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.REMAPS,,lambda x: x.keys(),"lambda x, kvm: x.apply(lambda i: i.remap(key_map=kvm))",,,,,FALSE,FALSE,TRUE,FALSE
+remap target,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.REMAPS,"lambda x: x.get(obj_prop.trigger.spawn.RESET_REMAP,0) == 1",lambda x: x.values(),"lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm))",,,,,FALSE,FALSE,TRUE,FALSE
+remap target,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.REMAPS,"lambda x: x.get(obj_prop.trigger.spawn.RESET_REMAP,0) == 0",lambda x: x.values(),"lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm))",,,,,TRUE,FALSE,TRUE,FALSE
