@@ -368,6 +368,8 @@ remap_table = remap_table.applymap(
     lambda x: pd.NA if x is False else x
 )
 remap_table.replace(float("nan"), pd.NA, inplace=True)
+remap_table.replace("TRUE", "True", inplace=True)
+remap_table.replace("FALSE", pd.NA, inplace=True)
 remap_table["object_id"] = remap_table["object_id"].apply(try_convert_int)
 remap_table['min'] = remap_table['min'].apply(try_convert_int)
 remap_table['max'] = remap_table['max'].apply(try_convert_int)

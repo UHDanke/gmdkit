@@ -156,7 +156,6 @@ def replace_ids(
             if (cond:=rule.condition) and callable(cond) and not cond(obj):
                 continue
             
-            
             kv_map = key_value_map.get(rule.type)
 
             if kv_map is None: continue
@@ -166,23 +165,22 @@ def replace_ids(
                 if callable(rule.fallback):
                     val = rule.fallback(obj)
 
-            if rule.fixed: continue            
-
-            if rule.default is not None:
-                if val is None:
-                    continue
-                if callable(rule.default) and val == rule.default(obj):
-                    continue
-                if val == rule.default:
-                    continue
-
+            if val is None:
+                continue
+            
             if (func:=rule.replace) and callable(func):
                 func(val, kv_map)
-            
-            elif (new:=kv_map.get(val)) is not None:
-                obj[pid] = new
-
+                continue
                 
+            if rule.get_value("fixed", val): continue
+        
+            if rule.type=="color_id": print(obj.get(obj_prop.ID,0), rule.type)
+
+            if val==rule.get_value("default", val): continue
+            
+            if (new:=kv_map.get(val)) is not None:
+                if rule.type=="color_id": print(obj.get(obj_prop.ID,0), rule.type, new)
+                obj[pid] = new
 
 
 class IDType:

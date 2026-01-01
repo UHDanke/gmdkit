@@ -4,7 +4,7 @@ from pathlib import Path
 from copy import deepcopy
 from typing import Literal
 # Package Imports
-from gmdkit.mappings import obj_prop, color_prop, color_id
+from gmdkit.mappings import obj_prop, color_prop, color_id, lvl_prop
 from gmdkit.models.level import Level, LevelList
 from gmdkit.functions.object import offset_position
 from gmdkit.functions.object_list import boundaries
@@ -106,6 +106,7 @@ def regroup_levels(level_list:LevelList, ignored_ids:dict=None, reserved_ids:dic
     
     for lvl in level_list:
         #print(collisions)
+        print(lvl[lvl_prop.level.NAME])
         objs = [lvl.start] + lvl.objects
         print(regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions))
         print()
