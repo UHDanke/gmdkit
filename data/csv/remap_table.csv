@@ -22,6 +22,8 @@ group id,obj_id.orb.TOGGLE,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,FALSE,1,
 group id,obj_id.trigger.ON_DEATH,obj_prop.trigger.on_death.GROUP_ID,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.GROUP_ID,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.TELEPORT,obj_prop.trigger.teleport.TARGET_ID,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,747,obj_prop.trigger.teleport.TARGET_ID,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,2902,obj_prop.trigger.teleport.TARGET_ID,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_1,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.song.PLAYER_1) or x.get(obj_prop.trigger.song.PLAYER_2) or x.get(obj_prop.trigger.song.CAMERA)) else None,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,FALSE,1,9999,TRUE,FALSE,FALSE
