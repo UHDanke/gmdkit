@@ -265,8 +265,6 @@ def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None, key_kwa
 
 class PlistDecoderMixin:
     
-    __slots__ = ()
-    
     ENCODER = None
     DECODER = None
     PLIST_FORMAT = None
@@ -318,8 +316,11 @@ class PlistDecoderMixin:
     def from_file(cls, path:str|PathLike, **kwargs) -> Self:
         
         parsed = from_plist_file(path)
+        
+        new = cls.from_plist(parsed,**kwargs)
+        new.path = path
                         
-        return cls.from_plist(parsed,**kwargs)
+        return new
     
     
     def to_file(self, path:str|PathLike, **kwargs):
@@ -328,6 +329,11 @@ class PlistDecoderMixin:
         
         to_plist_file(data, path)
     
+    def update(self, **kwargs):
+        self.to_file(path=self.path, **kwargs)
+    
+    def reload(self, **kwargs):
+        self.from_file(path=self.path, **kwargs)
     
     @classmethod
     def from_string(cls, string:str, **kwargs):

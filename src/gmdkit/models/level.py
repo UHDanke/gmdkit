@@ -27,7 +27,7 @@ class Level(PlistDictDecoderMixin,DictClass):
 
     @classmethod
     def from_file(cls, path:str|PathLike, load:bool=True, load_keys:Iterable=None, **kwargs):
-                
+        
         return super().from_file(path, load=load, load_keys=load_keys, **kwargs)
     
     
@@ -82,7 +82,6 @@ class Level(PlistDictDecoderMixin,DictClass):
                         
             if issubclass(type(value), GzipString):
                 value.save()
-        
     
     @classmethod
     def default(cls, name:str,load:bool=True):

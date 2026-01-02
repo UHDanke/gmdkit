@@ -94,6 +94,11 @@ def merge_levels(level_list:LevelList, override_colors:bool=True):
     return main_level
 
 
+def disable_start_pos(obj):
+    if obj.get(obj_prop.ID)!=obj_id.trigger.START_POSITION:
+        return
+    obj[obj_prop.start_pos.DISABLE] = False
+    
 def level_color_triggers(level:Level):
     colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.get(color_prop.CHANNEL) in color_id.LEVEL)
     level.objects += create_color_triggers(colors)
