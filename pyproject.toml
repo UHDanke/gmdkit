@@ -12,7 +12,7 @@ authors = [
   { name = "HDanke" }
 ]
 requires-python = ">=3.9"
-dependencies = ["zstandard","websocket-client"]
+dependencies = ["zstandard","websocket-client","typing"]
 keywords = ["geometry-dash", "gmd", "levels", "parser", "editor"]
 
 # Optional: classifiers help with PyPI visibility
