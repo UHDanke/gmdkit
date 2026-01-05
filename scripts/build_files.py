@@ -363,10 +363,13 @@ def try_convert_int(val):
     except (ValueError, TypeError):
         return val
 
+split(x,)
+
 # First convert strings to int where possible
 remap_table = remap_table.applymap(
     lambda x: pd.NA if x is False else x
 )
+remap_table["actions"] = remap_table["actions"].apply(lambda x: repr(x.split(",")).replace(" ", "") if x else "[]")
 remap_table.replace(float("nan"), pd.NA, inplace=True)
 remap_table.replace("TRUE", "True", inplace=True)
 remap_table.replace("FALSE", pd.NA, inplace=True)

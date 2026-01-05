@@ -2,7 +2,9 @@
 from gmdkit.models.serialization import DictDecoderMixin, ArrayDecoderMixin, dict_cast
 from gmdkit.models.types import DictClass, ListClass
 from gmdkit.casting.color import COLOR_DECODERS, COLOR_ENCODERS
-from gmdkit.mappings import color_prop, color_id
+from gmdkit.mappings import color_prop
+from gmdkit.defaults.color_ids import default_color
+
 
 class Color(DictDecoderMixin,DictClass):
     
@@ -23,33 +25,9 @@ class Color(DictDecoderMixin,DictClass):
             self[color_prop.COPY_ID] = key_value_map.get(v,v)
 
     @classmethod
-    def default(self, color):
-        match color:
-            case color_id.BACKGROUND:
-                self.set_rgba(40,125,255)
-                self[color_prop.DISABLE_OPACITY] = True
-            case color_id.GROUND:
-                self.set_rgba(0,102,255)
-                self[color_prop.DISABLE_OPACITY] = True
-            case color_id.LINE:
-                self.set_rgba(255,255,255)
-                self[color_prop.BLENDING] = True
-            case color_id.LINE_3D:
-                self.set_rgba(255,255,255)
-            case color_id.OBJECT:
-                self.set_rgba(255,255,255)
-            case color_id.GROUND_2:
-                self.set_rgba(0,102,255)
-                self[color_prop.DISABLE_OPACITY] = True
-            case color_id.MIDDLEGROUND:
-                self.set_rgba(40,125,255)
-            case color_id.MIDDLEGROUND_2:
-                self.set_rgba(40,125,255)                
-            case _:
-                self.set_rgba(255,255,255)
-        
-        return self
-        
+    def default(cls, color_id:int):        
+        return cls(default_color(color_id))
+
     def set_rgba(self, red:int=None,green:int=None,blue:int=None,alpha:float=None):
         if red is not None: self[color_prop.RED] = min(max(0,red),255)
         if green is not None: self[color_prop.GREEN] = min(max(0,green),255)

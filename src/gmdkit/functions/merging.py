@@ -98,22 +98,26 @@ def disable_start_pos(obj):
     if obj.get(obj_prop.ID)!=obj_id.trigger.START_POSITION:
         return
     obj[obj_prop.start_pos.DISABLE] = False
-    
+
+
 def level_color_triggers(level:Level):
     colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.get(color_prop.CHANNEL) in color_id.LEVEL)
     level.objects += create_color_triggers(colors)
 
 
+def obj_list_group(obj_list):
+    ids = compile_id_context(obj_list)
+    g, = next_free(values=ids["group_id"].get_ids(),vmin=1,vmax=9999,count=1)
+    add_groups(obj_list,{g})
+    return g,
+
 def level_add_toggles(lvl_list:LevelList):
     init_toggles = ObjectList()
     Y = 0
     for lvl in lvl_list:
-        obj_list = lvl.objects
+        obj_list = [lvl.start] + lvl.objects 
         min_x, min_y, center_x, center_y, max_x, max_y = boundaries(obj_list)
-        ids = compile_id_context(obj_list)
-        
-        g, = next_free(values=ids["group_id"].get_ids(),vmin=1,vmax=9999,count=1)
-        add_groups(obj_list,{g})
+        g = obj_list_group(obj_list)
         
         init_toggle = Object.default(obj_id.trigger.TOGGLE)
         init_toggle.update(

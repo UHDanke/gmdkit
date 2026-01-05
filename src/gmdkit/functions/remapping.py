@@ -24,6 +24,7 @@ class Identifier:
     reference: bool
     default: bool
     fixed: bool
+    remaps: set
     
 
 def compile_rules(
@@ -115,7 +116,9 @@ def get_ids(
                         min_limit = rule.min,
                         max_limit = rule.max,
                         default = v==default,
-                        fixed = rule.get_value("fixed", v) or v==default
+                        fixed = rule.get_value("fixed", v) or v==default,
+                        #obj_ref = obj,
+                        remaps = set()
                         )
  
 
@@ -181,12 +184,10 @@ def replace_ids(
 
 
 class IDType:
-
     
     def __init__(self):
         self.ids = set()
         self.ignored = set()
-        self.remaps = dict()
         self.min = -2147483648
         self.max = 2147483647
     
@@ -199,6 +200,7 @@ class IDType:
         reference:bool = None,
         in_range:bool = False,
         remap:bool = False,
+        func:Callable=None
     ) -> set[int]:
 
         result = set()
@@ -219,10 +221,16 @@ class IDType:
             if reference is not None and i.reference != reference:
                 continue
             
-            if remap and i.remappable:
-                result.update(self.remaps.get(i.id_val,set()))
+            if func and callable(func) and not func(i):
+                continue
             
-            result.add(i.id_val)
+            if remap and (new_ids:=i.remaps()):
+                for n in new_ids:
+                    n = min(max(n, self.min), self.max)
+                    result.add(n)
+            else:
+                n = min(max(i.id_val, self.min), self.max)
+                result.add(n)
         
         return result
     
@@ -244,16 +252,6 @@ class IDType:
             group.update(set(l))
 
    
-def compile_ids(ids:Iterable[Identifier]):
-    
-    result = {}
-    
-    for i in ids:
-        group = result.setdefault(i.id_type, IDType())  
-        group.ids.add(i)
-                
-    return result
-
 def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
     
     remaps = {}
@@ -281,7 +279,9 @@ def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
             max_limit=2147483647,
             reference=True,
             default=remap_id==0,
-            fixed=False
+            fixed=False,
+            obj_ref = obj,
+            remaps = set()
             )
         obj.spawn_remap_id = remap_id
         ids.add(identif)
@@ -313,6 +313,17 @@ def compile_spawn_groups(obj_list:ObjectList):
             spawn_groups[0].add(obj)
         
     return spawn_groups
+
+
+def compile_ids(ids:Iterable[Identifier]):
+    
+    result = {}
+    
+    for i in ids:
+        group = result.setdefault(i.id_type, IDType())  
+        group.ids.add(i)
+                
+    return result
 
 
 def compile_id_context(obj_list:ObjectList, extra_ids:set()=None, remaps:Literal["none","naive","search"]="none"):
