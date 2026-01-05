@@ -363,8 +363,6 @@ def try_convert_int(val):
     except (ValueError, TypeError):
         return val
 
-split(x,)
-
 # First convert strings to int where possible
 remap_table = remap_table.applymap(
     lambda x: pd.NA if x is False else x
