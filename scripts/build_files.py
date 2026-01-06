@@ -396,7 +396,7 @@ from typing import Callable
 from dataclasses import dataclass
 
 # Package Imports
-from gmdkit.mappings import obj_id, obj_prop
+from gmdkit.mappings import obj_id, obj_prop, color_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 
 @dataclass(frozen=True)

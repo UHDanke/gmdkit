@@ -200,7 +200,7 @@ class IDType:
         reference:bool = None,
         in_range:bool = False,
         remap:bool = False,
-        func:Callable=None
+        condition:Callable=None
     ) -> set[int]:
 
         result = set()
@@ -221,7 +221,7 @@ class IDType:
             if reference is not None and i.get("reference", False) != reference:
                 continue
             
-            if func and callable(func) and not func(i):
+            if condition and callable(condition) and not condition(i):
                 continue
             
             if remap and (new_ids:=i.get("remaps",set())):

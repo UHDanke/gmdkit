@@ -63,6 +63,9 @@ class ColorList(ArrayDecoderMixin,ListClass):
     
     def get_channels(self):
         return self.unique_values(lambda color: color.channels)
+    
+    def get_copies(self):
+        return lambda x: x.unique_values(lambda color: color.pluck(color_prop.CHANNEL))
         
     def remap(self, key_value_map):
         self.get_custom().apply(lambda color: color.remap(key_value_map))
