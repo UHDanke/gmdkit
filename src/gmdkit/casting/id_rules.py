@@ -84,7 +84,7 @@ ID_RULES = {
         ],
     obj_id.LEVEL_START: [
             IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.unique_values(lambda color: color.pluck(color_prop.CHANNEL)), replace=lambda x, kvm: x.remap(kvm), actions=['set_color','set_alpha'], fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True),
-            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID)), replace=lambda x, kvm: None, actions=['copy_color','copy_alpha'], fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True, reference=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID)), replace=lambda x, kvm: None, actions=['track_color','track_alpha'], fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, default=0, actions=['get_position'], min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [
@@ -312,732 +312,732 @@ ID_RULES = {
     obj_id.collectible.USER_COIN: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     obj_id.collectible.KEY: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     1587: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     1589: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     1598: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     obj_id.collectible.SMALL_COIN: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     3601: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4401: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4402: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4403: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4404: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4405: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4406: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4407: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4408: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4409: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4410: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4411: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4412: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4413: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4414: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4415: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4416: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4417: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4418: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4419: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4420: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4421: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4422: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4423: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4424: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4425: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4426: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4427: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4428: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4429: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4430: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4431: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4432: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4433: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4434: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4435: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4436: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4437: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4438: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4439: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4440: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4441: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4442: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4443: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4444: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4445: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4446: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4447: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4448: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4449: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4450: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4451: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4452: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4453: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4454: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4455: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4456: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4457: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4458: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4459: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4460: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4461: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4462: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4463: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4464: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4465: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4466: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4467: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4468: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4469: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4470: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4471: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4472: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4473: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4474: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4475: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4476: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4477: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4478: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4479: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4480: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4481: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4482: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4483: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4484: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4485: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4486: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4487: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4488: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4538: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4489: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4490: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4491: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4492: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4493: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4494: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4495: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4496: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4497: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4537: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4498: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4499: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4500: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4501: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4502: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4503: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4504: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4505: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4506: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4507: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4508: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4509: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4510: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4511: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4512: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4513: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4514: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4515: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4516: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4517: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4518: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4519: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4520: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4521: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4522: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4523: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4524: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4525: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4526: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4527: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4528: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4529: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4530: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4531: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4532: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4533: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4534: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4535: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4536: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     4539: [
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.TOGGLE_TRIGGER) else None, actions=['spawn','toggle'], min=1, max=9999),
             IDRule(type='group_id', prop=obj_prop.trigger.collectible.PARTICLE   , default=0, actions=['get_particles'], min=1, max=9999),
-            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=0, actions=['set_value'], min=0, max=9999)
+            IDRule(type='item_id', prop=obj_prop.trigger.collectible.ITEM_ID, default=lambda x: 0 if x.get(obj_prop.trigger.collectible.PICKUP_ITEM) else None, actions=['set_value'], min=0, max=9999)
         ],
     obj_id.trigger.area.MOVE: [
             IDRule(type='group_id', prop=obj_prop.trigger.effect.CENTER_ID, default=lambda x: 0 if x.get(obj_prop.trigger.effect.SPECIAL_CENTER) is None else None, actions=['track_position'], min=1, max=9999, remappable=True),
