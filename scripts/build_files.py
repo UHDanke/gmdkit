@@ -367,7 +367,7 @@ def try_convert_int(val):
 remap_table = remap_table.applymap(
     lambda x: pd.NA if x is False else x
 )
-remap_table["actions"] = remap_table["actions"].apply(lambda x: repr(x.split(",")).replace(" ", "") if type(x)==str else "[]")
+remap_table["actions"] = remap_table["actions"].apply(lambda x: repr(x.split(",")).replace(" ", "") if type(x)==str else pd.NA)
 remap_table.replace(float("nan"), pd.NA, inplace=True)
 remap_table.replace("TRUE", "True", inplace=True)
 remap_table.replace("FALSE", pd.NA, inplace=True)
@@ -409,6 +409,7 @@ class IDRule:
     iterable: bool = False
     reference: bool = False
     fixed: bool = False
+    actions: list = None
     function: Callable = None
     condition: Callable = None
     fallback: Callable = None

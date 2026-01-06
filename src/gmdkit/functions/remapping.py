@@ -54,7 +54,6 @@ def compile_rules(
             rules.extend(val)
             
     return rules
-
   
     
 def get_ids(
@@ -106,20 +105,21 @@ def get_ids(
                 if v is None: v = default
                 if v is None: continue
                     
-                yield Identifier(
-                        obj_id = oid,
-                        obj_prop = pid,
-                        id_val = v,
-                        id_type = rule.type,
-                        remappable = rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
-                        reference = rule.reference,
-                        min_limit = rule.min,
-                        max_limit = rule.max,
-                        default = v==default,
-                        fixed = rule.get_value("fixed", v) or v==default,
-                        #obj_ref = obj,
-                        remaps = set()
-                        )
+                yield {
+                        "obj_id": oid,
+                        "prop": pid,
+                        "val": v,
+                        "type": rule.type,
+                        "remappable": rule.remappable and obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
+                        "reference": rule.reference,
+                        "min": rule.min,
+                        "max": rule.max,
+                        "default": v==default,
+                        "actions": rule.actions or [],
+                        "fixed": rule.get_value("fixed", v) or v==default,
+                        "obj": obj,
+                        "remaps": set()
+                        }
  
 
 def replace_ids(
@@ -186,7 +186,7 @@ def replace_ids(
 class IDType:
     
     def __init__(self):
-        self.ids = set()
+        self.ids = list()
         self.ignored = set()
         self.min = -2147483648
         self.max = 2147483647
@@ -206,30 +206,30 @@ class IDType:
         result = set()
         for i in self.ids:
             
-            if in_range and not self.min <= i.id_val <= self.max:
+            if in_range and not self.min <= i.get("val",0) <= self.max:
                 continue
             
-            if default is not None and i.default != default:
+            if default is not None and i.get("default", False) != default:
                 continue
             
-            if fixed is not None and i.fixed != fixed:
+            if fixed is not None and i.get("fixed", False) != fixed:
                 continue
             
-            if remappable is not None and i.remappable != remappable:
+            if remappable is not None and i.get("remappable", False) != remappable:
                 continue
 
-            if reference is not None and i.reference != reference:
+            if reference is not None and i.get("reference", False) != reference:
                 continue
             
             if func and callable(func) and not func(i):
                 continue
             
-            if remap and (new_ids:=i.remaps()):
+            if remap and (new_ids:=i.get("remaps",set())):
                 for n in new_ids:
                     n = min(max(n, self.min), self.max)
                     result.add(n)
             else:
-                n = min(max(i.id_val, self.min), self.max)
+                n = min(max(i.get("val",0), self.min), self.max)
                 result.add(n)
         
         return result
@@ -239,8 +239,8 @@ class IDType:
         self.min = -2147483648
         self.max = 2147483647
         for i in self.ids:
-            self.min = max(i.min_limit, self.min)
-            self.max = min(i.max_limit, self.max)
+            self.min = max(i.get("min",self.min), self.min)
+            self.max = min(i.get("max",self.max), self.max)
         
         return self.min, self.max
     
@@ -251,11 +251,11 @@ class IDType:
             group = self.remaps.setdefault(k,set())
             group.update(set(l))
 
-   
+    
 def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
     
     remaps = {}
-    ids = set()
+    ids = []
     
     i = 1
     
@@ -269,22 +269,20 @@ def compile_remap_ids(obj_list:ObjectList) -> dict[int,dict[int,int]]:
         else:
             remap_id = 0
         
-        identif = Identifier(
-            obj_id=obj_id.trigger.SPAWN,
-            obj_prop=None,
-            id_val=remap_id,
-            id_type="remap_id",
-            remappable=obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
-            min_limit=0,
-            max_limit=2147483647,
-            reference=True,
-            default=remap_id==0,
-            fixed=False,
-            obj_ref = obj,
-            remaps = set()
-            )
+        identif = {
+                "obj_id": obj_id.trigger.SPAWN,
+                "val": remap_id,
+                "type": "remap_id",
+                "remappable": obj.get(obj_prop.trigger.SPAWN_TRIGGER, False),
+                "min": 0,
+                "default": remap_id==0,
+                "actions": ["remap"],
+                "fixed": False,
+                "obj": obj,
+                "remaps": set()
+                }
         obj.spawn_remap_id = remap_id
-        ids.add(identif)
+        ids.append(identif)
         
     obj_list.remaps = remaps
     return ids
@@ -320,16 +318,15 @@ def compile_ids(ids:Iterable[Identifier]):
     result = {}
     
     for i in ids:
-        group = result.setdefault(i.id_type, IDType())  
-        group.ids.add(i)
+        group = result.setdefault(i.get("type"), IDType())  
+        group.ids.append(i)
                 
     return result
 
 
-def compile_id_context(obj_list:ObjectList, extra_ids:set()=None, remaps:Literal["none","naive","search"]="none"):
-    id_list = obj_list.unique_values(get_ids)
-    if extra_ids: id_list.update(extra_ids)
-    id_list.update(compile_remap_ids(obj_list))
+def compile_id_context(obj_list:ObjectList, remaps:Literal["none","naive","search"]="none"):
+    id_list = obj_list.values(get_ids)
+    id_list.extend(compile_remap_ids(obj_list))
     compiled = compile_ids(id_list)
     
     match remaps:
