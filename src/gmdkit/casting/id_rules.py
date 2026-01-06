@@ -83,7 +83,8 @@ ID_RULES = {
             IDRule(type='enter_channel', prop=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, min=-32768, max=32767, remappable=True)
         ],
     obj_id.LEVEL_START: [
-            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.get_channels(), replace=lambda x, kvm: x.remap(kvm), actions=['set_color','set_alpha'], fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.unique_values(lambda color: color.pluck(color_prop.CHANNEL)), replace=lambda x, kvm: x.remap(kvm), actions=['set_color','set_alpha'], fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True),
+            IDRule(type='color_id', prop=obj_prop.level.COLORS, function=lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID)), replace=lambda x, kvm: None, actions=['copy_color','copy_alpha'], fixed=lambda x: not (1 <= x <= 999), min=1, max=1101, iterable=True, reference=True),
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, default=0, actions=['get_position'], min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [

@@ -11,7 +11,8 @@ color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.COPY_ID,,,,,,get_color,lamb
 color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,"lambda x: x.get(obj_prop.trigger.pulse.TARGET_TYPE, False) == False",,,,0,use_color,lambda x: not (1 <= x <= 999),1,1101,TRUE,FALSE,FALSE
 color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,use_color,lambda x: not (1 <= x <= 999),1,1101,FALSE,FALSE,TRUE
 color id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,use_color,lambda x: not (1 <= x <= 999),1,1101,FALSE,FALSE,TRUE
-color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: x.get_channels(),"lambda x, kvm: x.remap(kvm)",,,"set_color, set_alpha",lambda x: not (1 <= x <= 999),1,1101,FALSE,TRUE,FALSE
+color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: x.unique_values(lambda color: color.pluck(color_prop.CHANNEL)),"lambda x, kvm: x.remap(kvm)",,,"set_color, set_alpha",lambda x: not (1 <= x <= 999),1,1101,FALSE,TRUE,FALSE
+color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID)),"lambda x, kvm: None",,,"copy_color, copy_alpha",lambda x: not (1 <= x <= 999),1,1101,FALSE,TRUE,TRUE
 group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_ID,,,,,0,"move, get_position",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_POS,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
