@@ -88,9 +88,9 @@ ID_RULES = {
             IDRule(type='group_id', prop=obj_prop.level.PLAYER_SPAWN, default=0, actions=['get_position'], min=1, max=9999)
         ],
     obj_id.trigger.MOVE: [
-            IDRule(type='group_id', prop=obj_prop.trigger.move.TARGET_ID, default=0, actions=['move','get_position'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.move.TARGET_POS, default=lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None, actions=['track_position'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.move.TARGET_CENTER_ID, default=lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None, actions=['track_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.move.TARGET_ID, default=0, actions=['move','get_position','get_rand'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.move.TARGET_POS, default=lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None, actions=['track_position','get_rand'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.move.TARGET_CENTER_ID, default=lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None, actions=['track_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.ALPHA: [
             IDRule(type='group_id', prop=obj_prop.trigger.alpha.GROUP_ID, default=0, actions=['alpha'], min=1, max=9999, remappable=True)
@@ -114,16 +114,16 @@ ID_RULES = {
             IDRule(type='remap_target', prop=obj_prop.trigger.spawn.REMAPS, condition=lambda x: x.get(obj_prop.trigger.spawn.RESET_REMAP, False) == False, function=lambda x: x.values(), replace=lambda x, kvm: x.apply(lambda i: i.remap(value_map=kvm)), remappable=True, iterable=True)
         ],
     obj_id.trigger.TELEPORT: [
-            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     747: [
-            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     2902: [
-            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     3027: [
-            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=['get_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.EDIT_SONG: [
             IDRule(type='group_id', prop=obj_prop.trigger.song.GROUP_ID_1, default=0, actions=['track_position'], min=1, max=9999, remappable=True),
@@ -145,13 +145,13 @@ ID_RULES = {
             IDRule(type='sfx_group', prop=obj_prop.trigger.sfx.GROUP_ID, default=0, remappable=True)
         ],
     obj_id.trigger.ROTATE: [
-            IDRule(type='group_id', prop=obj_prop.trigger.rotate.TARGET_ID, default=0, actions=['rotate','move','get_position'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.rotate.CENTER_ID, default=0, actions=['track_position'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.rotate.TARGET_ID, default=0, actions=['rotate','move','get_position','get_rand'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.rotate.CENTER_ID, default=0, actions=['track_position','get_rand'], min=1, max=9999, remappable=True),
             IDRule(type='group_id', prop=obj_prop.trigger.rotate.AIM_TARGET, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) or x.get(obj_prop.trigger.rotate.FOLLOW_MODE) else None, min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MIN_X_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MIN_Y_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MAX_X_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MAX_Y_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MIN_X_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position','get_rand'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MIN_Y_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position','get_rand'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MAX_X_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position','get_rand'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.rotate.MAX_Y_ID, default=lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None, actions=['track_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.FOLLOW: [
             IDRule(type='group_id', prop=obj_prop.trigger.follow.TARGET_ID, default=0, actions=['move'], min=1, max=9999, remappable=True),
@@ -200,10 +200,10 @@ ID_RULES = {
         ],
     obj_id.trigger.ADV_FOLLOW: [
             IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.TARGET_ID, default=0, actions=['move_group'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.FOLLOW_ID, default=0, actions=['track_position'], min=1, max=9999, remappable=True),
+            IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.FOLLOW_ID, default=0, actions=['track_position','get_rand'], min=1, max=9999, remappable=True),
             IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.MAX_RANGE_REF, default=0, min=1, max=9999, remappable=True),
             IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.START_SPEED_REF, default=0, actions=['get_move'], min=1, max=9999, remappable=True),
-            IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.START_DIR_REF, default=0, actions=['get_position'], min=1, max=9999, remappable=True)
+            IDRule(type='group_id', prop=obj_prop.trigger.adv_follow.START_DIR_REF, default=0, actions=['get_position','get_rand'], min=1, max=9999, remappable=True)
         ],
     obj_id.trigger.KEYFRAME: [
             IDRule(type='group_id', prop=obj_prop.trigger.keyframe.GROUP_ID, default=lambda x: 0 if x.get(obj_prop.trigger.keyframe.INDEX,0) == 1 else None, actions=['move','scale','rotate'], min=1, max=9999),

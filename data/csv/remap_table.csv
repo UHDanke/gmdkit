@@ -13,19 +13,19 @@ color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambd
 color id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,lambda x: 0 if not x.get(obj_prop.trigger.effect.ENABLE_HSV) else None,use_color,lambda x: not (1 <= x <= 999),1,1101,FALSE,FALSE,TRUE
 color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: x.unique_values(lambda color: color.pluck(color_prop.CHANNEL)),"lambda x, kvm: x.remap(kvm)",,,"set_color, set_alpha",lambda x: not (1 <= x <= 999),1,1101,FALSE,TRUE,FALSE
 color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID)),"lambda x, kvm: None",,,"track_color, track_alpha",lambda x: not (1 <= x <= 999),1,1101,FALSE,TRUE,TRUE
-group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_ID,,,,,0,"move, get_position",FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_POS,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_ID,,,,,0,"move, get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_POS,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.MOVE,obj_prop.trigger.move.TARGET_CENTER_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.move.DIRECTION_MODE) or x.get(obj_prop.trigger.move.TARGET_MODE) else None,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ALPHA,obj_prop.trigger.alpha.GROUP_ID,,,,,0,alpha,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.TOGGLE,obj_prop.trigger.toggle.GROUP_ID,,,,,0,toggle,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.TOGGLE_BLOCK,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,"spawn, toggle",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.orb.TOGGLE,obj_prop.trigger.toggle_block.GROUP_ID,,,,,0,"spawn, toggle",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ON_DEATH,obj_prop.trigger.on_death.GROUP_ID,,,,,0,"spawn, toggle",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.SPAWN,obj_prop.trigger.spawn.GROUP_ID,,,,,0,spawn,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.TELEPORT,obj_prop.trigger.teleport.TARGET_ID,,,,,0,get_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,747,obj_prop.trigger.teleport.TARGET_ID,,,,,0,get_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,2902,obj_prop.trigger.teleport.TARGET_ID,,,,,0,get_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,3027,obj_prop.trigger.teleport.TARGET_ID,,,,,0,get_position,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.TELEPORT,obj_prop.trigger.teleport.TARGET_ID,,,,,0,"get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,747,obj_prop.trigger.teleport.TARGET_ID,,,,,0,"get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,2902,obj_prop.trigger.teleport.TARGET_ID,,,,,0,"get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,3027,obj_prop.trigger.teleport.TARGET_ID,,,,,0,"get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_1,,,,,0,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.EDIT_SONG,obj_prop.trigger.song.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.song.PLAYER_1) or x.get(obj_prop.trigger.song.PLAYER_2) or x.get(obj_prop.trigger.song.CAMERA)) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
@@ -33,13 +33,13 @@ group id,obj_id.trigger.SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,lambda x: 0 if n
 group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID_1,,,,,0,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP_ID_2,,,,,lambda x: 0 if not (x.get(obj_prop.trigger.sfx.PLAYER_1) or x.get(obj_prop.trigger.sfx.PLAYER_2) or x.get(obj_prop.trigger.sfx.CAMERA)) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.EDIT_SFX,obj_prop.trigger.sfx.GROUP,,,,,0,,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.TARGET_ID,,,,,0,"rotate, move, get_position",FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.CENTER_ID,,,,,0,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.TARGET_ID,,,,,0,"rotate, move, get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.CENTER_ID,,,,,0,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.AIM_TARGET,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) or x.get(obj_prop.trigger.rotate.FOLLOW_MODE) else None,,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MIN_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_X_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ROTATE,obj_prop.trigger.rotate.MAX_Y_ID,,,,,lambda x: 0 if x.get(obj_prop.trigger.rotate.AIM_MODE) else None,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.FOLLOW,obj_prop.trigger.follow.TARGET_ID,,,,,0,move,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.FOLLOW,obj_prop.trigger.follow.FOLLOW_TARGET,,,,,0,get_move,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ANIMATE,obj_prop.trigger.animate.TARGET_ID,,,,,0,animate,FALSE,1,9999,TRUE,FALSE,FALSE
@@ -58,10 +58,10 @@ group id,obj_id.trigger.CHECKPOINT,obj_prop.trigger.checkpoint.RESPAWN_ID,,,,,0,
 group id,obj_id.trigger.SCALE,obj_prop.trigger.scale.TARGET_ID,,,,,0,"scale, move",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.SCALE,obj_prop.trigger.scale.CENTER_ID,,,,,0,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.TARGET_ID,,,,,0,move_group,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.FOLLOW_ID,,,,,0,track_position,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.FOLLOW_ID,,,,,0,"track_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.MAX_RANGE_REF,,,,,0,,FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_SPEED_REF,,,,,0,get_move,FALSE,1,9999,TRUE,FALSE,FALSE
-group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_DIR_REF,,,,,0,get_position,FALSE,1,9999,TRUE,FALSE,FALSE
+group id,obj_id.trigger.ADV_FOLLOW,obj_prop.trigger.adv_follow.START_DIR_REF,,,,,0,"get_position, get_rand",FALSE,1,9999,TRUE,FALSE,FALSE
 group id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.GROUP_ID,,,,,"lambda x: 0 if x.get(obj_prop.trigger.keyframe.INDEX,0) == 1 else None","move, scale, rotate",FALSE,1,9999,FALSE,FALSE,FALSE
 group id,obj_id.trigger.KEYFRAME,obj_prop.trigger.keyframe.SPAWN_ID,,,,,0,spawn,FALSE,1,9999,FALSE,FALSE,FALSE
 group id,obj_id.trigger.ANIMATE_KEYFRAME,obj_prop.trigger.animate_keyframe.TARGET_ID,,,,,0,"move, scale, rotate",FALSE,1,9999,TRUE,FALSE,FALSE
