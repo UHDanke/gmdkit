@@ -2,7 +2,7 @@
 import base64
 
 # Package Imports
-from gmdkit.models.serialization import decode_string, encode_string
+from gmdkit.serialization.functions import decode_string, encode_string
  
 
 def decode_text(string:str) -> str:
@@ -26,15 +26,19 @@ def encode_text(string:str) -> str:
 class GzipString:
     
     __slots__ = ("string")
-    
+    ENCODED = True
     
     def __init__(self, string:str=""):
         self.string = string
     
     def load(self) -> str:
-        return decode_string(self.string)
+        if self.ENCODED:
+            return decode_string(self.string)
+        else:
+            return self.string
         
-    def save(self, string) -> None:
-        new = encode_string(string)
-        self.string = new
+    def save(self, string:str) -> None:
+        if self.ENCODED:
+            string = encode_string(string)
+        self.string = string
         return self.string

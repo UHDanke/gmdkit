@@ -1,12 +1,11 @@
 # Imports
 from dataclasses import dataclass
-from typing import get_type_hints
 
 # Package Imports
-from gmdkit.models.types import ListClass
-from gmdkit.models.serialization import ArrayDecoderMixin, DataclassDecoderMixin, DelimiterMixin, dict_cast
+from gmdkit.serialization.types import ListClass
+from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin, DelimiterMixin
 
-    
+
 @dataclass(slots=True)
 class Guideline(DataclassDecoderMixin):
     
@@ -15,8 +14,6 @@ class Guideline(DataclassDecoderMixin):
     
     time: float = 0
     color: float = 0
-    
-Guideline.DECODER = dict_cast(get_type_hints(Guideline))
 
 
 class GuidelineList(DelimiterMixin,ArrayDecoderMixin,ListClass):

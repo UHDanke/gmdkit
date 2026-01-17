@@ -438,4 +438,19 @@ def clean_remaps(objs:ObjectList) -> None:
         if obj.get(obj_prop.ID) == obj_id.trigger.SPAWN and (remaps:=obj.get(obj_prop.trigger.spawn.REMAPS)) is not None:
             remaps.clean()
         
+
+def objs_from_ids(id_list, condition=None):
+    new = ObjectList()
+    
+    for i in id_list:
+        obj = i.get("obj")
         
+        if obj is None: continue
+        if obj in new: continue
+        
+        if condition is not None and callable(condition) and not condition(i):
+            continue
+        
+        new.append(obj)
+    
+    return new

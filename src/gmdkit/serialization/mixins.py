@@ -1,267 +1,18 @@
 # Imports
 from dataclasses import fields
-from typing import Literal, Callable, get_type_hints, Any, Self
+from typing import Callable, Any, Self, get_type_hints
 from itertools import islice
 from os import PathLike
-import xml.etree.ElementTree as ET
-import base64
-import zlib
-import gzip
 
-
-def serialize(value:Any) -> str:
-    
-    if value is None:
-        return ''
-        
-    elif isinstance(value, bool):
-        return str(int(value))
-    
-    elif isinstance(value, float):           
-        return str(value)
-    
-    elif isinstance(value, str):
-        return str(value)
-    
-    elif hasattr(value, "to_string") and callable(getattr(value, "to_string")):
-        return value.to_string()
-    
-    else:
-        return str(value)
-
-
-def xor(data:bytes, key:bytes) -> bytes:
-    l = len(key)
-    return bytes(data[i] ^ key[i % l] for i in range(len(data)))
-
-
-def decode_string(
-        string:str,
-        xor_key:bytes=None,
-        compression:Literal[None,"zlib","gzip","deflate","auto"]="auto"
-        ) -> str:
-    
-    byte_stream = string.encode()
-    
-    if xor_key is not None:
-        byte_stream = xor(byte_stream, key=xor_key)
-    
-    byte_stream = base64.urlsafe_b64decode(byte_stream)
-    
-    match compression:
-        case 'zlib':
-            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
-        case 'gzip':
-            byte_stream = gzip.decompress(byte_stream)
-        case 'deflate':
-            byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
-        case 'auto':
-            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS|32)
-        case None:
-            pass            
-        case _:
-            raise ValueError(f"Unsupported decompression method: {compression}")
-
-    return byte_stream.decode("utf-8",errors='replace')
-
-
-def encode_string(
-        string:str,
-        xor_key:bytes=None,
-        compression:Literal[None,"zlib","gzip","deflate"]="gzip"
-        ) -> str:
-    
-    byte_stream = string.encode()
-        
-    match compression:
-        case 'zlib':
-            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
-        case 'gzip':
-            byte_stream = gzip.compress(byte_stream,mtime=0)
-        case 'deflate':
-            byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
-        case None:
-            pass
-        case _:
-            raise ValueError(f"Unsupported compression method: {compression}")
-            
-    byte_stream = base64.urlsafe_b64encode(byte_stream)
-    
-    if xor_key is not None:
-        byte_stream = xor(byte_stream, key=xor_key)
-    
-    return byte_stream.decode()
-
-
-def read_plist_elem(elem):
-        
-    match elem.tag:
-        case 'i':
-            return int(elem.text)
-        case 'r':
-            return float(elem.text)
-        case 's':
-            return str(elem.text)
-        case 't':
-            return True
-        case 'd':
-            return read_plist(elem)
-        
-        
-def read_plist(node):
-    
-    nodes = len(node)
-        
-    if nodes == 0:
-        return {}
-      
-    if (    
-            nodes > 0 and
-            node[0].tag == "k" and node[0].text == "_isArr" and
-            read_plist_elem(node[1])
-            ):
-        result = []
-        
-        for child in islice(node, 2, None):
-            match child.tag:
-                case 'k':
-                    continue
-                case _:
-                    result.append(read_plist_elem(child))
-        
-    else:
-        result = {}
-        key = None
-        
-        for child in node:
-            match child.tag:
-                case 'k':
-                    key = child.text
-                    continue
-                case _:
-                    value = read_plist_elem(child)
-                    if key is not None:
-                        result[key] = value
-                        
-                        key = None
-    
-    return result
-
-
-def write_plist_elem(parent, value):
-    
-    if isinstance(value, bool):
-        if value: ET.SubElement(parent, "t")
-        
-    elif isinstance(value, int):
-        ET.SubElement(parent, "i").text = str(value)
-    
-    elif isinstance(value, float):
-        ET.SubElement(parent, "r").text = str(value)
-    
-    elif isinstance(value, str):
-        ET.SubElement(parent, "s").text = str(value)
-    
-    elif isinstance(value, (dict, list, tuple)):
-        write_plist(ET.SubElement(parent, "d"),value)
-    
-    elif value is None:
-        pass
-    
-    else:
-        ET.SubElement(parent, "s").text = str(value)
-
-
-def write_plist(node, obj):
-    
-    if isinstance(obj, dict):
-        
-        for key, value in obj.items():
-            
-            ET.SubElement(node, "k").text = key
-            
-            write_plist_elem(node, value)
-            
-    elif isinstance(obj, (list,tuple)):
-        
-        ET.SubElement(node, "k").text = "_IsArr"
-        
-        ET.SubElement(node, "t")
-        
-        for i, value in enumerate(obj,start=1):
-            
-            ET.SubElement(node, "k").text = f"k_{i}"
-            
-            write_plist_elem(node, value)
-    
-    else:
-        write_plist_elem(node, obj)
-            
-    
-def from_plist_string(string:str):
-    
-    tree = ET.fromstring(string)
-    
-    return read_plist(tree.find("dict"))
-    
-
-def to_plist_string(data:dict|list|tuple) -> str:
-    
-    root = ET.Element("plist", version="1.0", gjver="2.0")
-    
-    dict_elem = ET.SubElement(root, "dict")
-    
-    write_plist(dict_elem, data)
-    
-    return ET.tostring(root, encoding='unicode') 
-
-
-def from_plist_file(path:str|PathLike):
-    
-    tree = ET.parse(path)
-    
-    root = tree.getroot()
-    
-    parsed_xml = read_plist(root.find("dict"))
-        
-    return parsed_xml
-
-
-def to_plist_file(data:dict|list|tuple, path:str|PathLike):
-    
-    root = ET.Element("plist", version="1.0", gjver="2.0")
-   
-    dict_elem = ET.SubElement(root, "dict")
-    
-    write_plist(dict_elem, data)
-           
-    tree = ET.ElementTree(root)
-    
-    tree.write(path, xml_declaration=True)
-
-
-def dict_cast(dictionary:dict, numkey:bool=False, default:Callable=None, key_kwargs:bool=False):
-    
-    def cast_func(key:str, value:Any, **kwargs):
-        
-        if numkey and isinstance(key, str) and key.isdigit():
-            key = int(key)
-        
-        if (func:=dictionary.get(key)) is not None and callable(func):
-            
-            if key_kwargs: kwargs = kwargs.get(key, {})
-                
-            value = func(value, **kwargs)
-            
-        elif default is not None and callable(default):
-            value = default(value)
-        
-        if not numkey: key = str(key)
-        
-        return (key,value)
-            
-    return cast_func
-
+# Package Imports
+from gmdkit.serialization import options
+from gmdkit.serialization.type_cast import serialize, dict_cast, decode_funcs
+from gmdkit.serialization.functions import (
+    decode_string, encode_string, 
+    from_plist_file, to_plist_file, 
+    from_plist_string, to_plist_string,
+    dict_wrapper, array_wrapper
+)
 
 class PlistDecoderMixin:
     
@@ -350,26 +101,22 @@ class PlistDecoderMixin:
         return to_plist_string(data)
 
 
-dict_formatter = lambda data, func, **kwargs: {k: v for k, v in (func(k, v, **kwargs) for k, v in data.items())}
-
 class PlistDictDecoderMixin(PlistDecoderMixin):
     
     __slots__ = ()
     
-    PLIST_FORMAT = staticmethod(dict_formatter)
-    SELF_FORMAT = staticmethod(dict_formatter)
+    PLIST_FORMAT = staticmethod(dict_wrapper)
+    SELF_FORMAT = staticmethod(dict_wrapper)
 
-
-list_formatter = lambda data, func, **kwargs: [func(v,**kwargs) for v in data]
 
 class PlistArrayDecoderMixin(PlistDecoderMixin):
     
     __slots__ = ()
     
-    PLIST_FORMAT = staticmethod(list_formatter)
-    SELF_FORMAT = staticmethod(list_formatter)
+    PLIST_FORMAT = staticmethod(array_wrapper)
+    SELF_FORMAT = staticmethod(array_wrapper)
     
-
+    
 class DataclassDecoderMixin:
     
     __slots__ = ()
@@ -379,6 +126,19 @@ class DataclassDecoderMixin:
     ENCODER = staticmethod(lambda key, value: (key,serialize(value)))
     DECODER = None
     
+    
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+    
+        if cls.DECODER is None:
+            type_hints = get_type_hints(cls)
+            
+            for k, v in type_hints.items():
+                type_hints[k] = decode_funcs.get(v,v)
+    
+            cls.DECODER = staticmethod(dict_cast(type_hints))
+        
+        
     @classmethod
     def from_args(cls, *args, **kwargs):
         
@@ -482,8 +242,8 @@ class DataclassDecoderMixin:
             parts.append(string)
             
         return separator.join(parts)
-
-
+       
+    
 class DictDecoderMixin:
 
     __slots__ = ()
@@ -511,7 +271,6 @@ class DictDecoderMixin:
                 key, value = decoder(token, next(tokens))
                 result[key] = value
             except Exception as e:
-                print(string)
                 raise e
                 
         return result
@@ -522,9 +281,9 @@ class DictDecoderMixin:
             separator:str=None, 
             encoder:Callable[[int|str,Any],str]=None
             ) -> str:
-        
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
+        
         return separator.join([separator.join(encoder(k,v)) for k,v in self.items()])
     
 
@@ -537,7 +296,7 @@ class ArrayDecoderMixin:
     GROUP_SIZE = 1
     ENCODER = staticmethod(serialize)
     DECODER = None
-        
+    
     @classmethod
     def from_string(
             cls, 
@@ -589,7 +348,31 @@ class ArrayDecoderMixin:
 
         return separator.join([encoder(x) for x in self])
     
+
+class DictDefaultMixin:
     
+    KEY_DEFAULTS = None
+    
+    def default_keys(self, *args):
+        #defaults = self.KEY_DEFAULTS or {}
+        return
+    
+    def reset_keys(self, *args):
+        return
+    
+    def items(self, skip_default:bool=False):
+        
+        items = super().items()
+        
+        if not skip_default or options.discard_default.get(): return items
+        
+        defaults = self.KEY_DEFAULTS or {}
+        
+        if not defaults: return items
+
+        
+
+
 class DelimiterMixin:
     
     START_DELIMITER = None

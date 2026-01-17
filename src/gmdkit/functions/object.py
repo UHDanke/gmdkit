@@ -7,6 +7,28 @@ from gmdkit.models.object import Object
 from gmdkit.mappings import color_id, obj_prop, obj_id
     
 
+def reset_transforms(obj:Object):      
+    obj.pop(obj_prop.ROTATION,None)
+    obj.pop(obj_prop.SCALE_X,None)
+    obj.pop(obj_prop.SCALE_Y,None)
+    obj.pop(obj_prop.SKEW_X,None)
+    obj.pop(obj_prop.SKEW_Y,None)
+
+
+def reset_pos(obj:Object):
+    if obj.get(obj_prop.X) is not None:
+        obj[obj_prop.X] = 0
+    if obj.get(obj_prop.Y) is not None:
+        obj[obj_prop.X] = 0
+
+
+def reset_colors(obj:Object):
+    obj.pop(obj_prop.COLOR_1,None)
+    obj.pop(obj_prop.COLOR_1_INDEX,None)
+    obj.pop(obj_prop.COLOR_2,None)
+    obj.pop(obj_prop.COLOR_2_INDEX,None)
+
+
 def clean_duplicate_groups(obj:Object) -> None:
     """
     Removes duplicate groups from an object. 

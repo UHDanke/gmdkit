@@ -3,7 +3,7 @@ from typing import Literal, Tuple
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.models.types import DictClass
+from gmdkit.serialization.types import DictClass
 
 
 def fnt_load(path) -> dict:

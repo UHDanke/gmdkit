@@ -3,8 +3,10 @@ from typing import Self, Callable
 from os import PathLike
 
 # Package Imports
-from gmdkit.models.types import ListClass, DictClass
-from gmdkit.models.serialization import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin, dict_cast, decode_string, encode_string, serialize
+from gmdkit.serialization.types import ListClass, DictClass
+from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin 
+from gmdkit.serialization.functions import decode_string, encode_string
+from gmdkit.serialization.type_cast import dict_cast, serialize
 from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 

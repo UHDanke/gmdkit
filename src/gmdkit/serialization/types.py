@@ -1,37 +1,9 @@
+# Package Imports
+from gmdkit.serialization.functions import filter_kwargs
+
 # Imports
-import inspect
 from typing import Self, Any
-from collections.abc import Iterator, Iterable, Callable
-
-
-def filter_kwargs(*functions:Callable, **kwargs) -> list[tuple[Callable,dict[str,Any]]]:
-    """
-    Filters keyword arguments to only those present on the given functions.
-
-    Parameters
-    ----------
-    *functions : Callable
-        One or more functions to retrieve the parameters from.
-        
-    **kwargs : dict[str,Any]
-        The keyword arguments to filter.
-
-    Returns
-    -------
-    func_kwargs : list[tuple[Callable,dict[str,any]]]
-        A list containing functions and matching keyword arguments.
-
-    """
-    if not kwargs: return [(f, {}) for f in functions]
-    
-    new_kwargs = []
-    
-    for function in functions:
-        sig = inspect.signature(function)
-        
-        new_kwargs.append({k: v for k, v in kwargs.items() if k in sig.parameters})
-    
-    return list(zip(functions, new_kwargs))
+from collections.abc import Iterable, Callable
 
 
 class ListClass(list):
@@ -67,6 +39,10 @@ class ListClass(list):
     def copy(self) -> Self:
         return self.__class__(self)
     
+    @classmethod
+    def wrap(cls, *args:Any):
+        return cls(list(args))
+        
     
     def where(self, *conditions:Callable, **kwargs:Any) -> Self:
         """
@@ -320,5 +296,35 @@ class DictClass(dict):
         else:
             for k in keys:
                 result.append(self.get(k))          
+        
+        return result
+
+
+    def discard(self, *keys:str, ignore_missing:bool=False) -> list:
+        """
+        Discards the specified keys from the object and returns their values.
+
+        Parameters
+        ----------
+        *keys : str
+            One or more keys to discard and retrieve the values of.
+        
+        ignore_missing: bool
+            Whether missing keys should be skipped. Defaults to False.
+            
+        Returns
+        -------
+        list
+            Returns a list containing the values of the discarded keys.
+
+        """
+        result = list()
+        
+        if ignore_missing:
+            for k in set(keys) & self.keys():
+                result.append(self.pop(k))
+        else:
+            for k in keys:
+                result.append(self.pop(k,None))          
         
         return result

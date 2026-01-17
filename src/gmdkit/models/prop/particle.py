@@ -1,9 +1,7 @@
 # Imports
 from dataclasses import dataclass
-from typing import get_type_hints
-
 # Package Imports
-from gmdkit.models.serialization import DataclassDecoderMixin, dict_cast
+from gmdkit.serialization.mixins import DataclassDecoderMixin
 
 
 @dataclass(slots=True)
@@ -84,11 +82,3 @@ class Particle(DataclassDecoderMixin):
     frictions_rand: float = 0
     frictionr: float = 0
     frictionr_rand: float = 0
-    
-    
-Particle.DECODER = staticmethod(dict_cast(
-    {
-     key: (lambda x: bool(int(x))) if func is bool else func
-     for key, func in get_type_hints(Particle).items()
-     }
-    ))

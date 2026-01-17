@@ -4,8 +4,9 @@ from urllib.parse import quote, unquote
 import re
 
 # Package Imports
-from gmdkit.models.serialization import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, LoadFileMixin, dict_cast
-from gmdkit.models.types import ListClass
+from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, LoadFileMixin
+from gmdkit.serialization.type_cast import dict_cast
+from gmdkit.serialization.types import ListClass
 from gmdkit.constants.paths import MUSIC_LIBRARY_PATH
  
 

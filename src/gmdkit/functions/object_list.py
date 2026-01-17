@@ -13,9 +13,11 @@ def add_groups(obj_list:ObjectList, groups):
     
     for obj in obj_list:
         g = obj.setdefault(obj_prop.GROUPS, IDList())
-        if len(g) + len(groups) > 10:
-            raise ValueError
-        g.extend(groups)
+        new = set(groups) - set(g)
+        
+        if len(g) + len(new) > 10:
+            raise ValueError("Group Limit exceeded.")
+        g.extend(new)
         
 
 def index_objects(obj_list:ObjectList, start:int=0) -> None:
@@ -38,6 +40,46 @@ def index_objects(obj_list:ObjectList, start:int=0) -> None:
     """
     for i, obj in enumerate(obj_list, start=start):
         obj.index = i
+
+
+def brickify(obj_list, height=None):
+    
+    if height is None:
+        height = math.ceil(math.sqrt(len(obj_list)))
+    
+    X = 0
+    Y = 0
+    i = 0
+    for obj in obj_list:
+        obj.update(
+            {
+                obj_prop.X: X,
+                obj_prop.Y: Y,
+                }
+            )
+        i+=1
+        if i >= height:
+            X += 30
+            Y = 0
+            i = 0 
+        else:
+            Y-=30
+
+
+def group_objects(
+        obj_list:ObjectList, 
+        key_func:Callable=lambda obj: obj.get(obj_prop.ID),
+        value_func:Callable=ObjectList
+        ):
+    
+    new = {}
+    
+    for obj in obj_list:
+        k = key_func(obj)
+        v = new.setdefault(k,ObjectList())
+        v.append(obj)
+        
+    return {k:value_func(v) for k, v in new.items()}
 
 
 def clean_gid_parents(obj_list:ObjectList) -> None:

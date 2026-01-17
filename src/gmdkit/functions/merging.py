@@ -1,8 +1,8 @@
 # Imports 
 import glob
 from pathlib import Path
-from copy import deepcopy
-from typing import Literal
+from copy import copy, deepcopy
+from typing import Literal, Callable
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id, color_prop, color_id
 from gmdkit.models.object import Object, ObjectList
@@ -12,6 +12,7 @@ from gmdkit.functions.object import offset_position
 from gmdkit.functions.remapping import regroup, compile_id_context
 from gmdkit.functions.color import create_color_triggers
 from gmdkit.functions.misc import next_free
+
 
 def load_folder(path, extension:str='.gmd') -> LevelList:
     
@@ -164,6 +165,95 @@ def regroup_levels(level_list:LevelList, ignored_ids:dict=None, reserved_ids:dic
         objs = [lvl.start] + lvl.objects
         regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions)
         for k, v in objs.id_context.items():
-            
             collisions.setdefault(k,set()).update(v.get_ids())
+
+
+def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_limit:float=0):
+    
+    objs = sorted(obj_list, key=lambda obj: obj.get(obj_prop.X,0))
+    
+    groups = {}
+    
+    x = None
+    for obj in objs:
+        ox = obj.get(obj_prop.X)
+        if x is None or ox is not None and ox-x > forward_limit:
+            x = ox
+        gx = groups.setdefault(x, [])
+        gx.append(obj)
+        
+    return {k: function(v) for k,v in groups.items()}
+
+
+def start_pos_fix(
+        obj_list:ObjectList, 
+        target_id:int,
+        forward_limit:float=0,
+        include_stop:bool=True,
+        condition:Callable=None
+        ):
+    
+    target_objs = obj_list.where(condition)# if callable(condition) else obj_list
+    
+    events = ObjectList()
+    
+    obj_groups = group_objects_x(target_objs, forward_limit=forward_limit)
+    ids = compile_id_context(obj_list)
+    
+    group_ids = ids["group_id"].get_ids()
+    
+    vmin, vmax = ids["group_id"].get_limits()
+    
+    new_ids = next_free(values=group_ids, vmin=vmin, vmax=vmax, count=len(obj_groups))
+    
+    
+    for i, (x, objs) in zip(new_ids, obj_groups.items()):
+        event = Object.default(obj_id.trigger.TIME_EVENT)
+        event.update({
+            obj_prop.X: x,
+            obj_prop.Y: -15,
+            obj_prop.trigger.time_event.ITEM_ID: target_id,
+            obj_prop.trigger.time_event.TARGET_ID: i,
+            obj_prop.trigger.time_event.TARGET_TIME: 1.00
+            })
+        events.append(event)
+        if include_stop:
+            stop = Object.default(obj_id.trigger.STOP)
+            stop.update({
+                obj_prop.X: x,
+                obj_prop.Y: -45,
+                obj_prop.trigger.stop.TARGET_ID: i,
+                })
+            events.append(stop)
+        add_groups(objs+[event], (i,))
+    
+    return events
+    
+    
+    
+    
+
+def level_area_start_pos_fix():
+    
+    AREA_TRIGGERS = [
+        obj_id.trigger.area.MOVE,
+        obj_id.trigger.area.ROTATE,
+        obj_id.trigger.area.SCALE,
+        obj_id.trigger.area.FADE,
+        obj_id.trigger.area.TINT,
+        obj_id.trigger.area.EDIT_MOVE,
+        obj_id.trigger.area.EDIT_ROTATE,
+        obj_id.trigger.area.EDIT_SCALE,
+        obj_id.trigger.area.EDIT_FADE,
+        obj_id.trigger.area.EDIT_TINT,
+        obj_id.trigger.area.STOP
+        ]
+
+    return
+        
+    
+    
+
+
+    
     

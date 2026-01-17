@@ -1,4 +1,5 @@
 # Package Imports
+from gmdkit.serialization.type_cast import to_bool, to_string, from_bool, from_float
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 
@@ -18,7 +19,7 @@ LEVEL_DECODERS = {
     'k11': int,
     'k110': IntList.from_string,
     'k111': int,
-    'k15': lambda x: bool(int(x)),
+    'k15': to_bool,
     'k16': int,
     'k17': int,
     'k18': int,
@@ -78,11 +79,11 @@ LEVEL_DECODERS = {
 
 LEVEL_ENCODERS = {
     'k101': str,
-    'k104': lambda x: x.to_string(),
-    'k105': lambda x: x.to_string(),
-    'k109': lambda x: x.to_string(),
-    'k110': lambda x: x.to_string(),
-    'k15': lambda x: str(int(x)),
+    'k104': to_string,
+    'k105': to_string,
+    'k109': to_string,
+    'k110': to_string,
+    'k15': from_bool,
     'k2': str,
     'k3': str,
     'k34': lambda x: x.save(),
@@ -90,12 +91,12 @@ LEVEL_ENCODERS = {
     'k5': str,
     'k67': str,
     'k87': str,
-    'k88': lambda x: x.to_string(),
-    'k91': lambda x: x.to_string(),
-    'kI1': float,
-    'kI2': float,
-    'kI3': float,
-    'kI7': float,
+    'k88': to_string,
+    'k91': to_string,
+    'kI1': from_float,
+    'kI2': from_float,
+    'kI3': from_float,
+    'kI7': from_float,
 }
 
 
@@ -104,7 +105,7 @@ LIST_DECODERS = {
     'k11': int,
     'k113': int,
     'k114': int,
-    'k15': lambda x: bool(int(x)),
+    'k15': to_bool,
     'k16': int,
     'k2': str,
     'k21': int,
@@ -125,9 +126,9 @@ LIST_DECODERS = {
 
 
 LIST_ENCODERS = {
-    'k15': lambda x: str(int(x)),
+    'k15': from_bool,
     'k2': str,
     'k3': str,
     'k5': str,
-    'k96': lambda x: x.to_string(),
+    'k96': to_string,
 }

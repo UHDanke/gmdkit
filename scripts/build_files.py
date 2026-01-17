@@ -14,7 +14,7 @@ def decode_obj_props(gd_type, gd_format, key):
             return 'int'
         
         case 'bool':
-            return 'lambda x: bool(int(x))'
+            return 'to_bool'
         
         case 'float' | 'real':
             return 'float'
@@ -60,7 +60,7 @@ def encode_obj_props(gd_type, gd_format, key):
     match gd_type:
         
         case 'bool':
-            return 'lambda x: str(int(x))'
+            return 'from_bool'
         
         case 'str' | 'string':
             
@@ -70,28 +70,28 @@ def encode_obj_props(gd_type, gd_format, key):
                     return 'encode_text'
                 
                 case 'hsv':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case 'particle':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case 'groups' | 'parent_groups' | 'events':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case  'weights' | 'sequence' | 'group weights' | 'group counts':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case 'remaps' |'group remaps':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                     
                 case 'colors':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case 'guidelines':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case 'color':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case _:
                     return 'str'
@@ -107,7 +107,7 @@ def decode_level_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'bool': 
-                    return 'lambda x: bool(int(x))'
+                    return 'to_bool'
                 
                 case _: return 'int'
                 
@@ -143,16 +143,16 @@ def encode_level_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'bool': 
-                    return 'lambda x: str(int(x))'
+                    return 'from_bool'
         
         case 'float' | 'real':
-            return 'float'
+            return 'from_float'
         
         case 'str' | 'string':
             match gd_format:              
                 
                 case 'int list':
-                    return 'lambda x: x.to_string()'
+                    return 'to_string'
                 
                 case 'gzip':
                     return 'lambda x: x.save()'
@@ -190,6 +190,7 @@ prop_class = prop_class.where(pd.notnull(prop_class), None)
 file = LineWriter(path="src/gmdkit/casting/object_props.py")
 file.write("""
 # Package Imports
+from gmdkit.serialization.type_cast import to_bool, to_string, from_bool, from_float
 from gmdkit.models.prop.string import decode_text, encode_text
 from gmdkit.models.prop.list import IDList, IntPairList, RemapList
 from gmdkit.models.prop.guideline import GuidelineList
@@ -269,6 +270,7 @@ level_class = level_class.where(pd.notnull(level_class), None)
 file = LineWriter(path="src/gmdkit/casting/level_props.py")
 file.write("""
 # Package Imports
+from gmdkit.serialization.type_cast import to_bool, to_string, from_bool, from_float
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 """.strip())

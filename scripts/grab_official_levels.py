@@ -1,11 +1,8 @@
 # Imports
-import os
-import sys
 from pathlib import Path
 
 # Package Imports
 from gmdkit.models.save import GameSave
-from gmdkit.models.prop.gzip import ObjectString
 from gmdkit.models.serialization import to_plist_file
 from gmdkit.models.object import ObjectList
 from gmdkit.functions.object import to_user_coins
@@ -57,7 +54,7 @@ for folder in common:
                 to_plist_file(data, output_copy_path / f"{name}.gmd")               
                 
         except FileNotFoundError:
-            print(f"No object string file found, skipping.")
+            print("No object string file found, skipping.")
             continue
         
         print(f"Saved {name}.gmd")

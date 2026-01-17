@@ -1,10 +1,9 @@
 # Imports
 from dataclasses import dataclass
-from typing import get_type_hints
 
 # Package Imports
-from gmdkit.models.types import ListClass
-from gmdkit.models.serialization import ArrayDecoderMixin, DataclassDecoderMixin, dict_cast
+from gmdkit.serialization.types import ListClass
+from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
 
 
 class IntList(ArrayDecoderMixin,ListClass):
@@ -14,13 +13,6 @@ class IntList(ArrayDecoderMixin,ListClass):
     SEPARATOR = ","
     GROUP_SIZE = 1
     DECODER = int
-    
-    def __init__(self, *items):
-        
-        if len(items) == 1 and isinstance(items[0], (list, tuple, set)):
-            super().__init__(items[0])
-        else:
-            super().__init__(items)
         
     
 class IDList(IntList):
@@ -60,8 +52,6 @@ class IntPair(DataclassDecoderMixin):
             
         if value_map is not None:
             self.value = value_map.get(self.value, self.value)
-                
-IntPair.DECODER = staticmethod(dict_cast(get_type_hints(IntPair)))
 
 
 class IntPairList(ArrayDecoderMixin,ListClass):

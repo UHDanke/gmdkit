@@ -1,6 +1,6 @@
 # Package Imports
-from gmdkit.models.types import DictClass
-from gmdkit.models.serialization import PlistDictDecoderMixin, LoadFileMixin
+from gmdkit.serialization.types import DictClass
+from gmdkit.serialization.mixins import PlistDictDecoderMixin, LoadFileMixin
 from gmdkit.constants.paths import GAME_MANAGER_PATH
 
 

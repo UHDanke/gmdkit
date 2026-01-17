@@ -1,5 +1,4 @@
 # Imports
-import math
 from typing import Iterable
 
 # Package Imports

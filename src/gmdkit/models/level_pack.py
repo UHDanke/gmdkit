@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.models.level import Level, LevelList
-from gmdkit.models.serialization import dict_cast
+from gmdkit.serialization.type_cast import dict_cast
 from gmdkit.casting.level_props import LIST_ENCODERS, LIST_DECODERS
 
 
