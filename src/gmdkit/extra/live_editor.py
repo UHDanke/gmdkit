@@ -33,7 +33,11 @@ class LiveEditor(ObjectString):
             raise ConnectionError(f"Failed to connect to {self.url}") from e
     
     def is_connected(self):
-        return (self.ws and self.ws.connected)
+        status = self.ws and self.ws.connected
+        
+        if not status: self.ws = None
+        
+        return status
         
     def close(self):
         if self.ws:
@@ -71,17 +75,24 @@ class LiveEditor(ObjectString):
             message = response.get("message","no error message provided")
             raise ValueError(f"Response error: {message}")
         
-        data = response.get("response")
+        self.is_connected()
         
-        return data
+        return response.get("response")
             
 
     def get_level_string(self, **kwargs):
         self.string = self.send_action("GET_LEVEL_STRING")
         return self.load()
 
-    def add_objects(self, objects:ObjectList, **kwargs):
-        return self.send_action("ADD_OBJECTS", objects=objects.to_string(), **kwargs)
+    def add_objects(self, objects:ObjectList, batch_size=None, **kwargs):
+        
+        if not objects: return
+        
+        batch_size = batch_size or len(objects)
+        
+        for i in range(0, len(objects), batch_size):
+            batch = objects[i:i+batch_size]
+            self.send_action("ADD_OBJECTS", objects=batch.to_string(), **kwargs)
         
     def remove_object_group(self, group_id:int, **kwargs):
-        return self.send_action("REMOVE_OBJECTS", group=group_id, **kwargs)
+        self.send_action("REMOVE_OBJECTS", group=group_id, **kwargs)
