@@ -6,6 +6,7 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.serialization import options
+from gmdkit.serialization.types import FilterItemsView
 from gmdkit.serialization.type_cast import serialize, dict_cast, decode_funcs
 from gmdkit.serialization.functions import (
     decode_string, encode_string, 
@@ -353,24 +354,32 @@ class DictDefaultMixin:
     
     KEY_DEFAULTS = None
     
-    def default_keys(self, *args):
-        #defaults = self.KEY_DEFAULTS or {}
-        return
+    def get_keydef(self, key):
+        if not self.KEY_DEFAULTS: return 
+        return self.KEY_DEFAULTS.get(key, None)
     
-    def reset_keys(self, *args):
-        return
+    def auto_keydef(self, *args):
+        for k in args:
+            if k not in self and (v:=self.get_keydef(k)) is not None:
+                self[k] = v
     
+    def reset_keydef(self, *args):
+        for k in args:
+            if (v:=self.get_keydef(k)) is not None:
+                self[k] = v
+                
     def items(self, skip_default:bool=False):
         
         items = super().items()
         
-        if not skip_default or options.discard_default.get(): return items
+        if not self.KEY_DEFAULTS or not (
+                skip_default or options.discard_default.get()
+                ): return items
         
-        defaults = self.KEY_DEFAULTS or {}
-        
-        if not defaults: return items
-
-        
+        return FilterItemsView(
+            self,
+            lambda k, v: v != self.get_keydef(k)
+        )
 
 
 class DelimiterMixin:

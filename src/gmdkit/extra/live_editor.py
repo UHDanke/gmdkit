@@ -32,13 +32,6 @@ class LiveEditor(ObjectString):
             self.ws = None
             raise ConnectionError(f"Failed to connect to {self.url}") from e
     
-    def is_connected(self):
-        status = self.ws and self.ws.connected
-        
-        if not status: self.ws = None
-        
-        return status
-        
     def close(self):
         if self.ws:
              self.ws.close()
@@ -54,7 +47,7 @@ class LiveEditor(ObjectString):
     
         return False
     
-    def send_action(self, action,**kwargs):
+    def send_action(self, action:str,**kwargs):
         if not self.ws:
             raise RuntimeError("WebSocket is not connected")
             
@@ -75,16 +68,15 @@ class LiveEditor(ObjectString):
             message = response.get("message","no error message provided")
             raise ValueError(f"Response error: {message}")
         
-        self.is_connected()
+        if not self.ws.connected: self.ws = None
         
         return response.get("response")
             
 
     def get_level_string(self, **kwargs):
-        self.string = self.send_action("GET_LEVEL_STRING")
-        return self.load()
+        return self.load(self.send_action("GET_LEVEL_STRING"))
 
-    def add_objects(self, objects:ObjectList, batch_size=None, **kwargs):
+    def add_objects(self, objects:ObjectList, batch_size:int|None=None, **kwargs) -> None:
         
         if not objects: return
         

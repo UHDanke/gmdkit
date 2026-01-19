@@ -5,9 +5,9 @@ from gmdkit.models.object import Object, ObjectList
 
 class ObjectString(GzipString):
     
-    def load(self):
+    def load(self, string:str|None=None):
         
-        string = super().load()
+        string = string if string is not None else super().load()
         
         obj_list = ObjectList.from_string(string)
         
@@ -19,7 +19,7 @@ class ObjectString(GzipString):
         return Object(), ObjectList()
     
         
-    def save(self, start=None, objects=None):
+    def save(self, start:Object|None=None, objects:ObjectList|None=None):
         
         start = start or getattr(self, "start", None)
         objects =  objects or getattr(self, "objects", None)

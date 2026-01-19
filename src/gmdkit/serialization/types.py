@@ -3,7 +3,7 @@ from gmdkit.serialization.functions import filter_kwargs
 
 # Imports
 from typing import Self, Any
-from collections.abc import Iterable, Callable
+from collections.abc import Iterable, Callable, ItemsView
 
 
 class ListClass(list):
@@ -33,7 +33,7 @@ class ListClass(list):
 
     
     def __repr__(self):
-        return f"{self.__class__}({list(self)})"
+        return f"{self.__class__.__name__}({super().__repr__()})"
         
         
     def copy(self) -> Self:
@@ -41,7 +41,7 @@ class ListClass(list):
     
     @classmethod
     def wrap(cls, *args:Any):
-        return cls(list(args))
+        return cls(args)
         
     
     def where(self, *conditions:Callable, **kwargs:Any) -> Self:
@@ -66,10 +66,10 @@ class ListClass(list):
         f_kw = filter_kwargs(*conditions, **kwargs)
 
         for item in self:
-            for condition, nkwargs in f_kw:
-                if condition(item, **nkwargs):
-
+            for condition in f_kw:
+                if condition(item):
                     result.append(item)
+                    break
         
         return result
     
@@ -100,12 +100,15 @@ class ListClass(list):
         print(new_list)  # Output: [2, 4, 6]
 
         """        
-        f_kw = filter_kwargs(*functions, **kwargs)
+        f_kw = filter_kwargs(*functions)
             
         for i, item in enumerate(self):
-            for function, nkwargs in f_kw:
-                if (val:=function(item, **nkwargs)) is not None:
-                    self[i] = val
+            val = item
+            for function in f_kw:
+                new = function(val)
+                if new is not None:
+                    val = new
+            self[i] = val
         
         return self
     
@@ -134,8 +137,8 @@ class ListClass(list):
         f_kw = filter_kwargs(*conditions, **kwargs)
 
         for item in self:
-            for condition, nkwargs in f_kw:
-                if condition(item,**nkwargs):
+            for condition in f_kw:
+                if condition(item):
                     ex.append(item)
                     break
             else:
@@ -164,10 +167,11 @@ class ListClass(list):
         """
         result = list()
         f_kw = filter_kwargs(*functions, **kwargs)
-        print(f_kw)
         for item in self:
-            for function, nkwargs in f_kw:
-                result.extend(function(item,**nkwargs) or [])
+            for function in f_kw:
+                vals = function(item) 
+                if vals:
+                    result.extend(vals)
                 
         return result
     
@@ -195,8 +199,10 @@ class ListClass(list):
         f_kw = filter_kwargs(*functions, **kwargs)
         
         for item in self:
-            for function, nkwargs in f_kw:
-                result.update(function(item,**nkwargs) or [])
+            for function in f_kw:
+                vals = function(item) 
+                if vals:
+                    result.update(vals)
                 
         return result
     
@@ -224,8 +230,9 @@ class ListClass(list):
         f_kw = filter_kwargs(*functions, **kwargs)
         
         for item in self:
-            for function, nkwargs in f_kw:
-                val = set(function(item,**nkwargs) or [])
+            for function in f_kw:
+                vals = function(item)
+                val = vals if isinstance(vals, set) else set(vals or ())
                 
                 if result is None:
                     result = val
@@ -247,16 +254,16 @@ class DictClass(dict):
         
     @classmethod
     def fromkeys(cls, iterable, value=None):
-        return cls({k: value for k in iterable})
+        return cls(dict.fromkeys(iterable, value))
 
 
     def __repr__(self):
-        return f"{self.__class__}({dict(self)})"
+        return f"{self.__class__.__name__}({super().__repr__()})"
 
 
     def copy(self):
         return self.__class__(self)
-
+    
 
     def __or__(self, other):
         if not isinstance(other, dict):
@@ -289,9 +296,10 @@ class DictClass(dict):
 
         """
         result = list()
+        key_set = set(keys)
         
         if ignore_missing:
-            for k in set(keys) & self.keys():
+            for k in key_set & self.keys():
                 result.append(self.get(k))
         else:
             for k in keys:
@@ -328,3 +336,17 @@ class DictClass(dict):
                 result.append(self.pop(k,None))          
         
         return result
+    
+    
+class FilterItemsView(ItemsView):
+    def __init__(self, mapping, predicate):
+        self._mapping = mapping
+        self._predicate = predicate
+
+    def __iter__(self):
+        for k, v in dict.items(self._mapping):
+            if self._predicate(k, v):
+                yield k, v
+
+    def __len__(self):
+        return sum(1 for _ in self)
