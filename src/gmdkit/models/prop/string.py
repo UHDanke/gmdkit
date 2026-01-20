@@ -26,19 +26,12 @@ def encode_text(string:str) -> str:
 class GzipString:
     
     __slots__ = ("string")
-    ENCODED = True
     
     def __init__(self, string:str=""):
         self.string = string
     
     def load(self) -> str:
-        if self.ENCODED:
-            return decode_string(self.string)
-        else:
-            return self.string
-        
+        return decode_string(self.string)
+
     def save(self, string:str) -> None:
-        if self.ENCODED:
-            string = encode_string(string)
-        self.string = string
-        return self.string
+        self.string = encode_string(string)

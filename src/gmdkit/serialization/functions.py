@@ -1,6 +1,7 @@
 # Imports
 from typing import Any, Callable, Literal
 from itertools import islice
+from functools import partial
 from inspect import signature
 from os import PathLike
 import xml.etree.ElementTree as ET
@@ -247,13 +248,17 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[tuple[Callable,dict[str
         A list containing functions and matching keyword arguments.
 
     """
-    if not kwargs: return [(f, {}) for f in functions]
+    if not kwargs: 
+        return [(f, {}) for f in functions]
+    kw_keys = set(kwargs)
+    result = []
     
-    new_kwargs = []
+    for fn in functions:
+        params = signature(fn).parameters
+        if params:
+            kw = {k: kwargs[k] for k in kw_keys & params}
+            result.append(partial(fn, **kw))
+        else:
+            result.append(fn)
     
-    for function in functions:
-        sig = signature(function)
-        
-        new_kwargs.append({k: v for k, v in kwargs.items() if k in sig.parameters})
-    
-    return list(zip(functions, new_kwargs))
+    return result

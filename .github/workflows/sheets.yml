@@ -32,7 +32,7 @@ jobs:
           SHEETS_JSON: ${{ vars.SHEETS_JSON }}
 
       - name: Run post-processing script
-        run: python scripts/build_files.py
+        run: python -m scripts.build_files
 
       - name: Commit and push changes
         run: |
