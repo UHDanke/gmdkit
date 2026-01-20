@@ -1,6 +1,6 @@
 # Imports
 from dataclasses import fields
-from typing import Callable, Any, Self, get_type_hints
+from typing import Callable, Any, Self, get_type_hints, Literal
 from itertools import islice
 from os import PathLike
 
@@ -14,22 +14,32 @@ from gmdkit.serialization.functions import (
     dict_wrapper, array_wrapper
 )
 
+Decoder = Callable[[int|str, Any], tuple[str, Any]]
+DecoderWithKwargs = Callable[..., tuple[str, Any]]
+DictDecoder = Callable[[int|str, Any], tuple[Any, Any]]
+
+Encoder = Callable[[int|str, Any], tuple[str, str]]
+DataclassEncoder = Callable[[str, Any], tuple[str, str]]
+ArrayEncoder = Callable[[Any], str]
+ArrayDecoder = Callable[[Any], Any]
+
 class PlistDecoderMixin:
     
-    ENCODER = None
-    DECODER = None
-    PLIST_FORMAT = None
-    SELF_FORMAT = None
+    ENCODER: Callable | None = None
+    DECODER: Callable | None = None
+    PLIST_FORMAT: Callable | None = None
+    SELF_FORMAT: Callable | None = None
+    path: str | PathLike | None = None
     
     
     @classmethod
     def from_plist(
             cls, 
             data:Any, 
-            decoder:Callable=None,
-            self_format:Callable[Any,Callable]=None, 
-            fkwargs:dict=None,
-            **kwargs
+            decoder:Callable|None=None,
+            self_format:Callable|None=None, 
+            fkwargs:dict[str, Any]|None=None,
+            **kwargs: Any
             ) -> Self:
         
         decoder = decoder or cls.DECODER
@@ -46,9 +56,9 @@ class PlistDecoderMixin:
         
     def to_plist(
             self, 
-            encoder:Callable=None, 
-            plist_format:Callable=None,
-            fkwargs:dict=None
+            encoder:Callable|None=None, 
+            plist_format:Callable|None=None,
+            fkwargs:dict[str, Any]|None=None
             ) -> Any:
         
         encoder = encoder or self.ENCODER or (lambda x: x)
@@ -96,7 +106,7 @@ class PlistDecoderMixin:
     
     def to_string(self, **kwargs):
         
-        data = self.to_plist(self, **kwargs)
+        data = self.to_plist(**kwargs)
         
         return to_plist_string(data)
 
@@ -121,10 +131,10 @@ class DataclassDecoderMixin:
     
     __slots__ = ()
     
-    SEPARATOR = ','
-    LIST_FORMAT = True
-    ENCODER = staticmethod(lambda key, value: (key,serialize(value)))
-    DECODER = None
+    SEPARATOR: str = ','
+    LIST_FORMAT: bool = True
+    ENCODER: DataclassEncoder = staticmethod(lambda key, value: (key,serialize(value)))
+    DECODER: DecoderWithKwargs | None = None
     
     
     def __init_subclass__(cls, **kwargs):
@@ -172,14 +182,18 @@ class DataclassDecoderMixin:
     def from_string(
             cls, 
             string:str, 
-            separator:str=None, 
-            list_format:bool=None, 
-            decoder:Callable[[int|str,Any],Any]=None
+            separator:str|None=None, 
+            list_format:bool|None=None, 
+            decoder:DecoderWithKwargs|None=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
-        list_format = list_format or cls.LIST_FORMAT
-        decoder = decoder or cls.DECODER or dict_cast(get_type_hints(cls))
+        list_format = list_format if list_format is not None else cls.LIST_FORMAT
+        
+        if decoder is None and cls.DECODER is not None:
+            decoder = cls.DECODER
+        else:
+            decoder = dict_cast(get_type_hints(cls))
         
         if string == '':
             return cls()
@@ -216,9 +230,9 @@ class DataclassDecoderMixin:
     
     def to_string(
             self, 
-            separator:str=None, 
-            list_format:bool=None, 
-            encoder:Callable[[str,Any],str]=None
+            separator:str|None=None, 
+            list_format:bool|None=None, 
+            encoder:DataclassEncoder|None=None
             ) -> str:
         
         separator = separator if separator is not None else self.SEPARATOR
@@ -248,16 +262,16 @@ class DictDecoderMixin:
 
     __slots__ = ()
     
-    SEPARATOR = ','
-    ENCODER = staticmethod(lambda key, value: (str(key),serialize(value)))
-    DECODER = None
+    SEPARATOR: str = ','
+    ENCODER: Encoder = staticmethod(lambda key, value: (str(key),serialize(value)))
+    DECODER: DictDecoder | None = None
     
     @classmethod
     def from_string(
             cls, 
             string:str, 
-            separator:str=None, 
-            decoder:Callable[[int|str,Any],Any]=None
+            separator:str|None=None, 
+            decoder:DictDecoder|None=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -278,8 +292,8 @@ class DictDecoderMixin:
     
     def to_string(
             self, 
-            separator:str=None, 
-            encoder:Callable[[int|str,Any],str]=None
+            separator:str|None=None, 
+            encoder:Encoder|None=None
             ) -> str:
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
@@ -291,20 +305,20 @@ class ArrayDecoderMixin:
     
     __slots__ = ()
     
-    SEPARATOR = ','
-    END_SEP = False
-    GROUP_SIZE = 1
-    ENCODER = staticmethod(serialize)
-    DECODER = None
+    SEPARATOR: str = ','
+    END_SEP: bool = False
+    GROUP_SIZE: int = 1
+    ENCODER: ArrayEncoder = staticmethod(serialize)
+    DECODER: ArrayDecoder | None = None
     
     @classmethod
     def from_string(
             cls, 
             string:str, 
-            separator:str=None,
-            end_sep:bool=None,
-            group_size:int=None, 
-            decoder:Callable[[str],Any]=None
+            separator:str|None=None,
+            end_sep:bool|None=None,
+            group_size:int|None=None, 
+            decoder:ArrayDecoder|None=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -337,9 +351,9 @@ class ArrayDecoderMixin:
         
     def to_string(
             self, 
-            separator:str=None,
-            end_sep:bool=None,
-            encoder:Callable[[Any],str]=None
+            separator:str|None=None,
+            end_sep:bool|None=None,
+            encoder:ArrayEncoder|None=None
             ) -> str:
         
         end_sep = end_sep or self.END_SEP
@@ -351,7 +365,7 @@ class ArrayDecoderMixin:
 
 class DictDefaultMixin:
     
-    KEY_DEFAULTS = None
+    KEY_DEFAULTS: dict[str, Any] | None = None
     
     def default_keys(self, *args):
         #defaults = self.KEY_DEFAULTS or {}
@@ -375,16 +389,16 @@ class DictDefaultMixin:
 
 class DelimiterMixin:
     
-    START_DELIMITER = None
-    END_DELIMITER = None
+    START_DELIMITER: str | None = None
+    END_DELIMITER: str | None = None
     
     @classmethod
     def from_string(
             cls,
             string:str,
             *args,
-            start_delimiter:str=None,
-            end_delimiter:str=None,
+            start_delimiter:str|None=None,
+            end_delimiter:str|None=None,
             **kwargs
             ) -> Self:
         
@@ -400,8 +414,8 @@ class DelimiterMixin:
     def to_string(
             self,
             *args,
-            start_delimiter:str=None,
-            end_delimiter:str=None,
+            start_delimiter:str|None=None,
+            end_delimiter:str|None=None,
             **kwargs
             ) -> Self:
         
@@ -418,23 +432,26 @@ class DelimiterMixin:
 
 class LoadFileMixin:
     
-    DEFAULT_PATH = None
-    COMPRESSION = None
-    CYPHER = None
+    DEFAULT_PATH: str | PathLike | None = None
+    COMPRESSION: Literal['zlib', 'gzip', 'deflate'] | None = None
+    CYPHER: bytes | None = None
     
     @classmethod
     def from_file(
             cls, 
-            path:str|PathLike=None, 
+            path:str|PathLike|None=None, 
             encoded:bool=True, 
-            compression:str=None, 
-            cypher:bytes=None,
-            **kwargs
+            compression:Literal['zlib', 'gzip', 'deflate']|None=None, 
+            cypher:bytes|None=None,
+            **kwargs: Any
             ) -> Self:
         
         path = path or cls.DEFAULT_PATH
         compression = compression or cls.COMPRESSION
         cypher = cypher or cls.CYPHER
+        
+        if path is None:
+            raise ValueError("path must be provided")
         
         with open(path, "r", encoding="utf-8") as file:
             
@@ -447,9 +464,9 @@ class LoadFileMixin:
     
     def to_file(
             self,
-            path:str|PathLike=None,
-            compression:str=None, 
-            cypher:bytes=None,
+            path:str|PathLike|None=None,
+            compression:Literal['zlib', 'gzip', 'deflate']|None=None, 
+            cypher:bytes|None=None,
             encoded:bool=True, 
             **kwargs
             ):
