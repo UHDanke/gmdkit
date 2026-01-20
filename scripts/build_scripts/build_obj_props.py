@@ -1,7 +1,6 @@
 import pandas as pd
 from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder
 
-
 CSV_PATH = "data/csv/prop_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_obj_props.txt"
 FILEPATH = "src/gmdkit/casting/object_props.py"
