@@ -1,0 +1,34 @@
+# Package Imports
+from gmdkit.serialization.type_cast import to_bool, to_string, from_bool, from_float
+from gmdkit.models.prop.list import IntList
+from gmdkit.models.prop.gzip import ObjectString, ReplayString
+
+
+LEVEL_DECODERS = {{
+{level_decoders}
+}}
+
+
+LEVEL_ENCODERS = {{
+{level_encoders}
+}}
+
+
+LEVEL_TYPES = {{
+{level_types}
+}}
+
+
+LIST_DECODERS = {{
+{list_decoders}
+}}
+
+
+LIST_ENCODERS = {{
+{list_encoders}
+}}
+
+
+LIST_TYPES = {{
+{list_types}
+}}

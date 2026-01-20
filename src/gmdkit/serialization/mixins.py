@@ -258,35 +258,44 @@ class DictDecoderMixin:
             cls, 
             string:str, 
             separator:str=None, 
-            decoder:Callable[[int|str,Any],Any]=None
+            decoder:Callable[[int|str,Any],Any]=None,
+            condition:Callable=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
         decoder = decoder or cls.DECODER or (lambda key, value: (key, value))
-        
+        use_condition = callable(condition)
+
+        tokens = string.split(separator)
+        if len(tokens) % 2 != 0:
+            raise ValueError("Malformed input string: uneven key/value pairs")
+
         result = cls()
-        tokens = iter(string.split(separator))
-    
-        for token in tokens:
-            try:
-                key, value = decoder(token, next(tokens))
+        for raw_key, raw_value in zip(tokens[::2], tokens[1::2]):
+            key, value = decoder(raw_key, raw_value)
+            if not use_condition or condition(key, value):
                 result[key] = value
-            except Exception as e:
-                raise e
-                
+
         return result
     
     
     def to_string(
             self, 
             separator:str=None, 
-            encoder:Callable[[int|str,Any],str]=None
+            encoder:Callable[[int|str,Any],str]=None,
+            condition:Callable=None
             ) -> str:
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
         
-        return separator.join([separator.join(encoder(k,v)) for k,v in self.items()])
-    
+        use_condition = callable(condition)
+
+        parts: list[str] = []
+        for key, value in self.items():
+            if not use_condition or condition(key, value):
+                parts.extend(encoder(key, value))
+        
+        return separator.join(parts)
 
 class ArrayDecoderMixin:
     
@@ -354,7 +363,7 @@ class DictDefaultMixin:
     
     KEY_DEFAULTS = None
     
-    def get_keydef(self, key):
+    def get_keydef(self, key:int|str):
         if not self.KEY_DEFAULTS: return 
         return self.KEY_DEFAULTS.get(key, None)
     
@@ -368,18 +377,21 @@ class DictDefaultMixin:
             if (v:=self.get_keydef(k)) is not None:
                 self[k] = v
                 
-    def items(self, skip_default:bool=False):
+    def to_string(self, skip_default:bool=False, condition:Callable|None=None,**kwargs):
         
-        items = super().items()
+        get_default = self.KEY_DEFAULTS and (skip_default or options.discard_default.get())
+        use_condition = callable(condition)
         
-        if not self.KEY_DEFAULTS or not (
-                skip_default or options.discard_default.get()
-                ): return items
+        if get_default and use_condition:
+            func = lambda k,v: condition(k,v) and v != self.get_keydef(k)
+        elif get_default:
+            func = lambda k,v: v != self.get_keydef(k)
+        elif use_condition:
+            func = condition
+        else:
+            func = None
         
-        return FilterItemsView(
-            self,
-            lambda k, v: v != self.get_keydef(k)
-        )
+        return super().to_string(condition=func)
 
 
 class DelimiterMixin:

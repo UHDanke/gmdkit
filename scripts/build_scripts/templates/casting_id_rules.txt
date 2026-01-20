@@ -1,0 +1,40 @@
+# Imports
+from typing import Callable
+from dataclasses import dataclass
+
+# Package Imports
+from gmdkit.mappings import obj_id, obj_prop, color_prop
+from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
+
+@dataclass(frozen=True)
+class IDRule:
+    type: str
+    prop: int
+    min: int = -2147483648
+    max: int = 2147483647
+    remappable: bool = False
+    iterable: bool = False
+    reference: bool = False
+    fixed: bool = False
+    actions: list = None
+    function: Callable = None
+    condition: Callable = None
+    fallback: Callable = None
+    default: Callable = None
+    replace: Callable = None
+
+    def get_value(self, attr, *a, default=None):
+        value = getattr(self, attr, default)
+        
+        if callable(value):
+            return value(*a)
+        
+        return value
+            
+
+ID_TYPES = {unique_types}
+    
+
+ID_RULES = {{
+{id_rules}
+}}
