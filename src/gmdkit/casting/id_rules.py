@@ -32,7 +32,7 @@ class IDRule:
         return value
             
 
-ID_TYPES = {'gradient_id', 'remap_target', 'sfx_id', 'sfx_group', 'remap_base', 'control_id', 'group_id', 'unique_sfx_id', 'enter_channel', 'item_id', 'song_channel', 'force_id', 'trigger_channel', 'link_id', 'collision_id', 'material_id', 'time_id', 'effect_id', 'color_id', 'song_id', 'keyframe_id'}
+ID_TYPES = {'remap_base', 'enter_channel', 'song_id', 'sfx_id', 'effect_id', 'time_id', 'control_id', 'trigger_channel', 'link_id', 'force_id', 'gradient_id', 'unique_sfx_id', 'item_id', 'keyframe_id', 'remap_target', 'collision_id', 'song_channel', 'color_id', 'group_id', 'sfx_group', 'material_id'}
     
 
 ID_RULES = {
