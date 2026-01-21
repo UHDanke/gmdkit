@@ -1,5 +1,5 @@
 # Imports
-from typing import Any, Literal
+from typing import Any, Generator, Literal
 from collections.abc import Callable
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -29,7 +29,7 @@ class Identifier:
 
 def compile_rules(
         object_id:int, 
-        rule_dict:dict[int|str,list[IDRule]]=ID_RULES
+        rule_dict:dict[int|str|None,list[IDRule]]=ID_RULES
         ) -> list[IDRule]:
     """
     Compiles a set of rules by object ID.
@@ -59,7 +59,7 @@ def compile_rules(
 def get_ids(
         obj:Object,
         rule_dict:dict[Any,list[IDRule]]=ID_RULES
-        ) -> Iterable[Identifier]:
+        ) -> Generator[Identifier]:
     """
     Compiles unique ID data referenced by an object.
 
@@ -194,10 +194,10 @@ class IDType:
     
     def get_ids(
         self,
-        default:bool = None,
-        fixed:bool = None,
-        remappable:bool = None,
-        reference:bool = None,
+        default:bool|None = None,
+        fixed:bool|None = None,
+        remappable:bool|None = None,
+        reference:bool|None = None,
         in_range:bool = False,
         remap:bool = False,
         condition:Callable|None=None

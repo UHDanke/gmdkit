@@ -193,7 +193,7 @@ def start_pos_fix(
         condition:Callable|None=None
         ):
     
-    target_objs = obj_list.where(condition)# if callable(condition) else obj_list
+    target_objs = obj_list.where(condition) if callable(condition) else obj_list
     
     events = ObjectList()
     
