@@ -272,10 +272,8 @@ class DictDecoderMixin:
             cls, 
             string:str, 
             separator:str|None=None, 
-            decoder:DictDecoder|None=None
-            separator:str|None=None, 
-            decoder:Callable[[int|str,Any],Any]=None,
-            condition:Callable=None
+            decoder:DictDecoder|None=None,
+            condition:Callable|None=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -298,10 +296,8 @@ class DictDecoderMixin:
     def to_string(
             self, 
             separator:str|None=None, 
-            encoder:Encoder|None=None
-            separator:str=None, 
-            encoder:Callable[[int|str,Any],str]=None,
-            condition:Callable=None
+            encoder:Encoder|None=None,
+            condition:Callable|None=None
             ) -> str:
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
