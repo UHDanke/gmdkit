@@ -22,7 +22,7 @@ class LevelSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):
     ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))    
     
     @classmethod
-    def from_plist(cls, data, load:bool=False, load_keys:Iterable=None,**kwargs) -> Self:
+    def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs) -> Self:
         
         fkwargs = kwargs.setdefault('fkwargs', {})
         fkwargs.setdefault('load', load)
@@ -31,7 +31,7 @@ class LevelSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):
         return super().from_plist(data, **kwargs)
         
     
-    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable|None=None, **kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
         fkwargs.setdefault('save', save)

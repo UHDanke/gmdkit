@@ -21,7 +21,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
 
     
     @classmethod
-    def default(cls, object_id:int, decoder:Callable=None) -> Self:
+    def default(cls, object_id:int, decoder:Callable|None=None) -> Self:
         
         decoder = decoder or cls.DECODER
         

@@ -113,12 +113,12 @@ class FontObject(DictClass):
             string, 
             groups:Literal[],
             
-            max_len:int=None,
-            max_wrap_len:int=None
+            max_len:int|None=None,
+            max_wrap_len:int|None=None,
             kerning:int=0,            
             position:Tuple[float,float]=(0,0),
-            anchor_x:Literal["left","center","right"]=None,
-            anchor_y:Literal["top","middle","bottom"]=None
+            anchor_x:Literal["left","center","right"]|None=None,
+            anchor_y:Literal["top","middle","bottom"]|None=None,
             align_x:Literal["left","center","right","justify"]="left",
             align_y:Literal["top","middle","bottom"]="center", 
             ) -> ObjectList:

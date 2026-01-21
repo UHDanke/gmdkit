@@ -10,19 +10,20 @@ DEFAULT_LEVEL_COLORS = {
      1014: {1: 40, 2: 125, 3: 255, 11: 255, 12: 255, 13: 255, 4: -1, 6: 1014, 7: 1.0, 15: 1.0, 18: False, 8: True}, 
      }
 
-DEFAULT_CUSTOM_COLOR = lambda channel: {
-    1: 255, 
-    2: 255, 
-    3: 255,
-    4: -1, 
-    6: channel,
-    7: 1.0, 
-    8: True,
-    11: 255, 
-    12: 255, 
-    13: 255, 
-    15: 1.0, 
-    18: False, 
+def DEFAULT_CUSTOM_COLOR(channel):
+    return {
+        1: 255, 
+        2: 255, 
+        3: 255,
+        4: -1, 
+        6: channel,
+        7: 1.0, 
+        8: True,
+        11: 255, 
+        12: 255, 
+        13: 255, 
+        15: 1.0, 
+        18: False, 
     }
 
 def default_color(color_id:int):

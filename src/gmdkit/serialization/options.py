@@ -10,7 +10,7 @@ discard_default = ContextVar("discard_default", default=False)
 
 @contextmanager
 def casting_options(
-        float_precision:int=None,
+        float_precision:int|None=None,
         string_fallback:bool=False,
         discard_default:bool=False
         ):

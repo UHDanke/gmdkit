@@ -155,7 +155,7 @@ def level_add_toggles(lvl_list:LevelList):
         
     return init_toggles
 
-def regroup_levels(level_list:LevelList, ignored_ids:dict=None, reserved_ids:dict=None, remaps:Literal["none","naive","search"]="none"):
+def regroup_levels(level_list:LevelList, ignored_ids:dict|None=None, reserved_ids:dict|None=None, remaps:Literal["none","naive","search"]="none"):
     ignored_ids = ignored_ids or {}
     reserved_ids = reserved_ids or {}
     collisions = reserved_ids
@@ -190,7 +190,7 @@ def start_pos_fix(
         target_id:int,
         forward_limit:float=0,
         include_stop:bool=True,
-        condition:Callable=None
+        condition:Callable|None=None
         ):
     
     target_objs = obj_list.where(condition)# if callable(condition) else obj_list

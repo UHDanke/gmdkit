@@ -146,7 +146,7 @@ def offset_position(
 def scale_position(
         obj:Object,
         scale_x:float=1.00,scale_y:float=1.00,
-        center_x:float=None, center_y:float=None, 
+        center_x:float|None=None, center_y:float|None=None, 
         only_move:bool=False
         ) -> None:
     
@@ -164,7 +164,7 @@ def scale_position(
 def rotate_position(
         obj:Object,
         angle:float=0, 
-        center_x:float=None, center_y:float=None, 
+        center_x:float|None=None, center_y:float|None=None, 
         only_move:bool=False
         ):
     

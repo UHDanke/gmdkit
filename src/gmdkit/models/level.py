@@ -19,7 +19,7 @@ class Level(PlistDictDecoderMixin,DictClass):
     ENCODER = staticmethod(dict_cast(LEVEL_ENCODERS))
     
     
-    def __init__(self, *args, load:bool=False, load_keys:Iterable=None,**kwargs):
+    def __init__(self, *args, load:bool=False, load_keys:Iterable|None=None,**kwargs):
         
         super().__init__(*args, **kwargs)
         
@@ -27,12 +27,17 @@ class Level(PlistDictDecoderMixin,DictClass):
 
 
     @classmethod
-    def from_file(cls, path:str|PathLike, load:bool=True, load_keys:Iterable=None, **kwargs):
+    def from_file(cls, path:str|PathLike, load:bool=True, load_keys:Iterable|None=None, **kwargs):
         
         return super().from_file(path, load=load, load_keys=load_keys, **kwargs)
     
     
-    def to_file(self, path:str|PathLike=None, extension:str="gmd", save:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_file(self, 
+            path:str|PathLike|None=None, 
+            extension:str="gmd", 
+            save:bool=True, 
+            save_keys:Iterable|None=None, 
+            **kwargs):
         
         if path is None: 
             path = Path()
@@ -45,14 +50,14 @@ class Level(PlistDictDecoderMixin,DictClass):
         super().to_file(path=path, save=save, save_keys=save_keys, **kwargs)
 
     
-    def to_plist(self, save:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_plist(self, save:bool=True, save_keys:Iterable|None=None, **kwargs):
         
         if save: self.save(keys=save_keys)
         
         return super().to_plist(**kwargs)
 
         
-    def load(self, keys:Iterable=None, copy_attributes:bool=True):
+    def load(self, keys:Iterable|None=None, copy_attributes:bool=True):
         
         keys = keys or self.keys()
         
@@ -73,7 +78,7 @@ class Level(PlistDictDecoderMixin,DictClass):
                     setattr(self, attr, value)
     
             
-    def save(self, keys:Iterable=None):
+    def save(self, keys:Iterable|None=None):
         
         keys = keys or self.keys()
         
@@ -110,7 +115,7 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     
 
     @classmethod
-    def from_plist(cls, data, load:bool=False, load_keys:Iterable=None,**kwargs):
+    def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
         fkwargs.setdefault('load', load)
@@ -119,7 +124,7 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
         return super().from_plist(data, **kwargs)
         
     
-    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable=None, **kwargs):
+    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable|None=None, **kwargs):
         
         fkwargs = kwargs.setdefault('fkwargs', {})
         fkwargs.setdefault('save', save)

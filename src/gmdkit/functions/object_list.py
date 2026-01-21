@@ -42,7 +42,7 @@ def index_objects(obj_list:ObjectList, start:int=0) -> None:
         obj.index = i
 
 
-def brickify(obj_list, height=None):
+def brickify(obj_list, height: int | None = None):
     
     if height is None:
         height = math.ceil(math.sqrt(len(obj_list)))
@@ -515,8 +515,8 @@ def boundaries(
 
 def grid_align(
         obj_list:ObjectList,
-        unit_x:float=None,
-        unit_y:float=None,
+        unit_x:float|None=None,
+        unit_y:float|None=None,
         offset_x:float=0,
         offset_y:float=0,
         snap:Literal["round", "floor", "ceil"]="round"
@@ -541,13 +541,13 @@ def grid_align(
 def warp_objects(
         obj_list:ObjectList,
         only_move:bool=False,
-        rotation:float=None,
-        skew:float=None,
-        scale_x:float=None,
-        scale_y:float=None,
-        center_x:float=None,
-        center_y:float=None,
-        center_rotation:float=None
+        rotation:float|None=None,
+        skew:float|None=None,
+        scale_x:float|None=None,
+        scale_y:float|None=None,
+        center_x:float|None=None,
+        center_y:float|None=None,
+        center_rotation:float|None=None
         ) -> None:
     
     if center_rotation is not None:

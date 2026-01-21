@@ -21,7 +21,7 @@ class IDList(IntList):
     
     SEPARATOR = "."
     
-    def remap(self, key_value_map:dict=None):
+    def remap(self, key_value_map:dict|None=None):
         
         if key_value_map is None: return
         
@@ -42,7 +42,7 @@ class IntPair(DataclassDecoderMixin):
     key: int = 0
     value: int = 0
     
-    def remap(self, *keys:str, value_map:dict=None, key_map:dict=None):
+    def remap(self, *keys:str, value_map:dict|None=None, key_map:dict|None=None):
         
         if keys and self.key not in keys:
             return

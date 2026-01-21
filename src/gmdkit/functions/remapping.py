@@ -200,7 +200,7 @@ class IDType:
         reference:bool = None,
         in_range:bool = False,
         remap:bool = False,
-        condition:Callable=None
+        condition:Callable|None=None
     ) -> set[int]:
 
         result = set()
@@ -354,9 +354,9 @@ def compile_id_context(obj_list:ObjectList, remaps:Literal["none","naive","searc
 
 def regroup(
         obj_list,
-        new_id_range:dict=None,
-        reserved_ids:dict=None,
-        ignored_ids:dict=None,
+        new_id_range:dict|None=None,
+        reserved_ids:dict|None=None,
+        ignored_ids:dict|None=None,
         remaps:Literal["none","naive","search"]="none"
         ):
     
@@ -396,7 +396,7 @@ def regroup(
     return new_remaps
 
 
-def remap_text_ids(obj_list:ObjectList, filter_func:Callable=None, regex_pattern:str=r"^(?:ID\s+(\d+)|(\d+)\s+(.+))$"):
+def remap_text_ids(obj_list:ObjectList, filter_func:Callable|None=None, regex_pattern:str=r"^(?:ID\s+(\d+)|(\d+)\s+(.+))$"):
     
     objs = obj_list.where(lambda obj: obj.get(obj_prop.ID)==obj_id.TEXT)
     
@@ -439,7 +439,7 @@ def clean_remaps(objs:ObjectList) -> None:
             remaps.clean()
         
 
-def objs_from_ids(id_list, condition=None):
+def objs_from_ids(id_list, condition: Callable | None = None):
     new = ObjectList()
     
     for i in id_list:

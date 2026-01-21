@@ -29,7 +29,7 @@ class Color(DictDecoderMixin,DictClass):
     def default(cls, color_id:int):        
         return cls(default_color(color_id))
 
-    def set_rgba(self, red:int=None,green:int=None,blue:int=None,alpha:float=None):
+    def set_rgba(self, red:int|None=None,green:int|None=None,blue:int|None=None,alpha:float|None=None):
         if red is not None: self[color_prop.RED] = min(max(0,red),255)
         if green is not None: self[color_prop.GREEN] = min(max(0,green),255)
         if blue is not None: self[color_prop.BLUE] = min(max(0,blue),255)

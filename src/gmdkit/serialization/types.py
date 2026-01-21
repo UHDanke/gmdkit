@@ -253,7 +253,7 @@ class DictClass(dict):
 
         
     @classmethod
-    def fromkeys(cls, iterable, value=None):
+    def fromkeys(cls, iterable, value: Any = None):
         return cls(dict.fromkeys(iterable, value))
 
 

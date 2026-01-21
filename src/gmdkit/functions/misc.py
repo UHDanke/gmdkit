@@ -8,7 +8,7 @@ from gmdkit.constants.game import guideline as guide_color
 
 def next_free(
         values:Iterable[int],
-        start:int=None,
+        start:int|None=None,
         vmin:int=-2**31,
         vmax:int=2**31-1,
         count:int=1
@@ -56,10 +56,12 @@ def next_free(
 
     if vmin > vmax: return result
     if start is None:
-        if vmin <= 0: start = 0
-        else: start = vmin
-    elif start < vmin: start = vmin
-    elif start > vmax and vmin < 0:  start = -1
+        start = 0 if vmin <= 0 else vmin
+    else:
+        if start < vmin:
+            start = vmin
+        elif start > vmax:
+            start = -1 if vmin < 0 else vmax
         
     if start is not None and start <= vmax:
         range_search(start, vmax, 1)
