@@ -16,12 +16,12 @@ class IDRule:
     iterable: bool = False
     reference: bool = False
     fixed: bool = False
-    actions: list = None
-    function: Callable = None
-    condition: Callable = None
-    fallback: Callable = None
-    default: Callable = None
-    replace: Callable = None
+    actions: list | None = None
+    function: Callable | None = None
+    condition: Callable | None = None
+    fallback: Callable | None = None
+    default: Callable | None = None
+    replace: Callable | None = None
 
     def get_value(self, attr, *a, default=None):
         value = getattr(self, attr, default)

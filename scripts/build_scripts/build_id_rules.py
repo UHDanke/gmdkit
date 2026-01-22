@@ -22,7 +22,8 @@ def render_rule(d):
             key_str = k
             val_str = repr(v) if k in keys else str(v)
             if val_str == 'nan': continue
-        parts.append(f"{key_str}={val_str}")
+            parts.append(f"{key_str}={val_str}")
+            
     return "IDRule(" + ", ".join(parts) + ")"
 
         
@@ -59,23 +60,33 @@ def main():
         entry = row.drop(labels='object_id').to_dict()
         result[obj_id].append(entry)
         
-    with open(FILEPATH, "w") as file:
-        
-        with open(TEMPLATE_PATH, "r") as tempfile:
-            
-            template = tempfile.read()
-            
-        unique_type_str = repr(set(unique_types))           
-            
-        mlist = []
-        for key, value in result.items():
-            nlist = []
-            for item in value:
-                nlist.append("    "*3+render_rule(item))
-            mlist.append("    "+f"{key}: "+"[\n"+',\n'.join(nlist)+"\n"+"    "*2+"]")
     
-        id_rules = ',\n'.join(mlist)
         
+    with open(TEMPLATE_PATH, "r") as tempfile:
+            
+        template = tempfile.read()
+            
+    unique_type_str = repr(set(unique_types))           
+            
+    mlist = []
+    for key, value in result.items():
+        nlist = [
+            "    " * 3 + render_rule(item)
+            for item in value
+        ]
+    
+        mlist.append(
+            "    "
+            + f"{key}: [\n"
+            + ",\n".join(nlist)
+            + "\n"
+            + "    " * 2
+            + "]"
+        )
+    
+    id_rules = ',\n'.join(mlist)
+    
+    with open(FILEPATH, "w") as file:
         file.write(template.format(
             unique_types=unique_type_str,
             id_rules=id_rules
