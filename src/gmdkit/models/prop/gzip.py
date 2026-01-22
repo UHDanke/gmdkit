@@ -1,4 +1,5 @@
 # Package Imports
+from typing import Any
 from gmdkit.models.prop.string import GzipString
 from gmdkit.models.object import Object, ObjectList
 
@@ -34,13 +35,13 @@ class ObjectString(GzipString):
 
 class ReplayString(GzipString):
     
-    def load(self, instance=None):
+    def load(self, instance: Any = None):
         
         string = super().load()
         
         self.replay_data = string
             
-    def save(self, replay_data=None):
+    def save(self, replay_data: str | None = None):
         
         replay_data = replay_data or getattr(self, "replay_data", None)
         

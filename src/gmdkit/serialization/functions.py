@@ -17,7 +17,7 @@ def xor(data:bytes, key:bytes) -> bytes:
 
 def decode_string(
         string:str,
-        xor_key:bytes=None,
+        xor_key:bytes|None=None,
         compression:Literal[None,"zlib","gzip","deflate","auto"]="auto"
         ) -> str:
     
@@ -47,7 +47,7 @@ def decode_string(
 
 def encode_string(
         string:str,
-        xor_key:bytes=None,
+        xor_key:bytes|None=None,
         compression:Literal[None,"zlib","gzip","deflate"]="gzip"
         ) -> str:
     

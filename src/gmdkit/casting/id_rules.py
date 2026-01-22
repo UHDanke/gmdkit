@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable
+from typing import Callable, Any
 from dataclasses import dataclass
 
 # Package Imports
@@ -23,7 +23,7 @@ class IDRule:
     default: Callable | None = None
     replace: Callable | None = None
 
-    def get_value(self, attr, *a, default=None):
+    def get_value(self, attr, *a, default: Any = None):
         value = getattr(self, attr, default)
         
         if callable(value):

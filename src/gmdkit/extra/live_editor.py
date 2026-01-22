@@ -73,7 +73,7 @@ class LiveEditor(ObjectString):
         return response.get("response")
             
 
-    def get_level_string(self, **kwargs):
+    def get_level_string(self):
         return self.load(self.send_action("GET_LEVEL_STRING"))
 
     def add_objects(self, objects:ObjectList, batch_size:int|None=None, **kwargs) -> None:

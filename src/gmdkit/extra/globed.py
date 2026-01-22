@@ -74,12 +74,12 @@ def decode_script(data:bytes):
 
 
 def encode_script(
-        prefix:str=None,
-        filename:str=None,
-        content:str=None,
+        prefix:str|None=None,
+        filename:str|None=None,
+        content:str|None=None,
         is_main:bool=False,
-        signature:bytes=None,
-        tail:bytes=None
+        signature:bytes|None=None,
+        tail:bytes|None=None
         ):
     
     result = bytearray()
@@ -138,16 +138,16 @@ class GlobedScript:
     
     def __init__(
             self,
-            text_object:Object=None, 
+            text_object:Object|None=None, 
             prefix:str=PREFIX, 
             main:bool=False, 
-            filename:str=None, 
-            content:str=None,
-            signature:bytes=None, 
-            tail:bytes=None
+            filename:str|None=None, 
+            content:str|None=None,
+            signature:bytes|None=None, 
+            tail:bytes|None=None
             ):
         
-        self.object = text_object
+        self.object = text_object or Object.default(obj_id.TEXT)
         self.prefix = prefix
         self.main = main
         self.filename = filename
@@ -155,17 +155,15 @@ class GlobedScript:
         self.signature = signature
         self.tail = tail
         
-        if self.object is None:
-            self.object = Object.default(obj_id.TEXT)
+        if text_object is None:
             self.save()
-            
         else:
             self.load()
         
         
     def load(self):
         try:
-            string = self.object.get(obj_prop.text.DATA)
+            string = self.object[obj_prop.text.DATA]
             string_bytes = string.encode("utf-8", errors="surrogateescape")              
             pre, main, fn, content, sig, tail = decode_script(string_bytes)
             self.prefix = pre
@@ -211,8 +209,13 @@ class GlobedScript:
         path = Path(path)
         
         if not path.suffix:
+            if self.filename is None:
+                raise RuntimeError("Filename is not set and path has no suffix")
             path = (path / self.filename).with_suffix('.' + extension.lstrip('.'))
                     
+        if self.content is None:
+            raise RuntimeError("Content is not set and cannot be exported")
+        
         with open(path,"w") as file:
             file.write(self.content)
 
@@ -221,7 +224,7 @@ def get_globed_scripts(obj_list:ObjectList):
     
     result = []
     
-    for obj in ObjectList:
+    for obj in obj_list:
         
         if obj_id.TEXT != obj.get(obj_prop.ID):
             continue

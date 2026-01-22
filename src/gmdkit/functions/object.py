@@ -146,7 +146,7 @@ def offset_position(
 def scale_position(
         obj:Object,
         scale_x:float=1.00,scale_y:float=1.00,
-        center_x:float=None, center_y:float=None, 
+        center_x:float|None=None, center_y:float|None=None, 
         only_move:bool=False
         ) -> None:
     
@@ -164,7 +164,7 @@ def scale_position(
 def rotate_position(
         obj:Object,
         angle:float=0, 
-        center_x:float=None, center_y:float=None, 
+        center_x:float|None=None, center_y:float|None=None, 
         only_move:bool=False
         ):
     
@@ -193,14 +193,14 @@ def rotate_position(
         obj[obj_prop.Y] = dx * math.sin(th) + dy * math.cos(th)
 
 
-def remap_keys(obj:Object, keys:int|str, value_map:dict[Any,Any]):
+def remap_keys(obj:Object, keys:list[int|str], value_map:dict[Any,Any]):
     
     for key in set(keys) & obj.keys():
     
         obj[key] = value_map.get(obj[key], obj[key])
 
     
-def delete_keys(obj:Object, keys:int|str):
+def delete_keys(obj:Object, keys:list[int|str]):
     
     for key in set(keys) & obj.keys():
         
@@ -229,8 +229,8 @@ def fix_transform(obj) -> None:
     if (scale_y:=obj.get(obj_prop.SCALE_Y,1.00)) < -1:
         obj[obj_prop.SCALE_Y] = -scale_y
         
-        if not (flip_y:=obj.get(obj_prop.FLIP_y, False)):
-            obj[obj_prop.FLIP_y] = not flip_y
+        if not (flip_y:=obj.get(obj_prop.FLIP_Y, False)):
+            obj[obj_prop.FLIP_Y] = not flip_y
         else:
             obj.pop(obj_prop.FLIP_Y, None)
     

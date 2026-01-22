@@ -42,7 +42,7 @@ def index_objects(obj_list:ObjectList, start:int=0) -> None:
         obj.index = i
 
 
-def brickify(obj_list, height=None):
+def brickify(obj_list, height: int | None = None):
     
     if height is None:
         height = math.ceil(math.sqrt(len(obj_list)))
@@ -336,7 +336,7 @@ def compile_keyframe_groups(
             groups = obj.get(obj_prop.GROUPS)
             
             if groups:
-                no_group.pop(value,None)
+                no_group.discard(value)
                 
                 for group in groups:
                     key_list = result.setdefault(group,set())
@@ -436,7 +436,7 @@ def compile_spawn_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
 def boundaries(
         obj_list:ObjectList, 
         center_type:Literal["midpoint","mean","median"]="mean"
-        ) -> tuple[float|None,float|None,float|None,float|None,float|None,float|None]:
+        ) -> tuple[float,float,float,float,float,float]:
     """
     Compiles the boundaries of a group of objects.
     Only the center position is considered, the object's texture is ignored.
@@ -495,7 +495,7 @@ def boundaries(
             case "median":
                 center_x = median(x)
     else:   
-        min_x = center_x = max_x = None
+        min_x = center_x = max_x = 0.0
     
     if y:
         min_y = min(y)
@@ -509,14 +509,14 @@ def boundaries(
             case "median":
                 center_y = median(y)
     else:
-        min_y = center_y = max_y = None
+        min_y = center_y = max_y = 0.0
         
     return min_x, min_y, center_x, center_y, max_x, max_y
 
 def grid_align(
         obj_list:ObjectList,
-        unit_x:float=None,
-        unit_y:float=None,
+        unit_x:float|None=None,
+        unit_y:float|None=None,
         offset_x:float=0,
         offset_y:float=0,
         snap:Literal["round", "floor", "ceil"]="round"
@@ -541,17 +541,20 @@ def grid_align(
 def warp_objects(
         obj_list:ObjectList,
         only_move:bool=False,
-        rotation:float=None,
-        skew:float=None,
-        scale_x:float=None,
-        scale_y:float=None,
-        center_x:float=None,
-        center_y:float=None,
-        center_rotation:float=None
+        rotation:float|None=None,
+        skew:float|None=None,
+        scale_x:float|None=None,
+        scale_y:float|None=None,
+        center_x:float|None=None,
+        center_y:float|None=None,
+        center_rotation:float|None=None
         ) -> None:
     
     if center_rotation is not None:
         rotation = (rotation or 0) - center_rotation
+    
+    center_x = center_x or 0.0
+    center_y = center_y or 0.0
         
     r = math.radians(rotation or 0)
     cos_r = math.cos(r)
@@ -617,15 +620,17 @@ def warp_objects(
                 obj[obj_prop.SKEW_X] = obj_skew_x
                 obj[obj_prop.SKEW_Y] = obj_scale_y
         
-        if (x:=obj.get(obj_prop.X)) is not None:
-            dx = x - center_x
-            obj[obj_prop.X] = m00 * dx + m01 * dx + center_x
-                
-        if (y:=obj.get(obj_prop.Y)) is not None:
-            dy = y - center_y
-            obj[obj_prop.Y] = m10 * dx + m11 * dy + center_y
-    
-    
+        x = obj.get(obj_prop.X, 0)
+        y = obj.get(obj_prop.Y, 0)
+        dx = x - center_x
+        dy = y - center_y
+        
+        if x is not None:
+            obj[obj_prop.X] = m00 * dx + m01 * dy + center_x
+        if y is not None:
+            obj[obj_prop.Y] = m10 * dx + m11 * dy + center_y 
+
+
 def align_objects(
         obj_list:ObjectList,
         keep_alignment:bool=False,
@@ -663,7 +668,7 @@ def align_objects(
     None
 
     """
-    if not x_axis or y_axis:
+    if not x_axis and not y_axis:
         return
         
     item_list = []
@@ -729,10 +734,3 @@ def align_objects(
     if x_axis: per_axis('x', obj_prop.X)
     
     if y_axis: per_axis('y', obj_prop.Y)
-
-
-            
-            
-            
-        
-    
