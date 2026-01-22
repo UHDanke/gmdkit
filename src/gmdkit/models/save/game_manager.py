@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.serialization.types import DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, LoadFileMixin
-from gmdkit.constants.paths import GAME_MANAGER_PATH
+from gmdkit.constants.paths.save import GAME_MANAGER_PATH
 
 
 class GameSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):

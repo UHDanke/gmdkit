@@ -3,7 +3,7 @@ from gmdkit.serialization.functions import filter_kwargs
 
 # Imports
 from typing import Self, Any
-from collections.abc import Iterable, Callable, ItemsView
+from collections.abc import Iterable, Callable
 
 
 class ListClass(list):
@@ -244,7 +244,7 @@ class ListClass(list):
                     return set()
         
         return result
-    
+
         
 class DictClass(dict):
     
@@ -336,17 +336,3 @@ class DictClass(dict):
                 result.append(self.pop(k,None))          
         
         return result
-    
-    
-class FilterItemsView(ItemsView):
-    def __init__(self, mapping, predicate):
-        self._mapping = mapping
-        self._predicate = predicate
-
-    def __iter__(self):
-        for k, v in dict.items(self._mapping):
-            if self._predicate(k, v):
-                yield k, v
-
-    def __len__(self):
-        return sum(1 for _ in self)

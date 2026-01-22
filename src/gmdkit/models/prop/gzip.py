@@ -26,7 +26,7 @@ class ObjectString(GzipString):
         objects =  objects or getattr(self, "objects", None)
         
         if start is None or objects is None:
-            return None
+            return self.string
     
         string = (ObjectList((start,)) + objects).to_string()
         
@@ -46,7 +46,7 @@ class ReplayString(GzipString):
         replay_data = replay_data or getattr(self, "replay_data", None)
         
         if replay_data is None:
-            return None
+            return self.string
         
         string = replay_data
         

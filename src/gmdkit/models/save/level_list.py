@@ -9,8 +9,8 @@ from gmdkit.models.level_pack import LevelPackList
 from gmdkit.serialization.types import DictClass
 from gmdkit.serialization.type_cast import dict_cast
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, LoadFileMixin
-from gmdkit.constants.paths import LOCAL_LEVELS_PATH
-
+from gmdkit.constants.paths.save import LOCAL_LEVELS_PATH
+from gmdkit.mappings import lvl_save
 
 class LevelSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):
     
@@ -42,6 +42,6 @@ class LevelSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):
 
 if __name__ == "__main__":
     level_data = LevelSave.from_file()
-    levels = level_data['LLM_01']
-    binary = level_data['LLM_02']
-    lists = level_data['LLM_03']
+    levels = level_data[lvl_save.LEVELS]
+    binary = level_data[lvl_save.BINARY]
+    lists = level_data[lvl_save.LISTS]

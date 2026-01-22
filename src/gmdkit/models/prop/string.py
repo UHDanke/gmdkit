@@ -35,3 +35,4 @@ class GzipString:
 
     def save(self, string:str) -> None:
         self.string = encode_string(string)
+    

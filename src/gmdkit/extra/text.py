@@ -100,6 +100,7 @@ class FontObject(DictClass):
         
         
         for c in string:
+            pass
             
             
                     
@@ -111,8 +112,7 @@ class FontObject(DictClass):
     
     def create_text_objects(
             string, 
-            groups:Literal[],
-            
+            groups,
             max_len:int|None=None,
             max_wrap_len:int|None=None,
             kerning:int=0,            

@@ -1,7 +1,7 @@
 # Imports 
 import glob
 from pathlib import Path
-from copy import copy, deepcopy
+from copy import deepcopy
 from typing import Literal, Callable
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id, color_prop, color_id
@@ -95,10 +95,10 @@ def merge_levels(level_list:LevelList, override_colors:bool=True):
     return main_level
 
 
-def disable_start_pos(obj):
+def disable_start_pos(obj:Object):
     if obj.get(obj_prop.ID)!=obj_id.trigger.START_POSITION:
         return
-    obj[obj_prop.start_pos.DISABLE] = False
+    obj[obj_prop.start_pos.DISABLE] = True
 
 
 def level_color_triggers(level:Level):
@@ -106,7 +106,7 @@ def level_color_triggers(level:Level):
     level.objects += create_color_triggers(colors)
 
 
-def obj_list_group(obj_list):
+def obj_list_group(obj_list:ObjectList):
     ids = compile_id_context(obj_list)
     g, = next_free(values=ids["group_id"].get_ids(),vmin=1,vmax=9999,count=1)
     add_groups(obj_list,{g})

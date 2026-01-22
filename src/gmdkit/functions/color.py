@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.mappings import obj_prop, color_id, obj_id, color_prop
 from gmdkit.models.object import ObjectList, Object
-from gmdkit.models.prop.color import Color
+from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.defaults.color_ids import default_color
 
 MAP_COLOR_TO_TRIGGER = {
@@ -16,11 +16,11 @@ MAP_COLOR_TO_TRIGGER = {
     color_prop.COPY_OPACITY: obj_prop.trigger.color.COPY_OPACITY,
     }
 
-def color_is_editable(color) -> bool:
+def color_is_editable(color:Color) -> bool:
     return color.get(color_prop.CHANNEL) not in color_id.PRESET
 
 
-def color_to_trigger(color):
+def color_to_trigger(color:Color) -> Object:
     obj = Object.default(obj_id.trigger.COLOR)
     
     for color_key, obj_key in MAP_COLOR_TO_TRIGGER.items():
@@ -37,7 +37,7 @@ def color_to_trigger(color):
     return obj
 
 
-def trigger_to_color(obj:Object):
+def trigger_to_color(obj:Object) -> Color:
     
     if obj.get(obj_prop.ID) != obj_id.trigger.COLOR:
         return
@@ -56,11 +56,16 @@ def trigger_to_color(obj:Object):
             
     return color
 
-def color_is_default(color):
+def color_is_default(color:Color) -> bool:
     cid = color.get(color_prop.CHANNEL)
     return dict(color) == default_color(cid)
     
-def create_color_triggers(color_list, ignore_defaults:bool=True, pos_x:float=0, pos_y:float=0) -> ObjectList:
+def create_color_triggers(
+        color_list:ColorList, 
+        ignore_defaults:bool=True, 
+        pos_x:float=0, 
+        pos_y:float=0
+        ) -> ObjectList:
     """
     Converts a colors into color triggers.
 

@@ -6,7 +6,6 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.serialization import options
-from gmdkit.serialization.types import FilterItemsView
 from gmdkit.serialization.type_cast import serialize, dict_cast, decode_funcs
 from gmdkit.serialization.functions import (
     decode_string, encode_string, 

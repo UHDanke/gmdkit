@@ -1,6 +1,6 @@
-__all__ = ["color_id","color_prop","obj_id","obj_prop","obj_enum","lvl_prop"]
+__all__ = ["color_id","color_prop","obj_id","obj_prop","obj_enum","lvl_prop","smart_template","lvl_save"]
 
-
+from gmdkit.mappings import lvl_save
 from gmdkit.mappings import color_id
 from gmdkit.mappings import color_prop
 from gmdkit.mappings import obj_id
