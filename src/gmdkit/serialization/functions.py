@@ -230,7 +230,7 @@ def array_wrapper(data, function, **kwargs):
     return [function(v,**kwargs) for v in data]
 
 
-def filter_kwargs(*functions:Callable, **kwargs) -> list[tuple[Callable,dict[str,Any]]]:
+def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     """
     Filters keyword arguments to only those present on the given functions.
 
@@ -244,12 +244,12 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[tuple[Callable,dict[str
 
     Returns
     -------
-    func_kwargs : list[tuple[Callable,dict[str,any]]]
-        A list containing functions and matching keyword arguments.
+    funcs : list[Callable]
+        A list containing functions with embedded kwargs.
 
     """
     if not kwargs: 
-        return [(f, {}) for f in functions]
+        return functions
     kw_keys = set(kwargs)
     result = []
     

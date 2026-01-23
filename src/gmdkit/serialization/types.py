@@ -63,10 +63,10 @@ class ListClass(list):
         """
         result = self.__class__()
         
-        f_kw = filter_kwargs(*conditions, **kwargs)
+        funcs = filter_kwargs(*conditions, **kwargs)
 
         for item in self:
-            for condition in f_kw:
+            for condition in funcs:
                 if condition(item):
                     result.append(item)
                     break
@@ -100,11 +100,11 @@ class ListClass(list):
         print(new_list)  # Output: [2, 4, 6]
 
         """        
-        f_kw = filter_kwargs(*functions)
+        funcs = filter_kwargs(*functions, **kwargs)
             
         for i, item in enumerate(self):
             val = item
-            for function in f_kw:
+            for function in funcs:
                 new = function(val)
                 if new is not None:
                     val = new
@@ -134,10 +134,10 @@ class ListClass(list):
         
         keep = []
 
-        f_kw = filter_kwargs(*conditions, **kwargs)
+        funcs = filter_kwargs(*conditions, **kwargs)
 
         for item in self:
-            for condition in f_kw:
+            for condition in funcs:
                 if condition(item):
                     ex.append(item)
                     break
@@ -166,9 +166,9 @@ class ListClass(list):
             A list containing the collected values.
         """
         result = list()
-        f_kw = filter_kwargs(*functions, **kwargs)
+        funcs = filter_kwargs(*functions, **kwargs)
         for item in self:
-            for function in f_kw:
+            for function in funcs:
                 vals = function(item) 
                 if vals:
                     result.extend(vals)
@@ -196,10 +196,10 @@ class ListClass(list):
         """
         result = set()
     
-        f_kw = filter_kwargs(*functions, **kwargs)
+        funcs = filter_kwargs(*functions, **kwargs)
         
         for item in self:
-            for function in f_kw:
+            for function in funcs:
                 vals = function(item) 
                 if vals:
                     result.update(vals)
@@ -227,10 +227,10 @@ class ListClass(list):
         """
         result = None
         
-        f_kw = filter_kwargs(*functions, **kwargs)
+        funcs = filter_kwargs(*functions, **kwargs)
         
         for item in self:
-            for function in f_kw:
+            for function in funcs:
                 vals = function(item)
                 val = vals if isinstance(vals, set) else set(vals or ())
                 
