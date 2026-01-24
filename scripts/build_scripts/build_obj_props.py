@@ -156,9 +156,9 @@ def main():
         prop_table.dropna(how='all').groupby('id')
         .apply(lambda g: pd.Series({
             'aliases': None if g['alias'].isna().all() else tuple(g['alias']),
-            'decode': decode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g['id'].iloc[0]),
-            'encode': encode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g['id'].iloc[0]),
-            'type': get_obj_types(g['type'].iloc[0], g['format'].iloc[0], g['id'].iloc[0]),
+            'decode': decode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
+            'encode': encode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
+            'type': get_obj_types(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
         }))
         .reset_index()
     )
