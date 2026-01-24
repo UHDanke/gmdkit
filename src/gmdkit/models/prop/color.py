@@ -15,16 +15,6 @@ class Color(DictDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(COLOR_DECODERS,numkey=True))
     ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,default=str))
     
-    @property
-    def channels(self):
-        return self.pluck(color_prop.CHANNEL,color_prop.COPY_ID,ignore_missing=True)
-    
-    def remap(self, key_value_map):
-        if (v:=self.get(color_prop.CHANNEL)) is not None: 
-            self[color_prop.CHANNEL] = key_value_map.get(v,v)
-        if (v:=self.get(color_prop.COPY_ID)) is not None: 
-            self[color_prop.COPY_ID] = key_value_map.get(v,v)
-
     @classmethod
     def default(cls, color_id:int):        
         return cls(default_color(color_id))
@@ -47,6 +37,12 @@ class Color(DictDecoderMixin,DictClass):
         rgb = list(bytes.fromhex(hex_string))
         self.set_rgba(*rgb)
 
+    def remap(self, key_value_map):
+        if (v:=self.get(color_prop.CHANNEL)) is not None: 
+            self[color_prop.CHANNEL] = key_value_map.get(v,v)
+        if (v:=self.get(color_prop.COPY_ID)) is not None: 
+            self[color_prop.COPY_ID] = key_value_map.get(v,v)
+
 
 class ColorList(ArrayDecoderMixin,ListClass):
 
@@ -56,19 +52,11 @@ class ColorList(ArrayDecoderMixin,ListClass):
     DECODER = Color.from_string
     ENCODER = staticmethod(lambda x, **kwargs: x.to_string(**kwargs))
     
-    def get_custom(self):
-        return self.where(lambda color: 0 < color.get(color_prop.CHANNEL) <= 999)
-    
-    def get_special(self):
-        return self.where(lambda color: color.get(color_prop.CHANNEL) > 999)
-    
-    def get_channels(self):
-        return self.unique_values(lambda color: color.channels)
+    def get_channels(self, condition):
+        return self.unique_values(lambda color: color.pluck(color_prop.CHANNEL))
     
     def get_copies(self):
-        return lambda x: x.unique_values(lambda color: color.pluck(color_prop.CHANNEL))
+        return lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID))
         
     def remap(self, key_value_map):
-        self.get_custom().apply(lambda color: color.remap(key_value_map))
-
-    
+        self.get_custom().apply(lambda color: color.remap(key_value_map))    

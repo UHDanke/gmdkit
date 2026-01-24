@@ -90,11 +90,14 @@ class PlistDecoderMixin:
         
         to_plist_file(data, path)
     
+    
     def update(self, **kwargs):
         self.to_file(path=self.path, **kwargs)
     
+    
     def reload(self, **kwargs):
         self.from_file(path=self.path, **kwargs)
+    
     
     @classmethod
     def from_string(cls, string:str, **kwargs):

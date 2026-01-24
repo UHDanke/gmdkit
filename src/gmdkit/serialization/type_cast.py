@@ -35,6 +35,21 @@ def to_string(obj) -> str:
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
 
 
+def zip_string(obj) -> str:
+    method = getattr(obj, "save", None)
+    if callable(method):
+        return method()
+    
+    string = getattr(obj, "string", None)
+    if string is not None:
+        return string
+    
+    if options.string_fallback.get():
+        return str(obj)
+
+    raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
+
+
 decode_funcs = {
     bool: to_bool
     }

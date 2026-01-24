@@ -5,13 +5,20 @@ CSV_PATH = "data/csv/remap_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_id_rules.txt"
 FILEPATH = "src/gmdkit/casting/id_rules.py"
 
-
 def try_convert_int(val):
     try:
         return int(val)
     except (ValueError, TypeError):
         return val
 
+
+def normalize_actions(x):
+    if not isinstance(x, str):
+        return x
+    x = x.strip()
+    if not x:
+        return pd.NA
+    return repr({i.strip() for i in x.split(",") if i.strip()})
 
 def render_rule(d):
     parts = []
@@ -26,6 +33,34 @@ def render_rule(d):
             
     return "IDRule(" + ", ".join(parts) + ")"
 
+
+def render_rule_tuple(value):
+    tuple_end =  ",)" if len(value) == 1 else ")"
+    
+    nlist = [
+        "    " * 3 + render_rule(item)
+        for item in value
+    ]
+    
+    return (
+        "(\n"
+        + ",\n".join(nlist)
+        + "\n"
+        + "    " * 2
+        + tuple_end
+    )
+
+def render_rule_keys(dictionary):
+    mlist = []
+    
+    for key, value in dictionary.items():
+        mlist.append(
+            "    "
+            + f"{key}: "
+            + render_rule_tuple(value)
+        )
+    
+    return ',\n'.join(mlist)
         
 def main():
     remap_table = pd.read_csv(CSV_PATH)
@@ -38,7 +73,7 @@ def main():
     remap_table = remap_table.map(
         lambda x: pd.NA if x is False else x
     )
-    remap_table["actions"] = remap_table["actions"].apply(lambda x: repr(x.split(",")).replace(" ", "") if type(x)==str else pd.NA)
+    remap_table["actions"] = remap_table["actions"].apply(normalize_actions)
     remap_table.replace(float("nan"), pd.NA, inplace=True)
     remap_table.replace("TRUE", "True", inplace=True)
     remap_table.replace("FALSE", pd.NA, inplace=True)
@@ -48,8 +83,40 @@ def main():
     remap_table["default"] = remap_table['default'].apply(try_convert_int)
     remap_table = remap_table.rename(columns={
         "property_id": "prop"    
-        })
+        })          
     
+    func_cols = [
+        "condition",
+        "function",
+        "replace",
+        "fallback",
+        "default",
+        "fixed",
+        "remappable"
+    ]
+
+    unique_functions = set(
+        v for v in remap_table[func_cols].values.ravel()
+        if (
+            pd.notna(v)
+            and v not in {"True", "False", True, False}
+            and not (
+                isinstance(v, str) and (
+                v.startswith("lambda")
+                or v.strip().lstrip("-").isdigit()
+                )   
+            )
+            and not isinstance(v, int)
+        )
+    )
+    print(unique_functions)
+    if unique_functions:
+        id_funcs = "from gmdkit.serialization.id_functions (" + (
+            "\n    ".join(unique_functions)
+            ) + "\n)"
+    else:
+        id_funcs = ""
+
     unique_types = remap_table["type"].dropna().unique().tolist()
     
     result = defaultdict(list)
@@ -60,36 +127,21 @@ def main():
         entry = row.drop(labels='object_id').to_dict()
         result[obj_id].append(entry)
         
-    
-        
     with open(TEMPLATE_PATH, "r") as tempfile:
             
         template = tempfile.read()
             
     unique_type_str = repr(set(unique_types))           
-            
-    mlist = []
-    for key, value in result.items():
-        nlist = [
-            "    " * 3 + render_rule(item)
-            for item in value
-        ]
     
-        mlist.append(
-            "    "
-            + f"{key}: [\n"
-            + ",\n".join(nlist)
-            + "\n"
-            + "    " * 2
-            + "]"
-        )
-    
-    id_rules = ',\n'.join(mlist)
+    base_id_rules = render_rule_tuple(result.pop(None,{}))
+    obj_id_rules = render_rule_keys(result)
     
     with open(FILEPATH, "w") as file:
         file.write(template.format(
+            rule_funcs=id_funcs,
             unique_types=unique_type_str,
-            id_rules=id_rules
+            base_id_rules=base_id_rules,
+            obj_id_rules=obj_id_rules,
             ))
 
 

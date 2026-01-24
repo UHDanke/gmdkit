@@ -11,7 +11,7 @@ from gmdkit.casting.id_rules import ID_RULES, IDRule
 from gmdkit.functions.misc import next_free
 from gmdkit.functions.object_list import compile_keyframe_groups
 
-
+            
 @dataclass(frozen=True)
 class Identifier:
     obj_id: int
@@ -83,24 +83,28 @@ def get_ids(
     for rule in rules:
 
         pid = rule.prop
+        val = obj.get(pid)
         
-        if (val:=obj.get(pid)) is not None or rule.fallback is not None or rule.default is not None:
-            
-            if (cond:=rule.condition) and callable(cond) and not cond(obj):
-                continue
+        if val is None:
+            val = rule.get_value("fallback", obj)
+
+        if rule.get_value("condition", obj) == False: 
+            continue
 
             if (func:=rule.function) and callable(func):
                 val = func(val)
             
-            if not val and val is not False:
+            if val is None:
                 # object id fallback
                 if callable(rule.fallback):
                     val = rule.fallback(obj)
 
-            if not rule.iterable: val = val,
+            if not rule.get("iterable",obj): 
+                val = val,
+            
+            default = rule.get_value("default", obj)
             
             for v in val:
-                default = rule.get_value("default", obj)
                 
                 if v is None: v = default
                 if v is None: continue
@@ -144,8 +148,6 @@ def replace_ids(
     Returns
     -------
     None
-    
-
     """
     
     rules = compile_rules(obj.get(obj_prop.ID,0),rule_dict=rule_dict)
@@ -153,34 +155,34 @@ def replace_ids(
     for rule in rules:
         
         pid = rule.prop
+        val = obj.get(pid)
+
+        if val is None:
+            fb = rule.get_value("fallback", obj)
+            if fb is None:
+                continue
+            else:
+                val = fb
         
-        if (val:=obj.get(rule.prop)) is not None or rule.fallback is not None or rule.default is not None:
+        if rule.get_value("condition", obj) == False: 
+            continue
+        
+        if rule.get_value("fixed", val): 
+            continue
 
-            if (cond:=rule.condition) and callable(cond) and not cond(obj):
-                continue
+        if rule.get_value("default", obj) == val: 
+            continue
             
-            kv_map = key_value_map.get(rule.type)
+        kv_map = key_value_map.get(rule.type)
 
-            if kv_map is None: continue
+        if kv_map is None: 
+            continue
             
-            if not val and val is not False:
-                # object id fallback
-                if callable(rule.fallback):
-                    val = rule.fallback(obj)
-
-            if val is None:
-                continue
+        if rule.get_value("replace", val, kv_map):
+            continue
             
-            if (func:=rule.replace) and callable(func):
-                func(val, kv_map)
-                continue
-                
-            if rule.get_value("fixed", val): continue
-
-            if val==rule.get_value("default", obj): continue
-            
-            if (new:=kv_map.get(val)) is not None:
-                obj[pid] = new
+        if (new:=kv_map.get(val)) is not None:
+            obj[pid] = new
 
 
 class IDType:

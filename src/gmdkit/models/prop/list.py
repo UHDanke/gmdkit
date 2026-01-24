@@ -33,6 +33,11 @@ class IDList(IntList):
         self[:] = new
 
 
+class GroupList(IDList):
+    
+    __slots__ = ()
+
+
 @dataclass(slots=True)
 class IntPair(DataclassDecoderMixin):
     
@@ -41,17 +46,6 @@ class IntPair(DataclassDecoderMixin):
 
     key: int = 0
     value: int = 0
-    
-    def remap(self, *keys:str, value_map:dict|None=None, key_map:dict|None=None):
-        
-        if keys and self.key not in keys:
-            return
-
-        if key_map is not None:
-            self.key = key_map.get(self.key, self.key)
-            
-        if value_map is not None:
-            self.value = value_map.get(self.value, self.value)
 
 
 class IntPairList(ArrayDecoderMixin,ListClass):
@@ -72,8 +66,14 @@ class IntPairList(ArrayDecoderMixin,ListClass):
     
     def values(self):
         return self.unique_values(lambda x: [x.value])
+    
+    def remap_keys(self, dictionary:dict|None=None):
+        if dictionary:
+            for pair in self:
+                k = pair.key
+                pair.key = dictionary.get(k, k)
 
-
+                    
 class RemapList(IntPairList):
     
     __slots__ = ()
@@ -107,5 +107,10 @@ class RemapList(IntPairList):
     
         self[:] = [p for p in self if p.value == ref[p.key]]
         self.sort(key=lambda p: (p.key, p.value))
-        
+    
+    def remap_vals(self, dictionary:dict|None=None):
+        if dictionary:
+            for pair in self:
+                v = pair.value
+                pair.value = dictionary.get(v, v)
     

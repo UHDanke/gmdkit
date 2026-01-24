@@ -1,5 +1,5 @@
 # Imports
-from typing import Any, Callable, Literal
+from typing import Callable, Literal
 from itertools import islice
 from functools import partial
 from inspect import signature
@@ -8,6 +8,9 @@ import xml.etree.ElementTree as ET
 import base64
 import zlib
 import gzip
+
+# Package Imports
+from gmdkit.serialization.type_cast import from_float
 
 
 def xor(data:bytes, key:bytes) -> bytes:
@@ -57,7 +60,7 @@ def encode_string(
         case 'zlib':
             byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
         case 'gzip':
-            byte_stream = gzip.compress(byte_stream,mtime=0)
+            byte_stream = gzip.compress(byte_stream, mtime=0)
         case 'deflate':
             byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
         case None:
@@ -137,7 +140,7 @@ def write_plist_elem(parent, value):
         ET.SubElement(parent, "i").text = str(value)
     
     elif isinstance(value, float):
-        ET.SubElement(parent, "r").text = str(value)
+        ET.SubElement(parent, "r").text = from_float(value)
     
     elif isinstance(value, str):
         ET.SubElement(parent, "s").text = str(value)
