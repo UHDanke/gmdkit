@@ -82,7 +82,7 @@ def main():
     remap_table['max'] = remap_table['max'].apply(try_convert_int)
     remap_table["default"] = remap_table['default'].apply(try_convert_int)
     remap_table = remap_table.rename(columns={
-        "property_id": "prop"    
+        "property_id": "obj_prop_id"    
         })          
     
     func_cols = [
@@ -109,10 +109,10 @@ def main():
             and not isinstance(v, int)
         )
     )
-    print(unique_functions)
+    
     if unique_functions:
-        id_funcs = "from gmdkit.serialization.id_functions (" + (
-            "\n    ".join(unique_functions)
+        id_funcs = "from gmdkit.serialization.id_functions import (\n    " + (
+            ",\n    ".join(unique_functions)
             ) + "\n)"
     else:
         id_funcs = ""
