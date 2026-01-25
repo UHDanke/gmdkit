@@ -8,13 +8,14 @@ from gmdkit.serialization.id_functions import obj_can_be_spawned
 
 Func = Callable|None
 
-class Identifier:
-    __slots__ = ('obj','id_val','default','fixed','remappable','remaps')
+class BaseIdentifier:
+    #__slots__ = ('obj','id_val','default','fixed','remappable','remaps')
     
     obj: Object
     obj_prop_id: int|str
     remaps: dict
     id_val: int|tuple[int]
+    id_type: str
     id_min: int = -2147483648
     id_max: int = 2147483647
     default: int|None = None
@@ -74,11 +75,11 @@ class Identifier:
         
              
 class IDRule:
-    identifier: Identifier
     
     def __init__(
             self,
             obj_prop_id:int|str,
+            id_type:str,
             condition: Func = None,
             function: Func = None,
             fallback: Func = None,
@@ -118,6 +119,7 @@ class IDRule:
             d["fixed"] = fixed
         
         d["obj_prop_id"] = obj_prop_id
+        d["id_type"] = id_type
         d["id_min"] = id_min
         d["id_max"] = id_max
         d["reference"] = reference
@@ -125,7 +127,7 @@ class IDRule:
         d["iterable"] = iterable
         d["replace"] = replace
         
-        class Identifier(Identifier):
+        class Identifier(BaseIdentifier):
             for k, v in d.items():
                 locals()[k] = v
 

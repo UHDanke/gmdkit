@@ -22,14 +22,14 @@ def normalize_actions(x):
 
 def render_rule(d):
     parts = []
-    keys = ['type']
+    keys = ['id_type']
         
     for k, v in d.items():
         if v is not None:
             key_str = k
             val_str = repr(v) if k in keys else str(v)
             if val_str == 'nan': continue
-            parts.append(f"{key_str}={val_str}")
+            parts.append(f"{key_str.strip()}={val_str.strip()}")
             
     return "IDRule(" + ", ".join(parts) + ")"
 
@@ -82,7 +82,10 @@ def main():
     remap_table['max'] = remap_table['max'].apply(try_convert_int)
     remap_table["default"] = remap_table['default'].apply(try_convert_int)
     remap_table = remap_table.rename(columns={
-        "property_id": "obj_prop_id"    
+        "property_id": "obj_prop_id",
+        "type": "id_type",
+        "min": "id_min",
+        "max": "id_max"
         })          
     
     func_cols = [
@@ -117,7 +120,7 @@ def main():
     else:
         id_funcs = ""
 
-    unique_types = remap_table["type"].dropna().unique().tolist()
+    unique_types = remap_table["id_type"].dropna().unique().tolist()
     
     result = defaultdict(list)
     

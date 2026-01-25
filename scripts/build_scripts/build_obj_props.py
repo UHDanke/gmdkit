@@ -152,14 +152,19 @@ def main():
     prop_table = pd.read_csv("data/csv/prop_table.csv")
     prop_table['id'] = prop_table['id'].apply(lambda x: int(x) if str(x).isdigit() else str(x))
     
-    prop_class = (
-        prop_table.dropna(how='all').groupby('id')
-        .apply(lambda g: pd.Series({
-            'aliases': None if g['alias'].isna().all() else tuple(g['alias']),
+    prop_class = prop_class = (
+        prop_table.dropna(how='all')
+        .groupby('id')
+        .apply(lambda g: {
+            'aliases': (
+                None if g['alias'].isna().all()
+                else tuple(a for a in g['alias'] if pd.notna(a))
+            ),
             'decode': decode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
             'encode': encode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
             'type': get_obj_types(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
-        }))
+        })
+        .apply(pd.Series)
         .reset_index()
     )
     
