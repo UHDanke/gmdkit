@@ -1,8 +1,8 @@
 # Package Imports
-from gmdkit.serialization.type_cast import to_bool, to_string, from_bool, from_float
+from gmdkit.serialization.type_cast import to_bool, to_string, from_bool, from_float, zip_string
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
-
+nan = None
 
 LEVEL_DECODERS = {
     'k1': int,
