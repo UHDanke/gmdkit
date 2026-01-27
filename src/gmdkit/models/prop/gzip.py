@@ -1,8 +1,22 @@
 # Package Imports
 from typing import Any
-from gmdkit.models.prop.string import GzipString
 from gmdkit.models.object import Object, ObjectList
+from gmdkit.serialization.functions import decode_string, encode_string
 
+
+class GzipString:
+    
+    __slots__ = ("string")
+    
+    def __init__(self, string:str=""):
+        self.string = string
+    
+    def load(self) -> str:
+        return decode_string(self.string)
+
+    def save(self, string:str) -> None:
+        self.string = encode_string(string)
+        
 
 class ObjectString(GzipString):
     
@@ -28,7 +42,7 @@ class ObjectString(GzipString):
         if start is None or objects is None:
             return self.string
     
-        string = (ObjectList((start,)) + objects).to_string()
+        string = (ObjectList().wrap(start) + objects).to_string()
         
         return super().save(string)
 

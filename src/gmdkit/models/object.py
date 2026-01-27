@@ -6,7 +6,7 @@ from os import PathLike
 from gmdkit.serialization.types import ListClass, DictClass
 from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin 
 from gmdkit.serialization.functions import decode_string, encode_string
-from gmdkit.serialization.type_cast import dict_cast, serialize
+from gmdkit.serialization.type_cast import dict_cast, serialize, to_string
 from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 
@@ -35,7 +35,7 @@ class ObjectList(ArrayDecoderMixin,ListClass):
     SEPARATOR = ";"
     END_SEP = True
     DECODER = Object.from_string
-    ENCODER = staticmethod(lambda x, **kwargs: x.to_string(**kwargs))
+    ENCODER = staticmethod(to_string)
     
     
     @classmethod

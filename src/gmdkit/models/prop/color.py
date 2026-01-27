@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.serialization.type_cast import dict_cast
+from gmdkit.serialization.type_cast import dict_cast, serialize, to_string
 from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin
 from gmdkit.serialization.types import DictClass, ListClass
 from gmdkit.casting.color import COLOR_DECODERS, COLOR_ENCODERS
@@ -13,7 +13,7 @@ class Color(DictDecoderMixin,DictClass):
     
     SEPARATOR = '_'
     DECODER = staticmethod(dict_cast(COLOR_DECODERS,numkey=True))
-    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,default=str))
+    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,default=serialize))
     
     @classmethod
     def default(cls, color_id:int):        
@@ -53,7 +53,7 @@ class ColorList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = '|'
     DECODER = Color.from_string
-    ENCODER = staticmethod(lambda x, **kwargs: x.to_string(**kwargs))
+    ENCODER = staticmethod(to_string)
     
     def get_channels(self, condition):
         return self.unique_values(lambda color: color.pluck(color_prop.CHANNEL))

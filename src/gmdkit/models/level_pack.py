@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.models.level import Level, LevelList
-from gmdkit.serialization.type_cast import dict_cast
+from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.casting.level_props import LIST_ENCODERS, LIST_DECODERS
 
 
@@ -17,4 +17,4 @@ class LevelPackList(LevelList):
     __slots__ = ()
     
     DECODER = LevelPack.from_plist
-    ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))
+    ENCODER = staticmethod(to_plist)

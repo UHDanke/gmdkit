@@ -7,7 +7,7 @@ from os import PathLike
 from gmdkit.models.level import LevelList
 from gmdkit.models.level_pack import LevelPackList
 from gmdkit.serialization.types import DictClass
-from gmdkit.serialization.type_cast import dict_cast
+from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, LoadFileMixin
 from gmdkit.constants.paths.save import LOCAL_LEVELS_PATH
 from gmdkit.mappings import lvl_save
@@ -19,7 +19,7 @@ class LevelSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):
     CYPHER = bytes([11])
     
     DECODER = staticmethod(dict_cast({"LLM_01": LevelList.from_plist,"LLM_03": LevelPackList.from_plist}))   
-    ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))    
+    ENCODER = staticmethod(to_plist)    
     
     @classmethod
     def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs) -> Self:

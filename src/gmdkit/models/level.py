@@ -6,8 +6,8 @@ from os import PathLike
 # Package Imports
 from gmdkit.serialization.types import ListClass, DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
-from gmdkit.serialization.type_cast import dict_cast
-from gmdkit.models.prop.string import GzipString
+from gmdkit.serialization.type_cast import dict_cast, to_plist
+from gmdkit.models.prop.gzip import GzipString
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
@@ -106,7 +106,7 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     __slots__ = ()
     
     DECODER = Level.from_plist
-    ENCODER = staticmethod(lambda x, **kwargs: x.to_plist(**kwargs))
+    ENCODER = staticmethod(to_plist)
     
     
     def __init__(self, *args):

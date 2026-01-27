@@ -1,5 +1,6 @@
 # Imports
 from typing import Callable, Any
+import base64
 
 # Package Imports
 from gmdkit.serialization import options
@@ -24,10 +25,21 @@ def from_float(obj:float):
         return f"{obj:.{decimals}f}".rstrip('0').rstrip('.')
 
 
-def to_string(obj) -> str:
+def to_string(obj, **kwargs) -> str:
     method = getattr(obj, "to_string", None)
     if callable(method):
-        return method()
+        return method(**kwargs)
+
+    if options.string_fallback.get():
+        return str(obj)
+
+    raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
+
+
+def to_plist(obj, **kwargs) -> str:
+    method = getattr(obj, "to_plist", None)
+    if callable(method):
+        return method(**kwargs)
 
     if options.string_fallback.get():
         return str(obj)
@@ -48,6 +60,24 @@ def zip_string(obj) -> str:
         return str(obj)
 
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
+
+
+def decode_text(string:str) -> str:
+    
+    string_bytes = string.encode("utf-8")
+    
+    decoded_bytes = base64.urlsafe_b64decode(string_bytes)
+    
+    return decoded_bytes.decode("utf-8", errors="surrogateescape")
+
+
+def encode_text(string:str) -> str:
+    
+    string_bytes = string.encode("utf-8", errors="surrogateescape")
+    
+    encoded_bytes = base64.urlsafe_b64encode(string_bytes)
+    
+    return encoded_bytes.decode("utf-8")
 
 
 decode_funcs = {
@@ -85,7 +115,7 @@ def serialize(obj) -> str:
 def dict_cast(
         dictionary:dict, 
         numkey:bool=False, 
-        default:Callable=serialize, 
+        default:Callable|None=None, 
         key_kwargs:bool=False
         ):
     
