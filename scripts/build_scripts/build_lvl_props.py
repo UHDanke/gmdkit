@@ -128,6 +128,8 @@ def main():
         .where(pd.notnull, None)
     )
     
+    level_class = level_class.where(pd.notnull(level_class), None)
+    
     level_list = level_table[level_table["alias"].str.startswith("list.", na=False)]
     
     list_class = (
@@ -142,6 +144,8 @@ def main():
         .reset_index()
         .where(pd.notnull, None)
     )
+    
+    list_class = list_class.where(pd.notnull(list_class), None)
     
     # Read template
     with open(TEMPLATE_PATH, "r") as tempfile:

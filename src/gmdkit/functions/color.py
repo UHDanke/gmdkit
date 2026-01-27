@@ -4,6 +4,9 @@ from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.defaults.color_ids import default_color
 
+
+RGBA = tuple[int,int,int,float]
+
 MAP_COLOR_TO_TRIGGER = {
     color_prop.RED: obj_prop.trigger.color.RED,
     color_prop.GREEN: obj_prop.trigger.color.GREEN,
@@ -18,6 +21,19 @@ MAP_COLOR_TO_TRIGGER = {
 
 def color_is_editable(color:Color) -> bool:
     return color.get(color_prop.CHANNEL) not in color_id.PRESET
+
+
+def color_fade(color_1:Color, color_2:Color, percent:float) -> RGBA:
+    r1, g1, b1, a1 = color_1.get_rgba()
+    r2, g2, b2, a2 = color_2.get_rgba()
+
+    r = round(r1 + (r2 - r1) * percent)
+    g = round(g1 + (g2 - g1) * percent)
+    b = round(b1 + (b2 - b1) * percent)
+    a = a1 + (a2 - a1) * percent
+
+    return (r,g,b,a)
+
 
 
 def color_to_trigger(color:Color) -> Object:

@@ -20,28 +20,31 @@ class Color(DictDecoderMixin,DictClass):
         return cls(default_color(color_id))
 
     def set_rgba(self, red:int|None=None,green:int|None=None,blue:int|None=None,alpha:float|None=None):
-        if red is not None: self[color_prop.RED] = min(max(0,red),255)
-        if green is not None: self[color_prop.GREEN] = min(max(0,green),255)
-        if blue is not None: self[color_prop.BLUE] = min(max(0,blue),255)
-        if alpha is not None: self[color_prop.OPACITY] = min(max(0,alpha),255)
-        
+        if red is not None: self[color_prop.RED] = red
+        if green is not None: self[color_prop.GREEN] = green
+        if blue is not None: self[color_prop.BLUE] = blue
+        if alpha is not None: self[color_prop.OPACITY] = alpha
+    
     def get_rgba(self):
-        result = []
-        result.append(self.get(color_prop.RED, 255))
-        result.append(self.get(color_prop.GREEN, 255))
-        result.append(self.get(color_prop.BLUE, 255))
-        result.append(self.get(color_prop.OPACITY, 1.00))
-        return result
+        r = self.get(color_prop.RED, 255)
+        g = self.get(color_prop.GREEN, 255)
+        b = self.get(color_prop.BLUE, 255)
+        a = self.get(color_prop.OPACITY, 1.00)
+        return (r,g,b,a)
     
     def set_hex(self, hex_string):
-        rgb = list(bytes.fromhex(hex_string))
-        self.set_rgba(*rgb)
-
-    def remap(self, key_value_map):
-        if (v:=self.get(color_prop.CHANNEL)) is not None: 
-            self[color_prop.CHANNEL] = key_value_map.get(v,v)
-        if (v:=self.get(color_prop.COPY_ID)) is not None: 
-            self[color_prop.COPY_ID] = key_value_map.get(v,v)
+        hex_string = hex_string.lstrip("#")
+        if len(hex_string) != 6:
+            raise ValueError("Invalid hex string.")
+        
+        r = int(hex_string[0:2], 16)
+        g = int(hex_string[2:4], 16)
+        b = int(hex_string[4:6], 16)
+        self.set_rgba(r, g, b)
+    
+    def get_hex(self):
+        r, g, b, _ = self.get_rgba()
+        return "#{:02X}{:02X}{:02X}".format(r, g, b)
 
 
 class ColorList(ArrayDecoderMixin,ListClass):
@@ -57,6 +60,3 @@ class ColorList(ArrayDecoderMixin,ListClass):
     
     def get_copies(self):
         return lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID))
-        
-    def remap(self, key_value_map):
-        self.get_custom().apply(lambda color: color.remap(key_value_map))    

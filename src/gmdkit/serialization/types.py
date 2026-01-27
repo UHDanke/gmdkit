@@ -4,6 +4,7 @@ from gmdkit.serialization.functions import filter_kwargs
 # Imports
 from typing import Self, Any
 from collections.abc import Iterable, Callable
+from enum import IntEnum
 
 
 class ListClass(list):
@@ -336,3 +337,13 @@ class DictClass(dict):
                 result.append(self.pop(k,None))          
         
         return result
+
+
+class EnumClass(IntEnum):
+    UNKNOWN = -1 
+    
+    @classmethod
+    def _missing_(cls, value):
+        obj = cls.UNKNOWN
+        obj._value_ = value
+        return obj
