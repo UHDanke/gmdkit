@@ -50,12 +50,13 @@ def decode_level_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'bool': 
-                    return 'to_bool'
+                    return 'bool'
                 
-                case _: return 'int'
+                case _: 
+                    return
                 
         case 'float' | 'real':
-            return 'float'
+            return
         
         case 'str' | 'string':
             match gd_format:              
@@ -72,7 +73,8 @@ def decode_level_props(gd_type, gd_format, key):
                         case 'k34':
                             return 'ReplayString'
                         
-                case _: return 'str'
+                case _:
+                    return
                 
         case _: return
         
@@ -85,10 +87,10 @@ def encode_level_props(gd_type, gd_format, key):
             match gd_format:
                 
                 case 'bool': 
-                    return 'from_bool'
+                    return 'int'
         
         case 'float' | 'real':
-            return 'from_float'
+            return
         
         case 'str' | 'string':
             match gd_format:              
@@ -100,7 +102,7 @@ def encode_level_props(gd_type, gd_format, key):
                     return 'zip_string'
                 
                 case _: 
-                    return 'str'
+                    return
                 
         case _: return
 
