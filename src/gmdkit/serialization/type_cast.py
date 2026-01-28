@@ -48,9 +48,6 @@ def to_plist(obj, **kwargs) -> str:
 
 
 def zip_string(obj) -> str:
-    method = getattr(obj, "save", None)
-    if callable(method):
-        return method()
     
     string = getattr(obj, "string", None)
     if string is not None:

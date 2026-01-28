@@ -340,6 +340,7 @@ class DictClass(dict):
 
 
 class EnumClass(IntEnum):
+    
     UNKNOWN = -1 
     
     @classmethod

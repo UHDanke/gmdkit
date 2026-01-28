@@ -26,12 +26,10 @@ class ObjectString(GzipString):
         
         obj_list = ObjectList.from_string(string)
         
-        if obj_list:
-            
-            self.start = obj_list.pop(0)
-            self.objects = obj_list
+        self.start = obj_list.pop(0,Object())
+        self.objects = obj_list
         
-        return Object(), ObjectList()
+        return (self.start, self.objects)
     
         
     def save(self, start:Object|None=None, objects:ObjectList|None=None):
@@ -44,8 +42,10 @@ class ObjectString(GzipString):
     
         string = (ObjectList().wrap(start) + objects).to_string()
         
-        return super().save(string)
-
+        super().save(string)
+        
+        return self.string
+    
 
 class ReplayString(GzipString):
     
@@ -64,4 +64,6 @@ class ReplayString(GzipString):
         
         string = replay_data
         
-        return super().save(string)
+        super().save(string)
+        
+        return self.string
