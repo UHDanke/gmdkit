@@ -1,4 +1,0 @@
-AUTO = 1
-CENTER = 2
-BOTTOM = 3
-TOP = 4

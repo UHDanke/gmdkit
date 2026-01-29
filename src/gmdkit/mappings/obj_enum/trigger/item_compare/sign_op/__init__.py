@@ -1,3 +1,0 @@
-NONE = 0
-ABSOLUTE = 1
-NEGATIVE = 2

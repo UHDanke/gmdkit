@@ -1,3 +1,0 @@
-DEFAULT = 0
-BASE = 1
-DETAIL = 2

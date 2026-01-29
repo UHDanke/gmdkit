@@ -1,3 +1,0 @@
-DISABLE = -1
-IGNORE = 0
-ENABLE = 1

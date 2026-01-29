@@ -1,3 +1,0 @@
-TIME = 0
-EVEN = 1
-DIST = 2

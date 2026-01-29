@@ -1,3 +1,0 @@
-ADD = 0
-MULTIPLY = 1
-DIVIDE = 2
