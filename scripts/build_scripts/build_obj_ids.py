@@ -7,7 +7,7 @@ FOLDERPATH = "src/gmdkit/mappings/obj_id/"
 def main():
     # Open object id table
     obj_id_table = pd.read_csv(CSV_PATH)
-    
+    obj_id_table = obj_id_table.rename(columns={"object id":"object id","gmdkit alias":"alias"})
     obj_alias_ids = obj_id_table[['id','alias']]
     obj_alias_ids=obj_alias_ids.dropna()
     obj_alias_ids.sort_values(by='id')

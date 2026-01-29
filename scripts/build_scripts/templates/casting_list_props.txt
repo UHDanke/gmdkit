@@ -4,16 +4,16 @@ from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 
 
-LEVEL_DECODERS = {{
-{level_decoders}
+LIST_DECODERS = {{
+{list_decoders}
 }}
 
 
-LEVEL_ENCODERS = {{
-{level_encoders}
+LIST_ENCODERS = {{
+{list_encoders}
 }}
 
 
-LEVEL_TYPES = {{
-{level_types}
+LIST_TYPES = {{
+{list_types}
 }}

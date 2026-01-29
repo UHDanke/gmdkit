@@ -1,10 +1,10 @@
 import pandas as pd
 from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder
 
-CSV_PATH = "data/csv/level_table.csv"
-TEMPLATE_PATH = "scripts/build_scripts/templates/casting_lvl_props.txt"
-FILEPATH = "src/gmdkit/casting/level_props.py"
-FOLDERPATH = "src/gmdkit/mappings/lvl_prop/"
+CSV_PATH = "data/csv/list_table.csv"
+TEMPLATE_PATH = "scripts/build_scripts/templates/casting_list_props.txt"
+FILEPATH = "src/gmdkit/casting/list_props.py"
+FOLDERPATH = "src/gmdkit/mappings/list_prop/"
 
 def get_lvl_types(gd_type, gd_format, key):
     
@@ -27,15 +27,6 @@ def get_lvl_types(gd_type, gd_format, key):
                 
                 case 'int list':
                     return 'IntList'
-                
-                case 'gzip':
-                    
-                    match key:
-                        case 'k4':
-                            return 'ObjectString'
-                        
-                        case 'k34':
-                            return 'ReplayString'
                         
                 case _: return 'str'
                 
@@ -64,15 +55,6 @@ def decode_level_props(gd_type, gd_format, key):
                 case 'int list':
                     return 'IntList.from_string'
                 
-                case 'gzip':
-                    
-                    match key:
-                        case 'k4':
-                            return 'ObjectString'
-                        
-                        case 'k34':
-                            return 'ReplayString'
-                        
                 case _:
                     return
                 
@@ -97,26 +79,23 @@ def encode_level_props(gd_type, gd_format, key):
                 
                 case 'int list':
                     return 'to_string'
-                
-                case 'gzip':
-                    return 'zip_string'
-                
+
                 case _: 
                     return
                 
         case _: return
 
 def main():
-    level_table = pd.read_csv(CSV_PATH)
-    level_table['id'] = level_table['id'].apply(lambda x: int(x) if str(x).isdigit() else str(x))
+    list_table = pd.read_csv(CSV_PATH)
+    list_table['id'] = list_table['id'].apply(lambda x: int(x) if str(x).isdigit() else str(x))
     
     # Compute decode/encode/type for all rows
-    level_table['decode'] = level_table.apply(lambda row: decode_level_props(row['type'], row['format'], row['id']), axis=1)
-    level_table['encode'] = level_table.apply(lambda row: encode_level_props(row['type'], row['format'], row['id']), axis=1)
-    level_table['lvl_type'] = level_table.apply(lambda row: get_lvl_types(row['type'], row['format'], row['id']), axis=1)
-    
-    level_class = (
-        level_table.dropna(how='all')
+    list_table['decode'] = list_table.apply(lambda row: decode_level_props(row['type'], row['format'], row['id']), axis=1)
+    list_table['encode'] = list_table.apply(lambda row: encode_level_props(row['type'], row['format'], row['id']), axis=1)
+    list_table['lvl_type'] = list_table.apply(lambda row: get_lvl_types(row['type'], row['format'], row['id']), axis=1)
+
+    list_class = (
+        list_table.dropna(how='all')
         .groupby('id')
         .apply(lambda g: pd.Series({
             'aliases': None if g['alias'].isna().all() else tuple(g['alias']),
@@ -128,28 +107,28 @@ def main():
         .where(pd.notnull, None)
     )
     
-    level_class = level_class.where(pd.notnull(level_class), None)
+    list_class = list_class.where(pd.notnull(list_class), None)
     
     # Read template
     with open(TEMPLATE_PATH, "r") as tempfile:
         template = tempfile.read()
     
     # Generate dictionary entries
-    lvl_decoders = "\n".join([
+    lst_decoders = "\n".join([
         f"    {repr(row['id'])}: {row['decode']},"
-        for _, row in level_class.iterrows()
+        for _, row in list_class.iterrows()
         if row['decode'] is not None
     ])
     
-    lvl_encoders = "\n".join([
+    lst_encoders = "\n".join([
         f"    {repr(row['id'])}: {row['encode']},"
-        for _, row in level_class.iterrows()
+        for _, row in list_class.iterrows()
         if row['encode'] is not None
     ])
     
-    lvl_types = "\n".join([
+    lst_types = "\n".join([
         f"    {repr(row['id'])}: {row['type']},"
-        for _, row in level_class.iterrows()
+        for _, row in list_class.iterrows()
         if row['type'] is not None
     ])
 
@@ -157,12 +136,12 @@ def main():
     # Write output file
     with open(FILEPATH, "w") as file:
         file.write(template.format(
-            level_decoders=lvl_decoders,
-            level_encoders=lvl_encoders,
-            level_types=lvl_types,
+            list_decoders=lst_decoders,
+            list_encoders=lst_encoders,
+            list_types=lst_types
         ))
     
-    alias_ids = level_table[['id','alias']]
+    alias_ids = list_table[['id','alias']]
     alias_ids = alias_ids.dropna()
     aliases = dict(zip(alias_ids['alias'],alias_ids['id']))
     
