@@ -373,7 +373,21 @@ class ArrayDecoderMixin:
         encoder = encoder or self.ENCODER or str
 
         return separator.join([encoder(x) for x in self])
+
+
+class TypedDictMixin:
     
+    KEY_TYPES: dict[str, Any] | None = None
+    
+    def coerce(self, key, value):
+        key_type = self.KEY_TYPES.get(key)
+        
+        if callable(key_type):
+            value = key_type(value)
+        
+        self[key] = value
+
+
 
 class DictDefaultMixin:
     

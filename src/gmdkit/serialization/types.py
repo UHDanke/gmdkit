@@ -341,10 +341,6 @@ class DictClass(dict):
 
 class EnumClass(IntEnum):
     
-    UNKNOWN = -1 
-    
     @classmethod
     def _missing_(cls, value):
-        obj = cls.UNKNOWN
-        obj._value_ = value
-        return obj
+        return int(value)

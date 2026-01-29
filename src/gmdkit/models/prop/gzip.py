@@ -26,7 +26,7 @@ class ObjectString(GzipString):
         
         obj_list = ObjectList.from_string(string)
         
-        self.start = obj_list.pop(0,Object())
+        self.start = obj_list.pop(0) if obj_list else Object()
         self.objects = obj_list
         
         return (self.start, self.objects)
