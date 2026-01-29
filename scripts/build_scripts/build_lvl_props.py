@@ -1,5 +1,5 @@
 import pandas as pd
-from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder
+from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder, sort_number
 
 CSV_PATH = "data/csv/level_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_lvl_props.txt"
@@ -134,24 +134,20 @@ def main():
     with open(TEMPLATE_PATH, "r") as tempfile:
         template = tempfile.read()
     
+    def gen_dict(column):
+        values = [(row['id'], row[column]) 
+                  for _, row in level_class.iterrows() if str(row[column]) not in ("nan","None")]
+        
+        values.sort(key=lambda x: sort_number(x[0]))
+        print(values)
+        return "\n".join([f"    {repr(x[0])}: {x[1]}," for x in values])
+         
     # Generate dictionary entries
-    lvl_decoders = "\n".join([
-        f"    {repr(row['id'])}: {row['decode']},"
-        for _, row in level_class.iterrows()
-        if row['decode']
-    ])
+    lvl_decoders = gen_dict("decode")
     
-    lvl_encoders = "\n".join([
-        f"    {repr(row['id'])}: {row['encode']},"
-        for _, row in level_class.iterrows()
-        if row['encode']
-    ])
+    lvl_encoders = gen_dict("encode")
     
-    lvl_types = "\n".join([
-        f"    {repr(row['id'])}: {row['type']},"
-        for _, row in level_class.iterrows()
-        if row['type']
-    ])
+    lvl_types = gen_dict("type")
 
     
     # Write output file

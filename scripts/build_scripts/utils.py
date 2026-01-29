@@ -2,6 +2,7 @@ from collections import defaultdict
 from pathlib import Path
 import os
 import shutil
+import re
 
 def tree():
     return defaultdict(tree)
@@ -40,3 +41,15 @@ def render_tree(node, base_path) -> None:
 
     for key in dict_keys:
         render_tree(node[key], base_path / key)
+
+def sort_number(s:int|str) -> str | None:
+    if isinstance(s, int):
+        return 0, "", s
+    elif isinstance(s, str):
+        match = re.search(r"^(.*?)(\d+)$", s.strip())
+        if match:
+            return 1, match.group(1), int(match.group(2))
+        else:
+            return 2, s, 0
+    
+    return 0, "", s

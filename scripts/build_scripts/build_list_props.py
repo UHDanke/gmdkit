@@ -1,5 +1,5 @@
 import pandas as pd
-from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder
+from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder, sort_number
 
 CSV_PATH = "data/csv/list_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_list_props.txt"
@@ -113,26 +113,21 @@ def main():
     with open(TEMPLATE_PATH, "r") as tempfile:
         template = tempfile.read()
     
+    def gen_dict(column):
+        values = [(row['id'], row[column]) 
+                  for _, row in list_class.iterrows() if str(row[column]) not in ("nan","None")]
+        
+        values.sort(key=lambda x: sort_number(x[0]))
+        return "\n".join([f"    {repr(x[0])}: {x[1]}," for x in values])
+         
     # Generate dictionary entries
-    lst_decoders = "\n".join([
-        f"    {repr(row['id'])}: {row['decode']},"
-        for _, row in list_class.iterrows()
-        if row['decode']
-    ])
+    lst_decoders = gen_dict("decode")
     
-    lst_encoders = "\n".join([
-        f"    {repr(row['id'])}: {row['encode']},"
-        for _, row in list_class.iterrows()
-        if row['encode']
-    ])
+    lst_encoders = gen_dict("encode")
     
-    lst_types = "\n".join([
-        f"    {repr(row['id'])}: {row['type']},"
-        for _, row in list_class.iterrows()
-        if row['type']
-    ])
+    lst_types = gen_dict("type")
 
-    
+
     # Write output file
     with open(FILEPATH, "w") as file:
         file.write(template.format(
