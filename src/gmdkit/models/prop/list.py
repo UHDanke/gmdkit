@@ -113,4 +113,40 @@ class RemapList(IntPairList):
             for pair in self:
                 v = pair.value
                 pair.value = dictionary.get(v, v)
+                
+                
+class DigitList(ListClass):
+    
+    LEADING_DIGIT = 1
+    
+    
+    @classmethod
+    def from_string(cls, string:str):
+        return cls(split_digit_list(int(string), cls.LEADING_DIGIT))
+
+    def to_string(self):
+        return str(join_digit_list(self, self.LEADING_DIGIT))
+    
+
+
+def split_digit_list(value:int, leading_digit:Literal[1,2,3,4,5,6,7,8,9]=1):
+    
+    if value < 0:
+        raise ValueError("Value must be non-negative")
+    
+    s = str(value)
+    
+    if not s.startswith(leading_digit):
+        raise ValueError("Value must have {leading_digit} as a leading digit")
+    
+    return [int(d) for d in s[1:]]
+    
+
+
+def join_digit_list(digit_list, leading_digit:Literal[1,2,3,4,5,6,7,8,9]=1):
+    return int(
+        leading_digit +
+        "".join(str(max(0, min(int(d), 9))) for d in digit_list)
+        )
+        
     

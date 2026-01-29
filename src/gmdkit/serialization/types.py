@@ -62,17 +62,19 @@ class ListClass(list):
         Self
             A new class instance containing filtered objects.
         """
-        result = self.__class__()
+        if not conditions:
+            return self.__class__()
         
-        funcs = filter_kwargs(*conditions, **kwargs)
-
-        for item in self:
-            for condition in funcs:
-                if condition(item):
-                    result.append(item)
-                    break
+        if len(conditions) == 1 and not kwargs:
+            condition = conditions[0]
+            return self.__class__(item for item in self if condition(item))
         
-        return result
+        funcs = filter_kwargs(*conditions, **kwargs) if kwargs else conditions
+        
+        return self.__class__(
+            item for item in self 
+            if any(condition(item) for condition in funcs)
+        )
     
     
     def apply(self, *functions:Callable, **kwargs) -> Self:
@@ -101,10 +103,21 @@ class ListClass(list):
         print(new_list)  # Output: [2, 4, 6]
 
         """        
-        funcs = filter_kwargs(*functions, **kwargs)
-            
-        for i, item in enumerate(self):
-            val = item
+        if not functions:
+            return self
+        
+        if len(functions) == 1 and not kwargs:
+            func = functions[0]
+            for i in range(len(self)):
+                new = func(self[i])
+                if new is not None:
+                    self[i] = new
+            return self
+        
+        funcs = filter_kwargs(*functions, **kwargs) if kwargs else functions
+        
+        for i in range(len(self)):
+            val = self[i]
             for function in funcs:
                 new = function(val)
                 if new is not None:
@@ -131,23 +144,26 @@ class ListClass(list):
         Self
             A new class instance containing the filtered objects.
         """
-        ex = self.__class__()
+        if not conditions:
+            return self.__class__()
         
-        keep = []
-
-        funcs = filter_kwargs(*conditions, **kwargs)
-
+        excluded = self.__class__()
+        kept = []
+        
+        funcs = filter_kwargs(*conditions, **kwargs) if kwargs else conditions
+        
+        excluded_append = excluded.append
+        kept_append = kept.append
+        
         for item in self:
-            for condition in funcs:
-                if condition(item):
-                    ex.append(item)
-                    break
+            if any(condition(item) for condition in funcs):
+                excluded_append(item)
             else:
-                keep.append(item)
-    
-        self[:] = keep
-        return ex
-    
+                kept_append(item)
+        
+        self[:] = kept
+        return excluded
+
     
     def values(self, *functions:Callable[..., Iterable[Any]], **kwargs:Any) -> list:
         """
@@ -166,13 +182,29 @@ class ListClass(list):
         list
             A list containing the collected values.
         """
-        result = list()
-        funcs = filter_kwargs(*functions, **kwargs)
+        if not functions:
+            return []
+        
+        if len(functions) == 1 and not kwargs:
+            func = functions[0]
+            result = []
+            extend = result.extend
+            for item in self:
+                vals = func(item)
+                if vals:
+                    extend(vals)
+            return result
+        
+        funcs = filter_kwargs(*functions, **kwargs) if kwargs else functions
+        
+        result = []
+        extend = result.extend
+        
         for item in self:
             for function in funcs:
-                vals = function(item) 
+                vals = function(item)
                 if vals:
-                    result.extend(vals)
+                    extend(vals)
                 
         return result
     
@@ -195,15 +227,20 @@ class ListClass(list):
             A set containing the unique collected values.
 
         """
+        if not functions:
+            return set()
+        
         result = set()
-    
-        funcs = filter_kwargs(*functions, **kwargs)
+        
+        funcs = filter_kwargs(*functions, **kwargs) if kwargs else functions
+        
+        update = result.update
         
         for item in self:
             for function in funcs:
-                vals = function(item) 
+                vals = function(item)
                 if vals:
-                    result.update(vals)
+                    update(vals)
                 
         return result
     
@@ -226,9 +263,12 @@ class ListClass(list):
             A set containing the shared collected values.
 
         """
-        result = None
+        if not functions or not self:
+            return set()
         
-        funcs = filter_kwargs(*functions, **kwargs)
+        funcs = filter_kwargs(*functions, **kwargs) if kwargs else functions
+        
+        result = None
         
         for item in self:
             for function in funcs:
@@ -237,14 +277,12 @@ class ListClass(list):
                 
                 if result is None:
                     result = val
-                
                 else:
                     result &= val
-                
-                if not result:
-                    return set()
+                    if not result:
+                        return set()
         
-        return result
+        return result if result is not None else set()
 
         
 class DictClass(dict):
@@ -296,17 +334,20 @@ class DictClass(dict):
             Returns a list containing the values of the specified keys.
 
         """
-        result = list()
-        key_set = set(keys)
+        if len(keys) == 1:
+            key = keys[0]
+            if ignore_missing and key not in self:
+                return []
+            return [self.get(key)]
         
         if ignore_missing:
-            for k in key_set & self.keys():
-                result.append(self.get(k))
+            if len(keys) > 3:
+                valid_keys = set(keys) & self.keys()
+                return [self[k] for k in keys if k in valid_keys]
+            else:
+                return [self[k] for k in keys if k in self]
         else:
-            for k in keys:
-                result.append(self.get(k))          
-        
-        return result
+            return [self.get(k) for k in keys]
 
 
     def discard(self, *keys:str, ignore_missing:bool=False) -> list:
@@ -327,16 +368,23 @@ class DictClass(dict):
             Returns a list containing the values of the discarded keys.
 
         """
-        result = list()
+        if not keys:
+            return []
+        
+        if len(keys) == 1:
+            key = keys[0]
+            if ignore_missing:
+                return [self.pop(key)] if key in self else []
+            return [self.pop(key, None)]
         
         if ignore_missing:
-            for k in set(keys) & self.keys():
-                result.append(self.pop(k))
+            if len(keys) > 3:
+                valid_keys = set(keys) & self.keys()
+                return [self.pop(k) for k in keys if k in valid_keys]
+            else:
+                return [self.pop(k) for k in keys if k in self]
         else:
-            for k in keys:
-                result.append(self.pop(k,None))          
-        
-        return result
+            return [self.pop(k, None) for k in keys]
 
 
 class EnumClass(IntEnum):

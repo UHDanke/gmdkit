@@ -1,9 +1,5 @@
 # Imports
-from typing import Iterable
-
-# Package Imports
-from gmdkit.models.prop.guideline import GuidelineList, Guideline
-from gmdkit.constants.game import guideline as guide_color
+from typing import Iterable, Literal
 
 
 def next_free(
@@ -72,26 +68,23 @@ def next_free(
     return result
 
 
-def bpm_guideline(bpm, bpb=1, beat_start=0, start=0, end=60, bar_color=guide_color.YELLOW, beat_color=guide_color.ORANGE):
-    result = GuidelineList()
-    interval = 60.0 / (bpm * bpb)
-    time = start
+def split_digit_list(value:int, leading_digit:Literal[1,2,3,4,5,6,7,8,9]=1):
     
-    if beat_start < start:
-        i = int((start - beat_start) // interval)
-    else:
-        i = 0
-
-    time = beat_start + i * interval
+    if value < 0:
+        raise ValueError("Value must be non-negative")
     
-    while time <= end:
-       if i % bpb == 0:
-           color = bar_color
-       else:
-           color = beat_color
+    s = str(value)
+    
+    if not s.startswith(leading_digit):
+        raise ValueError("Value must have {leading_digit} as a leading digit")
+    
+    return [int(d) for d in s[1:]]
+    
 
-       result.append(Guideline(time=time,color = color))
-       time += interval
-       i += 1
-       
-    return result
+def join_digit_list(digit_list, leading_digit:Literal[1,2,3,4,5,6,7,8,9]=1):
+    return int(
+        leading_digit +
+        "".join(str(max(0, min(int(d), 9))) for d in digit_list)
+        )
+        
+    
