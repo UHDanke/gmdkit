@@ -138,19 +138,19 @@ def main():
     lvl_decoders = "\n".join([
         f"    {repr(row['id'])}: {row['decode']},"
         for _, row in level_class.iterrows()
-        if row['decode'] is not None
+        if row['decode']
     ])
     
     lvl_encoders = "\n".join([
         f"    {repr(row['id'])}: {row['encode']},"
         for _, row in level_class.iterrows()
-        if row['encode'] is not None
+        if row['encode']
     ])
     
     lvl_types = "\n".join([
         f"    {repr(row['id'])}: {row['type']},"
         for _, row in level_class.iterrows()
-        if row['type'] is not None
+        if row['type']
     ])
 
     

@@ -117,19 +117,19 @@ def main():
     lst_decoders = "\n".join([
         f"    {repr(row['id'])}: {row['decode']},"
         for _, row in list_class.iterrows()
-        if row['decode'] is not None
+        if row['decode']
     ])
     
     lst_encoders = "\n".join([
         f"    {repr(row['id'])}: {row['encode']},"
         for _, row in list_class.iterrows()
-        if row['encode'] is not None
+        if row['encode']
     ])
     
     lst_types = "\n".join([
         f"    {repr(row['id'])}: {row['type']},"
         for _, row in list_class.iterrows()
-        if row['type'] is not None
+        if row['type']
     ])
 
     
