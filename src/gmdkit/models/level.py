@@ -45,7 +45,7 @@ class Level(PlistDictDecoderMixin,DictClass):
             path = Path(path)
         
         if not path.suffix:
-            path = (path / self[lvl_prop.level.NAME]).with_suffix('.' + extension.lstrip('.'))
+            path = (path / self[lvl_prop.NAME]).with_suffix('.' + extension.lstrip('.'))
             
         super().to_file(path=path, save=save, save_keys=save_keys, **kwargs)
 
@@ -93,7 +93,7 @@ class Level(PlistDictDecoderMixin,DictClass):
     def default(cls, name:str,load:bool=True):
         
         data = LEVEL_DEFAULT.copy()        
-        data[lvl_prop.level.NAME] = name
+        data[lvl_prop.NAME] = name
         
         kwargs = {}
         kwargs["load"] = load

@@ -1,5 +1,5 @@
 import pandas as pd
-from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder
+from scripts.build_scripts.utils import tree, build_tree, render_tree, clear_folder, sort_number
 
 CSV_PATH = "data/csv/prop_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_obj_props.txt"
@@ -176,26 +176,21 @@ def main():
         with open(TEMPLATE_PATH, "r") as tempfile:
             
             template = tempfile.read()
+            
+        def gen_dict(column):
+            values = [(row['id'], row[column]) 
+                      for _, row in prop_class.iterrows() if str(row[column]) not in ("nan","None")]
+            
+            values.sort(key=lambda x: sort_number(x[0]))
+            print(values)
+            return "\n".join([f"    {repr(x[0])}: {x[1]}," for x in values])
+         
+        prop_decoders = gen_dict("decode")
         
+        prop_encoders = gen_dict("encode")
         
-        prop_decoders = "\n".join([
-            f"    {repr(row['id'])}: {row['decode']},"
-            for _, row in prop_class.iterrows()
-            if row['decode'] is not None
-        ])
-        
-        prop_encoders = "\n".join([
-            f"    {repr(row['id'])}: {row['encode']},"
-            for _, row in prop_class.iterrows()
-            if row['encode'] is not None
-        ])
-        
-        prop_types = "\n".join([
-            f"    {repr(row['id'])}: {row['type']},"
-            for _, row in prop_class.iterrows()
-            if row['type'] is not None
-        ])
-        
+        prop_types = gen_dict("type")
+
         file.write(template.format(
             property_decoders=prop_decoders,
             property_encoders=prop_encoders,
