@@ -225,7 +225,6 @@ class ListClass(list):
         -------
         set
             A set containing the unique collected values.
-
         """
         if not functions:
             return set()
@@ -261,7 +260,6 @@ class ListClass(list):
         -------
         set
             A set containing the shared collected values.
-
         """
         if not functions or not self:
             return set()
@@ -332,7 +330,6 @@ class DictClass(dict):
         -------
         list
             Returns a list containing the values of the specified keys.
-
         """
         if len(keys) == 1:
             key = keys[0]
@@ -366,7 +363,6 @@ class DictClass(dict):
         -------
         list
             Returns a list containing the values of the discarded keys.
-
         """
         if not keys:
             return []
