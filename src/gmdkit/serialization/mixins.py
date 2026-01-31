@@ -290,6 +290,7 @@ class ArrayDecoderMixin:
     
     SEPARATOR: str = ','
     END_SEP: bool = False
+    END_SEP_PASS: bool = False
     GROUP_SIZE: int = 1
     ENCODER: ArrayEncoder = staticmethod(serialize)
     DECODER: ArrayDecoder | None = None
@@ -309,11 +310,14 @@ class ArrayDecoderMixin:
         group_size = group_size or cls.GROUP_SIZE
         decoder = decoder or cls.DECODER or (lambda x: x)
 
-        tokens = string.split(separator)
         result = cls()
+        tokens = string.split(separator)
+        
+        if end_sep and string.endswith(separator):
+            string = string[:-len(separator)]
         
         if group_size > 1:
-            if end_sep:
+            if False: # if end_sep removed for testing
                 for i in range(0, len(tokens), group_size):
                     group = [token + separator for token in tokens[i:i + group_size]]
                     if group:
