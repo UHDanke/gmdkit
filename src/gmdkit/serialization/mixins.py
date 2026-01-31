@@ -44,11 +44,11 @@ class PlistDecoderMixin:
         
         decoder = decoder or cls.DECODER
         self_format = self_format or cls.SELF_FORMAT
-        fkwargs = fkwargs or {}
         
         if decoder is None or not callable(decoder) or self_format is None or not callable(self_format):
             return cls(data, **kwargs)
         
+        fkwargs = fkwargs or {}
         new = self_format(data, decoder, **fkwargs)
         
         return cls(new, **kwargs)
@@ -63,11 +63,11 @@ class PlistDecoderMixin:
         
         encoder = encoder or self.ENCODER or (lambda x: x)
         plist_format = plist_format or self.PLIST_FORMAT
-        fkwargs = fkwargs or {}
         
         if encoder is None or not callable(encoder) or plist_format is None or not callable(plist_format):
             return self
         
+        fkwargs = fkwargs or {}
         new = plist_format(self, encoder, **fkwargs)
         
         return new
@@ -157,26 +157,16 @@ class DataclassDecoderMixin:
         
         decoder = cls.DECODER or dict_cast(get_type_hints(cls))
             
-        class_args = dict()
+        class_args = {}
         
-        iarg = iter(args)
-        
-        for f in fields(cls):
-            try:
-                key, value = decoder(f.name,next(iarg))
-                    
-                class_args[key] = value
-                
-            except StopIteration:
-                break
+        for field, arg in zip(fields(cls), args):
+            key, value = decoder(field.name, arg)
+            class_args[key] = value
         
         for key, value in kwargs.items():
-                
-            if not hasattr(cls, key): continue
-        
-            key, value = decoder(key,value)    
-            
-            class_args[key] = value
+            if hasattr(cls, key):
+                key, value = decoder(key, value)
+                class_args[key] = value
         
         return cls(**class_args)
     
@@ -198,36 +188,25 @@ class DataclassDecoderMixin:
         else:
             decoder = dict_cast(get_type_hints(cls))
         
-        if string == '':
+        if not string:
             return cls()
-            
-        tokens = iter(string.split(separator))
         
-        class_args = dict()
+        tokens = string.split(separator)
+        class_args = {}
         
         if list_format:
-            
-            for f in fields(cls):
-                try:
-                    key, value = decoder(f.name,next(tokens))
-                    
-                    class_args[key] = value
-                
-                except StopIteration:
-                    break
-                
-        else:
-            
-            for token in tokens:
-                
-                value = next(tokens)
-                
-                key, value = decoder(token,value)
-                    
-                if not hasattr(cls, key): continue
-                
+            for field, token in zip(fields(cls), tokens):
+                key, value = decoder(field.name, token)
                 class_args[key] = value
-                    
+        else:
+            if len(tokens) % 2 != 0:
+                raise ValueError("Malformed string: uneven key/value pairs")
+            
+            for i in range(0, len(tokens), 2):
+                key, value = decoder(tokens[i], tokens[i + 1])
+                if hasattr(cls, key):
+                    class_args[key] = value
+        
         return cls(**class_args)
     
     
@@ -243,21 +222,15 @@ class DataclassDecoderMixin:
         encoder = encoder or self.ENCODER
         
         parts = []
-        
         for field in fields(self):
+            value = getattr(self, field.name)
+            key, encoded_value = encoder(field.name, value)
             
-            key = field.name
-            value = getattr(self, key, None)
-            
-            key, value = encoder(field.name, getattr(self,key))
-            
-            if list_format:
-                string = value
-            else:
-                string = separator.join((key,value))
-            
-            parts.append(string)
-            
+            parts.append(
+                encoded_value if list_format 
+                else f"{key}{separator}{encoded_value}"
+                )
+        
         return separator.join(parts)
        
     
@@ -280,18 +253,17 @@ class DictDecoderMixin:
         
         separator = separator if separator is not None else cls.SEPARATOR
         decoder = decoder or cls.DECODER or (lambda key, value: (key, value))
-        use_condition = callable(condition)
 
         tokens = string.split(separator)
         if len(tokens) % 2 != 0:
             raise ValueError("Malformed input string: uneven key/value pairs")
-
+        
         result = cls()
         for raw_key, raw_value in zip(tokens[::2], tokens[1::2]):
             key, value = decoder(raw_key, raw_value)
-            if not use_condition or condition(key, value):
+            if condition is None or condition(key, value):
                 result[key] = value
-
+        
         return result
     
     
@@ -304,14 +276,13 @@ class DictDecoderMixin:
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
         
-        use_condition = callable(condition)
-
-        parts: list[str] = []
+        parts = []
         for key, value in self.items():
-            if not use_condition or condition(key, value):
+            if condition is None or condition(key, value):
                 parts.extend(encoder(key, value))
         
         return separator.join(parts)
+    
 
 class ArrayDecoderMixin:
     
@@ -337,30 +308,30 @@ class ArrayDecoderMixin:
         end_sep = end_sep or cls.END_SEP
         group_size = group_size or cls.GROUP_SIZE
         decoder = decoder or cls.DECODER or (lambda x: x)
-        
+
+        tokens = string.split(separator)
         result = cls()
         
-        if string == '': return result
-        
-        tokens = iter(string.split(separator))
-        
-        while True:
-            if group_size > 1:
-                item = [i+separator if end_sep else i for i in islice(tokens, group_size)]
+        if group_size > 1:
+            if end_sep:
+                for i in range(0, len(tokens), group_size):
+                    group = [token + separator for token in tokens[i:i + group_size]]
+                    if group:
+                        result.append(decoder(group) if decoder else group)
             else:
-                try:
-                    item = next(tokens)
-                except StopIteration:
-                    break
-                
-            if not item:
-                break
+                for i in range(0, len(tokens), group_size):
+                    group = tokens[i:i + group_size]
+                    if group:
+                        result.append(decoder(group) if decoder else group)
+        else:
+            if decoder:
+                result.extend(decoder(token) for token in tokens)
             else:
-                result.append(decoder(item))
-                
+                result.extend(tokens)
+        
         return result
-        
-        
+    
+    
     def to_string(
             self, 
             separator:str|None=None,
@@ -372,7 +343,7 @@ class ArrayDecoderMixin:
         separator = '' if end_sep else separator if separator is not None else self.SEPARATOR
         encoder = encoder or self.ENCODER or str
 
-        return separator.join([encoder(x) for x in self])
+        return separator.join(encoder(x) for x in self)
 
 
 class TypedDictMixin:

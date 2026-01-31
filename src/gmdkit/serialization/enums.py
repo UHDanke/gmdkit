@@ -437,3 +437,82 @@ class LevelLength(EnumClass):
     LONG = 3
     XL = 4
     PLAT = 5
+    
+class OfficialSongs(EnumClass):
+    STAY_INSIDE_ME = -1
+    STEREO_MADNESS = 0
+    BACK_ON_TRACK = 1
+    POLARGEIST = 2
+    DRY_OUT = 3
+    BASE_AFTER_BASE = 4
+    CANT_LET_GO = 5
+    JUMPER = 6
+    TIME_MACHINE = 7
+    CYCLES = 8
+    XSTEP = 9
+    CLUTTERFUNK = 10
+    THEORY_OF_EVERYTHING = 11
+    ELECTROMAN_ADVENTURES = 12
+    CLUBSTEP = 13
+    ELECTRODYNAMIX = 14
+    HEXAGON_FORCE = 15
+    BLAST_PROCESSING = 16
+    THEORY_OF_EVERYTHING_2 = 17
+    GEOMETRICAL_DOMINATOR = 18
+    DEADLOCKED = 19
+    FINGERDASH = 20
+    DASH = 21
+    EXPLORERS = 22
+    THE_SEVEN_SEAS = 23
+    VIKING_ARENA = 24
+    AIRBORNE_ROBOTS = 25
+    SECRET = 26
+    PAYLOAD = 27
+    BEAST_MODE = 28
+    MACHINA = 29
+    YEARS = 30
+    FRONTLINES = 31
+    SPACE_PIRATES = 32
+    STRIKER = 33
+    EMBERS = 34
+    ROUND_1 = 35
+    MONSTER_DANCE_OFF = 36
+    PRESS_START = 37
+    NOCK_EM = 38
+    POWER_TRIP = 39
+    
+    
+class EpicRating(EnumClass):
+    NONE = 0
+    EPIC = 1
+    LEGENDARY = 2
+    MYTHIC = 3
+
+class FeatureRating(EnumClass):
+    UNRATED = 0
+    RATED = 1
+    FEATURED = 2
+    EPIC = 3
+    LEGENDARY = 4
+    MYTHIC = 5
+    
+class DemonRating(EnumClass):
+    HARD = 0
+    EASY = 3
+    MEDIUM = 4
+    INSANE = 5
+    EXTREME = 6
+    
+class LevelType(EnumClass):
+    OFFICIAL = 1
+    LOCAL = 2
+    SAVED = 3
+    ONLINE = 4
+
+class LevelRating(EnumClass):
+    NONE = 0
+    EASY = 10
+    NORMAL = 20
+    HARD = 30
+    HARDER = 40
+    INSANE = 50

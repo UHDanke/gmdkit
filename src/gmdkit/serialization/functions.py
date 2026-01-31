@@ -84,7 +84,7 @@ def read_plist_elem(elem):
         case 'r':
             return float(elem.text)
         case 's':
-            return str(elem.text)
+            return elem.text or ""
         case 't':
             return True
         case 'd':
@@ -92,41 +92,36 @@ def read_plist_elem(elem):
         
         
 def read_plist(node):
+    children = node[:]
+    num_children = len(children)
     
-    nodes = len(node)
-        
-    if nodes == 0:
+    if num_children == 0:
         return {}
-      
-    if (    
-            nodes > 0 and
-            node[0].tag == "k" and node[0].text == "_isArr" and
-            read_plist_elem(node[1])
+    
+    if (
+            num_children >= 2 and 
+            children[0].tag == "k" and 
+            children[0].text == "_isArr" and
+            read_plist_elem(children[1])
             ):
         result = []
-        
-        for child in islice(node, 2, None):
-            match child.tag:
-                case 'k':
-                    continue
-                case _:
-                    result.append(read_plist_elem(child))
-        
-    else:
-        result = {}
-        key = None
-        
-        for child in node:
-            match child.tag:
-                case 'k':
-                    key = child.text
-                    continue
-                case _:
-                    value = read_plist_elem(child)
-                    if key is not None:
-                        result[key] = value
-                        
-                        key = None
+        for i in range(2, num_children):
+            if children[i].tag != 'k':
+                result.append(read_plist_elem(children[i]))
+        return result
+    
+    result = {}
+    i = 0
+    while i < num_children:
+        if children[i].tag == 'k':
+            key = children[i].text
+            if i + 1 < num_children and children[i + 1].tag != 'k':
+                result[key] = read_plist_elem(children[i + 1])
+                i += 2
+            else:
+                i += 1
+        else:
+            i += 1
     
     return result
 
@@ -148,10 +143,7 @@ def write_plist_elem(parent, value):
     elif isinstance(value, (dict, list, tuple)):
         write_plist(ET.SubElement(parent, "d"),value)
     
-    elif value is None:
-        pass
-    
-    else:
+    elif value is not None:
         ET.SubElement(parent, "s").text = str(value)
 
 
