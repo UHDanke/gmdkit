@@ -1,7 +1,6 @@
 # Imports
 from dataclasses import fields
 from typing import Callable, Any, Self, get_type_hints, Literal
-from itertools import islice
 from os import PathLike
 
 # Package Imports
