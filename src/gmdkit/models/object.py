@@ -33,7 +33,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
 class ObjectList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = ";"
-    END_SEP = True
+    KEEP_SEP = True
     DECODER = Object.from_string
     ENCODER = staticmethod(to_string)
     

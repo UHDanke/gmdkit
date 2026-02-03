@@ -52,6 +52,7 @@ class ColorList(ArrayDecoderMixin,ListClass):
     __slots__ = ()
     
     SEPARATOR = '|'
+    KEEP_SEP = True
     DECODER = Color.from_string
     ENCODER = staticmethod(to_string)
     

@@ -39,7 +39,7 @@ Artist.ENCODER = staticmethod(dict_cast(
 
 class ArtistList(DelimiterMixin, ArrayDecoderMixin, ListClass):
     SEPARATOR = ";"
-    END_SEP = True
+    KEEP_SEP = True
     DECODER = Artist.from_string
     ENCODER = staticmethod(lambda x: x.to_string())
 

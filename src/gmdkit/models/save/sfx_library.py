@@ -49,7 +49,7 @@ def _temp_sfx_from_string(string):
 
 class SFXList(DelimiterMixin, ArrayDecoderMixin, ListClass):
     SEPARATOR = ";"
-    END_SEP = True
+    KEEP_SEP = True
     DECODER = _temp_sfx_from_string
     ENCODER = staticmethod(lambda x: x.to_string())
 

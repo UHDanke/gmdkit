@@ -110,29 +110,85 @@ def serialize(obj) -> str:
 
 
 def dict_cast(
-        dictionary:dict, 
-        numkey:bool=False, 
-        default:Callable|None=None, 
-        key_kwargs:bool=False
-        ):
-    
-    def cast_func(key:str, value:Any, **kwargs):
-        
-        if numkey and isinstance(key, str) and key.isdigit():
-            key = int(key)
-        
-        if (func:=dictionary.get(key)) is not None and callable(func):
-            
-            if key_kwargs: kwargs = kwargs.get(key, {})
-                
-            value = func(value, **kwargs)
-            
-        elif default is not None and callable(default):
-            value = default(value)
-        
-        if not numkey: key = str(key)
-        
-        return (key,value)
-            
+        dictionary: dict,
+        numkey: bool = False,
+        default: Callable | None = None,
+        key_kwargs: bool = False,
+    ):
+    _get = dictionary.get
+    _default_is_callable = default is not None and callable(default)
+
+    if numkey and key_kwargs and _default_is_callable:
+        def cast_func(key: str, value: Any, **kwargs):
+            if isinstance(key, str) and key.isdigit():
+                key = int(key)
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs.get(key, {}))
+            else:
+                value = default(value)
+            return (key, value)
+
+    elif numkey and key_kwargs:
+        def cast_func(key: str, value: Any, **kwargs):
+            if isinstance(key, str) and key.isdigit():
+                key = int(key)
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs.get(key, {}))
+            return (key, value)
+
+    elif numkey and _default_is_callable:
+        def cast_func(key: str, value: Any, **kwargs):
+            if isinstance(key, str) and key.isdigit():
+                key = int(key)
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs)
+            else:
+                value = default(value)
+            return (key, value)
+
+    elif numkey:
+        def cast_func(key: str, value: Any, **kwargs):
+            if isinstance(key, str) and key.isdigit():
+                key = int(key)
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs)
+            return (key, value)
+
+    elif key_kwargs and _default_is_callable:
+        def cast_func(key: str, value: Any, **kwargs):
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs.get(key, {}))
+            else:
+                value = default(value)
+            return (str(key), value)
+
+    elif key_kwargs:
+        def cast_func(key: str, value: Any, **kwargs):
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs.get(key, {}))
+            return (str(key), value)
+
+    elif _default_is_callable:
+        def cast_func(key: str, value: Any, **kwargs):
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs)
+            else:
+                value = default(value)
+            return (str(key), value)
+
+    else:
+        def cast_func(key: str, value: Any, **kwargs):
+            func = _get(key)
+            if func is not None:
+                value = func(value, **kwargs)
+            return (str(key), value)
+
     return cast_func
         

@@ -287,7 +287,7 @@ class ArrayDecoderMixin:
     __slots__ = ()
     
     SEPARATOR: str = ','
-    END_SEP: bool = False
+    KEEP_SEP: bool = False
     GROUP_SIZE: int = 1
     ENCODER: ArrayEncoder = staticmethod(serialize)
     DECODER: ArrayDecoder | None = None
@@ -297,31 +297,27 @@ class ArrayDecoderMixin:
             cls, 
             string:str, 
             separator:str|None=None,
-            end_sep:bool|None=None,
+            keep_sep:bool|None=None,
             group_size:int|None=None, 
             decoder:ArrayDecoder|None=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
-        end_sep = end_sep or cls.END_SEP
+        keep_sep = keep_sep or cls.KEEP_SEP
         group_size = group_size or cls.GROUP_SIZE
         decoder = decoder or cls.DECODER
 
         result = cls()
 
+        string = string.removeprefix(separator).removesuffix(separator)
+        
         if not string:
             return result
-        
-        if string.endswith(separator):
-            string = string[:-len(separator)]
-        
-        if string.startswith(separator):
-            string = string[len(separator):]
-            
+
         tokens = string.split(separator)
         
         if group_size > 1:
-            if False: # if end_sep removed for testing
+            if keep_sep:
                 for i in range(0, len(tokens), group_size):
                     group = [token + separator for token in tokens[i:i + group_size]]
                     if group:
@@ -343,12 +339,12 @@ class ArrayDecoderMixin:
     def to_string(
             self, 
             separator:str|None=None,
-            end_sep:bool|None=None,
+            keep_sep:bool|None=None,
             encoder:ArrayEncoder|None=None
             ) -> str:
         
-        end_sep = end_sep or self.END_SEP
-        separator = '' if end_sep else separator if separator is not None else self.SEPARATOR
+        keep_sep = keep_sep or self.KEEP_SEP
+        separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR
         encoder = encoder or self.ENCODER or str
 
         return separator.join(encoder(x) for x in self)
