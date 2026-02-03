@@ -1,67 +1,48 @@
 # Imports
 from typing import Callable, Any
+from dataclasses import dataclass, field
 
 # Package Imports
 from gmdkit.models.object import Object
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.utils.id_functions import obj_can_be_spawned
 
-Func = Callable|None
+Func = Callable | None
+BoolFunc = Callable | bool | None
 
-class BaseIdentifier:
-    #__slots__ = ('obj','id_val','default','fixed','remappable','remaps')
-    
+ID_MIN = -2147483648
+ID_MAX =  2147483647
+
+
+@dataclass(slots=True)
+class Identifier:
+    # required
     obj: Object
-    obj_prop_id: int|str
-    remaps: dict
-    id_val: int|tuple[int]
+    obj_prop_id: int | str
+    id_val: int | tuple[int]
     id_type: str
-    id_min: int = -2147483648
-    id_max: int = 2147483647
-    default: int|None = None
-    is_default: bool = False
+    # optional
+    default: int | None = None
+    fixed: bool = False
     remappable: bool = False
     reference: bool = False
-    fixed: bool = False
-    actions: tuple = tuple()
     iterable: bool = False
+    id_min: int = ID_MIN
+    id_max: int = ID_MAX
+    actions: tuple = ()
+    replaceable: bool = True
     replace: Func = None
-    
-    
-    def __init__(
-            self,
-            obj:Object,
-            id_val:int|tuple[int],
-            default:int|None=None,
-            fixed:bool=False,
-            remappable:bool=False
-            ):
-        
-        self.obj = obj
-        self.id_val = id_val
-        
-        if self.default != default:
-            self.default = default
-            
-        if self.fixed != fixed:
-            self.fixed = fixed
-        
-        if id_val == default:
-            if not self.is_default:
-                self.is_default = True
-            if not self.fixed:
-                self.fixed = True
-            
-        remappable = self.remappable and remappable
-        if self.remappable != remappable:
-            self.remappable = remappable
-        
-        if self.remappable:
-            self.remaps = dict()
-    
-    
-    def remap_obj(self, kv_map:dict, override:bool=False):
-        
+    remaps: dict = field(default_factory=dict)
+    # derived
+    is_default: bool = field(init=False, default=False)
+
+    def __post_init__(self):
+        if self.id_val == self.default:
+            self.is_default = True
+            self.fixed = True
+
+
+    def remap_obj(self, kv_map: dict, override: bool = False) -> None:
         if not override and (self.fixed or self.default) or not kv_map:
             return
 
@@ -69,142 +50,125 @@ class BaseIdentifier:
             val = self.obj.get(self.obj_prop_id)
             if val is not None:
                 self.replace(val, kv_map)
-            
-        elif (new:=kv_map.get(self.val)) is not None:
+
+        elif (new := kv_map.get(self.id_val)) is not None:
             self.obj[self.obj_prop_id] = new
-        
-             
+
+
 class IDRule:
-    
+    __slots__ = (
+        "obj_prop_id", "id_type", "id_min", "id_max",
+        "condition", "function", "fallback", "replace",
+        "fixed", "default", "remappable",
+        "iterable", "reference", "actions",
+    )
+
     def __init__(
             self,
-            obj_prop_id:int|str,
-            id_type:str,
+            obj_prop_id: int | str,
+            id_type: str,
             condition: Func = None,
             function: Func = None,
             fallback: Func = None,
             replace: Func = None,
-            fixed: Any = None,
-            remappable: Any = None,
+            fixed: BoolFunc = None,
+            remappable: BoolFunc = None,
             default: Any = None,
             iterable: bool = False,
             reference: bool = False,
-            id_min: int = -2147483648,
-            id_max: int = 2147483647,
-            actions: tuple = tuple()
-            ):
-        
-        d = {}
-        
+            id_min: int = ID_MIN,
+            id_max: int = ID_MAX,
+            actions: tuple = (),
+        ):
+        self.obj_prop_id = obj_prop_id
+        self.id_type = id_type
+        self.id_min = id_min
+        self.id_max = id_max
         self.condition = condition
         self.function = function
         self.fallback = fallback
-        
-        if callable(remappable):
-            self.remappable = remappable
-        else:
-            self.remappable = None
-            d["remappable"] = remappable
-        
-        if callable(default):
-            self.default = default
-        else:
-            self.default = None
-            d["default"] = default
-            
-        if callable(fixed):
-            self.fixed = fixed
-        else:
-            self.fixed = None
-            d["fixed"] = fixed
-        
-        d["obj_prop_id"] = obj_prop_id
-        d["id_type"] = id_type
-        d["id_min"] = id_min
-        d["id_max"] = id_max
-        d["reference"] = reference
-        d["actions"] = actions
-        d["iterable"] = iterable
-        d["replace"] = replace
-        
-        class Identifier(BaseIdentifier):
-            for k, v in d.items():
-                locals()[k] = v
+        self.replace = replace
+        self.fixed = fixed
+        self.default = default
+        self.remappable = remappable
+        self.iterable = iterable
+        self.reference = reference
+        self.actions = actions
 
-        self.identifier = Identifier
-        
 
-    def get_ids(self, obj:Object):
-        i = self.identifier
-        pid = i.obj_prop_id
-        val = obj.get(pid)
+    def get_ids(self, obj: Object):
+        val = obj.get(self.obj_prop_id)
         
-        if val is None and callable(self.fallback):
-            fb = self.fallback(obj)
-            if fb is None:
-                return
-            val = fb
+        default = self.default(obj) if callable(self.default) else self.default
 
-        if callable(self.condition) and not self.condition(obj): 
+        if val is None:
+            if callable(self.fallback):
+                val = self.fallback(obj)
+            if val is None:
+                if default is None:
+                    return
+                val = default
+    
+        if callable(self.condition) and not self.condition(obj):
             return
-
+    
         if callable(self.function):
             val = self.function(val)
-
-        if callable(self.default):
-            default = self.default(obj)
-        else:
-            default = i.default
-        
-        if callable(self.fixed):
-            fixed = self.fixed(obj)
-        else:
-            fixed = i.fixed
-
-        if i.iterable:
+    
+        if self.iterable:
             val = tuple(val)
-        else:
-            val = default
-        
-        if val is None or len(val)==0: 
+            if not val:
+                return
+        elif val is None:
             return
         
-        yield self.identifier(
+        fixed = self.fixed(obj) if callable(self.fixed) else self.fixed
+        remappable = self.remappable(obj) if callable(self.remappable) else self.remappable
+    
+        yield Identifier(
             obj=obj,
-            id_val=val,
-            default=default,
-            remappable=obj_can_be_spawned(obj),
-            fixed=fixed
+            obj_prop_id =self.obj_prop_id,
+            id_val = val,
+            id_type = self.id_type,
+            default = default,
+            fixed = bool(fixed),
+            remappable = bool(remappable) and obj_can_be_spawned(obj),
+            reference = self.reference,
+            iterable = self.iterable,
+            id_min = self.id_min,
+            id_max = self.id_max,
+            actions = self.actions,
+            replace = self.replace,
         )
 
 
 class RuleHandler:
-    __slots__ = ("base","by_id")
-    
-    def __init__(self, base:tuple[IDRule], by_id:dict[int|str,tuple[IDRule]]):
-        self.base = base or tuple()
-        self.by_id = by_id or dict()
+    __slots__ = ("base", "by_id")
 
-    def get_ids(self, obj):
-        
+    def __init__(self, base: tuple[IDRule], by_id: dict[int | str, tuple[IDRule]]):
+        self.base  = base  or ()
+        self.by_id = by_id or {}
+
+    def get_ids(self, obj: Object):
         oid = obj.get(obj_prop.ID, obj_id.LEVEL_START)
-        
+
         rules = self.by_id.get(oid)
         if rules is not None:
             for rule in rules:
-                yield from rule(obj)
-        
+                yield from rule.get_ids(obj)
+
         if oid != obj_id.LEVEL_START and self.base:
             for rule in self.base:
-                yield from rule(obj)
+                yield from rule.get_ids(obj)
+
                 
 class IdentifierList:
     
     def __init__(self):
         self.ids = list()
         self.ignored = set()
-        self.min = -2147483648
-        self.max = 2147483647
+        self.min = ID_MIN
+        self.max = ID_MAX
     
     
     def get_ids(

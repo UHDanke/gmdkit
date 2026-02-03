@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.mappings import obj_id, obj_prop
-from gmdkit.serialization.id_classes import IDRule, RuleHandler
+from gmdkit.utils.id_classes import IDRule, RuleHandler
 {rule_funcs}
 
 

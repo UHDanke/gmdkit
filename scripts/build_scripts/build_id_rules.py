@@ -114,7 +114,7 @@ def main():
     )
     
     if unique_functions:
-        id_funcs = "from gmdkit.serialization.id_functions import (\n    " + (
+        id_funcs = "from gmdkit.utils.id_functions import (\n    " + (
             ",\n    ".join(unique_functions)
             ) + "\n)"
     else:
