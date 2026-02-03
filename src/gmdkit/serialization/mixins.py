@@ -155,7 +155,6 @@ class DataclassDecoderMixin:
     def from_args(cls, *args, **kwargs):
         
         decoder = cls.DECODER or dict_cast(get_type_hints(cls))
-        print(args)
         class_args = {}
         
         for field, arg in zip(fields(cls), args):
@@ -255,8 +254,6 @@ class DictDecoderMixin:
 
         tokens = string.split(separator)
         if len(tokens) % 2 != 0:
-            print(tokens)
-            print(cls)
             raise ValueError("Malformed input string: uneven key/value pairs")
         
         result = cls()
@@ -315,8 +312,11 @@ class ArrayDecoderMixin:
         if not string:
             return result
         
-        if end_sep and string.endswith(separator):
+        if string.endswith(separator):
             string = string[:-len(separator)]
+        
+        if string.startswith(separator):
+            string = string[len(separator):]
             
         tokens = string.split(separator)
         
