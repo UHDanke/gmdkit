@@ -4,7 +4,7 @@ from typing import Callable, Any
 # Package Imports
 from gmdkit.models.object import Object
 from gmdkit.mappings import obj_prop, obj_id
-from gmdkit.serialization.id_functions import obj_can_be_spawned
+from gmdkit.utils.id_functions import obj_can_be_spawned
 
 Func = Callable|None
 

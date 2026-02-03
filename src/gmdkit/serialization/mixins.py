@@ -155,7 +155,7 @@ class DataclassDecoderMixin:
     def from_args(cls, *args, **kwargs):
         
         decoder = cls.DECODER or dict_cast(get_type_hints(cls))
-            
+        print(args)
         class_args = {}
         
         for field, arg in zip(fields(cls), args):
@@ -255,6 +255,8 @@ class DictDecoderMixin:
 
         tokens = string.split(separator)
         if len(tokens) % 2 != 0:
+            print(tokens)
+            print(cls)
             raise ValueError("Malformed input string: uneven key/value pairs")
         
         result = cls()
@@ -289,7 +291,6 @@ class ArrayDecoderMixin:
     
     SEPARATOR: str = ','
     END_SEP: bool = False
-    END_SEP_PASS: bool = False
     GROUP_SIZE: int = 1
     ENCODER: ArrayEncoder = staticmethod(serialize)
     DECODER: ArrayDecoder | None = None
@@ -307,13 +308,17 @@ class ArrayDecoderMixin:
         separator = separator if separator is not None else cls.SEPARATOR
         end_sep = end_sep or cls.END_SEP
         group_size = group_size or cls.GROUP_SIZE
-        decoder = decoder or cls.DECODER or (lambda x: x)
+        decoder = decoder or cls.DECODER
 
         result = cls()
-        tokens = string.split(separator)
+
+        if not string:
+            return result
         
         if end_sep and string.endswith(separator):
             string = string[:-len(separator)]
+            
+        tokens = string.split(separator)
         
         if group_size > 1:
             if False: # if end_sep removed for testing
@@ -331,7 +336,7 @@ class ArrayDecoderMixin:
                 result.extend(decoder(token) for token in tokens)
             else:
                 result.extend(tokens)
-        
+                
         return result
     
     

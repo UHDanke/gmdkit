@@ -4,7 +4,7 @@ from dataclasses import dataclass
 # Package Imports
 from gmdkit.serialization.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
-from gmdkit.functions.misc import split_digit_list, join_digit_list
+from gmdkit.utils.misc import split_digit_list, join_digit_list
 
 class IntList(ArrayDecoderMixin,ListClass):
     

@@ -1,6 +1,5 @@
 # Imports
 from typing import Callable, Literal
-from itertools import islice
 from functools import partial
 from inspect import signature
 from os import PathLike
