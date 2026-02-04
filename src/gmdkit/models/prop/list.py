@@ -13,6 +13,7 @@ class IntList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = ","
     GROUP_SIZE = 1
+    ENCODER = str
     DECODER = int
         
     
