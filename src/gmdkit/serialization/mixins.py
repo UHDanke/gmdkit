@@ -16,13 +16,15 @@ from gmdkit.serialization.functions import (
 Decoder = Callable[[int|str, Any], tuple[str, Any]]
 DecoderWithKwargs = Callable[..., tuple[str, Any]]
 DictDecoder = Callable[[int|str, Any], tuple[Any, Any]]
-
 Encoder = Callable[[int|str, Any], tuple[str, str]]
 DataclassEncoder = Callable[[str, Any], tuple[str, str]]
 ArrayEncoder = Callable[[Any], str]
 ArrayDecoder = Callable[[Any], Any]
 
+
 class PlistDecoderMixin:
+    
+    __slots__ = ()
     
     ENCODER: Callable | None = None
     DECODER: Callable | None = None
@@ -93,7 +95,7 @@ class PlistDecoderMixin:
     def update(self, **kwargs):
         self.to_file(path=self.path, **kwargs)
     
-    
+   # TODO REDO 
     def reload(self, **kwargs):
         self.from_file(path=self.path, **kwargs)
     
@@ -344,9 +346,8 @@ class ArrayDecoderMixin:
             ) -> str:
         
         keep_sep = keep_sep or self.KEEP_SEP
-        separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR
         encoder = encoder or self.ENCODER or str
-
+        separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR or ''
         return separator.join(encoder(x) for x in self)
 
 
@@ -414,8 +415,8 @@ class DelimiterMixin:
             **kwargs
             ) -> Self:
         
-        start_delimiter = start_delimiter or cls.START_DELIMITER
-        end_delimiter = end_delimiter or cls.END_DELIMITER
+        start_delimiter = start_delimiter if start_delimiter is not None else cls.START_DELIMITER
+        end_delimiter = end_delimiter if end_delimiter is not None else cls.END_DELIMITER
         
         if start_delimiter: string = string.lstrip(start_delimiter)
         if end_delimiter: string = string.rstrip(end_delimiter)
@@ -431,8 +432,8 @@ class DelimiterMixin:
             **kwargs
             ) -> Self:
         
-        start_delimiter = start_delimiter or self.START_DELIMITER
-        end_delimiter = end_delimiter or self.END_DELIMITER
+        start_delimiter = start_delimiter if start_delimiter is not None else self.START_DELIMITER
+        end_delimiter = end_delimiter if end_delimiter is not None else self.END_DELIMITER
         
         string = super().to_string(*args, **kwargs)
         if string:

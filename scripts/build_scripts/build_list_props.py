@@ -6,6 +6,7 @@ TEMPLATE_PATH = "scripts/build_scripts/templates/casting_list_props.txt"
 FILEPATH = "src/gmdkit/casting/list_props.py"
 FOLDERPATH = "src/gmdkit/mappings/list_prop/"
 
+
 def get_lvl_types(gd_type, gd_format, key):
     
     match gd_type:
@@ -13,6 +14,9 @@ def get_lvl_types(gd_type, gd_format, key):
         case 'int' | 'integer' | 'number':
             
             match gd_format:
+                
+                case 'list type':
+                    return 'enums.ListType'
                 
                 case 'bool': 
                     return 'bool'
@@ -29,8 +33,13 @@ def get_lvl_types(gd_type, gd_format, key):
                     return 'IntList'
                         
                 case _: return 'str'
-                
+        
+        case 'dict':
+            if gd_format=="level map":
+                return "LevelMapping"
+            
         case _: return
+
 
 def decode_level_props(gd_type, gd_format, key):
     
@@ -52,14 +61,21 @@ def decode_level_props(gd_type, gd_format, key):
         case 'str' | 'string':
             match gd_format:              
                 
+                case 'base64':
+                    return 'decode_text'
+                
                 case 'int list':
                     return 'IntList.from_string'
                 
                 case _:
                     return
-                
+        case 'dict':
+            if gd_format=="level map":
+                return "LevelMapping.from_plist"
+            
         case _: return
-        
+
+
 def encode_level_props(gd_type, gd_format, key):
     
     match gd_type:
@@ -77,13 +93,20 @@ def encode_level_props(gd_type, gd_format, key):
         case 'str' | 'string':
             match gd_format:              
                 
+                case 'base64':
+                    return 'encode_text'
+                
                 case 'int list':
                     return 'to_string'
-
+                
                 case _: 
                     return
-                
+        case 'dict':
+            if gd_format=="level map":
+                return "to_plist"
+        
         case _: return
+
 
 def main():
     list_table = pd.read_csv(CSV_PATH)

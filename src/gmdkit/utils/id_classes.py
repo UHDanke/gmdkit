@@ -125,7 +125,7 @@ class IDRule:
         fixed = self.fixed(obj) if callable(self.fixed) else self.fixed
         remappable = self.remappable(obj) if callable(self.remappable) else self.remappable
     
-        yield Identifier(
+        return Identifier(
             obj=obj,
             obj_prop_id =self.obj_prop_id,
             id_val = val,

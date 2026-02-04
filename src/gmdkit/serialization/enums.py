@@ -53,18 +53,13 @@ class Easing(EnumClass):
     BACK_IN = 17
     BACK_OUT = 18
     
-     
-class ColorPlayer(EnumClass):
-    NONE = 0
-    PLAYER_1 = 1
-    PLAYER_2 = 2
-
 
 class ItemLabelAlignment(EnumClass):
     CENTER = 0
     LEFT = 1
     RIGHT = 2
-    
+
+
 class ItemLabelSpecialID(EnumClass):
     MAINTIME = -1
     POINTS = -2
@@ -119,7 +114,7 @@ class VolumeDirection(EnumClass):
     DOWN = 5
     UP = 6
     
-class ReverbPresets(EnumClass):
+class ReverbPreset(EnumClass):
     GENERIC = 0
     PADDED_CELL = 1
     ROOM = 2
@@ -162,7 +157,7 @@ class Option(EnumClass):
     IGNORE = 0
     ENABLE = 1
 
-class KeyframeSpinDir(EnumClass):
+class KeyframeSpin(EnumClass):
     NONE = 0
     CW = 1
     CCW = 2
@@ -244,7 +239,7 @@ class EffectSpecialCenter(EnumClass):
     CR = -10
     TR = -11
     
-class Edge(EnumClass):
+class CameraEdge(EnumClass):
     NONE = 0
     LEFT = 1
     RIGHT = 2
@@ -508,6 +503,15 @@ class LevelType(EnumClass):
     LOCAL = 2
     SAVED = 3
     ONLINE = 4
+    
+class ListType(EnumClass):
+    LOCAL = 2
+
+class TimelyType(EnumClass):
+    NONE = 0
+    DAILY = 1
+    WEEKLY = 2
+    EVENT = 3
 
 class LevelRating(EnumClass):
     NONE = 0

@@ -6,19 +6,45 @@ TEMPLATE_PATH = "scripts/build_scripts/templates/casting_lvl_props.txt"
 FILEPATH = "src/gmdkit/casting/level_props.py"
 FOLDERPATH = "src/gmdkit/mappings/lvl_prop/"
 
+
+def match_enum(enum_format):
+    
+    match enum_format:
+        case 'difficulty':
+            return 'enums.LevelDifficulty'
+        
+        case 'official songs':
+            return 'enums.OfficialSongs'
+        
+        case 'rating':
+            return 'enums.LevelRating'
+        
+        case 'level type':
+            return 'enums.LevelType'
+        
+        case 'epic rating':
+            return 'enums.EpicRating'
+        
+        case 'demon rating':
+            return 'enums.DemonRating'
+        
+        case _:
+            return
+
+
 def get_lvl_types(gd_type, gd_format, key):
     
     match gd_type:
         
         case 'int' | 'integer' | 'number':
             
-            match gd_format:
-                
-                case 'bool': 
-                    return 'bool'
-                
-                case _: return 'int'
-                
+            if (enum:=match_enum(gd_format)):
+                return enum
+            elif gd_format == 'bool':
+                return 'bool'
+            else:
+                return 'int'
+
         case 'float' | 'real':
             return 'float'
         
@@ -47,19 +73,21 @@ def decode_level_props(gd_type, gd_format, key):
         
         case 'int' | 'integer' | 'number':
             
-            match gd_format:
-                
-                case 'bool': 
-                    return 'bool'
-                
-                case _: 
-                    return
+            if (enum:=match_enum(gd_format)):
+                return enum
+            elif gd_format == 'bool':
+                return 'bool'
+            else:
+                return 'int'
                 
         case 'float' | 'real':
             return
         
         case 'str' | 'string':
             match gd_format:              
+                
+                case 'base64':
+                    return 'decode_text'
                 
                 case 'int list':
                     return 'IntList.from_string'
@@ -93,7 +121,10 @@ def encode_level_props(gd_type, gd_format, key):
             return
         
         case 'str' | 'string':
-            match gd_format:              
+            match gd_format:
+                
+                case 'base64':
+                    return 'encode_text'
                 
                 case 'int list':
                     return 'to_string'

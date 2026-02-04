@@ -287,8 +287,7 @@ class DictClass(dict):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        
+           
     @classmethod
     def fromkeys(cls, iterable, value: Any = None):
         return cls(dict.fromkeys(iterable, value))
@@ -313,6 +312,9 @@ class DictClass(dict):
             return NotImplemented
         return self.__class__(dict(other, **self))
     
+    @classmethod
+    def from_dict(cls, dictionary):
+        return cls(dictionary)
     
     def pluck(self, *keys:str, ignore_missing:bool=False) -> list:
         """

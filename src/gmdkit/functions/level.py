@@ -3,7 +3,8 @@ from gmdkit.mappings import lvl_prop
 from gmdkit.models.level import Level
 from gmdkit.serialization.enums import (
     LevelDifficulty, LevelRating, DemonRating, 
-    EpicRating, FeatureRating
+    EpicRating, FeatureRating,
+    TimelyType
 )
 
 def get_difficulty_rating(level:Level) -> LevelDifficulty:
@@ -80,4 +81,18 @@ def get_feature_rating(level:Level) -> FeatureRating:
             
             else:
                 return FeatureRating.UNRATED
+
+
+def get_timely_type(level:Level) -> TimelyType:
+    tid = level.get(lvl_prop.TIMELY_ID)
     
+    if tid is None:
+        return TimelyType.NONE
+    elif (0<tid<=10000):
+        return TimelyType.DAILY
+    elif (10000<tid<=20000):
+        return TimelyType.WEEKLY
+    elif (20000<tid<=30000):
+        return TimelyType.EVENT
+    else:
+        return TimelyType.NONE
