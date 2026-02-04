@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.serialization.type_cast import (
-    to_string,
+    to_string, to_plist,
     decode_text, encode_text
     )
 from gmdkit.serialization import enums
@@ -10,6 +10,7 @@ from gmdkit.models.prop.level_dict import LevelMapping
 LIST_DECODERS = {
     'k3': decode_text,
     'k15': bool,
+    'k21': enums.ListType.from_string,
     'k96': IntList.from_string,
     'k97': LevelMapping.from_plist,
 }

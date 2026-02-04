@@ -387,6 +387,14 @@ class DictClass(dict):
 
 class EnumClass(IntEnum):
     
+    
+    @classmethod
+    def from_string(cls, string: str):
+        return cls(int(string))
+
     @classmethod
     def _missing_(cls, value):
-        return int(value)
+        obj = int.__new__(cls, value)
+        obj._name_ = f"UNKNOWN_{value}"
+        obj._value_ = value
+        return obj

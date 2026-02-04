@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.serialization.type_cast import (
-    to_string,
+    to_string, to_plist,
     decode_text, encode_text
     )
 from gmdkit.serialization import enums

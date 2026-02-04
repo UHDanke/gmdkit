@@ -49,6 +49,9 @@ def decode_level_props(gd_type, gd_format, key):
             
             match gd_format:
                 
+                case 'list type':
+                    return 'enums.ListType.from_string'
+                
                 case 'bool': 
                     return 'bool'
                 

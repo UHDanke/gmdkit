@@ -74,7 +74,7 @@ def decode_level_props(gd_type, gd_format, key):
         case 'int' | 'integer' | 'number':
             
             if (enum:=match_enum(gd_format)):
-                return enum
+                return enum+'.from_string'
             elif gd_format == 'bool':
                 return 'bool'
             else:

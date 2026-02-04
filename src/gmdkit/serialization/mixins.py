@@ -96,9 +96,9 @@ class PlistDecoderMixin:
         self.to_file(path=self.path, **kwargs)
     
    # TODO REDO 
-    def reload(self, **kwargs):
-        self.from_file(path=self.path, **kwargs)
-    
+ 
+   #def reload(self, **kwargs):
+   #    self.from_file(path=self.path, **kwargs)
     
     @classmethod
     def from_string(cls, string:str, **kwargs):

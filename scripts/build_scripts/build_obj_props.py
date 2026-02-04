@@ -175,7 +175,7 @@ def decode_obj_props(gd_type, gd_format, key):
         
         case 'int' | 'integer' | 'number':
             if (enum:=match_enum(gd_format)):
-                return enum
+                return enum+'.from_string'
             else:
                 return 'int'
         
