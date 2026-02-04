@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from gmdkit.serialization.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
 from gmdkit.utils.misc import split_digit_list, join_digit_list
+from gmdkit.serialization.enums import GameEvents
 
 class IntList(ArrayDecoderMixin,ListClass):
     
@@ -32,6 +33,12 @@ class IDList(IntList):
         
         self[:] = new
 
+
+class EventList(IntList):
+    
+    __slots__ = ()
+    DECODER = GameEvents.from_string
+    
 
 class GroupList(IDList):
     

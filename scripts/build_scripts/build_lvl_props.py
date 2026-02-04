@@ -170,7 +170,6 @@ def main():
                   for _, row in level_class.iterrows() if str(row[column]) not in ("nan","None")]
         
         values.sort(key=lambda x: sort_number(x[0]))
-        print(values)
         return "\n".join([f"    {repr(x[0])}: {x[1]}," for x in values])
          
     # Generate dictionary entries

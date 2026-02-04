@@ -146,8 +146,11 @@ def get_obj_types(gd_type, gd_format, key):
                 case 'particle':
                     return 'Particle'
                 
-                case 'groups' | 'parent_groups' | 'events':
+                case 'groups' | 'parent_groups':
                     return 'IDList'
+                
+                case  'events':
+                    return "EventList"
                 
                 case  'weights' | 'sequence' | 'group weights' | 'group counts':
                     return 'IntPairList'
@@ -198,8 +201,11 @@ def decode_obj_props(gd_type, gd_format, key):
                 case 'particle':
                     return 'Particle.from_string'
                 
-                case 'groups' | 'parent_groups' | 'events':
+                case 'groups' | 'parent_groups':
                     return 'IDList.from_string'
+                
+                case  'events':
+                    return "EventList"
                 
                 case  'weights' | 'sequence' | 'group weights' | 'group counts':
                     return 'IntPairList.from_string'
@@ -301,7 +307,6 @@ def main():
                       for _, row in prop_class.iterrows() if str(row[column]) not in ("nan","None")]
             
             values.sort(key=lambda x: sort_number(x[0]))
-            print(values)
             return "\n".join([f"    {repr(x[0])}: {x[1]}," for x in values])
          
         prop_decoders = gen_dict("decode")

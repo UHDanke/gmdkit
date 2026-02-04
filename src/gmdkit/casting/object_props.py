@@ -6,7 +6,7 @@ from gmdkit.serialization.type_cast import (
     decode_text, encode_text
     )
 from gmdkit.serialization import enums
-from gmdkit.models.prop.list import IDList, IntPairList, RemapList
+from gmdkit.models.prop.list import IDList, EventList, IntPairList, RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.particle import Particle
@@ -384,7 +384,7 @@ PROPERTY_DECODERS = {
     425: int,
     426: int,
     428: to_bool,
-    430: IDList.from_string,
+    430: EventList,
     431: to_bool,
     432: int,
     433: to_bool,
@@ -1437,7 +1437,7 @@ PROPERTY_TYPES = {
     425: int,
     426: int,
     428: bool,
-    430: IDList,
+    430: EventList,
     431: bool,
     432: int,
     433: bool,
