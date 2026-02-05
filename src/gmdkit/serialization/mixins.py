@@ -92,13 +92,9 @@ class PlistDecoderMixin:
         to_plist_file(data, path)
     
     
-    def update(self, **kwargs):
+    def update_file(self, **kwargs):
         self.to_file(path=self.path, **kwargs)
-    
-   # TODO REDO 
- 
-   #def reload(self, **kwargs):
-   #    self.from_file(path=self.path, **kwargs)
+        
     
     @classmethod
     def from_string(cls, string:str, **kwargs):
@@ -121,6 +117,12 @@ class PlistDictDecoderMixin(PlistDecoderMixin):
     
     PLIST_FORMAT = staticmethod(dict_wrapper)
     SELF_FORMAT = staticmethod(dict_wrapper)
+    
+    def reload_file(self, **kwargs):
+        new = type(self).from_file(path=self.path, **kwargs)
+        self.clear()
+        self.update(new)
+        return self
 
 
 class PlistArrayDecoderMixin(PlistDecoderMixin):
@@ -129,8 +131,13 @@ class PlistArrayDecoderMixin(PlistDecoderMixin):
     
     PLIST_FORMAT = staticmethod(array_wrapper)
     SELF_FORMAT = staticmethod(array_wrapper)
-    
-    
+
+    def reload_file(self, **kwargs):
+        new = type(self).from_file(path=self.path, **kwargs)
+        self[:] = new
+        return self
+
+
 class DataclassDecoderMixin:
     
     __slots__ = ()
@@ -351,21 +358,29 @@ class ArrayDecoderMixin:
         return separator.join(encoder(x) for x in self)
 
 
-class TypedDictMixin:
+class TypeDictMixin:
     
-    KEY_TYPES: dict[str, Any] | None = None
+    KEY_TYPES: dict[Any, Callable] | None = None
+    TYPE_DEFAULT: Callable = str
     
+    def key_type(self, key:Any):
+        kt = self.KEY_TYPES.get(key)
+        
+        if kt is not None:
+            return kt
+        else:
+            return self.TYPE_DEFAULT
+        
     def coerce(self, key, value):
-        key_type = self.KEY_TYPES.get(key)
+        kt = self.key_type(key)
+        self[key] = kt(value)
         
-        if callable(key_type):
-            value = key_type(value)
-        
-        self[key] = value
+    def coerce_dict(self, dictionary:dict):
+        for k, v in dictionary.items():
+            self.coerce(k,v)
 
 
-
-class DictDefaultMixin:
+class DictDefaultMixin(TypeDictMixin):
     
     KEY_DEFAULTS: dict[str, Any] | None = None
     
