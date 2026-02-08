@@ -32,18 +32,19 @@ class ObjectString(GzipString):
         return (self.start, self.objects)
     
         
-    def save(self, start:Object|None=None, objects:ObjectList|None=None):
-        
-        start = start or getattr(self, "start", None)
-        objects =  objects or getattr(self, "objects", None)
-        
+    def save(
+        self,
+        start: Object | None = None,
+        objects: ObjectList | None = None,
+    ):
+        start = start if start is not None else getattr(self, "start", None)
+        objects = objects if objects is not None else getattr(self, "objects", None)
+    
         if start is None or objects is None:
             return self.string
     
-        string = (ObjectList().wrap(start) + objects).to_string()
-        
+        string = start.to_string() + objects.to_string()
         super().save(string)
-        
         return self.string
     
 

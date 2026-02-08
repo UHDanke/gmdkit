@@ -4,10 +4,10 @@ from pathlib import Path
 from os import PathLike
 
 # Package Imports
+from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.types import ListClass, DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
 from gmdkit.serialization.type_cast import dict_cast, to_plist
-from gmdkit.models.prop.gzip import GzipString
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
@@ -57,37 +57,45 @@ class Level(PlistDictDecoderMixin,DictClass):
         return super().to_plist(**kwargs)
 
         
-    def load(self, keys:Iterable|None=None, copy_attributes:bool=True):
-        
-        keys = keys or self.keys()
-        
-        for key in keys:
-            
-            value = self.get(key)
-            
-            if issubclass(type(value), GzipString):
-                value.load()
-                
-                if not copy_attributes: continue
-                
-                for attr, value in vars(value).items():
-                    
-                    if attr.startswith("_"): continue
-                    if attr == "string": continue
-                    
-                    setattr(self, attr, value)
+    def load(self, keys:Iterable|None=None):
+        keys = list(keys or self.keys())
     
+        for key in keys:
+            value = self.get(key)
+            load = getattr(value, "load", None)
+    
+            if load is not None and callable(load):
+                load()
+        
             
     def save(self, keys:Iterable|None=None):
-        
-        keys = keys or self.keys()
-        
+        keys = list(keys or self.keys())
+    
         for key in keys:
-            
             value = self.get(key)
-                        
-            if issubclass(type(value), GzipString):
-                value.save()
+            save = getattr(value, "save", None)
+    
+            if save is not None and callable(save):
+                save()
+        
+    @property
+    def start(self) -> Object|None:
+        objstr = self.get(lvl_prop.OBJECT_STRING)
+        if objstr is None:
+            return None
+    
+        objects = getattr(objstr, "start", None)
+        return objects
+    
+    @property
+    def objects(self) -> ObjectList|None:
+        objstr = self.get(lvl_prop.OBJECT_STRING)
+        if objstr is None:
+            return None
+    
+        objects = getattr(objstr, "objects", None)
+        return objects
+    
     
     @classmethod
     def default(cls, name:str,load:bool=True):
