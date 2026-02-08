@@ -79,22 +79,29 @@ class Level(PlistDictDecoderMixin,DictClass):
                 save()
         
     @property
-    def start(self) -> Object|None:
+    def start(self) -> Object:
         objstr = self.get(lvl_prop.OBJECT_STRING)
+        
         if objstr is None:
-            return None
+            raise RuntimeError("Object string is missing.")
+        
+        if not hasattr(objstr, "start"):
+            raise RuntimeError("Object string is not loaded.")
+
+        return getattr(objstr, "start")
     
-        objects = getattr(objstr, "start", None)
-        return objects
     
     @property
-    def objects(self) -> ObjectList|None:
+    def objects(self) -> ObjectList:
         objstr = self.get(lvl_prop.OBJECT_STRING)
+        
         if objstr is None:
-            return None
-    
-        objects = getattr(objstr, "objects", None)
-        return objects
+            raise RuntimeError("Object string is missing.")
+        
+        if not hasattr(objstr, "objects"):
+            raise RuntimeError("Object string is not loaded.")
+
+        return getattr(objstr, "objects")
     
     
     @classmethod
