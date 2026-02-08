@@ -2,6 +2,7 @@
 from typing import Callable, Literal
 from functools import partial
 from inspect import signature
+from itertools import cycle
 from os import PathLike
 import xml.etree.ElementTree as ET
 import base64
@@ -12,10 +13,8 @@ import gzip
 from gmdkit.serialization.type_cast import from_float
 
 
-def xor(data:bytes, key:bytes) -> bytes:
-    l = len(key)
-    return bytes(data[i] ^ key[i % l] for i in range(len(data)))
-
+def xor(data: bytes, key: bytes) -> bytes:
+    return bytes(d ^ k for d, k in zip(data, cycle(key)))
 
 def decode_string(
         string:str,
