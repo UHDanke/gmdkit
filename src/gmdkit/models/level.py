@@ -122,12 +122,7 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     
     DECODER = Level.from_plist
     ENCODER = staticmethod(to_plist)
-    
-    
-    def __init__(self, *args):
-        
-        super().__init__(*args)      
-    
+
 
     @classmethod
     def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs):

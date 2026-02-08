@@ -1,14 +1,15 @@
 # Imports
-from collections.abc import Iterable
+from pathlib import Path
 from os import PathLike
 
 # Package Imports
-from gmdkit.models.level import Level, LevelList
+from gmdkit.serialization.types import ListClass, DictClass
+from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
 from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.casting.list_props import LIST_ENCODERS, LIST_DECODERS
+from gmdkit.mappings import list_prop
 
-
-class LevelPack(Level):
+class LevelPack(PlistDictDecoderMixin,DictClass):
     
     __slots__ = ()
     
@@ -18,18 +19,20 @@ class LevelPack(Level):
     def to_file(self, 
             path:str|PathLike|None=None, 
             extension:str="gmdl", 
-            save:bool=True, 
-            save_keys:Iterable|None=None, 
             **kwargs):
         
-        return super().to_file(
-                path=path,
-                extension=extension,
-                save=save,
-                save_keys=save_keys
-            )
+        if path is None: 
+            path = Path()
+        else:
+            path = Path(path)
+        
+        if not path.suffix:
+            path = (path / self[list_prop.NAME]).with_suffix('.' + extension.lstrip('.'))
+            
+        super().to_file(path=path, **kwargs)
 
-class LevelPackList(LevelList):
+        
+class LevelPackList(PlistArrayDecoderMixin,ListClass):
     
     __slots__ = ()
     
