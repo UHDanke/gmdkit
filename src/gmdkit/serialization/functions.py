@@ -213,14 +213,12 @@ def to_plist_file(data:dict|list|tuple, path:str|PathLike):
     tree.write(path, xml_declaration=True)
 
 
-def dict_wrapper(data, function, **kwargs):
-    
-    return {k: v for k, v in (function(k, v, **kwargs) for k, v in data.items())}
+def dict_wrapper(data, func, **kwargs):
+    return dict(func(k, v, **kwargs) for k, v in data.items())
 
 
-def array_wrapper(data, function, **kwargs):
-    
-    return [function(v,**kwargs) for v in data]
+def array_wrapper(data, func, **kwargs):
+    return [func(v,**kwargs) for v in data]
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:

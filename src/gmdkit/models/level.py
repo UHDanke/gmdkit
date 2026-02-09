@@ -1,5 +1,7 @@
 # Imports
 from collections.abc import Iterable
+from functools import partial
+from typing import Any
 from pathlib import Path
 from os import PathLike
 
@@ -18,18 +20,11 @@ class Level(PlistDictDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(LEVEL_DECODERS))
     ENCODER = staticmethod(dict_cast(LEVEL_ENCODERS))
     
-    
-    def __init__(self, *args, load:bool=False, load_keys:Iterable|None=None,**kwargs):
-        
-        super().__init__(*args, **kwargs)
-        
-        if load: self.load(keys=load_keys)
-
 
     @classmethod
-    def from_file(cls, path:str|PathLike, load:bool=True, load_keys:Iterable|None=None, **kwargs):
+    def from_file(cls, path:str|PathLike, **kwargs):
         
-        return super().from_file(path, load=load, load_keys=load_keys, **kwargs)
+        return super().from_file(path, **kwargs)
     
     
     def to_file(self, 
@@ -48,8 +43,18 @@ class Level(PlistDictDecoderMixin,DictClass):
             path = (path / self[lvl_prop.NAME]).with_suffix('.' + extension.lstrip('.'))
             
         super().to_file(path=path, save=save, save_keys=save_keys, **kwargs)
-
+        
+        
+    @classmethod
+    def from_plist(cls, data:Any, load:bool=True, load_keys:Iterable|None=None, **kwargs):
+        
+        new = super().from_plist(data, **kwargs)
+        
+        if load: new.load(keys=load_keys)
+        
+        return new
     
+
     def to_plist(self, save:bool=True, save_keys:Iterable|None=None, **kwargs):
         
         if save: self.save(keys=save_keys)
@@ -127,17 +132,13 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     @classmethod
     def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs):
         
-        fkwargs = kwargs.setdefault('fkwargs', {})
-        fkwargs.setdefault('load', load)
-        fkwargs.setdefault('load_keys', load_keys)
+        decoder = partial(cls.DECODER, load=load, load_keys=load_keys)
         
-        return super().from_plist(data, **kwargs)
+        return super().from_plist(data, decoder=decoder, **kwargs)
         
     
     def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable|None=None, **kwargs):
         
-        fkwargs = kwargs.setdefault('fkwargs', {})
-        fkwargs.setdefault('save', save)
-        fkwargs.setdefault('save_keys', save_keys)
+        encoder = partial(self.ENCODER, save=save, save_keys=save_keys)
 
-        super().to_plist(path, **kwargs)
+        super().to_plist(path, encoder=encoder, **kwargs)

@@ -1,6 +1,6 @@
 # Imports
 from collections.abc import Iterable
-from typing import Self
+from functools import partial
 from os import PathLike
 
 # Package Imports
@@ -12,32 +12,42 @@ from gmdkit.serialization.mixins import PlistDictDecoderMixin, LoadFileMixin
 from gmdkit.constants.paths.save import LOCAL_LEVELS_PATH
 from gmdkit.mappings import lvl_save
 
+
 class LevelSave(LoadFileMixin,PlistDictDecoderMixin,DictClass):
     
     DEFAULT_PATH = LOCAL_LEVELS_PATH
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
     
-    DECODER = staticmethod(dict_cast({"LLM_01": LevelList.from_plist,"LLM_03": LevelPackList.from_plist}))   
-    ENCODER = staticmethod(to_plist)    
+    DECODER = staticmethod(dict_cast({
+        "LLM_01": LevelList.from_plist,
+        "LLM_03": LevelPackList.from_plist    
+        }))   
+    ENCODER = staticmethod(dict_cast({
+        "LLM_01": to_plist,
+        "LLM_03": to_plist   
+        }))   
+    
     
     @classmethod
-    def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs) -> Self:
+    def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs):
         
-        fkwargs = kwargs.setdefault('fkwargs', {})
-        fkwargs.setdefault('load', load)
-        fkwargs.setdefault('load_keys', load_keys)
+        decoder = dict_cast({
+            "LLM_01": partial(LevelList.from_plist, load=load, load_keys=load_keys),
+            "LLM_03": LevelPackList.from_plist    
+            })
         
-        return super().from_plist(data, **kwargs)
+        return super().from_plist(data, decoder=decoder, **kwargs)
         
     
     def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable|None=None, **kwargs):
         
-        fkwargs = kwargs.setdefault('fkwargs', {})
-        fkwargs.setdefault('save', save)
-        fkwargs.setdefault('save_keys', save_keys)
-
-        super().to_plist(path, **kwargs)
+        encoder = dict_cast({
+            "LLM_01": partial(to_plist, save=save, save_keys=save_keys),
+            "LLM_03": to_plist   
+            })
+        
+        super().to_plist(path, encoder=encoder, **kwargs)
     
 
 if __name__ == "__main__":

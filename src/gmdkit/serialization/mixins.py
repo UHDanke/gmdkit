@@ -38,8 +38,7 @@ class PlistDecoderMixin:
             cls, 
             data:Any, 
             decoder:Callable|None=None,
-            self_format:Callable|None=None, 
-            fkwargs:dict[str, Any]|None=None,
+            self_format:Callable|None=None,
             **kwargs: Any
             ) -> Self:
         
@@ -47,29 +46,27 @@ class PlistDecoderMixin:
         self_format = self_format or cls.SELF_FORMAT
         
         if decoder is None or not callable(decoder) or self_format is None or not callable(self_format):
-            return cls(data, **kwargs)
+            return cls(data)
         
-        fkwargs = fkwargs or {}
-        new = self_format(data, decoder, **fkwargs)
+        new = self_format(data, decoder, **kwargs)
         
-        return cls(new, **kwargs)
+        return cls(new)
     
         
     def to_plist(
             self, 
             encoder:Callable|None=None, 
             plist_format:Callable|None=None,
-            fkwargs:dict[str, Any]|None=None
+            **kwargs
             ) -> Any:
         
-        encoder = encoder or self.ENCODER or (lambda x: x)
+        encoder = encoder or self.ENCODER
         plist_format = plist_format or self.PLIST_FORMAT
         
         if encoder is None or not callable(encoder) or plist_format is None or not callable(plist_format):
             return self
-        
-        fkwargs = fkwargs or {}
-        new = plist_format(self, encoder, **fkwargs)
+
+        new = plist_format(self, encoder, **kwargs)
         
         return new
     
