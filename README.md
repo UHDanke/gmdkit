@@ -42,10 +42,10 @@ Importing, modifying a level and saving it:
 
 ```python
 # import level
-from gmdkit.models.level import Level
+from gmdkit import Level
 
 # import object
-from gmdkit.models.object import Object
+from gmdkit import Object
 
 # import property mappings
 from gmdkit.mappings import obj_prop
@@ -61,7 +61,7 @@ start = level.start
 
 # get level objects as an ObjectList()
 # object lists subclass list() so they can use all list methods alongside the ones defined by ListClass
-# level.objects WILL throw AttributeError() if the level lacks an object string,
+# level.objects WILL throw an error if the level lacks an object string,
 # or if you passed load = False to Level.from_file(), which skips loading objects
 # LevelSave by default does not load the objects of levels
 # so for any level you want to edit the objects of you must call level.load() first
