@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.serialization.type_cast import dict_cast, serialize, to_string
-from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin
+from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin
 from gmdkit.serialization.types import DictClass, ListClass
 from gmdkit.casting.color import COLOR_DECODERS, COLOR_ENCODERS
 from gmdkit.mappings import color_prop
@@ -47,12 +47,12 @@ class Color(DictDecoderMixin,DictClass):
         return "#{:02X}{:02X}{:02X}".format(r, g, b)
 
 
-class ColorList(ArrayDecoderMixin,ListClass):
+class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass):
 
     __slots__ = ()
     
     SEPARATOR = '|'
-    KEEP_SEP = True
+    END_DELIMITER = "|"
     DECODER = Color.from_string
     ENCODER = staticmethod(to_string)
     
