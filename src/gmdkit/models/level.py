@@ -4,6 +4,7 @@ from functools import partial
 from typing import Any
 from pathlib import Path
 from os import PathLike
+from glob import glob
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
@@ -20,13 +21,7 @@ class Level(PlistDictDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(LEVEL_DECODERS))
     ENCODER = staticmethod(dict_cast(LEVEL_ENCODERS))
     
-
-    @classmethod
-    def from_file(cls, path:str|PathLike, **kwargs):
-        
-        return super().from_file(path, **kwargs)
-    
-    
+   
     def to_file(self, 
             path:str|PathLike|None=None, 
             extension:str="gmd", 
@@ -127,6 +122,21 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     
     DECODER = Level.from_plist
     ENCODER = staticmethod(to_plist)
+    
+    
+    @classmethod
+    def from_folder(cls, path:str|PathLike, extension:str='.gmd'):
+        
+        new = cls()
+        
+        folder_path = str(Path(path) / ('*' + extension))
+        
+        for file in glob(folder_path):
+            level = Level.from_file(file)
+            
+            new.append(level)
+        
+        return new
 
 
     @classmethod

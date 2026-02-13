@@ -384,7 +384,7 @@ PROPERTY_DECODERS = {
     425: int,
     426: int,
     428: to_bool,
-    430: EventList,
+    430: EventList.from_string,
     431: to_bool,
     432: int,
     433: to_bool,

@@ -205,7 +205,7 @@ def decode_obj_props(gd_type, gd_format, key):
                     return 'IDList.from_string'
                 
                 case  'events':
-                    return "EventList"
+                    return "EventList.from_string"
                 
                 case  'weights' | 'sequence' | 'group weights' | 'group counts':
                     return 'IntPairList.from_string'

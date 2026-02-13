@@ -1,8 +1,7 @@
 # Imports 
-import glob
-from pathlib import Path
 from copy import deepcopy
 from typing import Literal, Callable
+
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id, color_prop, color_id
 from gmdkit.models.object import Object, ObjectList
@@ -11,24 +10,7 @@ from gmdkit.models.level import Level, LevelList
 from gmdkit.functions.object import offset_position
 from gmdkit.functions.remapping import regroup, compile_id_context
 from gmdkit.functions.color import create_color_triggers
-from gmdkit.functions.misc import next_free
-
-
-def load_folder(path, extension:str='.gmd') -> LevelList:
-    
-    level_list = LevelList()
-    
-    folder_path = str(Path(path) / ('*' + extension))
-    files = glob.glob(folder_path)
-    
-    for file in files:
-        print(file)
-        level = Level.from_file(file)
-        
-        level_list.append(level)
-    
-    
-    return level_list
+from gmdkit.utils.misc import next_free
 
 
 def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:int=30):
@@ -57,6 +39,8 @@ def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:
                 i += bounds[4]-bounds[0] + block_offset * 30
     
         i = i // 30 * 30
+
+
 
 
 def merge_levels(level_list:LevelList, override_colors:bool=True):
@@ -111,6 +95,7 @@ def obj_list_group(obj_list:ObjectList):
     g, = next_free(values=ids["group_id"].get_ids(),vmin=1,vmax=9999,count=1)
     add_groups(obj_list,{g})
     return g,
+
 
 def level_add_toggles(lvl_list:LevelList):
     init_toggles = ObjectList()

@@ -38,6 +38,9 @@ class IDList(IntList):
 class EventList(IntList):
     
     __slots__ = ()
+    
+    SEPARATOR = "."
+    
     DECODER = GameEvents.from_string
     
 
