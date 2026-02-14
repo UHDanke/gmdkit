@@ -78,7 +78,7 @@ def decode_level_props(gd_type, gd_format, key):
             elif gd_format == 'bool':
                 return 'bool'
             else:
-                return 'int'
+                return
                 
         case 'float' | 'real':
             return

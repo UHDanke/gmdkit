@@ -1,11 +1,21 @@
 # Imports
 from dataclasses import fields
-from typing import Callable, Any, Self, get_type_hints, Literal
-from os import PathLike
+from typing import Callable, Any, Self, get_type_hints, Literal, Optional, TYPE_CHECKING
 
 # Package Imports
 from gmdkit.serialization import options
-from gmdkit.serialization.type_cast import serialize, dict_cast, decode_funcs
+from gmdkit.serialization.type_cast import (
+    serialize, dict_serializer,
+    dict_cast, 
+    decode_funcs
+)
+from gmdkit.serialization.typing import (
+    PathString,
+    StringDecoder, StringEncoder,
+    StringDictDecoder, StringDictEncoder,
+    PlistWrapper, DictWrapper, ArrayWrapper,
+    Caster, DictCaster
+)
 from gmdkit.serialization.functions import (
     decode_string, encode_string, 
     from_plist_file, to_plist_file, 
@@ -13,32 +23,22 @@ from gmdkit.serialization.functions import (
     dict_wrapper, array_wrapper
 )
 
-Decoder = Callable[[int|str, Any], tuple[str, Any]]
-DecoderWithKwargs = Callable[..., tuple[str, Any]]
-DictDecoder = Callable[[int|str, Any], tuple[Any, Any]]
-Encoder = Callable[[int|str, Any], tuple[str, str]]
-DataclassEncoder = Callable[[str, Any], tuple[str, str]]
-ArrayEncoder = Callable[[Any], str]
-ArrayDecoder = Callable[[Any], Any]
-
 
 class PlistDecoderMixin:
     
-    __slots__ = ()
-    
-    ENCODER: Callable | None = None
-    DECODER: Callable | None = None
-    PLIST_FORMAT: Callable | None = None
-    SELF_FORMAT: Callable | None = None
-    path: str | PathLike | None = None
+    ENCODER: Optional[Caster] = None
+    DECODER: Optional[Caster] = None
+    PLIST_FORMAT: Optional[PlistWrapper] = None
+    SELF_FORMAT: Optional[PlistWrapper] = None
+    path: Optional[PathString] = None
     
     
     @classmethod
     def from_plist(
             cls, 
             data:Any, 
-            decoder:Callable|None=None,
-            self_format:Callable|None=None,
+            decoder:Optional[Caster]=None,
+            self_format:Optional[PlistWrapper]=None,
             **kwargs: Any
             ) -> Self:
         
@@ -55,8 +55,8 @@ class PlistDecoderMixin:
         
     def to_plist(
             self, 
-            encoder:Callable|None=None, 
-            plist_format:Callable|None=None,
+            encoder:Optional[Caster]=None, 
+            plist_format:Optional[PlistWrapper]=None,
             **kwargs
             ) -> Any:
         
@@ -72,7 +72,7 @@ class PlistDecoderMixin:
     
     
     @classmethod
-    def from_file(cls, path:str|PathLike, **kwargs) -> Self:
+    def from_file(cls, path:PathString, **kwargs) -> Self:
         
         parsed = from_plist_file(path)
         
@@ -82,7 +82,7 @@ class PlistDecoderMixin:
         return new
     
     
-    def to_file(self, path:str|PathLike, **kwargs):
+    def to_file(self, path:PathString, **kwargs):
             
         data = self.to_plist(**kwargs)
         
@@ -94,14 +94,14 @@ class PlistDecoderMixin:
         
     
     @classmethod
-    def from_string(cls, string:str, **kwargs):
+    def from_string(cls, string:str, **kwargs) -> Self:
         
         parsed = from_plist_string(string)
         
         return cls.from_plist(parsed, **kwargs)
     
     
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs) -> str:
         
         data = self.to_plist(**kwargs)
         
@@ -110,39 +110,71 @@ class PlistDecoderMixin:
 
 class PlistDictDecoderMixin(PlistDecoderMixin):
     
-    __slots__ = ()
+    ENCODER: Optional[DictCaster]
+    DECODER: Optional[DictCaster] 
+    PLIST_FORMAT: DictWrapper = staticmethod(dict_wrapper)
+    SELF_FORMAT: DictWrapper = staticmethod(dict_wrapper)
     
-    PLIST_FORMAT = staticmethod(dict_wrapper)
-    SELF_FORMAT = staticmethod(dict_wrapper)
-    
-    def reload_file(self, **kwargs):
+    def reload_file(self, **kwargs) -> Self:
         new = type(self).from_file(path=self.path, **kwargs)
         self.clear()
         self.update(new)
         return self
 
+    if TYPE_CHECKING:
+        @classmethod
+        def from_plist(
+            cls, 
+            data: dict, 
+            decoder: Optional[DictCaster] = None, 
+            self_format: Optional[DictWrapper] = None, 
+            **kwargs: Any
+        ) -> Self: ...
+        
+        def to_plist(
+            self, 
+            encoder: Optional[DictCaster] = None, 
+            plist_format: Optional[DictWrapper] = None, 
+            **kwargs
+        ) -> dict: ...
+        
 
 class PlistArrayDecoderMixin(PlistDecoderMixin):
     
-    __slots__ = ()
-    
-    PLIST_FORMAT = staticmethod(array_wrapper)
-    SELF_FORMAT = staticmethod(array_wrapper)
+    ENCODER: Optional[Caster]
+    DECODER: Optional[Caster] 
+    PLIST_FORMAT: ArrayWrapper = staticmethod(array_wrapper)
+    SELF_FORMAT: ArrayWrapper = staticmethod(array_wrapper)
 
-    def reload_file(self, **kwargs):
+    def reload_file(self, **kwargs) -> Self:
         new = type(self).from_file(path=self.path, **kwargs)
         self[:] = new
         return self
 
+    if TYPE_CHECKING:
+        @classmethod
+        def from_plist(
+            cls, 
+            data: list, 
+            decoder: Optional[Caster] = None, 
+            self_format: Optional[ArrayWrapper] = None, 
+            **kwargs: Any
+        ) -> Self: ...
+        
+        def to_plist(
+            self, 
+            encoder: Optional[Caster] = None, 
+            plist_format: Optional[ArrayWrapper] = None, 
+            **kwargs
+        ) -> list: ...
+
 
 class DataclassDecoderMixin:
     
-    __slots__ = ()
-    
     SEPARATOR: str = ','
     LIST_FORMAT: bool = True
-    ENCODER: DataclassEncoder = staticmethod(lambda key, value: (key,serialize(value)))
-    DECODER: DecoderWithKwargs | None = None
+    ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
+    DECODER: Optional[StringDictDecoder] = None
     
     
     def __init_subclass__(cls, **kwargs):
@@ -179,9 +211,9 @@ class DataclassDecoderMixin:
     def from_string(
             cls, 
             string:str, 
-            separator:str|None=None, 
-            list_format:bool|None=None, 
-            decoder:DecoderWithKwargs|None=None
+            separator:Optional[str]=None, 
+            list_format:Optional[bool]=None, 
+            decoder:Optional[StringDictDecoder]=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -216,9 +248,9 @@ class DataclassDecoderMixin:
     
     def to_string(
             self, 
-            separator:str|None=None, 
-            list_format:bool|None=None, 
-            encoder:DataclassEncoder|None=None
+            separator:Optional[str]=None, 
+            list_format:Optional[bool]=None, 
+            encoder:Optional[StringDictEncoder]=None
             ) -> str:
         
         separator = separator if separator is not None else self.SEPARATOR
@@ -239,20 +271,18 @@ class DataclassDecoderMixin:
        
     
 class DictDecoderMixin:
-
-    __slots__ = ()
     
     SEPARATOR: str = ','
-    ENCODER: Encoder = staticmethod(lambda key, value: (str(key),serialize(value)))
-    DECODER: DictDecoder | None = None
+    ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
+    DECODER: Optional[StringDictDecoder] = None
     
     @classmethod
     def from_string(
             cls, 
             string:str, 
-            separator:str|None=None, 
-            decoder:DictDecoder|None=None,
-            condition:Callable|None=None
+            separator:Optional[str]=None, 
+            decoder:Optional[StringDictDecoder]=None,
+            condition:Optional[Callable]=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -273,9 +303,9 @@ class DictDecoderMixin:
     
     def to_string(
             self, 
-            separator:str|None=None, 
-            encoder:Encoder|None=None,
-            condition:Callable|None=None
+            separator:Optional[str]=None, 
+            encoder:Optional[StringDictEncoder]=None,
+            condition:Optional[Callable]=None
             ) -> str:
         separator = separator or self.SEPARATOR
         encoder = encoder or self.ENCODER
@@ -290,22 +320,20 @@ class DictDecoderMixin:
 
 class ArrayDecoderMixin:
     
-    __slots__ = ()
-    
     SEPARATOR: str = ','
     KEEP_SEP: bool = False
     GROUP_SIZE: int = 1
-    ENCODER: ArrayEncoder = staticmethod(serialize)
-    DECODER: ArrayDecoder | None = None
+    ENCODER: Optional[StringEncoder] = staticmethod(serialize)
+    DECODER: Optional[StringDecoder] = None
     
     @classmethod
     def from_string(
             cls, 
             string:str, 
-            separator:str|None=None,
-            keep_sep:bool|None=None,
-            group_size:int|None=None, 
-            decoder:ArrayDecoder|None=None
+            separator:Optional[str]=None,
+            keep_sep:Optional[bool]=None,
+            group_size:Optional[int]=None, 
+            decoder:Optional[StringDecoder]=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -344,9 +372,9 @@ class ArrayDecoderMixin:
     
     def to_string(
             self, 
-            separator:str|None=None,
-            keep_sep:bool|None=None,
-            encoder:ArrayEncoder|None=None
+            separator:Optional[str]=None,
+            keep_sep:Optional[bool]=None,
+            encoder:Optional[StringEncoder]=None
             ) -> str:
         
         keep_sep = keep_sep or self.KEEP_SEP
@@ -414,16 +442,16 @@ class DictDefaultMixin(TypeDictMixin):
 
 class DelimiterMixin:
     
-    START_DELIMITER: str | None = None
-    END_DELIMITER: str | None = None
+    START_DELIMITER: Optional[str] = None
+    END_DELIMITER: Optional[str] = None
     
     @classmethod
     def from_string(
             cls,
             string:str,
             *args,
-            start_delimiter:str|None=None,
-            end_delimiter:str|None=None,
+            start_delimiter:Optional[str]=None,
+            end_delimiter:Optional[str]=None,
             **kwargs
             ) -> Self:
         
@@ -439,10 +467,10 @@ class DelimiterMixin:
     def to_string(
             self,
             *args,
-            start_delimiter:str|None=None,
-            end_delimiter:str|None=None,
+            start_delimiter:Optional[str]=None,
+            end_delimiter:Optional[str]=None,
             **kwargs
-            ) -> Self:
+            ) -> str:
         
         start_delimiter = start_delimiter if start_delimiter is not None else self.START_DELIMITER
         end_delimiter = end_delimiter if end_delimiter is not None else self.END_DELIMITER
@@ -455,19 +483,19 @@ class DelimiterMixin:
         return string
 
 
-class LoadFileMixin:
+class CompressFileMixin:
     
-    DEFAULT_PATH: str | PathLike | None = None
-    COMPRESSION: Literal['zlib', 'gzip', 'deflate'] | None = None
-    CYPHER: bytes | None = None
+    DEFAULT_PATH: Optional[PathString] = None
+    COMPRESSION: Optional[Literal['zlib', 'gzip', 'deflate']] = None
+    CYPHER: Optional[bytes] = None
     
     @classmethod
     def from_file(
             cls, 
-            path:str|PathLike|None=None, 
+            path:Optional[PathString]=None, 
             encoded:bool=True, 
-            compression:Literal['zlib', 'gzip', 'deflate']|None=None, 
-            cypher:bytes|None=None,
+            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None, 
+            cypher:Optional[bytes]=None,
             **kwargs: Any
             ) -> Self:
         
@@ -489,9 +517,9 @@ class LoadFileMixin:
     
     def to_file(
             self,
-            path:str|PathLike|None=None,
-            compression:Literal['zlib', 'gzip', 'deflate']|None=None, 
-            cypher:bytes|None=None,
+            path:Optional[PathString]=None,
+            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None, 
+            cypher:Optional[bytes]=None,
             encoded:bool=True, 
             **kwargs
             ):

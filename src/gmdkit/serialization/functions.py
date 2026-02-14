@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Literal
+from typing import Callable, Literal, Optional, Iterable
 from functools import partial
 from inspect import signature
 from itertools import cycle
@@ -18,8 +18,8 @@ def xor(data: bytes, key: bytes) -> bytes:
 
 def decode_string(
         string:str,
-        xor_key:bytes|None=None,
-        compression:Literal[None,"zlib","gzip","deflate","auto"]="auto"
+        xor_key:Optional[bytes]=None,
+        compression:Optional[Literal["zlib","gzip","deflate","auto"]]="auto"
         ) -> str:
     
     byte_stream = string.encode()
@@ -48,8 +48,8 @@ def decode_string(
 
 def encode_string(
         string:str,
-        xor_key:bytes|None=None,
-        compression:Literal[None,"zlib","gzip","deflate"]="gzip"
+        xor_key:Optional[bytes]=None,
+        compression:Optional[Literal["zlib","gzip","deflate"]]="gzip"
         ) -> str:
     
     byte_stream = string.encode()
@@ -74,7 +74,7 @@ def encode_string(
     return byte_stream.decode()
 
 
-def read_plist_elem(elem):
+def read_plist_elem(elem:ET.Element):
         
     match elem.tag:
         case 'i':
@@ -89,7 +89,7 @@ def read_plist_elem(elem):
             return read_plist(elem)
         
         
-def read_plist(node):
+def read_plist(node:ET.Element):
     children = node[:]
     num_children = len(children)
     
@@ -157,7 +157,7 @@ def write_plist(node, obj):
             
     elif isinstance(obj, (list,tuple)):
         
-        ET.SubElement(node, "k").text = "_IsArr"
+        ET.SubElement(node, "k").text = "_isArr"
         
         ET.SubElement(node, "t")
         
@@ -213,12 +213,13 @@ def to_plist_file(data:dict|list|tuple, path:str|PathLike):
     tree.write(path, xml_declaration=True)
 
 
-def dict_wrapper(data, func, **kwargs):
-    return dict(func(k, v, **kwargs) for k, v in data.items())
+
+def dict_wrapper(data:dict, func:Callable, **kwargs) -> dict:
+    return (func(k, v, **kwargs) for k, v in data.items())
 
 
-def array_wrapper(data, func, **kwargs):
-    return [func(v,**kwargs) for v in data]
+def array_wrapper(data:Iterable, func:Callable, **kwargs) -> list:
+    return (func(v,**kwargs) for v in data)
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:

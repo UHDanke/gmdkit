@@ -1,9 +1,10 @@
 # Imports
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 import base64
 
 # Package Imports
 from gmdkit.serialization import options
+from gmdkit.serialization.typing import NumKey
 
 
 def to_bool(string:str) -> bool:
@@ -14,7 +15,7 @@ def from_bool(obj:bool) -> str:
     return str(int(bool(obj)))
     
     
-def from_float(obj:float):
+def from_float(obj:float) -> str:
     decimals = options.float_precision.get()
     if decimals is None:
         if obj.is_integer():
@@ -23,9 +24,9 @@ def from_float(obj:float):
             return str(obj)
     else:
         return f"{obj:.{decimals}f}".rstrip('0').rstrip('.')
+    
 
-
-def to_string(obj, **kwargs) -> str:
+def to_string(obj:Any, **kwargs) -> str:
     method = getattr(obj, "to_string", None)
     if callable(method):
         return method(**kwargs)
@@ -36,7 +37,7 @@ def to_string(obj, **kwargs) -> str:
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
 
 
-def to_plist(obj, **kwargs) -> str:
+def to_plist(obj:Any, **kwargs) -> str:
     method = getattr(obj, "to_plist", None)
     if callable(method):
         return method(**kwargs)
@@ -47,7 +48,7 @@ def to_plist(obj, **kwargs) -> str:
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
 
 
-def zip_string(obj) -> str:
+def zip_string(obj:Any) -> str:
     
     string = getattr(obj, "string", None)
     if string is not None:
@@ -88,7 +89,7 @@ encode_funcs = {
     }
     
     
-def serialize(obj) -> str:
+def serialize(obj:Any) -> str:
     
     if isinstance(obj, str):
         return obj
@@ -109,86 +110,44 @@ def serialize(obj) -> str:
         return to_string(obj)
 
 
+def dict_serializer(key:NumKey, value:Any):
+    return (str(key), serialize(value))
+
+
 def dict_cast(
-        dictionary: dict,
-        numkey: bool = False,
-        default: Callable | None = None,
-        key_kwargs: bool = False,
-    ):
-    _get = dictionary.get
-    _default_is_callable = default is not None and callable(default)
+    functions: dict[NumKey,Callable],
+    key_kwargs: Optional[dict[NumKey,Callable]] = None,
+    numkey: bool = False,
+    default: Optional[Callable] = None,
+):
+    key_kwargs = key_kwargs or {}
+    f_get = functions.get
+    kw_get = key_kwargs.get
+    has_default = callable(default)
 
-    if numkey and key_kwargs and _default_is_callable:
-        def cast_func(key: str, value: Any, **kwargs):
-            if isinstance(key, str) and key.isdigit():
-                key = int(key)
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs.get(key, {}))
+    def cast_func(key: NumKey, value: Any, **kwargs) -> tuple[NumKey, Any]:
+        
+        if numkey and isinstance(key, str) and key.isdigit():
+            key = int(key)
+
+        func = f_get(key)
+
+        if func is not None:
+            kw_func = kw_get(key)
+            if kw_func:
+                kw = kw_func(**kwargs)
+                value = func(value, **kw) if kw else func(value)
             else:
-                value = default(value)
-            return (key, value)
+                value = func(value)
+                
+        elif has_default:
+            value = default(value)
 
-    elif numkey and key_kwargs:
-        def cast_func(key: str, value: Any, **kwargs):
-            if isinstance(key, str) and key.isdigit():
-                key = int(key)
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs.get(key, {}))
-            return (key, value)
+        if not numkey:
+            key = str(key)
 
-    elif numkey and _default_is_callable:
-        def cast_func(key: str, value: Any, **kwargs):
-            if isinstance(key, str) and key.isdigit():
-                key = int(key)
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs)
-            else:
-                value = default(value)
-            return (key, value)
-
-    elif numkey:
-        def cast_func(key: str, value: Any, **kwargs):
-            if isinstance(key, str) and key.isdigit():
-                key = int(key)
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs)
-            return (key, value)
-
-    elif key_kwargs and _default_is_callable:
-        def cast_func(key: str, value: Any, **kwargs):
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs.get(key, {}))
-            else:
-                value = default(value)
-            return (str(key), value)
-
-    elif key_kwargs:
-        def cast_func(key: str, value: Any, **kwargs):
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs.get(key, {}))
-            return (str(key), value)
-
-    elif _default_is_callable:
-        def cast_func(key: str, value: Any, **kwargs):
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs)
-            else:
-                value = default(value)
-            return (str(key), value)
-
-    else:
-        def cast_func(key: str, value: Any, **kwargs):
-            func = _get(key)
-            if func is not None:
-                value = func(value, **kwargs)
-            return (str(key), value)
+        return key, value
 
     return cast_func
+
         

@@ -26,12 +26,15 @@ class ObjectString(GzipString):
         
         obj_list = ObjectList.from_string(string)
         
-        self.start = obj_list.pop(0) if obj_list else Object()
-        self.objects = obj_list
+        if obj_list:
+            self.start = obj_list[0]
+            self.objects = obj_list[1:]
+        else:
+            self.start = Object()
+            self.objects = ObjectList()
         
         return (self.start, self.objects)
     
-        
     def save(
         self,
         start: Object | None = None,

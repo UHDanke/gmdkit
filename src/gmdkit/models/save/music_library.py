@@ -82,7 +82,7 @@ Song.DECODER = staticmethod(dict_cast(
      'tags': SongTagList.from_string,
      'music_platform': int,
      'extra_artists': SongArtistList.from_string,
-     'external_link': lambda x: unquote(x),
+     'external_link': unquote,
      'is_new': lambda x: bool(int(x)),
      'priority_order': int,
      'song_number': int

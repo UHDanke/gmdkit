@@ -1,9 +1,6 @@
 # Imports
-from collections.abc import Iterable
-from functools import partial
-from typing import Any
+from typing import Self, Optional, TYPE_CHECKING
 from pathlib import Path
-from os import PathLike
 from glob import glob
 
 # Package Imports
@@ -11,6 +8,7 @@ from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.types import ListClass, DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
 from gmdkit.serialization.type_cast import dict_cast, to_plist
+from gmdkit.serialization.typing import PathString
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
@@ -21,12 +19,14 @@ class Level(PlistDictDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(LEVEL_DECODERS))
     ENCODER = staticmethod(dict_cast(LEVEL_ENCODERS))
     
-   
+    if TYPE_CHECKING:
+        @classmethod
+        def from_file(cls, path:PathString, load:bool=True, **kwargs) -> Self: ...
+    
     def to_file(self, 
-            path:str|PathLike|None=None, 
+            path:Optional[PathString]=None, 
             extension:str="gmd", 
-            save:bool=True, 
-            save_keys:Iterable|None=None, 
+            save:bool=True,
             **kwargs):
         
         if path is None: 
@@ -37,30 +37,29 @@ class Level(PlistDictDecoderMixin,DictClass):
         if not path.suffix:
             path = (path / self[lvl_prop.NAME]).with_suffix('.' + extension.lstrip('.'))
             
-        super().to_file(path=path, save=save, save_keys=save_keys, **kwargs)
+        super().to_file(path=path, save=save, **kwargs)
         
         
     @classmethod
-    def from_plist(cls, data:Any, load:bool=True, load_keys:Iterable|None=None, **kwargs):
+    def from_plist(cls, data:dict, load:bool=True, **kwargs) -> Self:
         
         new = super().from_plist(data, **kwargs)
         
-        if load: new.load(keys=load_keys)
+        if load: new.load()
         
         return new
     
 
-    def to_plist(self, save:bool=True, save_keys:Iterable|None=None, **kwargs):
+    def to_plist(self, save:bool=True, **kwargs) -> dict:
         
-        if save: self.save(keys=save_keys)
+        if save: self.save()
         
         return super().to_plist(**kwargs)
 
         
-    def load(self, keys:Iterable|None=None):
-        keys = list(keys or self.keys())
+    def load(self):
     
-        for key in keys:
+        for key in self.keys():
             value = self.get(key)
             load = getattr(value, "load", None)
     
@@ -68,10 +67,8 @@ class Level(PlistDictDecoderMixin,DictClass):
                 load()
         
             
-    def save(self, keys:Iterable|None=None):
-        keys = list(keys or self.keys())
-    
-        for key in keys:
+    def save(self):    
+        for key in self.keys():
             value = self.get(key)
             save = getattr(value, "save", None)
     
@@ -103,17 +100,14 @@ class Level(PlistDictDecoderMixin,DictClass):
 
         return getattr(objstr, "objects")
     
-    
+    # TODO REDO
     @classmethod
     def default(cls, name:str,load:bool=True):
         
         data = LEVEL_DEFAULT.copy()        
         data[lvl_prop.NAME] = name
-        
-        kwargs = {}
-        kwargs["load"] = load
-        
-        return cls.from_plist(data, **kwargs)
+                
+        return cls.from_plist(data, load=load)
 
 
 class LevelList(PlistArrayDecoderMixin,ListClass):
@@ -125,30 +119,43 @@ class LevelList(PlistArrayDecoderMixin,ListClass):
     
     
     @classmethod
-    def from_folder(cls, path:str|PathLike, extension:str='.gmd'):
+    def from_folder(cls, path:PathString, extension:str='.gmd', load:bool=False):
         
         new = cls()
         
         folder_path = str(Path(path) / ('*' + extension))
         
         for file in glob(folder_path):
-            level = Level.from_file(file)
+            level = Level.from_file(file, load=load)
             
             new.append(level)
         
         return new
-
-
-    @classmethod
-    def from_plist(cls, data, load:bool=False, load_keys:Iterable|None=None,**kwargs):
+    
+    
+    def to_folder(self, path:PathString):
         
-        decoder = partial(cls.DECODER, load=load, load_keys=load_keys)
+        folder_path = Path(path)
         
-        return super().from_plist(data, decoder=decoder, **kwargs)
+        if not folder_path.is_dir():
+            raise ValueError("Given path is not a directory.")
+        
+        for lvl in self:
+            lvl.to_file(folder_path)
+    
+    
+    if TYPE_CHECKING:
+        @classmethod
+        def from_file(cls, path:PathString, load:bool=False, **kwargs) -> Self: ...
+        
+        def to_file(self, path:PathString, save:bool=False, **kwargs): ...
+        
+        @classmethod
+        def from_plist(cls, data, load:bool=False, **kwargs) -> Self: ...
+    
+        def to_plist(self, save:bool=True, **kwargs) -> list: ...
+
+        
+
         
     
-    def to_plist(self, path:str|PathLike, save:bool=True, save_keys:Iterable|None=None, **kwargs):
-        
-        encoder = partial(self.ENCODER, save=save, save_keys=save_keys)
-
-        super().to_plist(path, encoder=encoder, **kwargs)
