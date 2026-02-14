@@ -30,7 +30,7 @@ class PlistDecoderMixin:
     DECODER: Optional[Caster] = None
     PLIST_FORMAT: Optional[PlistWrapper] = None
     SELF_FORMAT: Optional[PlistWrapper] = None
-    path: Optional[PathString] = None
+    path: Optional[PathString]
     
     
     @classmethod

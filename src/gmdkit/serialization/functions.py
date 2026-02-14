@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Literal, Optional, Iterable
+from typing import Callable, Literal, Optional, Iterable, Any
 from functools import partial
 from inspect import signature
 from itertools import cycle
@@ -74,57 +74,38 @@ def encode_string(
     return byte_stream.decode()
 
 
-def read_plist_elem(elem:ET.Element):
-        
-    match elem.tag:
+def read_plist(node:ET.Element):
+    
+    match node.tag:
         case 'i':
-            return int(elem.text)
+            return int(node.text)
         case 'r':
-            return float(elem.text)
+            return float(node.text)
         case 's':
-            return elem.text or ""
+            return node.text or ""
         case 't':
             return True
-        case 'd':
-            return read_plist(elem)
-        
-        
-def read_plist(node:ET.Element):
-    children = node[:]
-    num_children = len(children)
-    
-    if num_children == 0:
-        return {}
-    
-    if (
-            num_children >= 2 and 
-            children[0].tag == "k" and 
-            children[0].text == "_isArr" and
-            read_plist_elem(children[1])
-            ):
-        result = []
-        for i in range(2, num_children):
-            if children[i].tag != 'k':
-                result.append(read_plist_elem(children[i]))
-        return result
-    
-    result = {}
-    i = 0
-    while i < num_children:
-        if children[i].tag == 'k':
-            key = children[i].text
-            if i + 1 < num_children and children[i + 1].tag != 'k':
-                result[key] = read_plist_elem(children[i + 1])
-                i += 2
-            else:
-                i += 1
-        else:
-            i += 1
-    
-    return result
+        case 'd'|'dict':
+            num = len(node)
+            
+            if num == 0:
+                return {}
+            
+            if (
+                    num >= 2 and
+                    node[0].tag == "k" and
+                    node[0].text == "_isArr" and
+                    node[1].tag == "t"
+                    ):
+                return [read_plist(node[i]) for i in range(3, len(node), 2)]
+            
+            return {
+                node[i].text: read_plist(node[i + 1])
+                for i in range(0, len(node) - 1, 2)
+            }
 
 
-def write_plist_elem(parent, value):
+def write_plist(parent:ET.Element, value:Any):
     
     if isinstance(value, bool):
         if value: ET.SubElement(parent, "t")
@@ -137,40 +118,34 @@ def write_plist_elem(parent, value):
     
     elif isinstance(value, str):
         ET.SubElement(parent, "s").text = str(value)
-    
-    elif isinstance(value, (dict, list, tuple)):
-        write_plist(ET.SubElement(parent, "d"),value)
-    
-    elif value is not None:
-        ET.SubElement(parent, "s").text = str(value)
 
-
-def write_plist(node, obj):
-    
-    if isinstance(obj, dict):
+    elif isinstance(value, dict):
+        node = ET.SubElement(parent, "d")
         
-        for key, value in obj.items():
+        for k, v in value.items():
             
-            ET.SubElement(node, "k").text = key
+            ET.SubElement(node, "k").text = k
             
-            write_plist_elem(node, value)
-            
-    elif isinstance(obj, (list,tuple)):
+            write_plist(node, v)
+    
+    elif isinstance(value, (list, tuple, set)):
+        
+        node = ET.SubElement(parent, "d")
         
         ET.SubElement(node, "k").text = "_isArr"
         
         ET.SubElement(node, "t")
         
-        for i, value in enumerate(obj,start=1):
+        for i, v in enumerate(value,start=1):
             
             ET.SubElement(node, "k").text = f"k_{i}"
             
-            write_plist_elem(node, value)
+            write_plist(node, v)
     
-    else:
-        write_plist_elem(node, obj)
-            
-    
+    elif value is not None:
+        ET.SubElement(parent, "s").text = str(value)           
+
+
 def from_plist_string(string:str):
     
     tree = ET.fromstring(string)
@@ -214,7 +189,13 @@ def to_plist_file(data:dict|list|tuple, path:str|PathLike):
 
 
 
-def dict_wrapper(data:dict, func:Callable, **kwargs) -> dict:
+def dict_wrapper(data:dict|ET.Element, func:Callable, **kwargs) -> dict:
+    """
+    if isinstance(data, ET.Element):
+        if data.tag != 'd':
+            raise ValueError()
+    else:
+    """
     return (func(k, v, **kwargs) for k, v in data.items())
 
 
@@ -225,7 +206,7 @@ def array_wrapper(data:Iterable, func:Callable, **kwargs) -> list:
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     """
     Filters keyword arguments to only those present on the given functions.
-
+    
     Parameters
     ----------
     *functions : Callable
@@ -233,12 +214,12 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
         
     **kwargs : dict[str,Any]
         The keyword arguments to filter.
-
+        
     Returns
     -------
     funcs : list[Callable]
         A list containing functions with embedded kwargs.
-
+        
     """
     if not kwargs: 
         return functions
