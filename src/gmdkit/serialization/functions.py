@@ -146,61 +146,47 @@ def write_plist(parent:ET.Element, value:Any):
         ET.SubElement(parent, "s").text = str(value)           
 
 
-def from_plist_string(string:str):
-    
+
+def from_plist_string(string: str) -> dict:
     tree = ET.fromstring(string)
-    
-    return read_plist(tree.find("dict"))
-    
+    d_elem = tree.find("dict")
+    if d_elem is not None:
+        d_elem.tag = "d"
+    return read_plist(tree.find("d"))
 
-def to_plist_string(data:dict|list|tuple) -> str:
-    
+
+def to_plist_string(data: Any) -> str:
     root = ET.Element("plist", version="1.0", gjver="2.0")
+    write_plist(root, data)
+    root[0].tag = "dict"
     
-    dict_elem = ET.SubElement(root, "dict")
-    
-    write_plist(dict_elem, data)
-    
-    return ET.tostring(root, encoding='unicode') 
+    return ET.tostring(root, encoding='unicode')
 
 
-def from_plist_file(path:str|PathLike):
-    
+def from_plist_file(path: str | PathLike) -> dict:
     tree = ET.parse(path)
-    
     root = tree.getroot()
-    
-    parsed_xml = read_plist(root.find("dict"))
-        
-    return parsed_xml
+    d_elem = root.find("dict")
+    if d_elem is not None:
+        d_elem.tag = "d"
+    return read_plist(root.find("d"))
 
-
-def to_plist_file(data:dict|list|tuple, path:str|PathLike):
-    
+def to_plist_file(data: Any, path: str | PathLike):
     root = ET.Element("plist", version="1.0", gjver="2.0")
-   
-    dict_elem = ET.SubElement(root, "dict")
+    write_plist(root, data)
+    root[0].tag = "dict"
     
-    write_plist(dict_elem, data)
-           
     tree = ET.ElementTree(root)
-    
     tree.write(path, xml_declaration=True)
 
 
 
 def dict_wrapper(data:dict|ET.Element, func:Callable, **kwargs) -> dict:
-    """
-    if isinstance(data, ET.Element):
-        if data.tag != 'd':
-            raise ValueError()
-    else:
-    """
-    return (func(k, v, **kwargs) for k, v in data.items())
+    return dict(func(k, v, **kwargs) for k, v in data.items())
 
 
 def array_wrapper(data:Iterable, func:Callable, **kwargs) -> list:
-    return (func(v,**kwargs) for v in data)
+    return list(func(v,**kwargs) for v in data)
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
