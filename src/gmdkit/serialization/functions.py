@@ -120,7 +120,10 @@ def write_plist(parent:ET.Element, value:Any):
         ET.SubElement(parent, "s").text = str(value)
 
     elif isinstance(value, dict):
-        node = ET.SubElement(parent, "d")
+        if parent.tag == "plist":
+            node = ET.SubElement(parent, "dict")
+        else:
+            node = ET.SubElement(parent, "d")
         
         for k, v in value.items():
             
@@ -129,8 +132,10 @@ def write_plist(parent:ET.Element, value:Any):
             write_plist(node, v)
     
     elif isinstance(value, (list, tuple, set)):
-        
-        node = ET.SubElement(parent, "d")
+        if parent.tag == "plist":
+            node = ET.SubElement(parent, "dict")
+        else:
+            node = ET.SubElement(parent, "d")
         
         ET.SubElement(node, "k").text = "_isArr"
         
@@ -149,33 +154,23 @@ def write_plist(parent:ET.Element, value:Any):
 
 def from_plist_string(string: str) -> dict:
     tree = ET.fromstring(string)
-    d_elem = tree.find("dict")
-    if d_elem is not None:
-        d_elem.tag = "d"
-    return read_plist(tree.find("d"))
+    return read_plist(tree.find("dict"))
 
 
 def to_plist_string(data: Any) -> str:
     root = ET.Element("plist", version="1.0", gjver="2.0")
     write_plist(root, data)
-    root[0].tag = "dict"
-    
     return ET.tostring(root, encoding='unicode')
 
 
 def from_plist_file(path: str | PathLike) -> dict:
     tree = ET.parse(path)
     root = tree.getroot()
-    d_elem = root.find("dict")
-    if d_elem is not None:
-        d_elem.tag = "d"
-    return read_plist(root.find("d"))
+    return read_plist(root.find("dict"))
 
 def to_plist_file(data: Any, path: str | PathLike):
     root = ET.Element("plist", version="1.0", gjver="2.0")
     write_plist(root, data)
-    root[0].tag = "dict"
-    
     tree = ET.ElementTree(root)
     tree.write(path, xml_declaration=True)
 
