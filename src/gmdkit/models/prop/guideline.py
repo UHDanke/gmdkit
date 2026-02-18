@@ -1,13 +1,11 @@
-# Imports
-from dataclasses import dataclass
-
 # Package Imports
 from gmdkit.serialization.types import ListClass
-from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin, DelimiterMixin
+from gmdkit.serialization.mixins import ArrayDecoderMixin, DelimiterMixin
+from gmdkit.serialization.decorators import dataclass_decoder
 
 
-@dataclass(slots=True)
-class Guideline(DataclassDecoderMixin):
+@dataclass_decoder(slots=True)
+class Guideline:
     
     SEPARATOR = "~"
     LIST_FORMAT = True

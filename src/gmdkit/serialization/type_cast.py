@@ -37,6 +37,11 @@ def to_string(obj:Any, **kwargs) -> str:
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
 
 
+def to_numkey(key:str) -> NumKey:
+    if key.isdigit():
+        key = int(key)
+    return key
+
 def to_plist(obj:Any, **kwargs) -> str:
     method = getattr(obj, "to_plist", None)
     if callable(method):
@@ -115,39 +120,45 @@ def dict_serializer(key:NumKey, value:Any):
 
 
 def dict_cast(
-    functions: dict[NumKey,Callable],
-    key_kwargs: Optional[dict[NumKey,Callable]] = None,
-    numkey: bool = False,
+    functions: dict[Any,Callable],
+    allowed_kwargs: Optional[dict[Any,dict|set]] = None,
+    key_func_start: Optional[Callable] = None,
+    key_func_end: Optional[Callable] = None,
     default: Optional[Callable] = None,
 ):
-    key_kwargs = key_kwargs or {}
+    allowed_kwargs = allowed_kwargs or {}
     f_get = functions.get
-    kw_get = key_kwargs.get
+    kw_get = allowed_kwargs.get
     has_default = callable(default)
+    kc_start = callable(key_func_start)
+    kc_end = callable(key_func_end)
 
-    def cast_func(key: NumKey, value: Any, **kwargs) -> tuple[NumKey, Any]:
+    def cast_func(key: Any, value: Any, **kwargs) -> tuple[Any, Any]:
         
-        if numkey and isinstance(key, str) and key.isdigit():
-            key = int(key)
-
+        if kc_start:
+            key = key_func_start(key)
+            
         func = f_get(key)
 
         if func is not None:
-            kw_func = kw_get(key)
-            if kw_func:
-                kw = kw_func(**kwargs)
-                value = func(value, **kw) if kw else func(value)
-            else:
-                value = func(value)
+            kw = {}
+            kw_data = kw_get(key)
+            if kw_data:
+                if isinstance(kw_data, set):
+                    kw = {k: kwargs[k] for k in kw_data & kwargs.keys()}
+                elif isinstance(kw_data, dict):
+                    kw = {k: kwargs[v] for k, v in kw_data.items() if k in kwargs}
                 
+            value = func(value, **kw) if kw else func(value)
+            
         elif has_default:
             value = default(value)
 
-        if not numkey:
-            key = str(key)
+        if kc_end:
+            key = key_func_end(key)
+        
 
         return key, value
 
     return cast_func
-
         

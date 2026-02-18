@@ -3,20 +3,24 @@ from typing import Callable, Literal, Optional, Iterable, Any
 from functools import partial
 from inspect import signature
 from itertools import cycle
-from os import PathLike
+from dataclasses import fields
 import xml.etree.ElementTree as ET
 import base64
 import zlib
 import gzip
 
 # Package Imports
-from gmdkit.serialization.type_cast import from_float
-
+from gmdkit.serialization.type_cast import (
+    from_float,
+    dict_cast, 
+    decode_funcs, encode_funcs
+)
+from gmdkit.serialization.typing import PathString
 
 def xor(data: bytes, key: bytes) -> bytes:
     return bytes(d ^ k for d, k in zip(data, cycle(key)))
 
-def decode_string(
+def decompress_string(
         string:str,
         xor_key:Optional[bytes]=None,
         compression:Optional[Literal["zlib","gzip","deflate","auto"]]="auto"
@@ -46,7 +50,7 @@ def decode_string(
     return byte_stream.decode("utf-8",errors='replace')
 
 
-def encode_string(
+def compress_string(
         string:str,
         xor_key:Optional[bytes]=None,
         compression:Optional[Literal["zlib","gzip","deflate"]]="gzip"
@@ -56,11 +60,11 @@ def encode_string(
         
     match compression:
         case 'zlib':
-            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
+            byte_stream = zlib.compress(byte_stream, wbits=zlib.MAX_WBITS)
         case 'gzip':
             byte_stream = gzip.compress(byte_stream, mtime=0)
         case 'deflate':
-            byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
+            byte_stream = zlib.compress(byte_stream, wbits=-zlib.MAX_WBITS)
         case None:
             pass
         case _:
@@ -163,17 +167,17 @@ def to_plist_string(data: Any) -> str:
     return ET.tostring(root, encoding='unicode')
 
 
-def from_plist_file(path: str | PathLike) -> dict:
+def from_plist_file(path: PathString) -> dict:
     tree = ET.parse(path)
     root = tree.getroot()
     return read_plist(root.find("dict"))
 
-def to_plist_file(data: Any, path: str | PathLike):
+
+def to_plist_file(data: Any, path: PathString):
     root = ET.Element("plist", version="1.0", gjver="2.0")
     write_plist(root, data)
     tree = ET.ElementTree(root)
     tree.write(path, xml_declaration=True)
-
 
 
 def dict_wrapper(data:dict|ET.Element, func:Callable, **kwargs) -> dict:
@@ -182,6 +186,76 @@ def dict_wrapper(data:dict|ET.Element, func:Callable, **kwargs) -> dict:
 
 def array_wrapper(data:Iterable, func:Callable, **kwargs) -> list:
     return list(func(v,**kwargs) for v in data)
+
+
+def compile_dataclass_codec(cls):
+
+    dkey_dict = {}
+    ekey_dict = {}
+    decoders = {}
+    encoders = {}
+    kw_dict = {}
+    
+    for f in fields(cls):
+        meta = f.metadata
+        name = f.name
+        key = meta.get("key")
+        ft = f.type
+        
+        if key is not None and name != key:
+            dkey_dict[key] = name
+            ekey_dict[name] = key
+    
+        decoder = meta.get("decoder")
+        
+        if decoder is None:
+            decoder = decode_funcs.get(ft, ft)
+        
+        decoders[name] = decoder
+        
+        encoder = meta.get("encoder")
+        
+        if encoder is None:
+            encoder = encode_funcs.get(ft, ft)
+
+        encoders[name] = encoder
+        
+        kw = meta.get("kwargs")
+        
+        if kw:
+            kw_dict[name] = kw
+            
+    
+    if dkey_dict:
+        dkey_get = dkey_dict.get
+        dkey_func = lambda key: dkey_get(key, key)
+    
+    else:
+        dkey_func = None
+        
+    if ekey_dict:
+        ekey_get = ekey_dict.get
+        ekey_func = lambda key: ekey_get(key, key)
+    
+    else:
+        ekey_func = None
+    
+    if not kw_dict: 
+        kw_dict = None
+
+    cls.DECODER = staticmethod(dict_cast(
+        decoders,
+        key_func_start=dkey_func,
+        allowed_kwargs=kw_dict
+        ))
+    
+    cls.ENCODER = staticmethod(dict_cast(
+        decoders,
+        key_func_end=ekey_func,
+        allowed_kwargs=kw_dict
+		))
+
+
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:

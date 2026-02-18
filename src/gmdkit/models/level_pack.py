@@ -15,8 +15,8 @@ class LevelPack(PlistDictDecoderMixin,DictClass):
     
     __slots__ = ()
     
-    DECODER = staticmethod(dict_cast(LIST_DECODERS, numkey=True))
-    ENCODER = staticmethod(dict_cast(LIST_ENCODERS, numkey=True))
+    DECODER = staticmethod(dict_cast(LIST_DECODERS))
+    ENCODER = staticmethod(dict_cast(LIST_ENCODERS))
         
     
     def to_file(self, 

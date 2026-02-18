@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.serialization.type_cast import dict_cast, serialize, to_string
+from gmdkit.serialization.type_cast import dict_cast, serialize, to_string, to_numkey
 from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin
 from gmdkit.serialization.types import DictClass, ListClass
 from gmdkit.casting.color import COLOR_DECODERS, COLOR_ENCODERS
@@ -12,7 +12,7 @@ class Color(DictDecoderMixin,DictClass):
     __slots__ = ()
     
     SEPARATOR = '_'
-    DECODER = staticmethod(dict_cast(COLOR_DECODERS,numkey=True))
+    DECODER = staticmethod(dict_cast(COLOR_DECODERS,key_func_start=to_numkey))
     ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,default=serialize))
     
     @classmethod

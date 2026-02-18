@@ -1,9 +1,13 @@
+# Imports
+from typing import Self, TYPE_CHECKING
+
 # Package Imports
 from gmdkit.models.level import LevelList
 from gmdkit.models.level_pack import LevelPackList
 from gmdkit.serialization.types import DictClass
 from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, CompressFileMixin
+from gmdkit.serialization.typing import PathString
 from gmdkit.constants.paths.save import LOCAL_LEVELS_PATH
 from gmdkit.mappings import lvl_save
 
@@ -18,11 +22,6 @@ LEVEL_SAVE_ENCODER = {
     "LLM_03": to_plist   
     }
 
-def kwargs_load(load:bool=False, **kwargs):
-    return {"load":load}
-
-def kwargs_save(save:bool=True, **kwargs):
-    return {"save":save}
 
 class LevelSave(CompressFileMixin,PlistDictDecoderMixin,DictClass):
     
@@ -30,9 +29,22 @@ class LevelSave(CompressFileMixin,PlistDictDecoderMixin,DictClass):
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
     
-    DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER, key_kwargs={"LLM_01":kwargs_load}))   
-    ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER, key_kwargs={"LLM_01":kwargs_save}))
+    DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER, allowed_kwargs={"LLM_01":{"load"}}))   
+    ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER, allowed_kwargs={"LLM_01":{"save"}})) 
     
+    @classmethod
+    def from_plist(cls, data, load:bool=False, **kwargs) -> Self:
+        return super().from_plist(data, load=load, **kwargs)
+
+    def to_plist(self, save:bool=True, **kwargs) -> list:
+        return super().to_plist(save=save, **kwargs)
+    
+    if TYPE_CHECKING:
+        @classmethod
+        def from_file(cls, path:PathString, load:bool=False, **kwargs) -> Self: ...
+        
+        def to_file(self, path:PathString, save:bool=False, **kwargs): ...
+
 
 if __name__ == "__main__":
     level_data = LevelSave.from_file()

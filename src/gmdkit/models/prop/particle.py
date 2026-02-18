@@ -1,14 +1,8 @@
-# Imports
-from dataclasses import dataclass
 # Package Imports
-from gmdkit.serialization.mixins import DataclassDecoderMixin
+from gmdkit.serialization.decorators import dataclass_decoder
 
-
-@dataclass(slots=True)
-class Particle(DataclassDecoderMixin):
-    
-    SEPARATOR = 'a'
-    DICT_FORMAT = False
+@dataclass_decoder(slots=True, separator='a', list_format=True)
+class Particle:
     
     max_particles: int = 0
     duration: float = 0

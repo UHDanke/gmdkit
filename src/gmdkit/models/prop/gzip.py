@@ -1,28 +1,34 @@
+# Imports
+from typing import Optional
+
 # Package Imports
-from typing import Any
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.serialization.functions import decode_string, encode_string
+from gmdkit.serialization.functions import decompress_string, compress_string
 
 
 class GzipString:
-    
-    __slots__ = ("string")
-    
-    def __init__(self, string:str=""):
-        self.string = string
+        
+    def __init__(self, string:Optional[str]=None):
+        self.string = string or str()
     
     def load(self) -> str:
-        return decode_string(self.string)
+        return decompress_string(self.string)
 
     def save(self, string:str) -> None:
-        self.string = encode_string(string)
+        self.string = compress_string(string)
         
 
 class ObjectString(GzipString):
     
-    def load(self, string:str|None=None):
+    def load(
+            self, string:Optional[str]=None, 
+            compressed:bool=True
+            ) -> tuple[Object,ObjectList]:
         
-        string = string if string is not None else super().load()
+        if string is None:
+            string = super().load()
+        elif compressed:
+            string = decompress_string(string)
         
         obj_list = ObjectList.from_string(string)
         
@@ -36,10 +42,10 @@ class ObjectString(GzipString):
         return (self.start, self.objects)
     
     def save(
-        self,
-        start: Object | None = None,
-        objects: ObjectList | None = None,
-    ):
+            self,
+            start: Optional[Object]=None,
+            objects: Optional[ObjectList]=None,
+            ) -> str:
         start = start if start is not None else getattr(self, "start", None)
         objects = objects if objects is not None else getattr(self, "objects", None)
     
@@ -53,13 +59,13 @@ class ObjectString(GzipString):
 
 class ReplayString(GzipString):
     
-    def load(self, instance: Any = None):
+    def load(self):
         
         string = super().load()
         
         self.replay_data = string
             
-    def save(self, replay_data: str | None = None):
+    def save(self, replay_data: Optional[str]=None):
         
         replay_data = replay_data or getattr(self, "replay_data", None)
         

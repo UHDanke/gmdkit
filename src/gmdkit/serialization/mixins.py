@@ -7,7 +7,6 @@ from gmdkit.serialization import options
 from gmdkit.serialization.type_cast import (
     serialize, dict_serializer,
     dict_cast, 
-    decode_funcs
 )
 from gmdkit.serialization.typing import (
     PathString,
@@ -17,7 +16,7 @@ from gmdkit.serialization.typing import (
     Caster, DictCaster
 )
 from gmdkit.serialization.functions import (
-    decode_string, encode_string, 
+    decompress_string, compress_string,
     from_plist_file, to_plist_file, 
     from_plist_string, to_plist_string,
     dict_wrapper, array_wrapper
@@ -175,18 +174,6 @@ class DataclassDecoderMixin:
     LIST_FORMAT: bool = True
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
-    
-    
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-    
-        if cls.DECODER is None:
-            type_hints = get_type_hints(cls)
-            
-            for k, v in type_hints.items():
-                type_hints[k] = decode_funcs.get(v,v)
-    
-            cls.DECODER = staticmethod(dict_cast(type_hints))
         
         
     @classmethod
@@ -219,10 +206,7 @@ class DataclassDecoderMixin:
         separator = separator if separator is not None else cls.SEPARATOR
         list_format = list_format if list_format is not None else cls.LIST_FORMAT
         
-        if decoder is None and cls.DECODER is not None:
-            decoder = cls.DECODER
-        else:
-            decoder = dict_cast(get_type_hints(cls))
+        decoder = decoder or cls.DECODER
         
         if not string:
             return cls()
@@ -232,7 +216,10 @@ class DataclassDecoderMixin:
         
         if list_format:
             for field, token in zip(fields(cls), tokens):
-                key, value = decoder(field.name, token)
+                try:
+                    key, value = decoder(field.name, token)
+                except Exception as e:
+                    raise ValueError(f"Error decoding field {field.name} in {cls}") from e
                 class_args[key] = value
         else:
             if len(tokens) % 2 != 0:
@@ -510,7 +497,7 @@ class CompressFileMixin:
             
             string = file.read()
             
-            if encoded: string = decode_string(string, compression=compression, xor_key=cypher)
+            if encoded: string = decompress_string(string, compression=compression, xor_key=cypher)
             
             return super().from_string(string, **kwargs)
         
@@ -532,6 +519,6 @@ class CompressFileMixin:
             
             string = super().to_string(**kwargs)
             
-            if encoded: string = encode_string(string, compression=compression, xor_key=cypher)
+            if encoded: string = compress_string(string, compression=compression, xor_key=cypher)
             
             file.write(string)

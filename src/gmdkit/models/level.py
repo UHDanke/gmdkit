@@ -9,9 +9,12 @@ from gmdkit.serialization.types import ListClass, DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
 from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.serialization.typing import PathString
-from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS
+from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS, LEVEL_TYPES
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
+
+
+LOAD_KEYS = {k for k, v in LEVEL_TYPES.items() if hasattr(v, "load") and hasattr(v, "save")}
 
 
 class Level(PlistDictDecoderMixin,DictClass):
@@ -58,8 +61,7 @@ class Level(PlistDictDecoderMixin,DictClass):
 
         
     def load(self):
-    
-        for key in self.keys():
+        for key in self.keys() & LOAD_KEYS:
             value = self.get(key)
             load = getattr(value, "load", None)
     
@@ -68,7 +70,7 @@ class Level(PlistDictDecoderMixin,DictClass):
         
             
     def save(self):    
-        for key in self.keys():
+        for key in self.keys() & LOAD_KEYS:
             value = self.get(key)
             save = getattr(value, "save", None)
     
