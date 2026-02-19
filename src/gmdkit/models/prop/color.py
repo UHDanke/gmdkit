@@ -13,7 +13,7 @@ class Color(DictDecoderMixin,DictClass):
     
     SEPARATOR = '_'
     DECODER = staticmethod(dict_cast(COLOR_DECODERS,key_func_start=to_numkey))
-    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,default=serialize))
+    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,key_func_end=str,default=serialize))
     
     @classmethod
     def default(cls, color_id:int):        

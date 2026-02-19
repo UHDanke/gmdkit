@@ -4,7 +4,7 @@ from typing import Optional
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.functions import decompress_string, compress_string
-
+from gmdkit.models.prop.replay_data.replay import ReplayInfo, ReplayEvents
 
 class GzipString:
         
@@ -63,16 +63,24 @@ class ReplayString(GzipString):
         
         string = super().load()
         
-        self.replay_data = string
+        replay_string, replay_start = string.split("#")
+        print(replay_start)
+        self.start = ReplayInfo.from_string(replay_start)
+        self.events = ReplayEvents.from_string(replay_string)
             
-    def save(self, replay_data: Optional[str]=None):
+    def save(
+            self,
+            start: Optional[ReplayInfo]=None,
+            events: Optional[ReplayEvents]=None,
+            ) -> str:
         
-        replay_data = replay_data or getattr(self, "replay_data", None)
+        start = start if start is not None else getattr(self, "start", None)
+        events = events if events is not None else getattr(self, "events", None)
         
-        if replay_data is None:
+        if start is None or events is None:
             return self.string
         
-        string = replay_data
+        string = start.to_string() + events.to_string()
         
         super().save(string)
         

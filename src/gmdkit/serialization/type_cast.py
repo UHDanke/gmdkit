@@ -24,7 +24,12 @@ def from_float(obj:float) -> str:
             return str(obj)
     else:
         return f"{obj:.{decimals}f}".rstrip('0').rstrip('.')
-    
+
+def to_float_from_int(string:str, scale=0) -> str:
+    return int(string) / 10**scale
+
+def from_float_to_int(obj:float, scale=0) -> str:
+    return str(int(obj * 10**scale))
 
 def to_string(obj:Any, **kwargs) -> str:
     method = getattr(obj, "to_string", None)

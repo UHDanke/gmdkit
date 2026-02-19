@@ -16,7 +16,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
     SEPARATOR = ","
     END_DELIMITER = ";"
     DECODER = staticmethod(dict_cast(PROPERTY_DECODERS,key_func_start=to_numkey))
-    ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,default=serialize))
+    ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,key_func_end=str,default=serialize))
     DEFAULTS = OBJECT_DEFAULT
 
     # TODO REDO

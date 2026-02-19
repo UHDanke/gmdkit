@@ -1,8 +1,9 @@
 # Package Imports
 from gmdkit.serialization.decorators import dataclass_decoder
+from gmdkit.serialization.mixins import DataclassDecoderMixin
 
 @dataclass_decoder(slots=True, separator='a', list_format=True)
-class HSV:
+class HSV(DataclassDecoderMixin):
 
     SEPARATOR = 'a'
     LIST_FORMAT = True
