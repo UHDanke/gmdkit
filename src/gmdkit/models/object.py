@@ -19,15 +19,12 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
     ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,key_func_end=str,default=serialize))
     DEFAULTS = OBJECT_DEFAULT
 
-    # TODO REDO
     @classmethod
-    def default(cls, object_id:int, decoder:Optional[Callable]=None) -> Self:
+    def default(cls, object_id:int) -> Self:
+                
+        string = cls.DEFAULTS[object_id]
         
-        decoder = decoder or cls.DECODER
-        
-        data = cls.DEFAULTS.get(object_id,{})
-        
-        return cls(decoder(k, v) for k, v in data.items())
+        return cls.from_string(string)
     
     
 class ObjectList(ArrayDecoderMixin,ListClass):

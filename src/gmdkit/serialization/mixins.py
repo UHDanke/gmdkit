@@ -301,7 +301,7 @@ class DictDecoderMixin:
             condition:Optional[Callable]=None
             ) -> Self:
         
-        decoder = decoder or cls.DECODER or (lambda key, value: (key, value))
+        decoder = decoder or cls.DECODER
         
         if len(tokens) % 2 != 0:
             raise ValueError(
@@ -314,7 +314,7 @@ class DictDecoderMixin:
             result.update((k, v) for k, v in pairs if condition is None or condition(k, v))
         except Exception as e:
             raise ValueError(
-                f"{cls.__module__}.{cls.__qualname__} Failed to decode"
+                f"{cls.__module__}.{cls.__qualname__} failed to decode"
                 ) from e
         
         return result
