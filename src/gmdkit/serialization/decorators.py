@@ -1,10 +1,14 @@
 # Imports
 from typing import Optional, Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 
 # Package Imports
 from gmdkit.utils.typing import StringDictDecoder, StringDictEncoder
-from gmdkit.serialization.type_cast import dict_cast
+from gmdkit.serialization.type_cast import (
+    dict_cast,
+    decode_funcs,
+    encode_funcs
+    )
 
 
 def dataclass_decoder(
@@ -16,83 +20,48 @@ def dataclass_decoder(
         **kwargs
         ):
     
-    def wrap(cls):
+    def wrap(cls):        
         cls = dataclass(cls, *args, **kwargs)
         
-        if decoder:
-            cls.DECODER = decoder
-        else:
-            dkey_dict = {}
-            ekey_dict = {}
-            decoders = {}
-            encoders = {}
-            kw_dict = {}
-            
-            for f in fields(cls):
-                meta = f.metadata
-                name = f.name
-                key = meta.get("key")
-                ft = f.type
-                
-                if key is not None and name != key:
-                    dkey_dict[key] = name
-                    ekey_dict[name] = key
-            
-                decoder = meta.get("decoder")
-                
-                if decoder is None:
-                    decoder = decode_funcs.get(ft, ft)
-                
-                decoders[name] = decoder
-                
-                encoder = meta.get("encoder")
-                
-                if encoder is None:
-                    encoder = encode_funcs.get(ft, ft)
+        dkey_dict = {}
+        ekey_dict = {}
+        decoders = {}
+        encoders = {}
+        kw_dict = {}
         
-                encoders[name] = encoder
-                
-                kw = meta.get("kwargs")
-                
-                if kw:
-                    kw_dict[name] = kw
-                    
-            
-            if dkey_dict:
-                dkey_get = dkey_dict.get
-                dkey_func = lambda key: dkey_get(key, key)
-            
-            else:
-                dkey_func = None
-                
-            if ekey_dict:
-                ekey_get = ekey_dict.get
-                ekey_func = lambda key: ekey_get(key, key)
-            
-            else:
-                ekey_func = None
-            
-            if not kw_dict: 
-                kw_dict = None
+        for f in fields(cls):
+            meta = f.metadata
+            name = f.name
+            key = meta.get("key")
+            ft = f.type
         
-            cls.DECODER = staticmethod(dict_cast(
+            if key is not None and name != key:
+                dkey_dict[key] = name
+                ekey_dict[name] = key
+        
+            decoders[name] = meta.get("decoder") or decode_funcs.get(ft, ft)
+            encoders[name] = meta.get("encoder") or encode_funcs.get(ft, str)
+        
+            kw = meta.get("kwargs")
+            if kw:
+                kw_dict[name] = kw
+        
+        cls.DECODER = staticmethod(
+            decoder or dict_cast(
                 decoders,
-                key_func_start=dkey_func,
+                key_func_start=dkey_dict.get if dkey_dict else None,
                 allowed_kwargs=kw_dict
-                ))
+                )
+            )
             
-            cls.ENCODER = staticmethod(dict_cast(
-                decoders,
-                key_func_end=ekey_func,
+        cls.ENCODER = staticmethod(
+            encoder or dict_cast(
+                encoders,
+                key_func_end=ekey_dict.get if ekey_dict else None,
                 allowed_kwargs=kw_dict
-        		))
+        		)
+            )
 
-        
-        if decoder:
-            cls.DECODER = decoder
-        
-        if encoder:
-            cls.ENCODER = encoder
         
         if separator:
             cls.SEPARATOR = separator

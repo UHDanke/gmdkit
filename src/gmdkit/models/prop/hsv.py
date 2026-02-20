@@ -4,9 +4,6 @@ from gmdkit.serialization.mixins import DataclassDecoderMixin
 
 @dataclass_decoder(slots=True, separator='a', list_format=True)
 class HSV(DataclassDecoderMixin):
-
-    SEPARATOR = 'a'
-    LIST_FORMAT = True
     
     hue: float = 0
     saturation: float = 1

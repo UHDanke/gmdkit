@@ -284,7 +284,6 @@ class DataclassDecoderMixin:
         
         parts = self.to_tokens(list_format=list_format, encoder=encoder)
         
-        print(self)
         return separator.join(parts)
        
     
