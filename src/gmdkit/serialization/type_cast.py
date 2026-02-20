@@ -4,7 +4,7 @@ import base64
 
 # Package Imports
 from gmdkit.serialization import options
-from gmdkit.serialization.typing import NumKey
+from gmdkit.utils.typing import NumKey
 
 
 def to_bool(string:str) -> bool:

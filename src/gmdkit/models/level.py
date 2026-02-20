@@ -4,11 +4,11 @@ from pathlib import Path
 from glob import glob
 
 # Package Imports
+from gmdkit.utils.types import ListClass, DictClass
+from gmdkit.utils.typing import PathString
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.serialization.types import ListClass, DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
 from gmdkit.serialization.type_cast import dict_cast, to_plist
-from gmdkit.serialization.typing import PathString
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS, LEVEL_TYPES
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop

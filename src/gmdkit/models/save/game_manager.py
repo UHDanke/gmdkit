@@ -1,6 +1,6 @@
 # Package Imports
+from gmdkit.utils.types import DictClass
 from gmdkit.models.level import LevelList
-from gmdkit.serialization.types import DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, CompressFileMixin
 from gmdkit.constants.paths.save import GAME_MANAGER_PATH
 

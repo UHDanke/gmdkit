@@ -1,6 +1,6 @@
 # Imports
 from dataclasses import fields
-from typing import Callable, Any, Self, get_type_hints, Literal, Optional, TYPE_CHECKING
+from typing import Callable, Any, Self, Literal, Optional, TYPE_CHECKING, Iterable
 
 # Package Imports
 from gmdkit.serialization import options
@@ -8,7 +8,7 @@ from gmdkit.serialization.type_cast import (
     serialize, dict_serializer,
     dict_cast, 
 )
-from gmdkit.serialization.typing import (
+from gmdkit.utils.typing import (
     PathString,
     StringDecoder, StringEncoder,
     StringDictDecoder, StringDictEncoder,
@@ -174,26 +174,87 @@ class DataclassDecoderMixin:
     LIST_FORMAT: bool = True
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
-        
-        
+    
     @classmethod
-    def from_args(cls, *args, **kwargs):
+    def from_tokens(
+            cls,
+            tokens:Iterable[str],
+            list_format:Optional[bool]=None, 
+            decoder:Optional[StringDictDecoder]=None
+            ) -> Self:
         
-        decoder = cls.DECODER or dict_cast(get_type_hints(cls))
+        list_format = list_format if list_format is not None else cls.LIST_FORMAT
+        decoder = decoder or cls.DECODER
+        
         class_args = {}
         
-        for field, arg in zip(fields(cls), args):
-            key, value = decoder(field.name, arg)
-            class_args[key] = value
-        
-        for key, value in kwargs.items():
-            if hasattr(cls, key):
-                key, value = decoder(key, value)
+        if list_format:
+            for field, token in zip(fields(cls), tokens):
+                try:
+                    key, value = decoder(field.name, token)
+                except Exception as e:
+                    raise ValueError(
+                        f"[{cls.__module__}.{cls.__qualname__}]"
+                        f"Failed to decode field '{field.name}' from token {token!r}: {e}"
+                        ) from e
                 class_args[key] = value
+        else:
+            length = len(tokens)
+            if length % 2 != 0:
+                raise ValueError(
+                    f"[{cls.__module__}.{cls.__qualname__}]"
+                    f"Malformed string: uneven key/value pairs ({length} tokens)"
+                    )
+            
+            for i in range(0, length, 2):
+                raw_key, raw_value = tokens[i], tokens[i + 1]
+                try:
+                    key, value = decoder(raw_key, raw_value)
+                except Exception as e:
+                    raise ValueError(
+                        f"[{cls.__module__}.{cls.__qualname__}]"
+                        f"Failed to decode key/value at index {i}: {e}"
+                        ) from e
+                    
+                if hasattr(cls, key):
+                    class_args[key] = value
+                else:
+                    raise ValueError(
+                        f"[{cls.__module__}.{cls.__qualname__}]"
+                        f"Unknown field '{key}'"
+                        )
         
         return cls(**class_args)
-    
         
+    
+    def to_tokens(
+            self,
+            list_format:Optional[bool]=None, 
+            encoder:Optional[StringDictEncoder]=None
+            ) -> Iterable[str]:
+        
+        list_format = list_format or self.LIST_FORMAT
+        encoder = encoder or self.ENCODER
+        
+        parts = []
+        for field in fields(self):
+            value = getattr(self, field.name)
+            try:
+                key, encoded_value = encoder(field.name, value)
+            except Exception as e:
+                raise ValueError(
+                    f"[{type(self).__module__}.{type(self).__qualname__}]"
+                    f" Failed to encode field '{field.name}': {e}"
+                    ) from e
+                
+            if not list_format:
+                parts.append(key)
+                
+            parts.append(encoded_value)
+            
+        return parts
+
+    
     @classmethod
     def from_string(
             cls, 
@@ -204,40 +265,18 @@ class DataclassDecoderMixin:
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
-        list_format = list_format if list_format is not None else cls.LIST_FORMAT
-        
-        decoder = decoder or cls.DECODER
         
         if not string:
             return cls()
         
         tokens = string.split(separator)
-        class_args = {}
         
-        if list_format:
-            for field, token in zip(fields(cls), tokens):
-                try:
-                    key, value = decoder(field.name, token)
-                except Exception as e:
-                    raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode field '{field.name}' from token {token!r}: {e}") from e
-                class_args[key] = value
-        else:
-            if len(tokens) % 2 != 0:
-                raise ValueError("[{cls.__module__}.{cls.__qualname__}] Malformed string: uneven key/value pairs")
-            
-            for i in range(0, len(tokens), 2):
-                raw_key, raw_value = tokens[i], tokens[i + 1]
-                try:
-                    key, value = decoder(raw_key, raw_value)
-                except Exception as e:
-                    raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode key/value at index {i}: {raw_key!r} / {raw_value!r}: {e}") from e
-                if hasattr(cls, key):
-                    class_args[key] = value
-                else:
-                    raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Unknown field '{key}'")
-        
-        return cls(**class_args)
-    
+        return cls.from_tokens(
+            tokens=tokens,
+            list_format=list_format,
+            decoder=decoder
+            )
+
     
     def to_string(
             self, 
@@ -247,21 +286,8 @@ class DataclassDecoderMixin:
             ) -> str:
         
         separator = separator if separator is not None else self.SEPARATOR
-        list_format = list_format or self.LIST_FORMAT
-        encoder = encoder or self.ENCODER
         
-        parts = []
-        for field in fields(self):
-            value = getattr(self, field.name)
-            try:
-                key, encoded_value = encoder(field.name, value)
-            except Exception as e:
-                raise ValueError(f"[{type(self).__module__}.{type(self).__qualname__}] Failed to encode field '{field.name}': {e}") from e
-            
-            parts.append(
-                encoded_value if list_format 
-                else f"{key}{separator}{encoded_value}"
-                )
+        parts = self.to_tokens(list_format=list_format, encoder=encoder)
         
         return separator.join(parts)
        
@@ -273,6 +299,56 @@ class DictDecoderMixin:
     DECODER: Optional[StringDictDecoder] = None
     
     @classmethod
+    def from_tokens(
+            cls, 
+            tokens:Iterable[str],
+            decoder:Optional[StringDictDecoder]=None,
+            condition:Optional[Callable]=None
+            ) -> Self:
+        
+        decoder = decoder or cls.DECODER or (lambda key, value: (key, value))
+        
+        if len(tokens) % 2 != 0:
+            raise ValueError(
+                f"[{cls.__module__}.{cls.__qualname__}]"
+                f"Malformed input string: uneven key/value pairs"
+                )
+        
+        result = cls()
+        try:
+            pairs = (decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
+            result.update((k, v) for k, v in pairs if condition is None or condition(k, v))
+        except Exception as e:
+            raise ValueError(
+                f"[{cls.__module__}.{cls.__qualname__}]"
+                f"Failed to decode: {e}"
+                ) from e
+        
+        return result
+    
+    
+    def to_tokens(
+            self, 
+            encoder:Optional[StringDictEncoder]=None,
+            condition:Optional[Callable]=None
+            ) -> Iterable[str]:
+        encoder = encoder or self.ENCODER
+        
+        try:
+            return [
+                part
+                for key, value in self.items()
+                if condition is None or condition(key, value)
+                for part in encoder(key, value)
+            ]
+        except Exception as e:
+            raise ValueError(
+                f"[{type(self).__module__}.{type(self).__qualname__}]"
+                f"Failed to encode: {e}"
+                ) from e
+            
+    
+    @classmethod
     def from_string(
             cls, 
             string:str, 
@@ -282,26 +358,13 @@ class DictDecoderMixin:
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
-        decoder = decoder or cls.DECODER or (lambda key, value: (key, value))
         
-        print(string)
         if string == "":
             return cls()
         
         tokens = string.split(separator)
-        if len(tokens) % 2 != 0:
-            raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Malformed input string: uneven key/value pairs")
         
-        result = cls()
-        for raw_key, raw_value in zip(tokens[::2], tokens[1::2]):
-            try:
-                key, value = decoder(raw_key, raw_value)
-            except Exception as e:
-                raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode key/value {raw_key!r} / {raw_value!r}: {e}") from e
-            if condition is None or condition(key, value):
-                result[key] = value
-        
-        return result
+        return cls.from_tokens(tokens,decoder=decoder,condition=condition)
     
     
     def to_string(
@@ -311,26 +374,67 @@ class DictDecoderMixin:
             condition:Optional[Callable]=None
             ) -> str:
         separator = separator or self.SEPARATOR
-        encoder = encoder or self.ENCODER
         
-        parts = []
-        for key, value in self.items():
-            if condition is None or condition(key, value):
-                try:
-                    parts.extend(encoder(key, value))
-                except Exception as e:
-                    raise ValueError(f"[{type(self).__module__}.{type(self).__qualname__}] Failed to encode key '{key}': {e}") from e
-        
+        parts = self.to_tokens(encoder=encoder,condition=condition)
         return separator.join(parts)
     
 
 class ArrayDecoderMixin:
     
     SEPARATOR: str = ','
-    KEEP_SEP: bool = False
+    KEEP_SEPARATOR: bool = False
     GROUP_SIZE: int = 1
     ENCODER: Optional[StringEncoder] = staticmethod(serialize)
     DECODER: Optional[StringDecoder] = None
+    
+    @classmethod
+    def from_tokens(
+            cls, 
+            tokens:Iterable[str],
+            group_size:Optional[int]=None, 
+            decoder:Optional[StringDecoder]=None
+            ) -> Self:
+        
+        group_size = group_size or cls.GROUP_SIZE
+        decoder = decoder or cls.DECODER
+
+        result = cls()
+        
+        try:
+            if group_size > 1:
+                for i in range(0, len(tokens), group_size):
+                    result.append(decoder(tokens[i:i + group_size]) if decoder else tokens[i:i + group_size])
+            elif decoder:
+                result.extend(decoder(token) for token in tokens)
+            else:
+                result.extend(tokens)
+        except Exception as e:
+            raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode: {e}") from e
+                
+        return result
+    
+    
+    def to_tokens(
+            self,
+            encoder:Optional[StringEncoder]=None,
+            group_size:Optional[int]=None,
+            ) -> str:
+        
+        encoder = encoder or self.ENCODER
+        group_size = group_size or self.GROUP_SIZE
+        
+        tokens = []
+        try:
+            for x in self:
+                group = encoder(x)
+                if len(group) != self.GROUP_SIZE:
+                    raise ValueError(f"encoder returned {len(group)} tokens, expected {self.GROUP_SIZE}")
+                tokens.extend(group)
+        except Exception as e:
+            raise ValueError(f"[{type(self).__name__}] Failed to encode: {e}") from e
+        
+        return tokens
+    
     
     @classmethod
     def from_string(
@@ -343,9 +447,7 @@ class ArrayDecoderMixin:
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
-        keep_sep = keep_sep or cls.KEEP_SEP
-        group_size = group_size or cls.GROUP_SIZE
-        decoder = decoder or cls.DECODER
+        keep_sep = keep_sep or cls.KEEP_SEPARATOR
 
         result = cls()
 
@@ -356,45 +458,30 @@ class ArrayDecoderMixin:
 
         tokens = string.split(separator)
         
-        if group_size > 1:
-            if keep_sep:
-                for i in range(0, len(tokens), group_size):
-                    group = [token + separator for token in tokens[i:i + group_size]]
-                    if group:
-                        try:
-                            result.append(decoder(group) if decoder else group)
-                        except Exception as e:
-                            raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode group at index {i}: {group!r}: {e}") from e
-            else:
-                for i in range(0, len(tokens), group_size):
-                    group = tokens[i:i + group_size]
-                    if group:
-                        try:
-                            result.append(decoder(group) if decoder else group)
-                        except Exception as e:
-                            raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode group at index {i}: {group!r}: {e}") from e
-        
-        else:
-            if decoder:
-                result.extend(decoder(token) for token in tokens)
-            else:
-                result.extend(tokens)
-                
-        return result
+        if keep_sep:
+            tokens = [token + separator for token in tokens]
+                        
+        return cls.from_tokens(
+            tokens,
+            group_size=group_size,
+            decoder=decoder
+            )
     
     
     def to_string(
             self, 
             separator:Optional[str]=None,
             keep_sep:Optional[bool]=None,
+            group_size:Optional[int]=None, 
             encoder:Optional[StringEncoder]=None
             ) -> str:
         
-        keep_sep = keep_sep or self.KEEP_SEP
-        encoder = encoder or self.ENCODER or str
+        keep_sep = keep_sep or self.KEEP_SEPARATOR
         separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR or ''
+        
+        tokens = self.to_tokens(encoder=encoder,group_size=group_size)
         try:
-            return separator.join(encoder(x) for x in self)
+            return separator.join(tokens)
         except Exception as e:
             raise ValueError(f"[{type(self).__name__}] Failed to encode to string: {e}")
 

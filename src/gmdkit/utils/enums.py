@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.serialization.types import EnumClass
+from gmdkit.utils.types import EnumClass
 
 
 class OldColor(EnumClass):

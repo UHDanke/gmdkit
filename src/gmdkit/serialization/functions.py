@@ -15,7 +15,7 @@ from gmdkit.serialization.type_cast import (
     dict_cast, 
     decode_funcs, encode_funcs
 )
-from gmdkit.serialization.typing import PathString
+from gmdkit.utils.typing import PathString
 
 def xor(data: bytes, key: bytes) -> bytes:
     return bytes(d ^ k for d, k in zip(data, cycle(key)))

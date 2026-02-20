@@ -1,11 +1,11 @@
 # Package Imports
+from gmdkit.utils import enums
 from gmdkit.serialization.type_cast import (
     to_bool, from_bool, 
     from_float,
     to_string,
     decode_text, encode_text
     )
-from gmdkit.serialization import enums
 from gmdkit.models.prop.list import IDList, EventList, IntPairList, RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV

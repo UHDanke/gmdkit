@@ -2,12 +2,12 @@
 from typing import Any, Optional
 
 # Package Imports
+from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import (
     DelimiterMixin,
     ArrayDecoderMixin,
     DataclassDecoderMixin
     )
-from gmdkit.serialization.types import ListClass
 from gmdkit.serialization.decorators import dataclass_decoder, field_decoder
 from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.replay_data.persistent import PersistentData

@@ -1,10 +1,10 @@
 # Package Imports
+from gmdkit.utils import enums
 from gmdkit.serialization.type_cast import (
     to_string,
     zip_string,
     decode_text, encode_text
     )
-from gmdkit.serialization import enums
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 

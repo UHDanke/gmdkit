@@ -2,9 +2,9 @@
 from typing import Self, Callable, Optional
 
 # Package Imports
-from gmdkit.serialization.types import ListClass, DictClass
+from gmdkit.utils.types import ListClass, DictClass
+from gmdkit.utils.typing import PathString
 from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin 
-from gmdkit.serialization.typing import PathString
 from gmdkit.serialization.functions import decompress_string, compress_string
 from gmdkit.serialization.type_cast import dict_cast, serialize, to_string, to_numkey
 from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS

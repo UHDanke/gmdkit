@@ -2,12 +2,12 @@
 from typing import Self, TYPE_CHECKING
 
 # Package Imports
+from gmdkit.utils.types import DictClass
+from gmdkit.utils.typing import PathString
 from gmdkit.models.level import LevelList
 from gmdkit.models.level_pack import LevelPackList
-from gmdkit.serialization.types import DictClass
 from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, CompressFileMixin
-from gmdkit.serialization.typing import PathString
 from gmdkit.constants.paths.save import LOCAL_LEVELS_PATH
 from gmdkit.mappings import lvl_save
 

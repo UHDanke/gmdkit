@@ -1,15 +1,12 @@
 # Package Imports
-from gmdkit.serialization.types import ListClass
-from gmdkit.serialization.mixins import ArrayDecoderMixin, DelimiterMixin
+from gmdkit.utils.types import ListClass
+from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin,DelimiterMixin
 from gmdkit.serialization.decorators import dataclass_decoder
 
 
-@dataclass_decoder(slots=True)
-class Guideline:
-    
-    SEPARATOR = "~"
-    LIST_FORMAT = True
-    
+@dataclass_decoder(slots=True, separator="~", list_format=True)
+class Guideline(DataclassDecoderMixin):
+
     time: float = 0
     color: float = 0
 
@@ -21,8 +18,8 @@ class GuidelineList(DelimiterMixin,ArrayDecoderMixin,ListClass):
     SEPARATOR = "~"
     END_DELIMITER = "~"
     GROUP_SIZE = 2
-    DECODER = staticmethod(lambda array: Guideline.from_args(*array))
-    ENCODER = staticmethod(lambda pair, s=SEPARATOR: pair.to_string(separator=s))
+    DECODER = staticmethod(Guideline.from_tokens)
+    ENCODER = staticmethod(Guideline.to_tokens)
     
     def clean(self):
         

@@ -1,7 +1,7 @@
 # Package Imports
+from gmdkit.utils.types import DictClass
 from gmdkit.serialization.mixins import DataclassDecoderMixin, DictDecoderMixin
 from gmdkit.serialization.decorators import dataclass_decoder, field_decoder
-from gmdkit.serialization.types import DictClass
 from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.replay_data.timer import TimerData
 

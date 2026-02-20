@@ -1,10 +1,9 @@
-
 # Package Imports
-from gmdkit.serialization.types import ListClass
-from gmdkit.serialization.mixins import ArrayDecoderMixin
+from gmdkit.utils.types import ListClass
+from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
 from gmdkit.serialization.decorators import dataclass_decoder
 from gmdkit.utils.misc import split_digit_list, join_digit_list
-from gmdkit.serialization.enums import GameEvents
+from gmdkit.utils.enums import GameEvents
 
 
 class IntList(ArrayDecoderMixin,ListClass):
@@ -49,14 +48,11 @@ class GroupList(IDList):
     __slots__ = ()
 
 
-@dataclass_decoder(slots=True, separator='.', list_format=True)
-class IntPair:
-    
-    SEPARATOR = '.'
-    LIST_FORMAT = True
-
+@dataclass_decoder(slots=True, separator="~", list_format=True)
+class IntPair(DataclassDecoderMixin):
     key: int = 0
     value: int = 0
+
 
 
 class IntPairList(ArrayDecoderMixin,ListClass):
@@ -65,8 +61,8 @@ class IntPairList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = "."
     GROUP_SIZE = 2
-    DECODER = staticmethod(lambda array: IntPair.from_args(*array))
-    ENCODER = staticmethod(lambda pair, s=SEPARATOR: pair.to_string(separator=s))
+    DECODER = staticmethod(IntPair.from_tokens)
+    ENCODER = staticmethod(IntPair.to_tokens)
     
     def __init__(self, **kwargs):
         items = [IntPair(k,v) for k,v in kwargs.items()]
@@ -78,7 +74,7 @@ class IntPairList(ArrayDecoderMixin,ListClass):
     def values(self):
         return self.unique_values(lambda x: [x.value])
     
-    def remap_keys(self, dictionary:dict|None=None):
+    def remap_keys(self, dictionary:dict):
         if dictionary:
             for pair in self:
                 k = pair.key
@@ -119,7 +115,7 @@ class RemapList(IntPairList):
         self[:] = [p for p in self if p.value == ref[p.key]]
         self.sort(key=lambda p: (p.key, p.value))
     
-    def remap_vals(self, dictionary:dict|None=None):
+    def remap_vals(self, dictionary:dict):
         if dictionary:
             for pair in self:
                 v = pair.value

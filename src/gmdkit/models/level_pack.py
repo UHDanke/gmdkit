@@ -1,10 +1,12 @@
 # Imports
+from typing import Optional
 from pathlib import Path
 from os import PathLike
 from glob import glob
 
 # Package Imports
-from gmdkit.serialization.types import ListClass, DictClass
+from gmdkit.utils.types import ListClass, DictClass
+from gmdkit.utils.typing import PathString
 from gmdkit.serialization.mixins import PlistDictDecoderMixin, PlistArrayDecoderMixin
 from gmdkit.serialization.type_cast import dict_cast, to_plist
 from gmdkit.casting.list_props import LIST_ENCODERS, LIST_DECODERS
@@ -20,7 +22,7 @@ class LevelPack(PlistDictDecoderMixin,DictClass):
         
     
     def to_file(self, 
-            path:str|PathLike|None=None, 
+            path:Optional[PathString]=None, 
             extension:str="gmdl", 
             **kwargs):
         

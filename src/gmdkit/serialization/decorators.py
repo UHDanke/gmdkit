@@ -3,8 +3,8 @@ from typing import Optional, Callable
 from dataclasses import dataclass, field
 
 # Package Imports
+from gmdkit.utils.typing import StringDictDecoder, StringDictEncoder
 from gmdkit.serialization.functions import compile_dataclass_codec
-from gmdkit.serialization.typing import StringDictDecoder, StringDictEncoder
 
 def dataclass_decoder(
         decoder:Optional[StringDictDecoder]=None, 

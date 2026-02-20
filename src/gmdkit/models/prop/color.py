@@ -1,7 +1,7 @@
 # Package Imports
+from gmdkit.utils.types import DictClass, ListClass
 from gmdkit.serialization.type_cast import dict_cast, serialize, to_string, to_numkey
 from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin
-from gmdkit.serialization.types import DictClass, ListClass
 from gmdkit.casting.color import COLOR_DECODERS, COLOR_ENCODERS
 from gmdkit.mappings import color_prop
 from gmdkit.defaults.color_ids import default_color

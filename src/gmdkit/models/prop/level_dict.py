@@ -1,4 +1,4 @@
-from gmdkit.serialization.types import DictClass
+from gmdkit.utils.types import DictClass
 from gmdkit.serialization.mixins import PlistDictDecoderMixin
 from gmdkit.serialization.type_cast import to_plist
 from gmdkit.models.level import Level
