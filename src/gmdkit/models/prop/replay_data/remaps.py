@@ -19,6 +19,3 @@ class RemapData(DataclassDecoderMixin):
     
     remap_ids: RemapChain = field_decoder(decoder=RemapChain.from_string,encoder=to_string)
     root_id: int
-    
-    
-RemapData.from_string("12_13_-1251")

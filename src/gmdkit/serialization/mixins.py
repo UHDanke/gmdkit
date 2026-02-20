@@ -5,8 +5,7 @@ from typing import Callable, Any, Self, Literal, Optional, TYPE_CHECKING, Iterab
 # Package Imports
 from gmdkit.serialization import options
 from gmdkit.serialization.type_cast import (
-    serialize, dict_serializer,
-    dict_cast, 
+    serialize, dict_serializer
 )
 from gmdkit.utils.typing import (
     PathString,
@@ -194,16 +193,14 @@ class DataclassDecoderMixin:
                     key, value = decoder(field.name, token)
                 except Exception as e:
                     raise ValueError(
-                        f"[{cls.__module__}.{cls.__qualname__}]"
-                        f"Failed to decode field '{field.name}' from token {token!r}: {e}"
+                        f"{cls.__module__}.{cls.__qualname__} failed to decode field '{field.name}' from token {token!r}"
                         ) from e
                 class_args[key] = value
         else:
             length = len(tokens)
             if length % 2 != 0:
                 raise ValueError(
-                    f"[{cls.__module__}.{cls.__qualname__}]"
-                    f"Malformed string: uneven key/value pairs ({length} tokens)"
+                    f"{cls.__module__}.{cls.__qualname__} odd number of tokens: {length}"
                     )
             
             for i in range(0, length, 2):
@@ -212,16 +209,14 @@ class DataclassDecoderMixin:
                     key, value = decoder(raw_key, raw_value)
                 except Exception as e:
                     raise ValueError(
-                        f"[{cls.__module__}.{cls.__qualname__}]"
-                        f"Failed to decode key/value at index {i}: {e}"
+                        f"{cls.__module__}.{cls.__qualname__} failed to decode key/value at index {i}"
                         ) from e
                     
                 if hasattr(cls, key):
                     class_args[key] = value
                 else:
                     raise ValueError(
-                        f"[{cls.__module__}.{cls.__qualname__}]"
-                        f"Unknown field '{key}'"
+                        f"{cls.__module__}.{cls.__qualname__} unknown field '{key}'"
                         )
         
         return cls(**class_args)
@@ -289,6 +284,7 @@ class DataclassDecoderMixin:
         
         parts = self.to_tokens(list_format=list_format, encoder=encoder)
         
+        print(self)
         return separator.join(parts)
        
     
@@ -310,8 +306,7 @@ class DictDecoderMixin:
         
         if len(tokens) % 2 != 0:
             raise ValueError(
-                f"[{cls.__module__}.{cls.__qualname__}]"
-                f"Malformed input string: uneven key/value pairs"
+                f"{cls.__module__}.{cls.__qualname__} odd number of tokens: {len(tokens)}"
                 )
         
         result = cls()
@@ -320,8 +315,7 @@ class DictDecoderMixin:
             result.update((k, v) for k, v in pairs if condition is None or condition(k, v))
         except Exception as e:
             raise ValueError(
-                f"[{cls.__module__}.{cls.__qualname__}]"
-                f"Failed to decode: {e}"
+                f"{cls.__module__}.{cls.__qualname__} Failed to decode"
                 ) from e
         
         return result
@@ -343,8 +337,7 @@ class DictDecoderMixin:
             ]
         except Exception as e:
             raise ValueError(
-                f"[{type(self).__module__}.{type(self).__qualname__}]"
-                f"Failed to encode: {e}"
+                f"{type(self).__module__}.{type(self).__qualname__} failed to encode"
                 ) from e
             
     
@@ -409,7 +402,7 @@ class ArrayDecoderMixin:
             else:
                 result.extend(tokens)
         except Exception as e:
-            raise ValueError(f"[{cls.__module__}.{cls.__qualname__}] Failed to decode: {e}") from e
+            raise ValueError(f"{cls.__module__}.{cls.__qualname__} failed to decode") from e
                 
         return result
     
@@ -426,12 +419,15 @@ class ArrayDecoderMixin:
         tokens = []
         try:
             for x in self:
-                group = encoder(x)
-                if len(group) != self.GROUP_SIZE:
-                    raise ValueError(f"encoder returned {len(group)} tokens, expected {self.GROUP_SIZE}")
-                tokens.extend(group)
+                if group_size > 1:
+                    group = encoder(x)
+                    if len(group) != group_size:
+                        raise ValueError(f"encoder returned {len(group)} tokens, expected {self.GROUP_SIZE}")
+                    tokens.extend(group)
+                else:
+                    tokens.append(encoder(x))
         except Exception as e:
-            raise ValueError(f"[{type(self).__name__}] Failed to encode: {e}") from e
+            raise ValueError(f"{type(self).__module__}.{type(self).__qualname__} failed to encode") from e
         
         return tokens
     
@@ -480,10 +476,9 @@ class ArrayDecoderMixin:
         separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR or ''
         
         tokens = self.to_tokens(encoder=encoder,group_size=group_size)
-        try:
-            return separator.join(tokens)
-        except Exception as e:
-            raise ValueError(f"[{type(self).__name__}] Failed to encode to string: {e}")
+        
+        return separator.join(tokens)
+
 
 
 class TypeDictMixin:
