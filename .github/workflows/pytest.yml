@@ -32,11 +32,5 @@ jobs:
           pip install -e .
           pip install pytest
 
-      - name: Run round-trip test
-        run: pytest tests/test_round_trip.py -v --tb=short
-        
-      - name: Run temp-ai-usage tests
-        run: pytest tests/temp_ai_tests.py -v --tb=short
-        
-      - name: Run object string test
-        run: pytest tests/object_test.py -v --tb=short
+      - name: Run Tests
+        run: pytest tests-v --tb=short
