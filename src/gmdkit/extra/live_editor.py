@@ -1,7 +1,7 @@
 # Imports
 from websocket import create_connection
 import json
-from typing import Optional
+from typing import Any, Optional
 
 # Package Imports
 from gmdkit.models.prop.gzip import ObjectString
@@ -14,10 +14,7 @@ WEBSOCKET_URL = "ws://127.0.0.1:1313"
 
 class LiveEditor(ObjectString):
         
-    def __init__(
-            self, 
-            url:str=WEBSOCKET_URL, 
-            ):
+    def __init__(self, url:str=WEBSOCKET_URL):
         self.url = url
         self.ws = None
 
@@ -30,9 +27,10 @@ class LiveEditor(ObjectString):
             raise ConnectionError(f"Failed to connect to {self.url}") from e
     
     def close(self):
-        if self.ws:
-             self.ws.close()
-             self.ws = None
+        if not self.ws:
+            raise RuntimeError("WebSocket is not connected")
+        self.ws.close()
+        self.ws = None
         
     def __enter__(self):
         return self.connect()
@@ -44,12 +42,9 @@ class LiveEditor(ObjectString):
     
         return False
     
-    def request(self, action:str, close:bool=False, **kwargs):
+    def request(self, action:str, **kwargs:Any):
         if not self.ws:
             raise RuntimeError("WebSocket is not connected")
-        
-        if close:
-            self.close()
             
         payload = {"action": action, **kwargs}
         payload_json = json.dumps(payload)
@@ -61,7 +56,6 @@ class LiveEditor(ObjectString):
         
         raw = self.ws.recv()
         response = json.loads(raw)
-        
         status = response.get("status")
         
         if status == "error":
@@ -79,19 +73,14 @@ class LiveEditor(ObjectString):
 
 
     def replace_level(self, save_string:bool=True, save_client:bool=False):
-        if save_string:
-            string = self.save()
-        else:
-            string = self.string
-            
-        self.send_action(
+        self.request(
             "REPLACE_LEVEL_STRING",
-            levelString=string,
+            levelString=self.save() if save_string else self.string,
             save=save_client
-            )
+        )
         
     
-    def add_objects(self, objects:ObjectList, batch_size:Optional[int]=None, **kwargs):
+    def add_objects(self, objects:ObjectList, batch_size:Optional[int]=None, **kwargs:Any):
         
         if not objects: return
         
@@ -99,8 +88,8 @@ class LiveEditor(ObjectString):
         
         for i in range(0, len(objects), batch_size):
             batch = objects[i:i+batch_size]
-            self.send_action("ADD_OBJECTS", objects=batch.to_string(), **kwargs)
+            self.request("ADD_OBJECTS", objects=batch.to_string(), **kwargs)
     
     
-    def remove_objects(self, group_id:int, **kwargs):
-        self.send_action("REMOVE_OBJECTS", group=group_id, **kwargs)
+    def remove_objects(self, group_id:int, **kwargs:Any):
+        self.request("REMOVE_OBJECTS", group=group_id, **kwargs)
