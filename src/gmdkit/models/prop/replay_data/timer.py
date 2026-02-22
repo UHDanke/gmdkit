@@ -3,12 +3,12 @@ from typing import Optional
 
 # Package Imports
 from gmdkit.serialization.mixins import DataclassDecoderMixin
-from gmdkit.serialization.decorators import dataclass_decoder, field_decoder
+from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.replay_data.remaps import RemapData
 
 
-@dataclass_decoder(slots=True, separator='&', list_format=True)
+@dataclass_decoder(slots=True, separator='&', from_array=True)
 class TimerData(DataclassDecoderMixin):
 
     item_id: int

@@ -1,9 +1,10 @@
 # Imports
-from typing import Callable, Literal, Optional, Iterable, Any
+from typing import Callable, Literal, Optional, Iterable, Any, get_type_hints, get_origin, get_args, Union
 from functools import partial
 from inspect import signature
 from itertools import cycle
-from dataclasses import fields
+from dataclasses import field, fields, dataclass
+import sys
 import xml.etree.ElementTree as ET
 import base64
 import zlib
@@ -11,11 +12,14 @@ import gzip
 
 # Package Imports
 from gmdkit.serialization.type_cast import (
-    from_float,
+    from_float, from_bool, to_bool,
     dict_cast, 
-    decode_funcs, encode_funcs
-)
-from gmdkit.utils.typing import PathString
+    )
+from gmdkit.utils.typing import (
+    StringDictDecoder, 
+    StringDictEncoder,
+    PathString
+    )
 
 def xor(data: bytes, key: bytes) -> bytes:
     return bytes(d ^ k for d, k in zip(data, cycle(key)))
@@ -188,74 +192,132 @@ def array_wrapper(data:Iterable, func:Callable, **kwargs) -> list:
     return list(func(v,**kwargs) for v in data)
 
 
-def compile_dataclass_codec(cls):
-
-    dkey_dict = {}
-    ekey_dict = {}
-    decoders = {}
-    encoders = {}
-    kw_dict = {}
+def decoder_from_type(type_hint:Any):
     
-    for f in fields(cls):
-        meta = f.metadata
-        name = f.name
-        key = meta.get("key")
-        ft = f.type
-        
-        if key is not None and name != key:
-            dkey_dict[key] = name
-            ekey_dict[name] = key
+    if type_hint is bool:
+        return to_bool
     
-        decoder = meta.get("decoder")
+    if callable(type_hint):
+        return type_hint
+ 
+    raise ValueError(f"Unsupported type hint: {type_hint}")
         
-        if decoder is None:
-            decoder = decode_funcs.get(ft, ft)
-        
-        decoders[name] = decoder
-        
-        encoder = meta.get("encoder")
-        
-        if encoder is None:
-            encoder = encode_funcs.get(ft, ft)
 
-        encoders[name] = encoder
+def encoder_from_type(type_hint:Any):
+    
+    if type_hint is bool:
+        return from_bool
+    
+    if type_hint is float:
+        return from_float
+    
+    if type_hint is int:
+        return str
+    
+    if type_hint is str:
+        return str
+    
+    raise ValueError(f"Unsupported type hint: {type_hint}")
+
+
+def dataclass_decoder(
+        cls=None,
+        decoder:Optional[StringDictDecoder]=None, 
+        encoder:Optional[StringDictEncoder]=None,
+        condition:Optional[Callable]=None,
+        separator:Optional[str]=None,
+        from_array:Optional[bool]=None,
+        *args,
+        **kwargs
+        ):
+    
+    def wrap(cls):        
+        cls = dataclass(cls, *args, **kwargs)
+        hints = get_type_hints(cls, globalns=vars(sys.modules[cls.__module__]))
         
-        kw = meta.get("kwargs")
+        dkey_dict = {}
+        ekey_dict = {}
+        decoders = {}
+        encoders = {}
+        kw_dict = {}
         
-        if kw:
-            kw_dict[name] = kw
+        for f in fields(cls):
+            meta = f.metadata
+            name = f.name
+            key = meta.get("key")
+            ft = hints[f.name]
+                        
+            if key is not None and name != key:
+                dkey_dict[key] = name
+                ekey_dict[name] = key
+        
+            decoders[name] = meta.get("decoder") or decoder_from_type(ft)
+            encoders[name] = meta.get("encoder") or encoder_from_type(ft)
+        
+            kw = meta.get("kwargs")
+            if kw:
+                kw_dict[name] = kw
+        
+        cls.DECODER = staticmethod(
+            decoder or dict_cast(
+                decoders,
+                key_func_start=dkey_dict.get if dkey_dict else None,
+                allowed_kwargs=kw_dict if kw_dict else None
+                )
+            )
             
-    
-    if dkey_dict:
-        dkey_get = dkey_dict.get
-        dkey_func = lambda key: dkey_get(key, key)
-    
-    else:
-        dkey_func = None
+        cls.ENCODER = staticmethod(
+            encoder or dict_cast(
+                encoders,
+                key_func_end=ekey_dict.get if ekey_dict else None,
+                allowed_kwargs=kw_dict if kw_dict else None
+        		)
+            )
         
-    if ekey_dict:
-        ekey_get = ekey_dict.get
-        ekey_func = lambda key: ekey_get(key, key)
+            
+        if separator is not None:
+            cls.SEPARATOR = separator
+        
+        if from_array is not None:
+            cls.FROM_ARRAY = from_array
+        
+        return cls
     
-    else:
-        ekey_func = None
-    
-    if not kw_dict: 
-        kw_dict = None
-
-    cls.DECODER = staticmethod(dict_cast(
-        decoders,
-        key_func_start=dkey_func,
-        allowed_kwargs=kw_dict
-        ))
-    
-    cls.ENCODER = staticmethod(dict_cast(
-        decoders,
-        key_func_end=ekey_func,
-        allowed_kwargs=kw_dict
-		))
+    return wrap if cls is None else wrap(cls)
 
 
+def field_decoder(
+        *args,
+        key:Optional[str]=None,
+        decoder:Optional[Callable]=None,
+        encoder:Optional[Callable]=None,
+        trim_condition:Optional[Callable]=None,
+        allowed_kwargs=None,
+        **kwargs
+        ):
+    
+    d = kwargs
+    md = d.setdefault("metadata",{})
+            
+    if "decoder" not in md and decoder is not None:
+        md["decoder"] = decoder
+    
+    if "encoder" not in md and encoder is not None:
+        md["encoder"] = encoder
+        
+    if "key" not in md and key is not None:
+        md["key"] = key
+    
+    if "trim_condition" not in md and trim_condition is not None:
+        md["trim_condition"] = trim_condition
+        
+    if "allowed_kwargs" not in md and allowed_kwargs is not None:
+        md["allowed_kwargs"] = allowed_kwargs
+        
+    if not md:
+        d.pop("metadata")
+         
+    return field(**d)
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:

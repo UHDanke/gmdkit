@@ -58,6 +58,28 @@ def to_plist(obj:Any, **kwargs) -> str:
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
 
 
+def from_optional(method:Callable):
+    
+    def from_string(string:str):
+        if string == "":
+            return None
+        else:
+            return method(string)
+        
+    return from_string
+
+
+def to_optional(method:Callable):
+    
+    def to_string(obj:Any):
+        if obj is None:
+            return ""
+        else:
+            return method(obj)
+        
+    return to_string
+    
+    
 def zip_string(obj:Any) -> str:
     
     string = getattr(obj, "string", None)

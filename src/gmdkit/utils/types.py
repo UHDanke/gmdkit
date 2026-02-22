@@ -387,14 +387,16 @@ class DictClass(dict):
 
 class EnumClass(IntEnum):
     
-    
     @classmethod
     def from_string(cls, string: str):
         return cls(int(string))
 
     @classmethod
     def _missing_(cls, value):
-        obj = int.__new__(cls, value)
-        obj._name_ = f"UNKNOWN_{value}"
-        obj._value_ = value
-        return obj
+        member = cls._value2member_map_.get(value)
+        if member is None:
+            member = int.__new__(cls, value)
+            member._name_ = f"UNKNOWN_{'N' if value <0 else ''}{abs(value)}"
+            member._value_ = value
+            cls._value2member_map_[value] = member
+        return member

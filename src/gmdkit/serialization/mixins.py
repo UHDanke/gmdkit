@@ -1,6 +1,11 @@
 # Imports
 from dataclasses import fields
-from typing import Callable, Any, Self, Literal, Optional, TYPE_CHECKING, Iterable
+from typing import (
+    Any, Self, Literal, 
+    Optional, 
+    Callable, Sequence,
+    TYPE_CHECKING,
+    )
 
 # Package Imports
 from gmdkit.serialization import options
@@ -11,6 +16,7 @@ from gmdkit.utils.typing import (
     PathString,
     StringDecoder, StringEncoder,
     StringDictDecoder, StringDictEncoder,
+    KeyValueCondition,
     PlistWrapper, DictWrapper, ArrayWrapper,
     Caster, DictCaster
 )
@@ -21,6 +27,34 @@ from gmdkit.serialization.functions import (
     dict_wrapper, array_wrapper
 )
 
+
+class PlistMixin:
+    ENCODER: Optional[DictCaster]
+    DECODER: Optional[DictCaster]
+    IS_ARRAY: bool = False
+    node: Optional = None
+    kCEK: Optional[int] = None
+    path: Optional[PathString]
+    
+    def load_plist():
+        pass
+    
+    def save_plist():
+        pass
+    
+    def from_file():
+        pass
+    
+    def to_file():
+        pass
+    
+    def from_string():
+        pass
+    
+    def to_string():
+        pass
+    
+    
 
 class PlistDecoderMixin:
     
@@ -61,7 +95,7 @@ class PlistDecoderMixin:
         encoder = encoder or self.ENCODER
         plist_format = plist_format or self.PLIST_FORMAT
         
-        if encoder is None or not callable(encoder) or plist_format is None or not callable(plist_format):
+        if encoder is None or not callable(encoder) or plist_format is None:
             return self
 
         new = plist_format(self, encoder, **kwargs)
@@ -170,24 +204,25 @@ class PlistArrayDecoderMixin(PlistDecoderMixin):
 class DataclassDecoderMixin:
     
     SEPARATOR: str = ','
-    LIST_FORMAT: bool = True
+    FROM_ARRAY: bool = True
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
+    CONDITION: Optional[KeyValueCondition] = None
     
     @classmethod
     def from_tokens(
             cls,
-            tokens:Iterable[str],
-            list_format:Optional[bool]=None, 
+            tokens:Sequence[str],
+            from_array:Optional[bool]=None, 
             decoder:Optional[StringDictDecoder]=None
             ) -> Self:
         
-        list_format = list_format if list_format is not None else cls.LIST_FORMAT
+        from_array = from_array if from_array is not None else cls.FROM_ARRAY
         decoder = decoder or cls.DECODER
         
         class_args = {}
         
-        if list_format:
+        if from_array:
             for field, token in zip(fields(cls), tokens):
                 try:
                     key, value = decoder(field.name, token)
@@ -224,26 +259,33 @@ class DataclassDecoderMixin:
     
     def to_tokens(
             self,
-            list_format:Optional[bool]=None, 
+            from_array:Optional[bool]=None,
+            condition:Optional[Callable]=None,
             encoder:Optional[StringDictEncoder]=None
-            ) -> Iterable[str]:
+            ) -> Sequence[str]:
         
-        list_format = list_format or self.LIST_FORMAT
+        from_array = from_array if from_array is not None else self.FROM_ARRAY
+        condition = condition or self.CONDITION
         encoder = encoder or self.ENCODER
         
         parts = []
         for field in fields(self):
-            value = getattr(self, field.name)
+            key = field.name
+            value = getattr(self, key)
+            
+            if condition is not None and condition(key, value):
+                continue
+            
             try:
-                key, encoded_value = encoder(field.name, value)
+                encoded_key, encoded_value = encoder(key, value)
             except Exception as e:
                 raise ValueError(
                     f"[{type(self).__module__}.{type(self).__qualname__}]"
-                    f" Failed to encode field '{field.name}': {e}"
+                    f" Failed to encode field '{key}': {e}"
                     ) from e
                 
-            if not list_format:
-                parts.append(key)
+            if not from_array:
+                parts.append(encoded_key)
                 
             parts.append(encoded_value)
             
@@ -255,7 +297,7 @@ class DataclassDecoderMixin:
             cls, 
             string:str, 
             separator:Optional[str]=None, 
-            list_format:Optional[bool]=None, 
+            from_array:Optional[bool]=None,
             decoder:Optional[StringDictDecoder]=None
             ) -> Self:
         
@@ -268,7 +310,7 @@ class DataclassDecoderMixin:
         
         return cls.from_tokens(
             tokens=tokens,
-            list_format=list_format,
+            from_array=from_array,
             decoder=decoder
             )
 
@@ -276,29 +318,31 @@ class DataclassDecoderMixin:
     def to_string(
             self, 
             separator:Optional[str]=None, 
-            list_format:Optional[bool]=None, 
+            from_array:Optional[bool]=None, 
             encoder:Optional[StringDictEncoder]=None
             ) -> str:
         
         separator = separator if separator is not None else self.SEPARATOR
         
-        parts = self.to_tokens(list_format=list_format, encoder=encoder)
-        
-        return separator.join(parts)
-       
+        parts = self.to_tokens(from_array=from_array, encoder=encoder)
+        try:
+            return separator.join(parts)
+        except:
+            print(type(self))
+            print(parts)
     
 class DictDecoderMixin:
     
     SEPARATOR: str = ','
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
+    CONDITION: Optional[KeyValueCondition] = None
     
     @classmethod
     def from_tokens(
             cls, 
-            tokens:Iterable[str],
+            tokens:Sequence[str],
             decoder:Optional[StringDictDecoder]=None,
-            condition:Optional[Callable]=None
             ) -> Self:
         
         decoder = decoder or cls.DECODER
@@ -310,8 +354,7 @@ class DictDecoderMixin:
         
         result = cls()
         try:
-            pairs = (decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
-            result.update((k, v) for k, v in pairs if condition is None or condition(k, v))
+            result.update(decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
         except Exception as e:
             raise ValueError(
                 f"{cls.__module__}.{cls.__qualname__} failed to decode"
@@ -323,9 +366,10 @@ class DictDecoderMixin:
     def to_tokens(
             self, 
             encoder:Optional[StringDictEncoder]=None,
-            condition:Optional[Callable]=None
-            ) -> Iterable[str]:
+            condition:Optional[KeyValueCondition]=None
+            ) -> Sequence[str]:
         encoder = encoder or self.ENCODER
+        condition = condition or self.CONDITION
         
         try:
             return [
@@ -346,7 +390,6 @@ class DictDecoderMixin:
             string:str, 
             separator:Optional[str]=None, 
             decoder:Optional[StringDictDecoder]=None,
-            condition:Optional[Callable]=None
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -356,7 +399,7 @@ class DictDecoderMixin:
         
         tokens = string.split(separator)
         
-        return cls.from_tokens(tokens,decoder=decoder,condition=condition)
+        return cls.from_tokens(tokens,decoder=decoder)
     
     
     def to_string(
@@ -382,7 +425,7 @@ class ArrayDecoderMixin:
     @classmethod
     def from_tokens(
             cls, 
-            tokens:Iterable[str],
+            tokens:Sequence[str],
             group_size:Optional[int]=None, 
             decoder:Optional[StringDecoder]=None
             ) -> Self:
@@ -410,7 +453,7 @@ class ArrayDecoderMixin:
             self,
             encoder:Optional[StringEncoder]=None,
             group_size:Optional[int]=None,
-            ) -> str:
+            ) -> Sequence[str]:
         
         encoder = encoder or self.ENCODER
         group_size = group_size or self.GROUP_SIZE
@@ -421,7 +464,7 @@ class ArrayDecoderMixin:
                 if group_size > 1:
                     group = encoder(x)
                     if len(group) != group_size:
-                        raise ValueError(f"encoder returned {len(group)} tokens, expected {self.GROUP_SIZE}")
+                        raise ValueError(f"encoder returned {len(group)} tokens, expected {group_size}")
                     tokens.extend(group)
                 else:
                     tokens.append(encoder(x))
@@ -442,7 +485,7 @@ class ArrayDecoderMixin:
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
-        keep_sep = keep_sep or cls.KEEP_SEPARATOR
+        keep_sep = keep_sep if keep_sep is not None else cls.KEEP_SEPARATOR
 
         result = cls()
 
@@ -471,13 +514,12 @@ class ArrayDecoderMixin:
             encoder:Optional[StringEncoder]=None
             ) -> str:
         
-        keep_sep = keep_sep or self.KEEP_SEPARATOR
+        keep_sep = keep_sep if keep_sep is not None else self.KEEP_SEPARATOR
         separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR or ''
         
         tokens = self.to_tokens(encoder=encoder,group_size=group_size)
         
         return separator.join(tokens)
-
 
 
 class TypeDictMixin:

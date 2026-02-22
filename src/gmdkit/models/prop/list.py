@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
-from gmdkit.serialization.decorators import dataclass_decoder
+from gmdkit.serialization.functions import dataclass_decoder
 from gmdkit.utils.misc import split_digit_list, join_digit_list
 from gmdkit.utils.enums import GameEvents
 
@@ -48,7 +48,7 @@ class GroupList(IDList):
     __slots__ = ()
 
 
-@dataclass_decoder(slots=True, separator="~", list_format=True)
+@dataclass_decoder(slots=True, separator="~", from_array=True)
 class IntPair(DataclassDecoderMixin):
     key: int = 0
     value: int = 0

@@ -1,8 +1,8 @@
 # Package Imports
-from gmdkit.serialization.decorators import dataclass_decoder
+from gmdkit.serialization.functions import dataclass_decoder
 from gmdkit.serialization.mixins import DataclassDecoderMixin
 
-@dataclass_decoder(slots=True, separator='a', list_format=True)
+@dataclass_decoder(slots=True, separator='a', from_array=True)
 class HSV(DataclassDecoderMixin):
     
     hue: float = 0

@@ -1,10 +1,10 @@
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin,DelimiterMixin
-from gmdkit.serialization.decorators import dataclass_decoder
+from gmdkit.serialization.functions import dataclass_decoder
 
 
-@dataclass_decoder(slots=True, separator="~", list_format=True)
+@dataclass_decoder(slots=True, separator="~", from_array=True)
 class Guideline(DataclassDecoderMixin):
 
     time: float = 0

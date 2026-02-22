@@ -61,11 +61,8 @@ def match_enum(enum_format):
         case 'keyframe ref mode':
             return 'enums.KeyframeRefMode'
         
-        case 'ui x ref':
-            return 'enums.UIRefX'
-        
-        case 'ui y ref':
-            return 'enums.UIRefY'
+        case 'ui ref'|'ui x ref'|'ui y ref':
+            return 'enums.UIRef'
         
         case 'label special id':
             return 'enums.ItemLabelSpecialID'

@@ -12,12 +12,10 @@ class OldColor(EnumClass):
     COLOR_4 = 7
     LINE_3D = 8
 
-
 class SingleColorMode(EnumClass):
     DEFAULT = 0
     BASE = 1
     DETAIL = 2
-
 
 class ZLayer(EnumClass):
     B5 = -5
@@ -30,7 +28,6 @@ class ZLayer(EnumClass):
     T2 = 7
     T3 = 9
     T4 = 11    
-    
     
 class Easing(EnumClass):
     NONE = 0
@@ -52,31 +49,27 @@ class Easing(EnumClass):
     BACK_IN_OUT = 16
     BACK_IN = 17
     BACK_OUT = 18
-    
 
 class ItemLabelAlignment(EnumClass):
     CENTER = 0
     LEFT = 1
     RIGHT = 2
 
-
 class ItemLabelSpecialID(EnumClass):
     MAINTIME = -1
     POINTS = -2
     ATTEMPTS = -3
     
-
-class UIRefX(EnumClass):
-    AUTO = 1
-    CENTER = 2
+class UIRef(EnumClass):
+    DEFAULT = 0
+    AUTO_X = 1
+    CENTER_X = 2
     LEFT = 3
     RIGHT = 4
-    
-class UIRefY(EnumClass):
-    AUTO = 1
-    CENTER = 2
-    BOTTOM = 3
-    TOP = 4
+    AUTO_Y = 5
+    CENTER_Y = 6
+    BOTTOM = 7
+    TOP = 8
 
 class TouchMode(EnumClass):
     FLIP = 0
@@ -98,7 +91,6 @@ class StopMode(EnumClass):
     STOP = 0
     PAUSE = 1
     RESUME = 2
-
 
 class SelectAxis(EnumClass):
     NONE = 0
@@ -136,7 +128,6 @@ class ReverbPreset(EnumClass):
     PARKING_LOT = 18
     SEWER_PIPE = 19
     UNDER_WATER = 20
-    
 
 class SequenceMode(EnumClass):
     STOP = 0
@@ -225,7 +216,6 @@ class EnterMode(EnumClass):
     ENTER = 1
     EXIT = 2
     
-    
 class EffectSpecialCenter(EnumClass):
     P1 = -1
     P2 = -2
@@ -245,7 +235,6 @@ class CameraEdge(EnumClass):
     RIGHT = 2
     UP = 3
     DOWN = 4
-    
     
 class ArrowDir(EnumClass):
     NONE = 0
@@ -384,14 +373,12 @@ class Gamemode(EnumClass):
     SPIDER = 6
     SWING = 7
 
-
 class Speed(EnumClass):
     NORMAL = 0
     SLOW = 1
     FAST = 2
     VERY_FAST = 3
     SUPER_FAST = 4
-    
     
 class ColorID(EnumClass):
     DEFAULT = 0
@@ -409,7 +396,6 @@ class ColorID(EnumClass):
     LIGHTER = 1012
     MIDDLEGROUND = 1013
     MIDDLEGROUND_2 = 1014
-    
     
 class LevelDifficulty(EnumClass):    
     NA = -1
@@ -475,7 +461,6 @@ class OfficialSongs(EnumClass):
     PRESS_START = 37
     NOCK_EM = 38
     POWER_TRIP = 39
-    
     
 class EpicRating(EnumClass):
     NONE = 0

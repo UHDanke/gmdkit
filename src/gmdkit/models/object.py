@@ -1,5 +1,5 @@
 # Imports
-from typing import Self, Callable, Optional
+from typing import Self
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
@@ -22,7 +22,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
     @classmethod
     def default(cls, object_id:int) -> Self:
                 
-        string = cls.DEFAULTS[object_id]
+        string = cls.DEFAULTS.get(object_id, f"1,{object_id},2,0,3,0;")
         
         return cls.from_string(string)
     
@@ -30,7 +30,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
 class ObjectList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = ";"
-    KEEP_SEP = True
+    KEEP_SEPARATOR = True
     DECODER = Object.from_string
     ENCODER = staticmethod(to_string)
     
