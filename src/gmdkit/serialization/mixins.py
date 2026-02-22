@@ -609,7 +609,10 @@ class CompressFileMixin:
             
             if encoded: string = decompress_string(string, compression=compression, xor_key=cypher)
             
-            return super().from_string(string, **kwargs)
+            new = super().from_string(string, **kwargs)
+        
+        new.path = path # ensure 'None' is replaced w/ valid path
+        return new
         
     
     def to_file(
@@ -624,6 +627,9 @@ class CompressFileMixin:
         path = path or self.DEFAULT_PATH
         compression = compression or self.COMPRESSION
         cypher = cypher or self.CYPHER
+        
+        if path is None:
+            raise ValueError("path must be provided")
         
         with open(path, "w", encoding="utf-8") as file:
             

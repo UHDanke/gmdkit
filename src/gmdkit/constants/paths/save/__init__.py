@@ -14,4 +14,7 @@ if LOCAL_PATH.exists():
     MUSIC_LIBRARY_PATH = LOCAL_PATH / "musiclibrary.dat"
     SFX_LIBRARY_PATH = LOCAL_PATH / "sfxlibrary.dat"
 else:
-    raise FileNotFoundError(f"Base save directory not found: {LOCAL_PATH}")
+    GAME_MANAGER_PATH = None
+    LOCAL_LEVELS_PATH = None
+    MUSIC_LIBRARY_PATH = None
+    SFX_LIBRARY_PATH = None
