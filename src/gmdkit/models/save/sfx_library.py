@@ -5,7 +5,7 @@ from dataclasses import field
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DelimiterMixin, CompressFileMixin
 from gmdkit.serialization.decorators import dataclass_decoder
 from gmdkit.serialization.type_cast import to_string
-from gmdkit.serialization.types import ListClass
+from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import SFX_LIBRARY_PATH
 
 

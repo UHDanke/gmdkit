@@ -19,6 +19,8 @@ def assert_error(exc_info: ExceptionInfo[BaseException], *patterns: str) -> None
         assert p in msg, f"Expected '{pattern}' in: {str(exc_info.value)}"
 
 
+
+
 @pytest.fixture
 def temp_dir():
     temp = tempfile.mkdtemp()
@@ -26,10 +28,15 @@ def temp_dir():
     shutil.rmtree(temp)
 
 
+ONLINE_LEVELS_DIR = Path(__file__).parent / "data" / "gmd" / "online"
+
+level_paths: list[Path] = []
+for path in ONLINE_LEVELS_DIR.glob("*.gmd"):
+    level_paths.append(path)
+
 @pytest.fixture
 def example_level_path():
-    return Path(__file__).parent / "example_level.gmd"
-
+    return level_paths[0] if level_paths else None
 
 class TestObjectCreation:
     

@@ -4,9 +4,9 @@ from urllib.parse import quote, unquote
 import re
 
 # Package Imports
-from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, LoadFileMixin
+from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, CompressFileMixin
 from gmdkit.serialization.type_cast import dict_cast
-from gmdkit.serialization.types import ListClass
+from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
  
 
@@ -132,7 +132,7 @@ class TagList(ArtistList):
 
 
 @dataclass(slots=True)
-class MusicLibrary(LoadFileMixin,DataclassDecoderMixin):
+class MusicLibrary(CompressFileMixin,DataclassDecoderMixin):
     version: int
     artists: ArtistList
     songs: SongList
