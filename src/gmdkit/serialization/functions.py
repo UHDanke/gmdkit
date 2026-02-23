@@ -18,6 +18,7 @@ from gmdkit.serialization.type_cast import (
 from gmdkit.utils.typing import (
     StringDictDecoder, 
     StringDictEncoder,
+    KeyValueFormat,
     PathString
     )
 
@@ -227,6 +228,8 @@ def dataclass_decoder(
         condition:Optional[Callable]=None,
         separator:Optional[str]=None,
         from_array:Optional[bool]=None,
+        default_optional: bool = False,
+        auto_key: Optional[KeyValueFormat] = None,
         *args,
         **kwargs
         ):
@@ -248,13 +251,18 @@ def dataclass_decoder(
         encoders = {}
         kw_dict = {}
         
-        for f in fields(cls):
+        for i, f in enumerate(fields(cls)):
             meta = f.metadata
             name = f.name
-            key = meta.get("key")
+            key = meta.get("key") 
+            if key is None and auto_key is not None:
+                key = auto_key(name, i)
+                
             ft = hints[f.name]
                         
             if key is not None and name != key:
+                if key in dkey_dict:
+                    raise ValueError(f"Duplicate serialization key: {key!r}")
                 dkey_dict[key] = name
                 ekey_dict[name] = key
         
@@ -265,7 +273,7 @@ def dataclass_decoder(
             if kw:
                 kw_dict[name] = kw
             
-            if meta.get("optional"):
+            if meta.get("optional") or default_optional:
                 if f.default_factory is not MISSING:
                     default = f.default_factory()
                 elif f.default is not MISSING:

@@ -24,6 +24,7 @@ class StringEncoder(Protocol):
 class KeyValueCondition(Protocol):
     def __call__(self, key: Any, value: Any) -> bool : ...
 
+
 class StringDictDecoder(Protocol):
     def __call__(self, key: str, value: str, **kwargs:Any) -> tuple[NumKey, Any]: ...
     
@@ -39,3 +40,7 @@ class DictWrapper(Protocol):
     
 class ArrayWrapper(Protocol):
     def __call__(self, data:Iterable, func:Caster, **kwargs) -> list: ...
+    
+    
+class KeyValueFormat(Protocol):
+    def __call__(self, key: Any, value: Any) -> str : ...
