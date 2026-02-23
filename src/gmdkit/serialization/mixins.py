@@ -228,7 +228,7 @@ class DataclassDecoderMixin:
                     key, value = decoder(field.name, token)
                 except Exception as e:
                     raise ValueError(
-                        f"{cls.__module__}.{cls.__qualname__} failed to decode field '{field.name}' from token {token!r}"
+                        f"{cls.__module__}.{cls.__qualname__} failed to decode field '{field.name}'"
                         ) from e
                 class_args[key] = value
         else:
@@ -276,11 +276,12 @@ class DataclassDecoderMixin:
         )
         
         skip_fields = set()
-        for key, value in reversed(field_data):
-            if condition is not None and condition(key, value):
-                skip_fields.add(key)
-            elif from_array:
-                break
+        if condition is not None:
+            for key, value in reversed(field_data):
+                if condition(key, value):
+                    skip_fields.add(key)
+                elif from_array:
+                    break
                 
         for key, value in field_data:
             
