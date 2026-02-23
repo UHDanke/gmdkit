@@ -269,11 +269,22 @@ class DataclassDecoderMixin:
         encoder = encoder or self.ENCODER
         
         parts = []
-        for field in fields(self):
-            key = field.name
-            value = getattr(self, key)
-            
+        
+        field_data = tuple(
+            (field.name, getattr(self, field.name))
+            for field in fields(self)
+        )
+        
+        skip_fields = set()
+        for key, value in reversed(field_data):
             if condition is not None and condition(key, value):
+                skip_fields.add(key)
+            elif from_array:
+                break
+                
+        for key, value in field_data:
+            
+            if key in skip_fields:
                 continue
             
             try:
