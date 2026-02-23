@@ -71,7 +71,8 @@ class ReplayInput(DataclassDecoderMixin):
         
         if not string:
             return cls()
-        
+        # RobTop PLEASE use a sane serialization format you are getting lost in the commas
+        # Checkpoint data also uses commas so maxsplit needs to be specified here.
         tokens = string.split(separator,1)
         
         return cls.from_tokens(

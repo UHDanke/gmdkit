@@ -221,9 +221,18 @@ class DataclassDecoderMixin:
         decoder = decoder or cls.DECODER
         
         class_args = {}
+        f = fields(cls)
+        f_len = len(f)
+        length = len(tokens)
+
         
         if from_array:
-            for field, token in zip(fields(cls), tokens):
+            if f_len > length:
+                raise ValueError(
+                    f"{cls.__module__}.{cls.__qualname__} too many tokens: {length}, expected at most {f_len}"
+                    )
+            
+            for field, token in zip(f, tokens):
                 try:
                     key, value = decoder(field.name, token)
                 except Exception as e:
@@ -232,10 +241,14 @@ class DataclassDecoderMixin:
                         ) from e
                 class_args[key] = value
         else:
-            length = len(tokens)
             if length % 2 != 0:
                 raise ValueError(
                     f"{cls.__module__}.{cls.__qualname__} odd number of tokens: {length}"
+                    )            
+            
+            if f_len * 2 > length:
+                raise ValueError(
+                    f"{cls.__module__}.{cls.__qualname__} too many tokens: {length}, expected at most {f_len * 2}"
                     )
             
             for i in range(0, length, 2):
