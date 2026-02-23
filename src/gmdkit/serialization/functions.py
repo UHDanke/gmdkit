@@ -1,9 +1,9 @@
 # Imports
-from typing import Callable, Literal, Optional, Iterable, Any, get_type_hints, get_origin, get_args, Union
+from typing import Callable, Literal, Optional, Iterable, Any, get_type_hints
 from functools import partial
 from inspect import signature
 from itertools import cycle
-from dataclasses import field, fields, dataclass
+from dataclasses import field, fields, dataclass, MISSING
 import sys
 import xml.etree.ElementTree as ET
 import base64
@@ -235,8 +235,15 @@ def dataclass_decoder(
         cls = dataclass(cls, *args, **kwargs)
         hints = get_type_hints(cls, globalns=vars(sys.modules[cls.__module__]))
         
+        if separator is not None:
+            cls.SEPARATOR = separator
+        
+        if from_array is not None:
+            cls.FROM_ARRAY = from_array
+        
         dkey_dict = {}
         ekey_dict = {}
+        cond_dict = {}
         decoders = {}
         encoders = {}
         kw_dict = {}
@@ -254,9 +261,19 @@ def dataclass_decoder(
             decoders[name] = meta.get("decoder") or decoder_from_type(ft)
             encoders[name] = meta.get("encoder") or encoder_from_type(ft)
         
-            kw = meta.get("kwargs")
+            kw = meta.get("allowed_kwargs")
             if kw:
                 kw_dict[name] = kw
+            
+            if meta.get("optional"):
+                if f.default_factory is not MISSING:
+                    default = f.default_factory()
+                elif f.default is not MISSING:
+                    default = f.default
+                else:
+                    default = None
+                cond_dict[name] = default
+                
         
         cls.DECODER = staticmethod(
             decoder or dict_cast(
@@ -274,12 +291,13 @@ def dataclass_decoder(
         		)
             )
         
-            
-        if separator is not None:
-            cls.SEPARATOR = separator
+        if cond_dict:
+            def is_default(key, value):
+                return key in cond_dict and cond_dict[key] == value
+        else:
+            is_default = None                
         
-        if from_array is not None:
-            cls.FROM_ARRAY = from_array
+        cls.CONDITION = condition or is_default
         
         return cls
     
@@ -291,13 +309,18 @@ def field_decoder(
         key:Optional[str]=None,
         decoder:Optional[Callable]=None,
         encoder:Optional[Callable]=None,
-        trim_condition:Optional[Callable]=None,
+        optional:Optional[bool]=None,
         allowed_kwargs=None,
         **kwargs
         ):
     
-    d = kwargs
-    md = d.setdefault("metadata",{})
+    d = dict(kwargs)
+    
+    original_md = d.get("metadata")
+    if original_md is not None and not isinstance(original_md, dict):
+        raise TypeError(f"'metadata' must be a dict if provided, got {type(original_md).__name__}")
+    
+    md = dict(original_md) if original_md else {}
             
     if "decoder" not in md and decoder is not None:
         md["decoder"] = decoder
@@ -308,16 +331,18 @@ def field_decoder(
     if "key" not in md and key is not None:
         md["key"] = key
     
-    if "trim_condition" not in md and trim_condition is not None:
-        md["trim_condition"] = trim_condition
+    if "optional" not in md and optional is not None:
+            md["optional"] = optional
         
     if "allowed_kwargs" not in md and allowed_kwargs is not None:
         md["allowed_kwargs"] = allowed_kwargs
-        
-    if not md:
+                 
+    if md:
+        d["metadata"] = md
+    elif "metadata" in d:
         d.pop("metadata")
-         
-    return field(**d)
+
+    return field(*args, **d)
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
