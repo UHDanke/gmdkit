@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 import base64
 import zlib
 import gzip
+import string as strlib
 
 # Package Imports
 from gmdkit.serialization.type_cast import (
@@ -282,7 +283,6 @@ def dataclass_decoder(
                     default = None
                 cond_dict[name] = default
                 
-        
         cls.DECODER = staticmethod(
             decoder or dict_cast(
                 decoders,
@@ -305,7 +305,7 @@ def dataclass_decoder(
         else:
             is_default = None                
         
-        cls.CONDITION = condition or is_default
+        cls.CONDITION = staticmethod(condition or is_default)
         
         return cls
     
@@ -351,6 +351,21 @@ def field_decoder(
         d.pop("metadata")
 
     return field(*args, **d)
+
+
+def auto_key_formatter(template:str="{index}"):
+    allowed = {"key", "index"}
+
+    for _, field_name, _, _ in strlib.Formatter().parse(template):
+        if field_name and field_name not in allowed:
+            raise ValueError(
+                f"Unsupported placeholder '{field_name}' in key format string"
+            )
+
+    def formatter(key: str, index: int) -> str:
+        return template.format(key=key, index=index)
+
+    return formatter
 
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:

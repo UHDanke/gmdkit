@@ -31,6 +31,13 @@ def to_float_from_int(string:str, scale=0) -> str:
 def from_float_to_int(obj:float, scale=0) -> str:
     return str(int(obj * 10**scale))
 
+
+def args_to_int(*args):
+    return (int(a) for a in args)
+
+def args_to_str(*args):
+    return (str(a) for a in args)
+
 def to_string(obj:Any, **kwargs) -> str:
     method = getattr(obj, "to_string", None)
     if callable(method):

@@ -16,16 +16,16 @@ from gmdkit.serialization.type_cast import to_string
 class RemapChain(DelimiterMixin, ArrayDecoderMixin, ListClass):
     
     SEPARATOR = "_"
+    END_DELIMITER = "_"
     DECODER = int
+    ENCODER = str
     
     def apply_remaps(self, groups:Sequence[int], remaps:dict[int,dict[int,int]]):
         def apply(values, remap_id):
             remap = remaps[remap_id]
             return [remap.get(v, v) for v in values]
         return reduce(apply, self, groups)
-                
-        
-        
+
 
 @dataclass_decoder(slots=True, separator='-', from_array=True)
 class RemapData(DataclassDecoderMixin):

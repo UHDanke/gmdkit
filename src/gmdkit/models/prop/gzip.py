@@ -64,7 +64,7 @@ class ReplayString(GzipString):
         string = super().load()
         
         replay_string, replay_start = string.split("#")
-        print(replay_start)
+        
         self.start = ReplayInfo.from_string(replay_start)
         self.events = ReplayEvents.from_string(replay_string)
             

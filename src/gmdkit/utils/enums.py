@@ -505,3 +505,12 @@ class LevelRating(EnumClass):
     HARD = 30
     HARDER = 40
     INSANE = 50
+    
+class ReplayEventID(EnumClass):
+    JUMP_P1 = 0
+    LEFT_P1 = 2
+    RIGHT_P1 = 3
+    JUMP_P2 = 6
+    LEFT_P2 = 7
+    RIGHT_P2 = 8
+    CHECKPOINT = 99

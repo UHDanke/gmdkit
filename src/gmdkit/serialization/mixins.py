@@ -253,7 +253,6 @@ class DataclassDecoderMixin:
                     raise ValueError(
                         f"{cls.__module__}.{cls.__qualname__} unknown field '{key}'"
                         )
-        
         return cls(**class_args)
         
     
@@ -278,11 +277,15 @@ class DataclassDecoderMixin:
         skip_fields = set()
         if condition is not None:
             for key, value in reversed(field_data):
-                if condition(key, value):
-                    skip_fields.add(key)
-                elif from_array:
-                    break
-                
+                try:
+                    if condition(key, value):
+                        skip_fields.add(key)
+                    elif from_array:
+                        break
+                except Exception as e:
+                    print(key, value)
+                    raise e
+                    
         for key, value in field_data:
             
             if key in skip_fields:
@@ -337,12 +340,10 @@ class DataclassDecoderMixin:
         separator = separator if separator is not None else self.SEPARATOR
         
         parts = self.to_tokens(from_array=from_array, encoder=encoder)
-        try:
-            return separator.join(parts)
-        except:
-            print(type(self))
-            print(parts)
-    
+        
+        return separator.join(parts)
+
+
 class DictDecoderMixin:
     
     SEPARATOR: str = ','
@@ -609,9 +610,8 @@ class DelimiterMixin:
         start_delimiter = start_delimiter if start_delimiter is not None else cls.START_DELIMITER
         end_delimiter = end_delimiter if end_delimiter is not None else cls.END_DELIMITER
         
-        if start_delimiter: string = string.lstrip(start_delimiter)
-        if end_delimiter: string = string.rstrip(end_delimiter)
-        
+        if start_delimiter: string = string.removeprefix(start_delimiter)
+        if end_delimiter: string = string.removesuffix(end_delimiter)
         return super().from_string(string, *args, **kwargs)
     
     
