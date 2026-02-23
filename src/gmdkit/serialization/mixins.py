@@ -36,18 +36,31 @@ class PlistMixin:
     kCEK: Optional[int] = None
     path: Optional[PathString]
     
+    @classmethod()
+    def from_node(cls, node):
+        
+        
+        
+        
+        pass
+    
+    def to_node():
+        pass
+    
     def load_plist():
         pass
     
     def save_plist():
         pass
     
+    @classmethod()
     def from_file():
         pass
     
     def to_file():
         pass
     
+    @classmethod()
     def from_string():
         pass
     
@@ -319,8 +332,7 @@ class DataclassDecoderMixin:
             cls, 
             string:str, 
             separator:Optional[str]=None, 
-            from_array:Optional[bool]=None,
-            decoder:Optional[StringDictDecoder]=None
+            **kwargs
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -330,23 +342,18 @@ class DataclassDecoderMixin:
         
         tokens = string.split(separator)
         
-        return cls.from_tokens(
-            tokens=tokens,
-            from_array=from_array,
-            decoder=decoder
-            )
+        return cls.from_tokens(tokens,**kwargs)
 
     
     def to_string(
             self, 
             separator:Optional[str]=None, 
-            from_array:Optional[bool]=None, 
-            encoder:Optional[StringDictEncoder]=None
+            **kwargs
             ) -> str:
         
         separator = separator if separator is not None else self.SEPARATOR
         
-        parts = self.to_tokens(from_array=from_array, encoder=encoder)
+        parts = self.to_tokens(**kwargs)
         
         return separator.join(parts)
 
@@ -409,7 +416,7 @@ class DictDecoderMixin:
             cls, 
             string:str, 
             separator:Optional[str]=None, 
-            decoder:Optional[StringDictDecoder]=None,
+            **kwargs,
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -419,18 +426,17 @@ class DictDecoderMixin:
         
         tokens = string.split(separator)
         
-        return cls.from_tokens(tokens,decoder=decoder)
+        return cls.from_tokens(tokens,**kwargs)
     
     
     def to_string(
             self, 
             separator:Optional[str]=None, 
-            encoder:Optional[StringDictEncoder]=None,
-            condition:Optional[Callable]=None
+            **kwargs
             ) -> str:
         separator = separator or self.SEPARATOR
         
-        parts = self.to_tokens(encoder=encoder,condition=condition)
+        parts = self.to_tokens(**kwargs)
         return separator.join(parts)
     
 
@@ -500,8 +506,7 @@ class ArrayDecoderMixin:
             string:str, 
             separator:Optional[str]=None,
             keep_sep:Optional[bool]=None,
-            group_size:Optional[int]=None, 
-            decoder:Optional[StringDecoder]=None
+            **kwargs
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
@@ -519,25 +524,20 @@ class ArrayDecoderMixin:
         if keep_sep:
             tokens = [token + separator for token in tokens]
                         
-        return cls.from_tokens(
-            tokens,
-            group_size=group_size,
-            decoder=decoder
-            )
+        return cls.from_tokens(tokens,**kwargs)
     
     
     def to_string(
             self, 
             separator:Optional[str]=None,
             keep_sep:Optional[bool]=None,
-            group_size:Optional[int]=None, 
-            encoder:Optional[StringEncoder]=None
+            **kwargs
             ) -> str:
         
         keep_sep = keep_sep if keep_sep is not None else self.KEEP_SEPARATOR
         separator = '' if keep_sep else separator if separator is not None else self.SEPARATOR or ''
         
-        tokens = self.to_tokens(encoder=encoder,group_size=group_size)
+        tokens = self.to_tokens(**kwargs)
         
         return separator.join(tokens)
 
