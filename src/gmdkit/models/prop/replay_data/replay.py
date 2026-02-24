@@ -58,28 +58,11 @@ class ReplayInput(DataclassDecoderMixin):
     delta_step : int
     event: Any = field_decoder(default_factory=ReplayEvent,optional=True,decoder=process_events,encoder=to_string)
 
-    @classmethod
-    def from_string(
-            cls, 
-            string:str, 
-            separator:Optional[str]=None, 
-            from_array:Optional[bool]=None,
-            decoder:Optional[StringDictDecoder]=None
-            ) -> Self:
-        
-        separator = separator if separator is not None else cls.SEPARATOR
-        
-        if not string:
-            return cls()
-        # RobTop PLEASE use a sane serialization format you are getting lost in the commas
-        # Checkpoint data also uses commas so maxsplit needs to be specified here.
-        tokens = string.split(separator,1)
-        
-        return cls.from_tokens(
-            tokens=tokens,
-            from_array=from_array,
-            decoder=decoder
-            )
+
+# RobTop PLEASE use a sane serialization format you are getting lost in the commas
+# Checkpoint data also uses commas so maxsplit needs to be specified here
+ReplayInput.MAX_SPLIT = 1
+
 
 class ReplayEvents(DelimiterMixin, ArrayDecoderMixin, ListClass):
     
