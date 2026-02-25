@@ -28,7 +28,7 @@ def temp_dir():
     shutil.rmtree(temp)
 
 
-ONLINE_LEVELS_DIR = Path(__file__).parent / "data" / "gmd" / "online"
+ONLINE_LEVELS_DIR = Path(__file__).parent.parent / "data" / "gmd" / "official" / "copy"
 
 level_paths: list[Path] = []
 for path in ONLINE_LEVELS_DIR.glob("*.gmd"):
