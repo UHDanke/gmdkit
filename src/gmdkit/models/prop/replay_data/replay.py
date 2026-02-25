@@ -28,7 +28,7 @@ class ReplayInfo(DataclassDecoderMixin):
 
 @dataclass_decoder(slots=True,from_array=True,separator=":",default_optional=True)
 class ReplayEvent(DataclassDecoderMixin):
-    event_id: ReplayEventID = field_decoder(default=ReplayEventID(0),decoder=ReplayEventID.from_string,encoder=to_string)
+    event_id: ReplayEventID = field_decoder(default_factory=ReplayEventID,decoder=ReplayEventID.from_string,encoder=to_string)
     event_data: str = field_decoder(default="")
 
 
@@ -57,6 +57,10 @@ class ReplayInput(DataclassDecoderMixin):
     delta_step : int
     event: Any = field_decoder(default_factory=ReplayEvent,optional=True,decoder=process_events,encoder=to_string)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> baa8e443c9813705e06423f0f6c7a372901611dc
 # RobTop PLEASE use a sane serialization format you are getting lost in the commas
 # Checkpoint data also uses commas so maxsplit needs to be specified here
 ReplayInput.MAX_SPLIT = 1
