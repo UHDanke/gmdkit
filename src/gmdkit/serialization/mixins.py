@@ -1,5 +1,6 @@
 # Imports
 from dataclasses import fields
+import xml.etree.ElementTree as ET
 from typing import (
     Any, Self, Literal, 
     Optional, 
@@ -24,49 +25,151 @@ from gmdkit.serialization.functions import (
     decompress_string, compress_string,
     from_plist_file, to_plist_file, 
     from_plist_string, to_plist_string,
-    dict_wrapper, array_wrapper
+    read_plist, write_plist,
+    dict_wrapper, array_wrapper,
+    validate_node
 )
 
 
 class PlistMixin:
+    
     ENCODER: Optional[DictCaster]
     DECODER: Optional[DictCaster]
+    ENCODER_KEY: Optional[int] = None
     IS_ARRAY: bool = False
-    node: Optional = None
-    kCEK: Optional[int] = None
+    node: Optional[ET.Element]
     path: Optional[PathString]
     
-    @classmethod()
-    def from_node(cls, node):
+    
+    def __init_subclass__(cls, **kwargs):
+       super().__init_subclass__(**kwargs)
+       
+       if cls.IS_ARRAY and cls.ENCODER_KEY is not None:
+           raise TypeError(f"{cls.__module__}.{cls.__qualname__}: IS_ARRAY and ENCODER_KEY are mutually exclusive")    
+    
+    
+    def load_plist(
+            self,
+            node:Optional[ET.Element]=None, 
+            is_array:Optional[bool]=None,
+            encoder_key:Optional[int]=None,
+            decoder:Optional=None,            
+            **kwargs
+            ):
         
+        node = node if node is not None else self.node
+        is_array = self.IS_ARRAY
+        encoder_key = self.ENCODER_KEY
+        decoder = self.DECODER
         
+        try:
+            validate_node(node, is_array, encoder_key)
+        except Exception as e:
+            raise RuntimeError(f"{type(self).__module__}.{type(self).__qualname__} failed to validate node") from e
         
+        self.clear()
+        
+        start = 2 if is_array or encoder_key is not None else 0
+        index_range = range(start, len(node), 2)
+        
+        if decoder:
+            if is_array:
+                self.extend(decoder(node[i+1].text,**kwargs) for i in index_range)
+            else:
+                self.update(decoder(node[i].text,node[i+1].text,**kwargs) for i in index_range)
+        else:
+            if is_array:
+                self.extend(read_plist(node[i+1]) for i in index_range)
+            else:
+                self.update((node[i].text, read_plist(node[i+1])) for i in index_range)
+
+    
+    def save_plist(
+            self,
+            node:Optional[ET.Element]=None,
+            is_array:Optional[bool]=None,
+            encoder_key:Optional[int]=None,
+            encoder:Optional=None,
+            **kwargs):
+        
+        node = node if node is not None else self.node
+        is_array = self.IS_ARRAY
+        encoder_key = self.ENCODER_KEY
+        encoder = self.ENCODER
+        
+        node[:] = []
+        
+        # headers
+        if is_array:
+            ET.SubElement(node, 'k').text = '_isArr'
+            ET.SubElement(node, 't')
+        elif encoder_key is not None:
+            ET.SubElement(node, 'k').text = 'kCEK'
+            ET.SubElement(node, 'i').text = str(encoder_key)
+        
+        if is_array:
+            for k, v in enumerate(self, start=1):
+                if encoder is not None:
+                    v = encoder(v, **kwargs)
+                ET.SubElement(node, 'k').text = f'k_{k}'
+                write_plist(node,v)
+        else:
+            for k, v in self.items():
+                if encoder is not None:
+                    k, v = encoder(k, v, **kwargs)
+                
+                ET.SubElement(node, 'k').text = k
+                write_plist(node, v)
+
+        return node
+
+
+    @classmethod
+    def from_string(cls, string:str, **kwargs):
+        
+        node = ET.fromstring(string)
+        
+        if node.tag != "plist":
+            raise ValueError("Expected root node to be plist, got '{node.tag}'")
+        
+        root = node.find("dict")
+        
+        new = cls()
+        new.node = root
+        new.load_plist()
+        
+        return new
+    
+    
+    def to_string(self, **kwargs):
+        
+        root = ET.Element("plist", version="1.0", gjver="2.0")
         
         pass
     
-    def to_node():
-        pass
     
-    def load_plist():
-        pass
+    @classmethod
+    def from_file(cls, path:PathString, **kwargs) -> Self:
+        
+        with open(path) as file:
+            string = file.read()
+            
+        new = cls.from_string(string, **kwargs)
+        new.path = path
+                        
+        return new
     
-    def save_plist():
-        pass
     
-    @classmethod()
-    def from_file():
-        pass
+    def to_file(self, path:PathString, **kwargs):
+            
+        data = self.to_plist(**kwargs)
+        
+        to_plist_file(data, path)
     
-    def to_file():
-        pass
     
-    @classmethod()
-    def from_string():
-        pass
-    
-    def to_string():
-        pass
-    
+    def update_file(self, **kwargs):
+        self.to_file(path=self.path, **kwargs)
+        
     
 
 class PlistDecoderMixin:
@@ -217,6 +320,7 @@ class PlistArrayDecoderMixin(PlistDecoderMixin):
 class DataclassDecoderMixin:
     
     SEPARATOR: str = ','
+    MAX_SPLIT: Optional[int] = None
     FROM_ARRAY: bool = True
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
@@ -259,14 +363,19 @@ class DataclassDecoderMixin:
                     )            
                 
             for i in range(0, length, 2):
-                raw_key, raw_value = tokens[i], tokens[i + 1]
-                try:
-                    key, value = decoder(raw_key, raw_value)
-                except Exception as e:
-                    raise ValueError(
-                        f"{cls.__module__}.{cls.__qualname__} failed to decode key/value at index {i}"
-                        ) from e
-                    
+                encoded_key, encoded_value = tokens[i], tokens[i + 1]
+                
+                if decoder is None:
+                    key = encoded_key
+                    value = encoded_value
+                else:
+                    try:
+                        key, value = decoder(encoded_key, encoded_value)
+                    except Exception as e:
+                        raise ValueError(
+                            f"{cls.__module__}.{cls.__qualname__} failed to decode key/value at index {i}"
+                            ) from e
+                        
                 if hasattr(cls, key):
                     class_args[key] = value
                 else:
@@ -297,54 +406,56 @@ class DataclassDecoderMixin:
         skip_fields = set()
         if condition is not None:
             for key, value in reversed(field_data):
-                try:
-                    if condition(key, value):
-                        skip_fields.add(key)
-                    elif from_array:
-                        break
-                except Exception as e:
-                    print(key, value)
-                    raise e
+                if condition(key, value):
+                    skip_fields.add(key)
+                elif from_array:
+                    break
                     
         for key, value in field_data:
             
-            if key in skip_fields:
+            if skip_fields and key in skip_fields:
                 continue
             
-            try:
-                encoded_key, encoded_value = encoder(key, value)
-            except Exception as e:
-                raise ValueError(
-                    f"[{type(self).__module__}.{type(self).__qualname__}]"
-                    f" Failed to encode field '{key}': {e}"
-                    ) from e
-                
+            if encoder is None:
+                encoded_key = key
+                encoded_value = value
+            else:
+                try:
+                    encoded_key, encoded_value = encoder(key, value)
+                except Exception as e:
+                    raise ValueError(
+                        f"[{type(self).__module__}.{type(self).__qualname__}]"
+                        f" Failed to encode field '{key}': {e}"
+                        ) from e
+                    
             if not from_array:
                 parts.append(encoded_key)
                 
             parts.append(encoded_value)
             
         return parts
-
     
+        
     @classmethod
     def from_string(
             cls, 
             string:str, 
-            separator:Optional[str]=None, 
+            separator:Optional[str]=None,
+            max_split:Optional[int]=None,
             **kwargs
             ) -> Self:
         
         separator = separator if separator is not None else cls.SEPARATOR
+        max_split = max_split if max_split is not None else cls.MAX_SPLIT
         
         if not string:
             return cls()
         
-        tokens = string.split(separator)
+        tokens = string.split(separator, max_split)
         
         return cls.from_tokens(tokens,**kwargs)
-
-    
+            
+        
     def to_string(
             self, 
             separator:Optional[str]=None, 
@@ -380,12 +491,15 @@ class DictDecoderMixin:
                 )
         
         result = cls()
-        try:
-            result.update(decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
-        except Exception as e:
-            raise ValueError(
-                f"{cls.__module__}.{cls.__qualname__} failed to decode"
-                ) from e
+        if decoder is None:
+            result.update(zip(tokens[::2], tokens[1::2]))
+        else:
+            try:
+                result.update(decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
+            except Exception as e:
+                raise ValueError(
+                    f"{cls.__module__}.{cls.__qualname__} failed to decode"
+                    ) from e
         
         return result
     
@@ -438,7 +552,7 @@ class DictDecoderMixin:
         
         parts = self.to_tokens(**kwargs)
         return separator.join(parts)
-    
+
 
 class ArrayDecoderMixin:
     
@@ -458,7 +572,7 @@ class ArrayDecoderMixin:
         
         group_size = group_size or cls.GROUP_SIZE
         decoder = decoder or cls.DECODER
-
+        
         result = cls()
         
         try:
@@ -486,14 +600,17 @@ class ArrayDecoderMixin:
         
         tokens = []
         try:
-            for x in self:
-                if group_size > 1:
-                    group = encoder(x)
+            if group_size > 1:
+                for x in self:
+                    group = encoder(x) if encoder else x
                     if len(group) != group_size:
                         raise ValueError(f"encoder returned {len(group)} tokens, expected {group_size}")
                     tokens.extend(group)
-                else:
-                    tokens.append(encoder(x))
+            elif encoder:
+                tokens.extend(encoder(token) for token in tokens)
+            else:
+                tokens.extend(tokens)
+                
         except Exception as e:
             raise ValueError(f"{type(self).__module__}.{type(self).__qualname__} failed to encode") from e
         
@@ -511,16 +628,16 @@ class ArrayDecoderMixin:
         
         separator = separator if separator is not None else cls.SEPARATOR
         keep_sep = keep_sep if keep_sep is not None else cls.KEEP_SEPARATOR
-
+        
         result = cls()
-
+        
         string = string.removeprefix(separator).removesuffix(separator)
         
         if not string:
             return result
-
-        tokens = string.split(separator)
         
+        tokens = string.split(separator)
+           
         if keep_sep:
             tokens = [token + separator for token in tokens]
                         
@@ -699,3 +816,28 @@ class CompressFileMixin:
             if encoded: string = compress_string(string, compression=compression, xor_key=cypher)
             
             file.write(string)
+
+
+class PlistOutputMixin:
+
+    EXTENSION: str="plist"
+    FALLBACK_NAME: Callable = lambda self: self[lvl_prop.NAME]
+    
+    def to_file(self, 
+            path:Optional[PathString]=None, 
+            extension:Optional[str]=None,
+            fallback_name:Optional[Callable]=None,
+            **kwargs):
+        
+        fallback_name = fallback_name is not None or self.FALLBACK_NAME
+        
+        if path is None: 
+            path = Path()
+        else:
+            path = Path(path)
+        
+        if not path.suffix:
+            name = fallback_name(self)
+            path = (path / name).with_suffix('.' + extension.lstrip('.'))
+            
+        super().to_file(path=path, **kwargs)

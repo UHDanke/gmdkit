@@ -107,13 +107,13 @@ def read_plist(node:ET.Element):
                     node[0].text == "_isArr" and
                     node[1].tag == "t"
                     ):
-                return [read_plist(node[i]) for i in range(3, len(node), 2)]
+                return [read_plist(node[i]) for i in range(2, len(node), 2)]
             
             return {
                 node[i].text: read_plist(node[i + 1])
                 for i in range(0, len(node) - 1, 2)
             }
-
+            
 
 def write_plist(parent:ET.Element, value:Any):
     
@@ -141,7 +141,7 @@ def write_plist(parent:ET.Element, value:Any):
             
             write_plist(node, v)
     
-    elif isinstance(value, (list, tuple, set)):
+    elif isinstance(value, (list, tuple)):
         if parent.tag == "plist":
             node = ET.SubElement(parent, "dict")
         else:
@@ -159,6 +159,44 @@ def write_plist(parent:ET.Element, value:Any):
     
     elif value is not None:
         ET.SubElement(parent, "s").text = str(value)           
+
+
+def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optional[int]=None):
+    
+    if is_array and encoder_key is not None:
+        raise ValueError("Arrays and encoder keys are mutually exclusive")
+
+    if node.tag not in ['d', 'dict']:
+        raise ValueError("Element is not a plist dict element")
+    
+    length = len(node)
+    
+    if length % 2 != 0:
+        raise ValueError(f"odd number of elements: {length}")
+    
+    if length < 2:
+        if is_array:
+            raise ValueError(f"Expected at least 2 header elements for array, found {length}")
+        elif encoder_key is not None:
+            raise ValueError(f"Expected at least 2 header elements for encoded struct, found {length}")
+        else:
+            return
+        
+    key_el = node[0]
+    val_el = node[1]
+    
+    if is_array and (key_el.tag != 'k' or key_el.text != '_isArr' or val_el.tag != 't' or val_el.text is not None):
+            raise ValueError(f"Malformed array header, expected '<k>_isArr</k><t/>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
+    elif encoder_key is not None:
+        if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
+            raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
+        elif node[1].text != str(encoder_key):
+            raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
+    
+            
+    for i in range(0, length, 2):
+        if node[i].tag != 'k':
+            raise ValueError(f"Expected key tag 'k' at index {i}, got '{node[i].tag}'")
 
 
 

@@ -155,14 +155,14 @@ def dict_serializer(key:NumKey, value:Any):
 
 def dict_cast(
     functions: dict[Any,Callable],
-    allowed_kwargs: Optional[dict[Any,dict|set]] = None,
+    allow_kwargs: Optional[dict[Any,bool]] = None,
     key_func_start: Optional[Callable] = None,
     key_func_end: Optional[Callable] = None,
     default: Optional[Callable] = None,
 ):
-    allowed_kwargs = allowed_kwargs or {}
+    allow_kwargs = allow_kwargs or {}
     f_get = functions.get
-    kw_get = allowed_kwargs.get
+    kw_get = allow_kwargs.get
     has_default = callable(default)
     kc_start = callable(key_func_start)
     kc_end = callable(key_func_end)
@@ -175,15 +175,8 @@ def dict_cast(
         func = f_get(key)
 
         if func is not None:
-            kw = {}
-            kw_data = kw_get(key)
-            if kw_data:
-                if isinstance(kw_data, set):
-                    kw = {k: kwargs[k] for k in kw_data & kwargs.keys()}
-                elif isinstance(kw_data, dict):
-                    kw = {k: kwargs[v] for k, v in kw_data.items() if k in kwargs}
-                
-            value = func(value, **kw) if kw else func(value)
+            
+            value = func(value, **kw) if kw_get(key) else func(value)
             
         elif has_default:
             value = default(value)

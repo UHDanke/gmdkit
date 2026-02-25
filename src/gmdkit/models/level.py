@@ -1,5 +1,5 @@
 # Imports
-from typing import Self, Optional, TYPE_CHECKING
+from typing import Self, Optional, TYPE_CHECKING, Callable
 from pathlib import Path
 from glob import glob
 
