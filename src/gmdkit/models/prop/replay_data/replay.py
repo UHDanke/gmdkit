@@ -28,7 +28,7 @@ class ReplayInfo(DataclassDecoderMixin):
 
 @dataclass_decoder(slots=True,from_array=True,separator=":",default_optional=True)
 class ReplayEvent(DataclassDecoderMixin):
-    event_id: ReplayEventID = field_decoder(default_factory=ReplayEventID,decoder=ReplayEventID.from_string,encoder=to_string)
+    event_id: ReplayEventID = field_decoder(default=ReplayEventID(0),decoder=ReplayEventID.from_string,encoder=to_string)
     event_data: str = field_decoder(default="")
 
 

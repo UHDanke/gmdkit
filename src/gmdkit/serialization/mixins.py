@@ -451,7 +451,7 @@ class DataclassDecoderMixin:
         if not string:
             return cls()
         
-        tokens = string.split(separator, max_split)
+        tokens = string.split(separator, max_split) if max_split is not None else string.split(separator)
         
         return cls.from_tokens(tokens,**kwargs)
             
@@ -607,9 +607,9 @@ class ArrayDecoderMixin:
                         raise ValueError(f"encoder returned {len(group)} tokens, expected {group_size}")
                     tokens.extend(group)
             elif encoder:
-                tokens.extend(encoder(token) for token in tokens)
+                tokens.extend(encoder(x) for x in self)
             else:
-                tokens.extend(tokens)
+                tokens.extend(self)
                 
         except Exception as e:
             raise ValueError(f"{type(self).__module__}.{type(self).__qualname__} failed to encode") from e
