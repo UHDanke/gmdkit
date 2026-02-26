@@ -176,7 +176,7 @@ def dict_cast(
 
         if func is not None:
             
-            value = func(value, **kw) if kw_get(key) else func(value)
+            value = func(value, **kwargs) if kw_get(key) else func(value)
             
         elif has_default:
             value = default(value)

@@ -27,7 +27,7 @@ from gmdkit.serialization.functions import (
     from_plist_string, to_plist_string,
     read_plist, write_plist,
     dict_wrapper, array_wrapper,
-    validate_node
+    validate_dict_node
 )
 
 
@@ -63,7 +63,7 @@ class PlistMixin:
         decoder = self.DECODER
         
         try:
-            validate_node(node, is_array, encoder_key)
+            validate_dict_node(node, is_array, encoder_key)
         except Exception as e:
             raise RuntimeError(f"{type(self).__module__}.{type(self).__qualname__} failed to validate node") from e
         

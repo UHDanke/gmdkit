@@ -29,8 +29,8 @@ class LevelSave(CompressFileMixin,PlistDictDecoderMixin,DictClass):
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
     
-    DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER, allowed_kwargs={"LLM_01":{"load"}}))   
-    ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER, allowed_kwargs={"LLM_01":{"save"}})) 
+    DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER, allow_kwargs={"LLM_01": True}))
+    ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER, allow_kwargs={"LLM_01": True}))
     
     @classmethod
     def from_plist(cls, data, load:bool=False, **kwargs) -> Self:

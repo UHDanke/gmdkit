@@ -325,7 +325,7 @@ def dataclass_decoder(
             decoder or dict_cast(
                 decoders,
                 key_func_start=dkey_dict.get if dkey_dict else None,
-                allowed_kwargs=kw_dict if kw_dict else None
+                allow_kwargs=kw_dict if kw_dict else None
                 )
             )
             
@@ -333,7 +333,7 @@ def dataclass_decoder(
             encoder or dict_cast(
                 encoders,
                 key_func_end=ekey_dict.get if ekey_dict else None,
-                allowed_kwargs=kw_dict if kw_dict else None
+                allow_kwargs=kw_dict if kw_dict else None
         		)
             )
         
