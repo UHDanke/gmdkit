@@ -1,12 +1,13 @@
 # Imports
 from typing import Any, Protocol, Callable, Iterable
+from xml.etree.ElementTree import Element
 from os import PathLike
 
     
 PathString = str|PathLike
 PlistStruct = dict|list|tuple
 NumKey = int|str
-
+Node = Element
 
 class Caster(Protocol):
     def __call__(self, value: Any, **kwargs:Any) -> Any : ...

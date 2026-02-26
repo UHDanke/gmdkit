@@ -12,7 +12,7 @@ LIST_DECODERS = {
     'k15': bool,
     'k21': enums.ListType.from_string,
     'k96': IntList.from_string,
-    'k97': LevelMapping.from_plist,
+    'k97': LevelMapping.from_node,
 }
 
 

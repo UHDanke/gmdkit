@@ -6,7 +6,7 @@ from gmdkit.models.level import Level
 from gmdkit.models.object import Object
 from gmdkit.mappings import obj_prop
 
-from utils import ONLINE_LEVELS, OFFLINE_LEVELS
+from tests.utils import ONLINE_LEVELS, OFFLINE_LEVELS
 
 level_paths = (ONLINE_LEVELS + OFFLINE_LEVELS)[:10]
 

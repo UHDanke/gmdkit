@@ -77,6 +77,7 @@ class TouchMode(EnumClass):
     OFF = 2
     
 class SelectPlayer(EnumClass):
+    NONE = -1
     ALL = 0
     P1 = 1
     P2 = 2

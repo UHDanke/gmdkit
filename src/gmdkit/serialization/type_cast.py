@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Any, Optional
+from typing import Callable, Any
 import base64
 
 # Package Imports
@@ -39,6 +39,8 @@ def args_to_str(*args):
     return (str(a) for a in args)
 
 def to_string(obj:Any, **kwargs) -> str:
+    if obj is None:
+        return ""
     method = getattr(obj, "to_string", None)
     if callable(method):
         return method(**kwargs)
@@ -116,17 +118,6 @@ def encode_text(string:str) -> str:
     
     return encoded_bytes.decode("utf-8")
 
-
-decode_funcs = {
-    bool: to_bool
-    }
-
-
-encode_funcs = {
-    bool: from_bool,
-    float: from_float    
-    }
-    
     
 def serialize(obj:Any) -> str:
     
@@ -152,40 +143,4 @@ def serialize(obj:Any) -> str:
 def dict_serializer(key:NumKey, value:Any):
     return (str(key), serialize(value))
 
-
-def dict_cast(
-    functions: dict[Any,Callable],
-    allow_kwargs: Optional[dict[Any,bool]] = None,
-    key_func_start: Optional[Callable] = None,
-    key_func_end: Optional[Callable] = None,
-    default: Optional[Callable] = None,
-):
-    allow_kwargs = allow_kwargs or {}
-    f_get = functions.get
-    kw_get = allow_kwargs.get
-    has_default = callable(default)
-    kc_start = callable(key_func_start)
-    kc_end = callable(key_func_end)
-
-    def cast_func(key: Any, value: Any, **kwargs) -> tuple[Any, Any]:
-        
-        if kc_start:
-            key = key_func_start(key)
-            
-        func = f_get(key)
-
-        if func is not None:
-            
-            value = func(value, **kw) if kw_get(key) else func(value)
-            
-        elif has_default:
-            value = default(value)
-
-        if kc_end:
-            key = key_func_end(key)
-        
-
-        return key, value
-
-    return cast_func
         

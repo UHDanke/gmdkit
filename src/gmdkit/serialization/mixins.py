@@ -1,11 +1,11 @@
 # Imports
+from pathlib import Path
 from dataclasses import fields
 import xml.etree.ElementTree as ET
 from typing import (
     Any, Self, Literal, 
     Optional, 
     Callable, Sequence,
-    TYPE_CHECKING,
     )
 
 # Package Imports
@@ -18,20 +18,16 @@ from gmdkit.utils.typing import (
     StringDecoder, StringEncoder,
     StringDictDecoder, StringDictEncoder,
     KeyValueCondition,
-    PlistWrapper, DictWrapper, ArrayWrapper,
-    Caster, DictCaster
+    DictCaster
 )
 from gmdkit.serialization.functions import (
     decompress_string, compress_string,
-    from_plist_file, to_plist_file, 
-    from_plist_string, to_plist_string,
     read_plist, write_plist,
-    dict_wrapper, array_wrapper,
-    validate_node
+    validate_dict_node
 )
 
 
-class PlistMixin:
+class PlistDecoderMixin:
     
     ENCODER: Optional[DictCaster]
     DECODER: Optional[DictCaster]
@@ -48,7 +44,7 @@ class PlistMixin:
            raise TypeError(f"{cls.__module__}.{cls.__qualname__}: IS_ARRAY and ENCODER_KEY are mutually exclusive")    
     
     
-    def load_plist(
+    def load_data(
             self,
             node:Optional[ET.Element]=None, 
             is_array:Optional[bool]=None,
@@ -63,7 +59,7 @@ class PlistMixin:
         decoder = self.DECODER
         
         try:
-            validate_node(node, is_array, encoder_key)
+            validate_dict_node(node, is_array=is_array, encoder_key=encoder_key)
         except Exception as e:
             raise RuntimeError(f"{type(self).__module__}.{type(self).__qualname__} failed to validate node") from e
         
@@ -74,9 +70,9 @@ class PlistMixin:
         
         if decoder:
             if is_array:
-                self.extend(decoder(node[i+1].text,**kwargs) for i in index_range)
+                self.extend(decoder(node[i+1],**kwargs) for i in index_range)
             else:
-                self.update(decoder(node[i].text,node[i+1].text,**kwargs) for i in index_range)
+                self.update(decoder(node[i].text,node[i+1],**kwargs) for i in index_range)
         else:
             if is_array:
                 self.extend(read_plist(node[i+1]) for i in index_range)
@@ -84,7 +80,7 @@ class PlistMixin:
                 self.update((node[i].text, read_plist(node[i+1])) for i in index_range)
 
     
-    def save_plist(
+    def save_data(
             self,
             node:Optional[ET.Element]=None,
             is_array:Optional[bool]=None,
@@ -107,22 +103,47 @@ class PlistMixin:
             ET.SubElement(node, 'k').text = 'kCEK'
             ET.SubElement(node, 'i').text = str(encoder_key)
         
-        if is_array:
-            for k, v in enumerate(self, start=1):
-                if encoder is not None:
-                    v = encoder(v, **kwargs)
-                ET.SubElement(node, 'k').text = f'k_{k}'
-                write_plist(node,v)
-        else:
-            for k, v in self.items():
-                if encoder is not None:
+        if encoder:
+            if is_array:
+                for k, v in enumerate(self, start=1):
+                    ET.SubElement(node, 'k').text = f'k_{k}'
+                    node.append(encoder(v, **kwargs))
+            else:
+                for k, v in self.items():
                     k, v = encoder(k, v, **kwargs)
-                
-                ET.SubElement(node, 'k').text = k
-                write_plist(node, v)
+                    ET.SubElement(node, 'k').text = k
+                    node.append(v)
+        else:
+            if is_array:
+                for k, v in enumerate(self, start=1):
+                    ET.SubElement(node, 'k').text = f'k_{k}'
+                    node.append(write_plist(v))
+            else:
+                for k, v in self.items():
+                    ET.SubElement(node, 'k').text = k
+                    node.append(write_plist(v))
 
         return node
-
+    
+    
+    @classmethod
+    def from_node(cls, node, load_data:bool=True, **kwargs):
+        
+        new = cls()
+        new.node = node
+        if node.tag == "dict":
+            node.tag = "d"
+        if load_data:
+            new.load_data(**kwargs)
+            
+        return new
+    
+    def to_node(self, save_data:bool=True, **kwargs):
+        
+        if save_data:
+            self.save_data(**kwargs)
+        
+        return self.node
 
     @classmethod
     def from_string(cls, string:str, **kwargs):
@@ -130,192 +151,71 @@ class PlistMixin:
         node = ET.fromstring(string)
         
         if node.tag != "plist":
-            raise ValueError("Expected root node to be plist, got '{node.tag}'")
+            raise ValueError(f"Expected root node to be plist, got '{node.tag}'")
         
         root = node.find("dict")
         
-        new = cls()
-        new.node = root
-        new.load_plist()
+        if root is None:
+            raise ValueError("plist does not contain a <dict> root element")
         
-        return new
+        return cls.from_node(root,**kwargs)
     
     
-    def to_string(self, **kwargs):
+    def to_string(self, xml_declaration:bool=True, **kwargs):
+        node = self.to_node(**kwargs)
+
+        tag = node.tag
+        node.tag = "dict"
         
         root = ET.Element("plist", version="1.0", gjver="2.0")
+        root.append(node)
         
-        pass
+        string = ET.tostring(
+            root,
+            encoding="unicode",
+            xml_declaration=xml_declaration
+        )
+        
+        node.tag = tag
+        
+        return string
     
     
     @classmethod
     def from_file(cls, path:PathString, **kwargs) -> Self:
         
-        with open(path) as file:
+        with open(path, "r") as file:
             string = file.read()
             
         new = cls.from_string(string, **kwargs)
         new.path = path
-                        
         return new
     
     
-    def to_file(self, path:PathString, **kwargs):
-            
-        data = self.to_plist(**kwargs)
+    def to_file(self, 
+            path:Optional[PathString]=None, 
+            **kwargs):
         
-        to_plist_file(data, path)
+        path = path or getattr(self, "path", None)
+        
+        string = self.to_string(**kwargs)
+        
+        with open(path,"w") as file:
+            file.write(string)
     
     
     def update_file(self, **kwargs):
         self.to_file(path=self.path, **kwargs)
         
-    
-
-class PlistDecoderMixin:
-    
-    ENCODER: Optional[Caster] = None
-    DECODER: Optional[Caster] = None
-    PLIST_FORMAT: Optional[PlistWrapper] = None
-    SELF_FORMAT: Optional[PlistWrapper] = None
-    path: Optional[PathString]
-    
-    
-    @classmethod
-    def from_plist(
-            cls, 
-            data:Any, 
-            decoder:Optional[Caster]=None,
-            self_format:Optional[PlistWrapper]=None,
-            **kwargs: Any
-            ) -> Self:
         
-        decoder = decoder or cls.DECODER
-        self_format = self_format or cls.SELF_FORMAT
+    def reload_file(self, load_data:bool=True, **kwargs):
+        new = self.from_file(path=self.path, load_data=False)
         
-        if decoder is None or not callable(decoder) or self_format is None or not callable(self_format):
-            return cls(data)
+        self.node = new.node
         
-        new = self_format(data, decoder, **kwargs)
+        if load_data:
+            self.load_data(**kwargs)
         
-        return cls(new)
-    
-        
-    def to_plist(
-            self, 
-            encoder:Optional[Caster]=None, 
-            plist_format:Optional[PlistWrapper]=None,
-            **kwargs
-            ) -> Any:
-        
-        encoder = encoder or self.ENCODER
-        plist_format = plist_format or self.PLIST_FORMAT
-        
-        if encoder is None or not callable(encoder) or plist_format is None:
-            return self
-
-        new = plist_format(self, encoder, **kwargs)
-        
-        return new
-    
-    
-    @classmethod
-    def from_file(cls, path:PathString, **kwargs) -> Self:
-        
-        parsed = from_plist_file(path)
-        
-        new = cls.from_plist(parsed,**kwargs)
-        new.path = path
-                        
-        return new
-    
-    
-    def to_file(self, path:PathString, **kwargs):
-            
-        data = self.to_plist(**kwargs)
-        
-        to_plist_file(data, path)
-    
-    
-    def update_file(self, **kwargs):
-        self.to_file(path=self.path, **kwargs)
-        
-    
-    @classmethod
-    def from_string(cls, string:str, **kwargs) -> Self:
-        
-        parsed = from_plist_string(string)
-        
-        return cls.from_plist(parsed, **kwargs)
-    
-    
-    def to_string(self, **kwargs) -> str:
-        
-        data = self.to_plist(**kwargs)
-        
-        return to_plist_string(data)
-
-
-class PlistDictDecoderMixin(PlistDecoderMixin):
-    
-    ENCODER: Optional[DictCaster]
-    DECODER: Optional[DictCaster] 
-    PLIST_FORMAT: DictWrapper = staticmethod(dict_wrapper)
-    SELF_FORMAT: DictWrapper = staticmethod(dict_wrapper)
-    
-    def reload_file(self, **kwargs) -> Self:
-        new = type(self).from_file(path=self.path, **kwargs)
-        self.clear()
-        self.update(new)
-        return self
-
-    if TYPE_CHECKING:
-        @classmethod
-        def from_plist(
-            cls, 
-            data: dict, 
-            decoder: Optional[DictCaster] = None, 
-            self_format: Optional[DictWrapper] = None, 
-            **kwargs: Any
-        ) -> Self: ...
-        
-        def to_plist(
-            self, 
-            encoder: Optional[DictCaster] = None, 
-            plist_format: Optional[DictWrapper] = None, 
-            **kwargs
-        ) -> dict: ...
-        
-
-class PlistArrayDecoderMixin(PlistDecoderMixin):
-    
-    ENCODER: Optional[Caster]
-    DECODER: Optional[Caster] 
-    PLIST_FORMAT: ArrayWrapper = staticmethod(array_wrapper)
-    SELF_FORMAT: ArrayWrapper = staticmethod(array_wrapper)
-
-    def reload_file(self, **kwargs) -> Self:
-        new = type(self).from_file(path=self.path, **kwargs)
-        self[:] = new
-        return self
-
-    if TYPE_CHECKING:
-        @classmethod
-        def from_plist(
-            cls, 
-            data: list, 
-            decoder: Optional[Caster] = None, 
-            self_format: Optional[ArrayWrapper] = None, 
-            **kwargs: Any
-        ) -> Self: ...
-        
-        def to_plist(
-            self, 
-            encoder: Optional[Caster] = None, 
-            plist_format: Optional[ArrayWrapper] = None, 
-            **kwargs
-        ) -> list: ...
-
 
 class DataclassDecoderMixin:
     
@@ -331,7 +231,9 @@ class DataclassDecoderMixin:
             cls,
             tokens:Sequence[str],
             from_array:Optional[bool]=None, 
-            decoder:Optional[StringDictDecoder]=None
+            decoder:Optional[StringDictDecoder]=None,
+            decoder_kwargs:bool=False,
+            **kwargs
             ) -> Self:
         
         from_array = from_array if from_array is not None else cls.FROM_ARRAY
@@ -339,7 +241,7 @@ class DataclassDecoderMixin:
         
         class_args = {}
         f = fields(cls)
-        f_len = len(f) * 1 if from_array else 2
+        f_len = len(f) * (1 if from_array else 2)
         length = len(tokens)
         
         if length > f_len:
@@ -370,7 +272,10 @@ class DataclassDecoderMixin:
                     value = encoded_value
                 else:
                     try:
-                        key, value = decoder(encoded_key, encoded_value)
+                        if decoder_kwargs:
+                            key, value = decoder(encoded_key, encoded_value, **kwargs)
+                        else:
+                            key, value = decoder(encoded_key, encoded_value)
                     except Exception as e:
                         raise ValueError(
                             f"{cls.__module__}.{cls.__qualname__} failed to decode key/value at index {i}"
@@ -451,8 +356,11 @@ class DataclassDecoderMixin:
         if not string:
             return cls()
         
-        tokens = string.split(separator, max_split)
-        
+        if max_split:
+            tokens = string.split(separator, max_split)
+        else:
+            tokens = string.split(separator)
+            
         return cls.from_tokens(tokens,**kwargs)
             
         
@@ -607,7 +515,7 @@ class ArrayDecoderMixin:
                         raise ValueError(f"encoder returned {len(group)} tokens, expected {group_size}")
                     tokens.extend(group)
             elif encoder:
-                tokens.extend(encoder(token) for token in tokens)
+                tokens.extend(encoder(x) for x in self)
             else:
                 tokens.extend(tokens)
                 
@@ -630,8 +538,6 @@ class ArrayDecoderMixin:
         keep_sep = keep_sep if keep_sep is not None else cls.KEEP_SEPARATOR
         
         result = cls()
-        
-        string = string.removeprefix(separator).removesuffix(separator)
         
         if not string:
             return result
@@ -760,84 +666,161 @@ class DelimiterMixin:
 
 class CompressFileMixin:
     
-    DEFAULT_PATH: Optional[PathString] = None
+    COMPRESSED: bool = False
     COMPRESSION: Optional[Literal['zlib', 'gzip', 'deflate']] = None
     CYPHER: Optional[bytes] = None
     
     @classmethod
-    def from_file(
-            cls, 
-            path:Optional[PathString]=None, 
-            encoded:bool=True, 
-            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None, 
+    def from_string(
+            cls,
+            string:str,
+            compressed:Optional[bool]=None,
+            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
             cypher:Optional[bytes]=None,
-            **kwargs: Any
+            **kwargs
             ) -> Self:
         
-        path = path or cls.DEFAULT_PATH
+        compressed = compressed if compressed is not None else cls.COMPRESSED
         compression = compression or cls.COMPRESSION
         cypher = cypher or cls.CYPHER
         
-        if path is None:
-            raise ValueError("path must be provided")
-        
-        with open(path, "r", encoding="utf-8") as file:
+        if compressed:
+            string = decompress_string(string, compression=compression, xor_key=cypher)
             
-            string = file.read()
-            
-            if encoded: string = decompress_string(string, compression=compression, xor_key=cypher)
-            
-            new = super().from_string(string, **kwargs)
-        
-        new.path = path # ensure 'None' is replaced w/ valid path
-        return new
-        
+        return super().from_string(string, **kwargs)
     
-    def to_file(
+    
+    def to_string(
             self,
-            path:Optional[PathString]=None,
-            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None, 
+            compressed:Optional[bool]=None,
+            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
             cypher:Optional[bytes]=None,
-            encoded:bool=True, 
             **kwargs
-            ):
+            ) -> str:
         
-        path = path or self.DEFAULT_PATH
+        compressed = compressed if compressed is not None else self.COMPRESSED
         compression = compression or self.COMPRESSION
         cypher = cypher or self.CYPHER
         
-        if path is None:
-            raise ValueError("path must be provided")
+        string = super().to_string(**kwargs)
+    
+        if compressed:
+            string = compress_string(string, compression=compression, xor_key=cypher)
         
-        with open(path, "w", encoding="utf-8") as file:
-            
-            string = super().to_string(**kwargs)
-            
-            if encoded: string = compress_string(string, compression=compression, xor_key=cypher)
-            
-            file.write(string)
+        return string
+        
 
-
-class PlistOutputMixin:
-
-    EXTENSION: str="plist"
-    FALLBACK_NAME: Callable = lambda self: self[lvl_prop.NAME]
+class FilePathMixin:
+    
+    EXTENSION: str
+    NAME_FALLBACK: Callable
+    DEFAULT_PATH: PathString
+    
+    @classmethod
+    def from_file(
+            cls, 
+            path:Optional[PathString]=None,
+            extension:Optional[str]=None,
+            **kwargs: Any
+            ) -> Self:
+        
+        extension = extension if extension is not None else getattr(cls, "EXTENSION", None)
+        path = path or getattr(cls, "DEFAULT_PATH", None)
+        
+        if path is None:
+            path = Path()
+        else:
+            path = Path(path)
+        
+        if extension is not None and path.suffix != f".{extension}":
+            raise ValueError(f"Wrong extension, expected '{extension}', got '{path.suffix}'")
+            
+        return super().from_file(path=path,**kwargs)
+      
     
     def to_file(self, 
             path:Optional[PathString]=None, 
             extension:Optional[str]=None,
-            fallback_name:Optional[Callable]=None,
+            name_fallback:Optional[Callable]=None,
             **kwargs):
         
-        fallback_name = fallback_name is not None or self.FALLBACK_NAME
+        extension = extension if extension is not None else getattr(self, "EXTENSION", None)
+        name_fallback = name_fallback if name_fallback is not None else getattr(self, "NAME_FALLBACK", None)
+        
+        path = path or getattr(self, "DEFAULT_PATH", None)
         
         if path is None: 
             path = Path()
         else:
             path = Path(path)
         
-        if not path.suffix:
-            name = fallback_name(self)
-            path = (path / name).with_suffix('.' + extension.lstrip('.'))
+        if extension is not None and path.suffix and path.suffix != f".{extension}":
+            raise ValueError(f"Wrong extension, expected '{extension}', got '{path.suffix}'")
             
-        super().to_file(path=path, **kwargs)
+        if not path.suffix:
+            if name_fallback is None:
+                raise ValueError("Cannot resolve default filename as no fallback function was provided")
+                
+            name = name_fallback(self)
+            path = (path / name).with_suffix('.' + extension.lstrip('.'))
+        
+        super().to_file(path=path)
+        
+
+class LoadContentMixin:
+    
+    CONTENT_KEYS: Optional[set] = None
+    
+    @classmethod
+    def from_node(cls, node, load_data:bool=True, load_content:bool=True, content_keys:Optional[set]=None, **kwargs):
+        
+        new = super().from_node(node, load_data=load_data**kwargs)
+        
+        if load_data and load_content: 
+            new.load_content()
+            
+        return new
+    
+    
+    def to_node(self, save_data:bool=True, save_content:bool=True, content_keys:Optional[set]=None, **kwargs):
+        
+        if save_data and save_content:
+            self.save_content()
+        
+        return super().to_node(save_data=save_data,**kwargs)
+
+        
+    def load_content(self, content_keys:Optional[set]=None):
+        
+        target = content_keys if content_keys is not None else getattr(self, "CONTENT_KEYS", None)
+    
+        available = self.keys()
+        if target is not None:
+            key_set = available & target
+        else:
+            key_set = available
+        
+        for key in key_set:
+            value = self.get(key)
+            load = getattr(value, "load", None)
+    
+            if load is not None and callable(load):
+                load()
+        
+            
+    def save_content(self, content_keys:Optional[set]=None):
+        
+        target = content_keys if content_keys is not None else getattr(self, "CONTENT_KEYS", None)
+    
+        available = self.keys()
+        if target is not None:
+            key_set = available & target
+        else:
+            key_set = available
+            
+        for key in key_set:
+            value = self.get(key)
+            save = getattr(value, "save", None)
+    
+            if save is not None and callable(save):
+                save()

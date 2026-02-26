@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.utils.types import DictClass
 from gmdkit.models.level import LevelList
-from gmdkit.serialization.mixins import PlistDictDecoderMixin, CompressFileMixin
+from gmdkit.serialization.mixins import PlistDecoderMixin, CompressFileMixin
 from gmdkit.constants.paths.save import GAME_MANAGER_PATH
 
 
@@ -13,7 +13,7 @@ def levels_to_dict(level_list, **kwargs):
     return dict(keys,level_list.to_plist(**kwargs))
 
     
-class GameSave(CompressFileMixin,PlistDictDecoderMixin,DictClass):
+class GameSave(CompressFileMixin,PlistDecoderMixin,DictClass):
 
     DEFAULT_PATH = GAME_MANAGER_PATH
     COMPRESSION = "gzip"

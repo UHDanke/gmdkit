@@ -1,35 +1,67 @@
+# Imports
+from typing import Optional
+
 # Package Imports
-from gmdkit.utils.types import DictClass, ListClass
-from gmdkit.serialization.type_cast import dict_cast, serialize, to_string, to_numkey
-from gmdkit.serialization.mixins import DictDecoderMixin, ArrayDecoderMixin, DelimiterMixin
-from gmdkit.casting.color import COLOR_DECODERS, COLOR_ENCODERS
-from gmdkit.mappings import color_prop
+from gmdkit.utils.types import ListClass
+from gmdkit.serialization.type_cast import to_string
+from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin
+from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.defaults.color_ids import default_color
+from gmdkit.utils.enums import SelectPlayer
+from gmdkit.models.prop.hsv import HSV
 
 
-class Color(DictDecoderMixin,DictClass):
+@dataclass_decoder(slots=True, from_array=False, separator="_", auto_key=str)
+class Color(DataclassDecoderMixin):
     
-    __slots__ = ()
-    
-    SEPARATOR = '_'
-    DECODER = staticmethod(dict_cast(COLOR_DECODERS,key_func_start=to_numkey))
-    ENCODER = staticmethod(dict_cast(COLOR_ENCODERS,key_func_end=str,default=serialize))
+    red: int = 0
+    green: int = 0
+    blue: int = 0
+    player: SelectPlayer = field_decoder(default=SelectPlayer(-1),decoder=SelectPlayer.from_string,encoder=str)
+    blending: bool = field_decoder(default=False,optional=True)
+    channel: int = 0
+    opacity: float = 0.0
+    disable_opacity: bool = field_decoder(default=False,optional=True)
+    copy_id: int = field_decoder(default=0,optional=True)
+    hsv: HSV = field_decoder(default_factory=HSV,optional=True,decoder=HSV.from_string,encoder=to_string)
+    to_red: int = 0
+    to_green: int = 0
+    to_blue: int = 0
+    time_delta: float = 0.0
+    to_opacity: float = 0.0
+    duration: float = field_decoder(default=False,optional=True)
+    copy_opacity: bool = field_decoder(default=False,optional=True)
+    disable_legacy_hsv: bool = False
+
     
     @classmethod
     def default(cls, color_id:int):        
         return cls(default_color(color_id))
 
-    def set_rgba(self, red:int|None=None,green:int|None=None,blue:int|None=None,alpha:float|None=None):
-        if red is not None: self[color_prop.RED] = red
-        if green is not None: self[color_prop.GREEN] = green
-        if blue is not None: self[color_prop.BLUE] = blue
-        if alpha is not None: self[color_prop.OPACITY] = alpha
+    def set_rgba(
+            self, 
+            red:Optional[int]=None,
+            green:Optional[int]=None,
+            blue:Optional[int]=None,
+            alpha:Optional[float]=None
+            ):
+        if red is not None: 
+            self.red = red
+            
+        if green is not None: 
+            self.green = green
+        
+        if blue is not None: 
+            self.blue = blue
+        
+        if alpha is not None: 
+            self.opacity = alpha
     
     def get_rgba(self):
-        r = self.get(color_prop.RED, 255)
-        g = self.get(color_prop.GREEN, 255)
-        b = self.get(color_prop.BLUE, 255)
-        a = self.get(color_prop.OPACITY, 1.00)
+        r = self.red
+        g = self.green
+        b = self.blue
+        a = self.opacity
         return (r,g,b,a)
     
     def set_hex(self, hex_string):
@@ -57,7 +89,7 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass):
     ENCODER = staticmethod(to_string)
     
     def get_channels(self, condition):
-        return self.unique_values(lambda color: color.pluck(color_prop.CHANNEL))
+        return self.unique_values(lambda color: (color.channel,))
     
     def get_copies(self):
-        return lambda x: x.unique_values(lambda color: color.pluck(color_prop.COPY_ID))
+        return self.unique_values(lambda color: (color.copy_id,))

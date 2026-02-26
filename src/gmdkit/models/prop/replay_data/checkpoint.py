@@ -5,7 +5,7 @@ from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.replay_data.persistent import PersistentData
 
 
-@dataclass_decoder(slots=True, separator=',', from_array=False, auto_key=lambda key, value: str(value+1))
+@dataclass_decoder(slots=True, separator=',', from_array=False, auto_key=str)
 class CheckpointData(DelimiterMixin,DataclassDecoderMixin):
     
     seed: int

@@ -1,5 +1,5 @@
 from gmdkit.utils.types import DictClass
-from gmdkit.serialization.mixins import PlistDictDecoderMixin
+from gmdkit.serialization.mixins import PlistDecoderMixin
 from gmdkit.serialization.type_cast import to_plist
 from gmdkit.models.level import Level
 
@@ -12,7 +12,7 @@ def level_to_dict(key:int|str, value:Level, **kwargs):
     return (key, to_plist(value))
 
 
-class LevelMapping(PlistDictDecoderMixin,DictClass):
+class LevelMapping(PlistDecoderMixin,DictClass):
     DECODER = staticmethod(dict_to_level)   
     ENCODER = staticmethod(level_to_dict)  
     

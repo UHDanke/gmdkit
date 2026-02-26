@@ -1,25 +1,23 @@
 # Imports
-from typing import Callable, Literal, Optional, Iterable, Any, get_type_hints
+from typing import Callable, Literal, Optional, Any, get_type_hints
 from functools import partial
 from inspect import signature
 from itertools import cycle
 from dataclasses import field, fields, dataclass, MISSING
 import sys
 import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import Element
 import base64
 import zlib
 import gzip
-import string as strlib
 
 # Package Imports
 from gmdkit.serialization.type_cast import (
-    from_float, from_bool, to_bool,
-    dict_cast, 
+    from_float, from_bool, to_bool
     )
 from gmdkit.utils.typing import (
     StringDictDecoder, 
     StringDictEncoder,
-    KeyValueFormat,
     PathString
     )
 
@@ -84,7 +82,7 @@ def compress_string(
     return byte_stream.decode()
 
 
-def read_plist(node:ET.Element):
+def read_plist(node:Element) -> [int,float,str,bool,dict,list]:
     
     match node.tag:
         case 'i':
@@ -115,57 +113,59 @@ def read_plist(node:ET.Element):
             }
             
 
-def write_plist(parent:ET.Element, value:Any):
+def write_plist(value:Any) -> Element:
     
     if isinstance(value, bool):
-        if value: ET.SubElement(parent, "t")
+        if value: 
+            return Element("t")
         
     elif isinstance(value, int):
-        ET.SubElement(parent, "i").text = str(value)
+        node = Element("i")
+        node.text = str(value)
+        return node
     
     elif isinstance(value, float):
-        ET.SubElement(parent, "r").text = from_float(value)
+        node = Element("r")
+        node.text = from_float(value)
+        return node
     
     elif isinstance(value, str):
-        ET.SubElement(parent, "s").text = str(value)
-
+        node = Element("s")
+        node.text = value
+        return node
+    
     elif isinstance(value, dict):
-        if parent.tag == "plist":
-            node = ET.SubElement(parent, "dict")
-        else:
-            node = ET.SubElement(parent, "d")
+        root = Element("d")
         
         for k, v in value.items():
-            
-            ET.SubElement(node, "k").text = k
-            
-            write_plist(node, v)
+            node = Element("k")
+            node.text = str(k)
+            root.append(node)
+            root.append(write_plist(v))
+        
+        return root
     
     elif isinstance(value, (list, tuple)):
-        if parent.tag == "plist":
-            node = ET.SubElement(parent, "dict")
-        else:
-            node = ET.SubElement(parent, "d")
+        root = Element("d")
+        node = Element("k")
+        node.text = "_isArr"
+        root.append(node)
+        root.append(Element("t"))
         
-        ET.SubElement(node, "k").text = "_isArr"
+        for k, v in enumerate(value,start=1):
+            node = Element("k")
+            node.text = f"k_{k}"
+            root.append(node)
+            root.append(write_plist(v))
         
-        ET.SubElement(node, "t")
-        
-        for i, v in enumerate(value,start=1):
-            
-            ET.SubElement(node, "k").text = f"k_{i}"
-            
-            write_plist(node, v)
+        return root
     
-    elif value is not None:
-        ET.SubElement(parent, "s").text = str(value)           
-
+    else:
+        raise ValueError(f"Class {type(value)} is not serializable")
+    
 
 def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optional[int]=None):
     
-    if is_array and encoder_key is not None:
-        raise ValueError("Arrays and encoder keys are mutually exclusive")
-
     if node.tag not in ['d', 'dict']:
         raise ValueError("Element is not a plist dict element")
     
@@ -185,19 +185,26 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
     key_el = node[0]
     val_el = node[1]
     
-    if is_array and (key_el.tag != 'k' or key_el.text != '_isArr' or val_el.tag != 't' or val_el.text is not None):
+    array_header = key_el.tag == 'k' and key_el.text == '_isArr' and val_el.tag != 't' and val_el.text is None
+    encoder_header = key_el.tag == 'k' and key_el.text == 'kCEK' and val_el.tag == 'i' and val_el.text is not None
+    
+    if is_array:
+        if not array_header:
             raise ValueError(f"Malformed array header, expected '<k>_isArr</k><t/>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
     elif encoder_key is not None:
-        if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
-            raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
-        elif node[1].text != str(encoder_key):
-            raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
-    
-            
+        if not encoder_header:
+            if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
+                raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
+            elif node[1].text != str(encoder_key):
+                raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
+    elif array_header:
+        raise ValueError("Expected plain dict, found array header")
+    elif encoder_header:
+        raise ValueError("Expected plain dict, found encoded struct header")
+        
     for i in range(0, length, 2):
         if node[i].tag != 'k':
             raise ValueError(f"Expected key tag 'k' at index {i}, got '{node[i].tag}'")
-
 
 
 def from_plist_string(string: str) -> dict:
@@ -205,10 +212,12 @@ def from_plist_string(string: str) -> dict:
     return read_plist(tree.find("dict"))
 
 
-def to_plist_string(data: Any) -> str:
+def to_plist_string(data:[dict,list]) -> str:
     root = ET.Element("plist", version="1.0", gjver="2.0")
-    write_plist(root, data)
-    return ET.tostring(root, encoding='unicode')
+    node = write_plist(data)
+    node.tag = "dict"
+    root.append(node)
+    return ET.tostring(root, encoding='unicode').decode()
 
 
 def from_plist_file(path: PathString) -> dict:
@@ -219,17 +228,11 @@ def from_plist_file(path: PathString) -> dict:
 
 def to_plist_file(data: Any, path: PathString):
     root = ET.Element("plist", version="1.0", gjver="2.0")
-    write_plist(root, data)
+    node = write_plist(data)
+    node.tag = "dict"
+    root.append(node)
     tree = ET.ElementTree(root)
     tree.write(path, xml_declaration=True)
-
-
-def dict_wrapper(data:dict|ET.Element, func:Callable, **kwargs) -> dict:
-    return dict(func(k, v, **kwargs) for k, v in data.items())
-
-
-def array_wrapper(data:Iterable, func:Callable, **kwargs) -> list:
-    return list(func(v,**kwargs) for v in data)
 
 
 def decoder_from_type(type_hint:Any):
@@ -268,7 +271,7 @@ def dataclass_decoder(
         separator:Optional[str]=None,
         from_array:Optional[bool]=None,
         default_optional: bool = False,
-        auto_key: Optional[KeyValueFormat] = None,
+        auto_key: Optional[Callable] = None,
         *args,
         **kwargs
         ):
@@ -290,12 +293,12 @@ def dataclass_decoder(
         encoders = {}
         kw_dict = {}
         
-        for i, f in enumerate(fields(cls)):
+        for i, f in enumerate(fields(cls),start=1):
             meta = f.metadata
             name = f.name
             key = meta.get("key") 
             if key is None and auto_key is not None:
-                key = auto_key(name, i)
+                key = auto_key(i)
                 
             ft = hints[f.name]
                         
@@ -324,16 +327,16 @@ def dataclass_decoder(
         cls.DECODER = staticmethod(
             decoder or dict_cast(
                 decoders,
-                key_func_start=dkey_dict.get if dkey_dict else None,
-                allowed_kwargs=kw_dict if kw_dict else None
+                key_start=dkey_dict.get if dkey_dict else None,
+                allow_kwargs=kw_dict if kw_dict else None
                 )
             )
             
         cls.ENCODER = staticmethod(
             encoder or dict_cast(
                 encoders,
-                key_func_end=ekey_dict.get if ekey_dict else None,
-                allowed_kwargs=kw_dict if kw_dict else None
+                key_end=ekey_dict.get if ekey_dict else None,
+                allow_kwargs=kw_dict if kw_dict else None
         		)
             )
         
@@ -387,24 +390,92 @@ def field_decoder(
         d["metadata"] = md
     elif "metadata" in d:
         d.pop("metadata")
-
+        
     return field(*args, **d)
 
 
-def auto_key_formatter(template:str="{index}"):
-    allowed = {"key", "index"}
+def dict_cast(
+        functions: dict[Any,Callable],
+        allow_kwargs: Optional[dict[Any,bool]] = None,
+        key_start: Optional[Callable] = None,
+        key_end: Optional[Callable] = None,
+        default: Optional[Callable] = None,
+        ):
+    allow_kwargs = allow_kwargs or {}
+    f_get = functions.get
+    kw_get = allow_kwargs.get
+    has_default = callable(default)
+    kc_start = callable(key_start)
+    kc_end = callable(key_end)
 
-    for _, field_name, _, _ in strlib.Formatter().parse(template):
-        if field_name and field_name not in allowed:
-            raise ValueError(
-                f"Unsupported placeholder '{field_name}' in key format string"
-            )
+    def cast_func(key: Any, value: Any, **kwargs) -> tuple[Any, Any]:
+        
+        if kc_start:
+            key = key_start(key)
+            
+        func = f_get(key)
 
-    def formatter(key: str, index: int) -> str:
-        return template.format(key=key, index=index)
+        if func is not None:
+            
+            value = func(value, **kwargs) if kw_get(key) else func(value)
+            
+        elif has_default:
+            value = default(value)
 
-    return formatter
+        if kc_end:
+            key = key_end(key)
+        
 
+        return key, value
+
+    return cast_func
+
+
+def from_node(function:Callable):
+    def get_node_text(node, **kwargs):
+        return function(node.text, **kwargs)
+    
+    return get_node_text
+
+
+def from_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):
+    
+    d = {}
+    
+    for k, f in functions.items():
+        if exclude and exclude.get(k):
+            d[k] = f
+        else:
+            d[k] = from_node(f)
+            
+    return d
+
+
+def to_node(function:Callable):
+    def return_node(value, **kwargs):
+        string = function(value, **kwargs)
+        return write_plist(string)
+    
+    return return_node
+
+def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):
+    
+    d = {}
+    
+    for k, f in functions.items():
+        if exclude and exclude.get(k):
+            d[k] = f
+        else:
+            d[k] = to_node(f)
+            
+    return d
+    
+    
+def key_node(string):
+    node = ET.Element("k")
+    node.text = string
+    return node
+        
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     """
@@ -433,7 +504,10 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
         params = signature(fn).parameters
         if params:
             kw = {k: kwargs[k] for k in kw_keys & params}
-            result.append(partial(fn, **kw))
+            if kw:
+                result.append(partial(fn, **kw))
+            else:
+                result.append(fn)
         else:
             result.append(fn)
     
