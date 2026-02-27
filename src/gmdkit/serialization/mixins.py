@@ -585,7 +585,7 @@ class ArrayDecoderMixin:
             return result
         
         if keep_separator:
-            string.removesuffix(separator)
+            string = string.removesuffix(separator)
         
         tokens = string.split(separator)
            
