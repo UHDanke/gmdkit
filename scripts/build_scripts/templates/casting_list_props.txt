@@ -5,7 +5,8 @@ from gmdkit.serialization.type_cast import (
     decode_text, encode_text
     )
 from gmdkit.models.prop.list import IntList
-from gmdkit.models.prop.level_dict import LevelMapping
+from gmdkit.models.level import LevelMapping
+
 
 LIST_DECODERS = {{
 {list_decoders}

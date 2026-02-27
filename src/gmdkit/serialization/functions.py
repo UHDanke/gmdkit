@@ -105,12 +105,14 @@ def read_plist(node:Element) -> [int,float,str,bool,dict,list]:
                     node[0].text == "_isArr" and
                     node[1].tag == "t"
                     ):
-                return [read_plist(node[i]) for i in range(2, len(node), 2)]
+                return [read_plist(node[i]) for i in range(3, len(node), 2)]
             
             return {
                 node[i].text: read_plist(node[i + 1])
                 for i in range(0, len(node) - 1, 2)
             }
+        case _:
+            raise ValueError(f"Unknown node tag: {node.tag} for node {node}")
             
 
 def write_plist(value:Any) -> Element:
@@ -270,8 +272,9 @@ def dataclass_decoder(
         condition:Optional[Callable]=None,
         separator:Optional[str]=None,
         from_array:Optional[bool]=None,
-        default_optional: bool = False,
         auto_key: Optional[Callable] = None,
+        default_optional: bool = False,
+        default_kwargs: bool = False,
         *args,
         **kwargs
         ):
@@ -291,7 +294,7 @@ def dataclass_decoder(
         cond_dict = {}
         decoders = {}
         encoders = {}
-        kw_dict = {}
+        has_kwargs = set()
         
         for i, f in enumerate(fields(cls),start=1):
             meta = f.metadata
@@ -311,11 +314,17 @@ def dataclass_decoder(
             decoders[name] = meta.get("decoder") or decoder_from_type(ft)
             encoders[name] = meta.get("encoder") or encoder_from_type(ft)
         
-            kw = meta.get("allowed_kwargs")
-            if kw:
-                kw_dict[name] = kw
             
-            if meta.get("optional") or default_optional:
+            allow_kwargs = meta.get("allow_kwargs")
+            allow_kwargs = default_kwargs if allow_kwargs is None else allow_kwargs
+            
+            if allow_kwargs:
+                has_kwargs.add(name)
+            
+            optional = meta.get("optional")
+            optional = default_optional if optional is None else optional
+            
+            if optional:
                 if f.default_factory is not MISSING:
                     default = f.default_factory()
                 elif f.default is not MISSING:
@@ -328,7 +337,7 @@ def dataclass_decoder(
             decoder or dict_cast(
                 decoders,
                 key_start=dkey_dict.get if dkey_dict else None,
-                allow_kwargs=kw_dict if kw_dict else None
+                allow_kwargs=has_kwargs
                 )
             )
             
@@ -336,7 +345,7 @@ def dataclass_decoder(
             encoder or dict_cast(
                 encoders,
                 key_end=ekey_dict.get if ekey_dict else None,
-                allow_kwargs=kw_dict if kw_dict else None
+                allow_kwargs=has_kwargs
         		)
             )
         
@@ -359,7 +368,7 @@ def field_decoder(
         decoder:Optional[Callable]=None,
         encoder:Optional[Callable]=None,
         optional:Optional[bool]=None,
-        allowed_kwargs=None,
+        allow_kwargs:Optional[bool]=None,
         **kwargs
         ):
     
@@ -383,8 +392,8 @@ def field_decoder(
     if "optional" not in md and optional is not None:
             md["optional"] = optional
         
-    if "allowed_kwargs" not in md and allowed_kwargs is not None:
-        md["allowed_kwargs"] = allowed_kwargs
+    if "allow_kwargs" not in md and allow_kwargs is not None:
+        md["allow_kwargs"] = allow_kwargs
                  
     if md:
         d["metadata"] = md
@@ -396,14 +405,13 @@ def field_decoder(
 
 def dict_cast(
         functions: dict[Any,Callable],
-        allow_kwargs: Optional[dict[Any,bool]] = None,
+        allow_kwargs: Optional[set] = None,
         key_start: Optional[Callable] = None,
         key_end: Optional[Callable] = None,
         default: Optional[Callable] = None,
         ):
-    allow_kwargs = allow_kwargs or {}
+    has_kwargs = allow_kwargs or set()
     f_get = functions.get
-    kw_get = allow_kwargs.get
     has_default = callable(default)
     kc_start = callable(key_start)
     kc_end = callable(key_end)
@@ -417,7 +425,7 @@ def dict_cast(
 
         if func is not None:
             
-            value = func(value, **kwargs) if kw_get(key) else func(value)
+            value = func(value, **kwargs) if key in has_kwargs else func(value)
             
         elif has_default:
             value = default(value)

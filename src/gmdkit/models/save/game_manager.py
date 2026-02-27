@@ -2,6 +2,17 @@
 from gmdkit.utils.types import DictClass
 from gmdkit.serialization.mixins import PlistDecoderMixin, CompressFileMixin, FilePathMixin
 from gmdkit.constants.paths.save import GAME_MANAGER_PATH
+from gmdkit.serialization.type_cast import to_node as to_node_func
+from gmdkit.models.level import LevelMapping
+
+
+GAME_SAVE_DECODER = {
+    "GLM_01": LevelMapping.from_node, 
+    }
+
+GAME_SAVE_ENCODER = {
+    "LLM_01": to_node_func,
+    }
 
     
 class GameSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
@@ -11,7 +22,10 @@ class GameSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
 
-    
+# GLM_01: LevelMapping
+
+
+
 if __name__ == "__main__":
     
     import time

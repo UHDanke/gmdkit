@@ -1,5 +1,5 @@
 # Imports
-from typing import Self
+from typing import Self, Optional
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
@@ -38,3 +38,31 @@ class ObjectList(CompressFileMixin,ArrayDecoderMixin,ListClass):
     DECODER = Object.from_string
     ENCODER = staticmethod(to_string)
     COMPRESSED = False
+    
+
+class ObjectGroup:
+    
+    __slots__ = ("string","objects")
+    
+    def __init__(self, string:Optional[str]=None):
+        self.string = string or str()
+    
+    
+    def load(self, string:Optional[str]=None) -> ObjectList:
+        
+        string = self.string if string is None else string
+        
+        self.objects = ObjectList.from_string(string)
+        
+        return self.objects
+    
+    def save(self, objects: Optional[ObjectList]=None) -> str:
+        objects = getattr(self, "objects", None) if objects is not None else objects
+    
+        if objects is None:
+            return self.string
+    
+        self.string = objects.to_string()
+        
+        return self.string
+

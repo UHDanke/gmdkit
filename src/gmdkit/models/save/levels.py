@@ -25,6 +25,7 @@ LEVEL_SAVE_ENCODER = {
     "LLM_03": to_node_func   
     }
 
+ALLOW_KWARGS = {"LLM_01","LLM_03"}
 
 class LevelSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     
@@ -33,8 +34,8 @@ class LevelSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
     
-    DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER,default=read_plist,allow_kwargs={"LLM_01":True,"LLM_03":True}))
-    ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER,default=write_plist,allow_kwargs={"LLM_01":True,"LLM_03":True}))
+    DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER,default=read_plist,allow_kwargs=ALLOW_KWARGS))
+    ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER,default=write_plist,allow_kwargs=ALLOW_KWARGS))
     
     if TYPE_CHECKING:
         @classmethod

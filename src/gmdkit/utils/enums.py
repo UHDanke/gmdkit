@@ -1,3 +1,6 @@
+# Imports
+from enum import Enum
+
 # Package Imports
 from gmdkit.utils.types import EnumClass
 
@@ -515,3 +518,39 @@ class ReplayEventID(EnumClass):
     LEFT_P2 = 7
     RIGHT_P2 = 8
     CHECKPOINT = 99
+    
+    
+class TemplatePosition(EnumClass):
+    CENTER = 0
+    TOP = 1
+    BOTTOM = 2
+    LEFT = 3
+    RIGHT = 4
+    TOP_LEFT = 5
+    TOP_RIGHT = 6
+    BOTTOM_LEFT = 7
+    BOTTOM_RIGHT = 8
+
+class TemplateType(Enum):
+    NONE = "0"
+    SQUARE = "1"
+    SLOPE_BOTTOM_RIGHT = "2"
+    SLOPE_BOTTOM_LEFT = "3"
+    SLOPE_TOP_RIGHT = "4"
+    SLOPE_TOP_LEFT = "5"
+    LONG_SLOPE_CENTER_BOTTOM_RIGHT = "6"
+    LONG_SLOPE_SIDE_BOTTOM_RIGHT = "7"
+    LONG_SLOPE_CENTER_BOTTOM_LEFT = "8"
+    LONG_SLOPE_SIDE_BOTTOM_LEFT = "9"
+    LONG_SLOPE_CENTER_TOP_RIGHT = "A"
+    LONG_SLOPE_SIDE_TOP_RIGHT = "B"
+    LONG_SLOPE_CENTER_TOP_LEFT = "C"
+    LONG_SLOPE_SIDE_TOP_LEFT = "D"
+    LONG_SLOPE_CENTER_RIGHT_TOP = "E"
+    LONG_SLOPE_SIDE_RIGHT_TOP = "F"
+    LONG_SLOPE_CENTER_RIGHT_BOTTOM = "G"
+    LONG_SLOPE_SIDE_RIGHT_BOTTOM = "H"
+    LONG_SLOPE_CENTER_LEFT_BOTTOM = "I"
+    LONG_SLOPE_SIDE_LEFT_BOTTOM = "J"
+    LONG_SLOPE_CENTER_LEFT_TOP = "K"
+    LONG_SLOPE_SIDE_LEFT_TOP = "L"

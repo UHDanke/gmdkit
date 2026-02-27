@@ -12,9 +12,6 @@ from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
 
 
-LOAD_KEYS = {k for k, v in LEVEL_TYPES.items() if hasattr(v, "load") and hasattr(v, "save")}
-
-
 class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LEVEL_DECODERS),default=read_plist))
@@ -88,6 +85,12 @@ def level_from_file(path:PathString, load_level_data:bool=True, load_level_conte
 def level_to_file(level:Level,path:PathString, save_level_data:True=False, save_level_content:bool=False, **kwargs) -> Element:
     return level.to_file(path=path,save_data=save_level_data,save_content=save_level_content)
 
+def dict_to_level(key:str, node:Element, load_level_data:bool=True, **kwargs) -> Level:
+    return (int(key), Level.from_node(node=node,load_data=load_level_data,load_content=False))
+
+def level_to_dict(key:int, level:Level, save_level_data:bool=True, **kwargs) -> Element:
+    return (str(key), level.to_node(save_data=save_level_data,save_content=False))
+
 
 class LevelList(FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
     
@@ -114,5 +117,10 @@ class LevelList(FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
         def from_folder(cls, path:PathString, load_level_data:bool=False, load_level_content:bool=False, **kwargs) -> Self: ...
         
         def to_folder(self, path:PathString, save_level_data:bool=False, save_level_content:bool=False, **kwargs): ...
-        
+
+
+class LevelMapping(PlistDecoderMixin,DictClass):
+    DECODER = staticmethod(dict_to_level)   
+    ENCODER = staticmethod(level_to_dict)  
+    
     
