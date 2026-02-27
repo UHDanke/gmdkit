@@ -3,14 +3,16 @@ from typing import Self, Optional
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
+from gmdkit.utils.typing import Element
 from gmdkit.serialization.mixins import (
     DictDecoderMixin, 
-    ArrayDecoderMixin, 
+    ArrayDecoderMixin,
+    PlistDecoderMixin,
     DelimiterMixin,
     CompressFileMixin
     )
 from gmdkit.serialization.type_cast import serialize, to_string, to_numkey
-from gmdkit.serialization.functions import dict_cast
+from gmdkit.serialization.functions import dict_cast, write_plist
 from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 
@@ -66,3 +68,26 @@ class ObjectGroup:
         
         return self.string
 
+def dict_to_obj_list(key:str, node:Element, load_object_group, **kwargs) -> ObjectGroup:
+    
+    new = ObjectGroup(node.text)
+    
+    if load_object_group:
+        new.load()
+        
+    return (int(key),new)
+
+def obj_list_to_dict(key:int, obj_list:ObjectGroup, save_object_group:bool=True, **kwargs) -> Element:
+    
+    if save_object_group:
+        obj_list.save()
+        
+    return (str(key), write_plist(obj_list.string))
+    
+
+
+class ObjectGroupDict(PlistDecoderMixin,DictClass):
+    DECODER = staticmethod(dict_to_obj_list)
+    ENCODER = staticmethod(obj_list_to_dict)
+    EXTENSION = "plist"
+    
