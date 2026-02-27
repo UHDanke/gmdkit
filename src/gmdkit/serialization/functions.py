@@ -45,7 +45,7 @@ def decompress_string(
         case 'zlib':
             byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
         case 'gzip':
-            byte_stream = gzip.decompress(byte_stream)
+            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS | 16) 
         case 'deflate':
             byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
         case 'auto':
@@ -61,18 +61,19 @@ def decompress_string(
 def compress_string(
         string:str,
         xor_key:Optional[bytes]=None,
-        compression:Optional[Literal["zlib","gzip","deflate"]]="gzip"
+        compression:Optional[Literal["zlib","gzip","deflate"]]="gzip",
+        level: int = 9
         ) -> str:
     
     byte_stream = string.encode()
         
     match compression:
         case 'zlib':
-            byte_stream = zlib.compress(byte_stream, wbits=zlib.MAX_WBITS)
+            byte_stream = zlib.compress(byte_stream, wbits=zlib.MAX_WBITS, level=level)
         case 'gzip':
-            byte_stream = gzip.compress(byte_stream, mtime=0)
+            byte_stream = gzip.compress(byte_stream, compresslevel=level, mtime=0)
         case 'deflate':
-            byte_stream = zlib.compress(byte_stream, wbits=-zlib.MAX_WBITS)
+            byte_stream = zlib.compress(byte_stream, wbits=-zlib.MAX_WBITS, level=level)
         case None:
             pass
         case _:
