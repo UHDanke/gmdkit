@@ -2,7 +2,7 @@
 from typing import Callable, Literal, Optional, Any, get_type_hints
 from functools import partial
 from inspect import signature
-from itertools import cycle
+import numpy as np
 from dataclasses import field, fields, dataclass, MISSING
 import sys
 import xml.etree.ElementTree as ET
@@ -21,8 +21,12 @@ from gmdkit.utils.typing import (
     Element
     )
 
+
 def xor(data: bytes, key: bytes) -> bytes:
-    return bytes(d ^ k for d, k in zip(data, cycle(key)))
+    d = np.frombuffer(data, dtype=np.uint8)
+    k = np.frombuffer(key * (len(data) // len(key) + 1), dtype=np.uint8)[:len(data)]
+    return (d ^ k).tobytes()
+
 
 def decompress_string(
         string:str,
