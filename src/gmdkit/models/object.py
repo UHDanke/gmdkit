@@ -8,6 +8,7 @@ from gmdkit.serialization.mixins import (
     DictDecoderMixin, 
     ArrayDecoderMixin,
     PlistDecoderMixin,
+    FilePathMixin,
     DelimiterMixin,
     CompressFileMixin
     )
@@ -68,6 +69,7 @@ class ObjectGroup:
         
         return self.string
 
+
 def dict_to_obj_list(key:str, node:Element, load_object_group, **kwargs) -> ObjectGroup:
     
     new = ObjectGroup(node.text)
@@ -85,8 +87,7 @@ def obj_list_to_dict(key:int, obj_list:ObjectGroup, save_object_group:bool=True,
     return (str(key), write_plist(obj_list.string))
     
 
-
-class ObjectGroupDict(PlistDecoderMixin,DictClass):
+class ObjectGroupDict(FilePathMixin,PlistDecoderMixin,DictClass):
     DECODER = staticmethod(dict_to_obj_list)
     ENCODER = staticmethod(obj_list_to_dict)
     EXTENSION = "plist"

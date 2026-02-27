@@ -14,7 +14,7 @@ class LevelPack(FilePathMixin,PlistDecoderMixin,DictClass):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LIST_DECODERS,exclude={'k97'}),default=read_plist))
     ENCODER = staticmethod(dict_cast(to_node_dict(LIST_ENCODERS,exclude={'k97'}),default=write_plist))
-    ENCODER_KEY = 6
+    ENCODER_KEY = 12
     EXTENSION = "gmdl"
 
     def _name_fallback_(self):

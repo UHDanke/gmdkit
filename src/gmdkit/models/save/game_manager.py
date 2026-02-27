@@ -11,7 +11,7 @@ GAME_SAVE_DECODER = {
     }
 
 GAME_SAVE_ENCODER = {
-    "LLM_01": to_node_func,
+    "GLM_01": to_node_func,
     }
 
     

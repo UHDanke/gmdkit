@@ -197,8 +197,8 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
         if not encoder_header:
             if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
                 raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'")
-            elif node[1].text != str(encoder_key):
-                raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
+        elif val_el.text != str(encoder_key):
+            raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
     elif array_header:
         raise ValueError("Expected plain dict, found array header")
     elif encoder_header:
