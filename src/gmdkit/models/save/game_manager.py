@@ -1,24 +1,22 @@
 # Package Imports
 from gmdkit.utils.types import DictClass
-from gmdkit.models.level import LevelList
-from gmdkit.serialization.mixins import PlistDecoderMixin, CompressFileMixin
+from gmdkit.serialization.mixins import PlistDecoderMixin, CompressFileMixin, FilePathMixin
 from gmdkit.constants.paths.save import GAME_MANAGER_PATH
 
-
-def levels_from_dict(data, **kwargs):
-    return LevelList.from_plist(list(data.values()), **kwargs)
     
-def levels_to_dict(level_list, **kwargs):
-    keys = (lvl['k1'] for lvl in level_list)
-    return dict(keys,level_list.to_plist(**kwargs))
-
-    
-class GameSave(CompressFileMixin,PlistDecoderMixin,DictClass):
+class GameSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
 
     DEFAULT_PATH = GAME_MANAGER_PATH
+    COMPRESSED = True
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
 
     
 if __name__ == "__main__":
+    
+    import time
+
+    _start = time.perf_counter()
     game_data = GameSave.from_file()
+    _end = time.perf_counter()
+    print(f"Load took {_end - _start:.6f} seconds")

@@ -31,8 +31,8 @@ from gmdkit.serialization.functions import (
 
 class PlistDecoderMixin:
     
-    ENCODER: Optional[PlistEncoder]
-    DECODER: Optional[PlistDecoder]
+    ENCODER: Optional[PlistEncoder] = None
+    DECODER: Optional[PlistDecoder] = None
     CONTAINER: Optional[str] = None
     ENCODER_KEY: Optional[int] = None
     IS_ARRAY: bool = False

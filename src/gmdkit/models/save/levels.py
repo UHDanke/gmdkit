@@ -46,11 +46,11 @@ class LevelSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
 if __name__ == "__main__":
     import time
 
-    start = time.perf_counter()
+    _start = time.perf_counter()
     level_data = LevelSave.from_file()
     levels = level_data[lvl_save.LEVELS]
     binary = level_data[lvl_save.BINARY]
     lists = level_data[lvl_save.LISTS]
     
-    end = time.perf_counter()
-    print(f"Load took {end - start:.6f} seconds")
+    _end = time.perf_counter()
+    print(f"Load took {_end - _start:.6f} seconds")
