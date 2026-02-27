@@ -74,7 +74,7 @@ def decode_level_props(gd_type, gd_format, key):
                     return
         case 'dict':
             if gd_format=="level map":
-                return "LevelMapping.from_plist"
+                return "LevelMapping.from_node"
             
         case _: return
 
@@ -106,7 +106,7 @@ def encode_level_props(gd_type, gd_format, key):
                     return
         case 'dict':
             if gd_format=="level map":
-                return "to_plist"
+                return "to_node"
         
         case _: return
 

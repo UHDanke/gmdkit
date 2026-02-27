@@ -6,7 +6,6 @@ from itertools import cycle
 from dataclasses import field, fields, dataclass, MISSING
 import sys
 import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element
 import base64
 import zlib
 import gzip
@@ -18,7 +17,8 @@ from gmdkit.serialization.type_cast import (
 from gmdkit.utils.typing import (
     StringDictDecoder, 
     StringDictEncoder,
-    PathString
+    PathString,
+    Element
     )
 
 def xor(data: bytes, key: bytes) -> bytes:
@@ -185,16 +185,16 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
     key_el = node[0]
     val_el = node[1]
     
-    array_header = key_el.tag == 'k' and key_el.text == '_isArr' and val_el.tag != 't' and val_el.text is None
+    array_header = key_el.tag == 'k' and key_el.text == '_isArr' and val_el.tag == 't' and val_el.text is None
     encoder_header = key_el.tag == 'k' and key_el.text == 'kCEK' and val_el.tag == 'i' and val_el.text is not None
     
     if is_array:
         if not array_header:
-            raise ValueError(f"Malformed array header, expected '<k>_isArr</k><t/>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
+            raise ValueError(f"Malformed array header, expected '<k>_isArr</k><t />', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'")
     elif encoder_key is not None:
         if not encoder_header:
             if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
-                raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el)}{ET.tostring(val_el)}'")
+                raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'")
             elif node[1].text != str(encoder_key):
                 raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
     elif array_header:
@@ -443,7 +443,7 @@ def from_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]
     d = {}
     
     for k, f in functions.items():
-        if exclude and exclude.get(k):
+        if exclude and k in exclude:
             d[k] = f
         else:
             d[k] = from_node(f)
@@ -463,7 +463,7 @@ def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=N
     d = {}
     
     for k, f in functions.items():
-        if exclude and exclude.get(k):
+        if exclude and k in exclude:
             d[k] = f
         else:
             d[k] = to_node(f)

@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.utils import enums
 from gmdkit.serialization.type_cast import (
-    to_string, to_plist,
+    to_string, to_node,
     decode_text, encode_text
     )
 from gmdkit.models.prop.list import IntList
@@ -20,7 +20,7 @@ LIST_ENCODERS = {
     'k3': encode_text,
     'k15': int,
     'k96': to_string,
-    'k97': to_plist,
+    'k97': to_node,
 }
 
 

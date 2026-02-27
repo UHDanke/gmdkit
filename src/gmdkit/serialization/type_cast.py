@@ -56,8 +56,8 @@ def to_numkey(key:str) -> NumKey:
         key = int(key)
     return key
 
-def to_plist(obj:Any, **kwargs) -> str:
-    method = getattr(obj, "to_plist", None)
+def to_node(obj:Any, **kwargs) -> str:
+    method = getattr(obj, "to_node", None)
     if callable(method):
         return method(**kwargs)
 

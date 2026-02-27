@@ -7,7 +7,6 @@ from os import PathLike
 PathString = str|PathLike
 PlistStruct = dict|list|tuple
 NumKey = int|str
-Node = Element
 
 class Caster(Protocol):
     def __call__(self, value: Any, **kwargs:Any) -> Any : ...
@@ -31,6 +30,23 @@ class StringDictDecoder(Protocol):
     
 class StringDictEncoder(Protocol):
     def __call__(self, key:NumKey, value:Any, **kwargs:Any) -> tuple[str, str]: ...
+
+
+class PlistDictDecoder(Protocol):
+    def __call__(self, key:str, value:Element) -> tuple[int, Any]: ...
+    
+class PlistDictEncoder(Protocol):
+    def __call__(self, key:str, value:Any) -> tuple[int, Element]: ...
+
+class PlistArrayDecoder(Protocol):
+    def __call__(self, value:Element) -> Any: ...
+    
+class PlistArrayEncoder(Protocol):
+    def __call__(self, value:Any) -> Element: ...
+
+
+PlistDecoder = PlistDictDecoder|PlistArrayDecoder
+PlistEncoder = PlistDictEncoder|PlistArrayDecoder
 
 
 class PlistWrapper(Protocol):
