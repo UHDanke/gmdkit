@@ -6,23 +6,23 @@ from gmdkit.utils.types import DictClass
 from gmdkit.utils.typing import PathString
 from gmdkit.models.level import LevelList
 from gmdkit.models.level_pack import LevelPackList
-from gmdkit.serialization.type_cast import to_node as to_node_func
+from gmdkit.serialization.type_cast import to_node
 from gmdkit.serialization.mixins import PlistDecoderMixin, CompressFileMixin, FilePathMixin
-from gmdkit.serialization.functions import dict_cast, from_node, to_node, read_plist, write_plist
+from gmdkit.serialization.functions import dict_cast, from_node_wrap, to_node_wrap, read_plist, write_plist
 from gmdkit.constants.paths.save import LOCAL_LEVELS_PATH
 from gmdkit.mappings import lvl_save
 
 
 LEVEL_SAVE_DECODER = {
     "LLM_01": LevelList.from_node,
-    "LLM_02": from_node(int),
+    "LLM_02": from_node_wrap(int),
     "LLM_03": LevelPackList.from_node    
     }
 
 LEVEL_SAVE_ENCODER = {
-    "LLM_01": to_node_func,
-    "LLM_02": to_node(int),
-    "LLM_03": to_node_func   
+    "LLM_01": to_node,
+    "LLM_02": to_node_wrap(int),
+    "LLM_03": to_node   
     }
 
 ALLOW_KWARGS = {"LLM_01","LLM_03"}
