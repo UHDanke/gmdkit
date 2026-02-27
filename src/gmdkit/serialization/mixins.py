@@ -55,11 +55,7 @@ class PlistDecoderMixin:
         encoder_key = self.ENCODER_KEY if encoder_key is None else encoder_key
         decoder = self.DECODER if decoder is None else decoder
         container = self.CONTAINER if container is None else container
-        
-        if container is None:
-            data = self
-        else:
-            data = getattr(self, container)
+        data = self if container is None else getattr(self, container)
         
         try:
             validate_dict_node(node, is_array=is_array, encoder_key=encoder_key)
@@ -97,42 +93,38 @@ class PlistDecoderMixin:
         encoder_key = self.ENCODER_KEY if encoder_key is None else encoder_key
         encoder = self.ENCODER if encoder is None else encoder
         container = self.CONTAINER if container is None else container
-        
-        if container is None:
-            data = self
-        else:
-            data = getattr(self, container)
+        data = self if container is None else getattr(self, container)
         
         node[:] = []
         
-        # headers
         if is_array:
             ET.SubElement(node, 'k').text = '_isArr'
             ET.SubElement(node, 't')
-        elif encoder_key is not None:
-            ET.SubElement(node, 'k').text = 'kCEK'
-            ET.SubElement(node, 'i').text = str(encoder_key)
-        
-        if encoder:
-            if is_array:
-                for k, v in enumerate(data, start=1):
-                    ET.SubElement(node, 'k').text = f'k_{k}'
-                    node.append(encoder(v, **kwargs))
+            items = enumerate(data, start=1)
+            if encoder:
+                def write(k, v): return f'k_{k}', encoder(v, **kwargs)
             else:
-                for k, v in data.items():
-                    k, v = encoder(k, v, **kwargs)
-                    ET.SubElement(node, 'k').text = k
-                    node.append(v)
+                def write(k, v): return f'k_{k}', write_plist(v)
         else:
-            if is_array:
-                for k, v in enumerate(data, start=1):
-                    ET.SubElement(node, 'k').text = f'k_{k}'
-                    node.append(write_plist(v))
+            if encoder_key is not None:
+                ET.SubElement(node, 'k').text = 'kCEK'
+                ET.SubElement(node, 'i').text = str(encoder_key)
+            items = data.items()
+            if encoder:
+                def write(k, v): return encoder(k, v, **kwargs)
             else:
-                for k, v in data.items():
-                    ET.SubElement(node, 'k').text = k
-                    node.append(write_plist(v))
-
+                def write(k, v): return k, write_plist(v)
+    
+        sub = ET.SubElement
+        append = node.append
+    
+        for k, v in items:
+            k, v = write(k, v)
+            if v is None:
+                continue
+            sub(node, 'k').text = k
+            append(v)
+    
         return node
     
     
@@ -559,7 +551,7 @@ class ArrayDecoderMixin:
             elif encoder:
                 tokens.extend(encoder(x) for x in data)
             else:
-                tokens.extend(tokens)
+                tokens.extend(data)
                 
         except Exception as e:
             raise ValueError(f"{type(self).__module__}.{type(self).__qualname__} failed to encode") from e
@@ -891,8 +883,8 @@ class FolderLoaderMixin:
             **kwargs
             ):
         
-        extension = cls.EXTENSION if extension is None else extension
-        decoder = cls.DECODER if decoder is None else decoder
+        extension = cls.FOLDER_EXTENSION if extension is None else extension
+        decoder = cls.FOLDER_DECODER if decoder is None else decoder
         container = cls.CONTAINER if container is None else container
         
         new = cls()
@@ -918,7 +910,7 @@ class FolderLoaderMixin:
             container:Optional[str]=None,
             ):
         
-        encoder = self.ENCODER if encoder is None else encoder
+        encoder = self.FOLDER_ENCODER if encoder is None else encoder
         container = self.CONTAINER if container is None else container
         
         if container is None:

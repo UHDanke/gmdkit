@@ -125,7 +125,8 @@ def write_plist(value:Any) -> Element:
     if isinstance(value, bool):
         if value: 
             return Element("t")
-        
+        return None
+    
     elif isinstance(value, int):
         node = Element("i")
         node.text = str(value)
@@ -145,25 +146,25 @@ def write_plist(value:Any) -> Element:
         root = Element("d")
         
         for k, v in value.items():
-            node = Element("k")
-            node.text = str(k)
+            node = write_plist(v)
+            if node is None:
+                continue
+            ET.SubElement(root, "k").text = str(k)
             root.append(node)
-            root.append(write_plist(v))
         
         return root
     
     elif isinstance(value, (list, tuple)):
         root = Element("d")
-        node = Element("k")
-        node.text = "_isArr"
-        root.append(node)
+        ET.SubElement(root, "k").text = "_isArr"
         root.append(Element("t"))
         
-        for k, v in enumerate(value,start=1):
-            node = Element("k")
-            node.text = f"k_{k}"
+        for k, v in enumerate(value, start=1):
+            node = write_plist(v)
+            if node is None:
+                continue
+            ET.SubElement(root, "k").text = f"k_{k}"
             root.append(node)
-            root.append(write_plist(v))
         
         return root
     
@@ -444,7 +445,7 @@ def dict_cast(
     return cast_func
 
 
-def from_node(function:Callable):
+def from_node_wrap(function:Callable):
     def get_node_text(node, **kwargs):
         return function(node.text, **kwargs)
     
@@ -459,17 +460,18 @@ def from_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]
         if exclude and k in exclude:
             d[k] = f
         else:
-            d[k] = from_node(f)
+            d[k] = from_node_wrap(f)
             
     return d
 
 
-def to_node(function:Callable):
+def to_node_wrap(function:Callable):
     def return_node(value, **kwargs):
         string = function(value, **kwargs)
         return write_plist(string)
     
     return return_node
+
 
 def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):
     
@@ -479,16 +481,10 @@ def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=N
         if exclude and k in exclude:
             d[k] = f
         else:
-            d[k] = to_node(f)
+            d[k] = to_node_wrap(f)
             
     return d
     
-    
-def key_node(string):
-    node = ET.Element("k")
-    node.text = string
-    return node
-        
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     """

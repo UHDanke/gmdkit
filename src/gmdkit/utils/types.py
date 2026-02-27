@@ -340,7 +340,7 @@ class DictClass(dict):
             return [self.get(key)]
         
         if ignore_missing:
-            if len(keys) > 3:
+            if len(keys) > 7:
                 valid_keys = set(keys) & self.keys()
                 return [self[k] for k in keys if k in valid_keys]
             else:
@@ -376,7 +376,7 @@ class DictClass(dict):
             return [self.pop(key, None)]
         
         if ignore_missing:
-            if len(keys) > 3:
+            if len(keys) > 7:
                 valid_keys = set(keys) & self.keys()
                 return [self.pop(k) for k in keys if k in valid_keys]
             else:
