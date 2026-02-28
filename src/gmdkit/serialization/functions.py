@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 import base64
 import zlib
 import gzip
+from enum import Enum
 
 # Package Imports
 from gmdkit.serialization.type_cast import (
@@ -262,11 +263,11 @@ def encoder_from_type(type_hint:Any):
     if type_hint is float:
         return from_float
     
-    if type_hint is int:
+    if isinstance(type_hint, type) and issubclass(type_hint, (int, str)):
         return str
     
-    if type_hint is str:
-        return str
+    if isinstance(type_hint, type) and issubclass(type_hint, Enum):
+        return lambda x: str(x.value)
     
     raise ValueError(f"Unsupported type hint: {type_hint}")
 

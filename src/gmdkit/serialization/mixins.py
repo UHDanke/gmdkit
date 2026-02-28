@@ -361,7 +361,10 @@ class DataclassDecoderMixin:
         if not string:
             return cls()
         
-        tokens = string.split(separator, -1 if max_split is None else max_split)
+        if not separator:
+            tokens = [*string[:max_split], string[max_split:]] if max_split is not None else list(string)
+        else:
+            tokens = string.split(separator, -1 if max_split is None else max_split)
         
         return cls.from_tokens(tokens,**kwargs)
             
@@ -465,7 +468,7 @@ class DictDecoderMixin:
         if string == "":
             return cls()
         
-        tokens = string.split(separator)
+        tokens = list(string) if not separator else string.split(separator)
         
         return cls.from_tokens(tokens,**kwargs)
     
@@ -579,9 +582,9 @@ class ArrayDecoderMixin:
         if keep_separator:
             string = string.removesuffix(separator)
         
-        tokens = string.split(separator)
+        tokens = list(string) if not separator else string.split(separator)
            
-        if keep_separator:
+        if keep_separator and separator:
             tokens = [token + separator for token in tokens]
                         
         return cls.from_tokens(tokens,**kwargs)

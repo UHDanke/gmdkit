@@ -59,7 +59,8 @@ class ObjectGroup:
         
         return self.objects
     
-    def save(self, objects: Optional[ObjectList]=None) -> str:
+    
+    def save(self, objects:Optional[ObjectList]=None) -> str:
         objects = getattr(self, "objects", None) if objects is not None else objects
     
         if objects is None:
@@ -68,27 +69,36 @@ class ObjectGroup:
         self.string = objects.to_string()
         
         return self.string
-
-
-def dict_to_obj_list(key:str, node:Element, load_object_group, **kwargs) -> ObjectGroup:
     
-    new = ObjectGroup(node.text)
     
-    if load_object_group:
-        new.load()
+    @classmethod
+    def from_string(cls, string:str, load_objects:bool=True):
         
-    return (int(key),new)
-
-def obj_list_to_dict(key:int, obj_list:ObjectGroup, save_object_group:bool=True, **kwargs) -> Element:
-    
-    if save_object_group:
-        obj_list.save()
+        new = cls(string)
         
-    return (str(key), write_plist(obj_list.string))
+        if load_objects:
+            new.load()
+            
+        return new
+    
+    
+    def to_string(self, save_objects:bool=True):
+        
+        if save_objects:
+            self.save()
+        
+        return self.string
+    
+    
+def dict_to_obj_group(key:str, node:Element, load_object_group:bool=True, **kwargs) -> tuple[int,ObjectGroup]:
+    return (int(key),ObjectGroup.from_string(node.text,load_objects=load_object_group))
+
+def obj_group_to_dict(key:int, obj_group:ObjectGroup, save_object_group:bool=True, **kwargs) -> tuple[str,Element]:
+    return (str(key), write_plist(obj_group.to_string(save_objects=save_object_group)))
     
 
 class ObjectGroupDict(FilePathMixin,PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(dict_to_obj_list)
-    ENCODER = staticmethod(obj_list_to_dict)
+    DECODER = staticmethod(dict_to_obj_group)
+    ENCODER = staticmethod(obj_group_to_dict)
     EXTENSION = "plist"
     

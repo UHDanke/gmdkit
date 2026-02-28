@@ -1,2 +1,8 @@
-from . import prop
-from . import var_prop
+ENCODER_KEY = 'kCEK'
+ID = 1
+NAME = 2
+VARIATIONS = 3
+ALLOW_ROTATION = 4
+ALLOW_FLIP_X = 5
+ALLOW_FLIP_Y = 6
+IGNORE_CORNERS = 7

@@ -13,7 +13,10 @@ __all__ = [
     "Object", 
     "ObjectList",
     "GameSave", 
-    "LevelSave"
+    "LevelSave",
+    "SmartTemplate", 
+    "SmartPrefab", 
+    "SmartLayout"
     ]
 
 from . import constants
@@ -25,5 +28,6 @@ from .utils import typing, enums
 from .models.level import Level, LevelList
 from .models.level_pack import LevelPack, LevelPackList
 from .models.object import Object, ObjectList
+from .models.template import SmartTemplate, SmartPrefab, SmartLayout
 from .models.save.game_manager import GameSave
 from .models.save.level_manager import LevelSave
