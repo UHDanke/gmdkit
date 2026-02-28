@@ -54,7 +54,7 @@ def decompress_string(
         case None:
             pass            
         case _:
-            raise ValueError(f"Unsupported decompression method: {compression}")
+            raise ValueError(f"unsupported decompression method: {compression}")
 
     return byte_stream.decode("utf-8",errors='replace')
 
@@ -78,7 +78,7 @@ def compress_string(
         case None:
             pass
         case _:
-            raise ValueError(f"Unsupported compression method: {compression}")
+            raise ValueError(f"unsupported compression method: {compression}")
             
     byte_stream = base64.urlsafe_b64encode(byte_stream)
     
@@ -118,7 +118,7 @@ def read_plist(node:Element) -> [int,float,str,bool,dict,list]:
                 for i in range(0, len(node) - 1, 2)
             }
         case _:
-            raise ValueError(f"Unknown node tag: {node.tag} for node {node}")
+            raise ValueError(f"unknown node tag: {node.tag} for node {node}")
             
 
 def write_plist(value:Any) -> Element:
@@ -170,24 +170,24 @@ def write_plist(value:Any) -> Element:
         return root
     
     else:
-        raise ValueError(f"Class {type(value)} is not serializable")
+        raise ValueError(f"class {type(value)} is not serializable")
     
 
 def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optional[int]=None):
     
     if node.tag not in ['d', 'dict']:
-        raise ValueError("Element is not a plist dict element")
+        raise ValueError("element is not a plist dict element")
     
     length = len(node)
     
     if length % 2 != 0:
-        raise ValueError(f"odd number of elements: {length}")
+        raise ValueError(f"expected an even number of key-value dict elements, got {length}")
     
     if length < 2:
         if is_array:
-            raise ValueError(f"Expected at least 2 header elements for array, found {length}")
+            raise ValueError(f"expected at least 2 header elements for array, found {length}")
         elif encoder_key is not None:
-            raise ValueError(f"Expected at least 2 header elements for encoded struct, found {length}")
+            raise ValueError(f"expected at least 2 header elements for encoded dict, found {length}")
         else:
             return
         
@@ -199,21 +199,25 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
     
     if is_array:
         if not array_header:
-            raise ValueError(f"Malformed array header, expected '<k>_isArr</k><t />', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'")
+            raise ValueError(
+                f"malformed array header, expected '<k>_isArr</k><t />', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'"
+                )
     elif encoder_key is not None:
         if not encoder_header:
             if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
-                raise ValueError(f"Malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'")
+                raise ValueError(
+                    f"malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'"
+                    )
         elif val_el.text != str(encoder_key):
-            raise ValueError(f"Encoder key mismatch, expected '{encoder_key}', got '{val_el.text}'")
+            raise ValueError(f"encoder key does not match, expected '{encoder_key}', got '{val_el.text}'")
     elif array_header:
-        raise ValueError("Expected plain dict, found array header")
+        raise ValueError("expected plain dict, found array header")
     elif encoder_header:
-        raise ValueError("Expected plain dict, found encoded struct header")
+        raise ValueError("expected plain dict, found encoded dict header")
         
     for i in range(0, length, 2):
         if node[i].tag != 'k':
-            raise ValueError(f"Expected key tag 'k' at index {i}, got '{node[i].tag}'")
+            raise ValueError(f"expected key tag 'k' at index {i}, got '{node[i].tag}'")
 
 
 def from_plist_string(string: str) -> dict:
@@ -252,7 +256,7 @@ def decoder_from_type(type_hint:Any):
     if callable(type_hint):
         return type_hint
  
-    raise ValueError(f"Unsupported type hint: {type_hint}")
+    raise ValueError(f"unsupported type hint: {type_hint}")
         
 
 def encoder_from_type(type_hint:Any):
@@ -269,7 +273,7 @@ def encoder_from_type(type_hint:Any):
     if isinstance(type_hint, type) and issubclass(type_hint, Enum):
         return lambda x: str(x.value)
     
-    raise ValueError(f"Unsupported type hint: {type_hint}")
+    raise ValueError(f"unsupported type hint: {type_hint}")
 
 
 def dataclass_decoder(
@@ -314,7 +318,7 @@ def dataclass_decoder(
                         
             if key is not None and name != key:
                 if key in dkey_dict:
-                    raise ValueError(f"Duplicate serialization key: {key!r}")
+                    raise ValueError(f"duplicate serialization key: {key!r}")
                 dkey_dict[key] = name
                 ekey_dict[name] = key
         

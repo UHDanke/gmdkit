@@ -58,14 +58,13 @@ class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
 
         return getattr(objstr, "objects")
     
-    # TODO REDO
     @classmethod
-    def default(cls, name:str,load:bool=True):
+    def default(cls, name:str, **kwargs):
         
-        data = LEVEL_DEFAULT.copy()        
-        data[lvl_prop.NAME] = name
+        new = cls.from_string(LEVEL_DEFAULT,**kwargs)        
+        new[lvl_prop.NAME] = name
                 
-        return cls.from_plist(data, load=load)
+        return new
 
 
 def to_level(node:Element, load_level_data:bool=True, load_level_content:bool=False, **kwargs) -> Level:

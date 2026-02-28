@@ -1,3 +1,6 @@
+# Imports
+from typing import Optional
+
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
@@ -22,16 +25,9 @@ class IDList(IntList):
     
     SEPARATOR = "."
     
-    def remap(self, key_value_map:dict|None=None):
-        
-        if key_value_map is None: return
-        
-        new = []
-        
-        for x in self:
-            new.append(key_value_map.get(x,x))
-        
-        self[:] = new
+    def remap(self, key_value_map:dict):
+        kv_get = key_value_map.get
+        self[:] = [kv_get(x,x) for x in self]
 
 
 class EventList(IntList):

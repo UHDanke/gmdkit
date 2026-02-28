@@ -60,7 +60,7 @@ class PlistDecoderMixin:
         try:
             validate_dict_node(node, is_array=is_array, encoder_key=encoder_key)
         except Exception as e:
-            raise RuntimeError(f"{type(self).__module__}.{type(self).__qualname__} failed to validate node") from e
+            raise RuntimeError(f"[{type(self).__name__}] failed to validate node") from e
         
         data.clear()
         
@@ -138,16 +138,17 @@ class PlistDecoderMixin:
                 node.tag = "d"
             if load_data:
                 new.load_data(**kwargs)
-        except:
-            print(node)
-            raise RuntimeError(f"{cls.__module__}.{cls.__qualname__}")
+        except Exception as e:
+            raise RuntimeError(f"[{cls.__name__}] failed to load node") from e
         return new
     
     def to_node(self, save_data:bool=True, **kwargs):
         
-        if save_data:
-            self.save_data(**kwargs)
-        
+        try:
+            if save_data:
+                self.save_data(**kwargs)
+        except Exception as e:
+            raise RuntimeError(f"[{type(self).__name__}] failed to save node") from e
         return self.node
 
     @classmethod
@@ -156,12 +157,16 @@ class PlistDecoderMixin:
         node = ET.fromstring(string)
         
         if node.tag != "plist":
-            raise ValueError(f"Expected root node to be plist, got '{node.tag}'")
+            raise ValueError(
+                f"[{cls.__name__}] expected root node to be <plist>, got <{node.tag}> instead"
+                )
         
         root = node.find("dict")
         
         if root is None:
-            raise ValueError("plist does not contain a <dict> root element")
+            raise ValueError(
+                f"[{cls.__name__}] plist does not contain a <dict> sub-element"
+                )
         
         return cls.from_node(root,**kwargs)
     
@@ -249,7 +254,7 @@ class DataclassDecoderMixin:
         
         if length > f_len:
             raise ValueError(
-                f"{cls.__module__}.{cls.__qualname__} too many tokens: {length}, expected at most {f_len}"
+                f"[{cls.__name__}] expected at most {f_len} tokens, got {length}"
                 )
         
         if from_array:            
@@ -258,13 +263,13 @@ class DataclassDecoderMixin:
                     key, value = decoder(field.name, token)
                 except Exception as e:
                     raise ValueError(
-                        f"{cls.__module__}.{cls.__qualname__} failed to decode field '{field.name}'"
+                        f"[{cls.__name__}] failed to decode field '{field.name}'"
                         ) from e
                 class_args[key] = value
         else:
             if length % 2 != 0:
                 raise ValueError(
-                    f"{cls.__module__}.{cls.__qualname__} odd number of tokens: {length}"
+                    f"[{cls.__name__}] expected an even number of key-value tokens, got {length}"
                     )            
                 
             for i in range(0, length, 2):
@@ -281,14 +286,14 @@ class DataclassDecoderMixin:
                             key, value = decoder(encoded_key, encoded_value)
                     except Exception as e:
                         raise ValueError(
-                            f"{cls.__module__}.{cls.__qualname__} failed to decode key/value at index {i}"
+                            f"[{cls.__name__}] failed to decode key / value pair {1+i//2}"
                             ) from e
                         
                 if hasattr(cls, key):
                     class_args[key] = value
                 else:
                     raise ValueError(
-                        f"{cls.__module__}.{cls.__qualname__} unknown field '{key}'"
+                        f"[{cls.__name__}] got unexpected field '{key}'"
                         )
         return cls(**class_args)
         
@@ -332,8 +337,7 @@ class DataclassDecoderMixin:
                     encoded_key, encoded_value = encoder(key, value)
                 except Exception as e:
                     raise ValueError(
-                        f"[{type(self).__module__}.{type(self).__qualname__}]"
-                        f" Failed to encode field '{key}': {e}"
+                        f"f[{type(self).__name__}] failed to encode field '{key}'"
                         ) from e
                     
             if not from_array:
@@ -399,9 +403,10 @@ class DictDecoderMixin:
         decoder = cls.DECODER if decoder is None else decoder
         container = cls.CONTAINER if container is None else container
         
-        if len(tokens) % 2 != 0:
+        length = len(tokens)
+        if length % 2 != 0:
             raise ValueError(
-                f"{cls.__module__}.{cls.__qualname__} odd number of tokens: {len(tokens)}"
+                f"[{cls.__name__}] expected an even number of key-value tokens, got {length}"
                 )
             
         result = cls()
@@ -418,7 +423,7 @@ class DictDecoderMixin:
                 data.update(decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
             except Exception as e:
                 raise ValueError(
-                    f"{cls.__module__}.{cls.__qualname__} failed to decode"
+                    f"[{cls.__name__}] failed to decode"
                     ) from e
         
         return result
@@ -449,7 +454,7 @@ class DictDecoderMixin:
             ]
         except Exception as e:
             raise ValueError(
-                f"{type(self).__module__}.{type(self).__qualname__} failed to encode"
+                f"[{type(self).__name__}] failed to encode"
                 ) from e
             
     
@@ -520,7 +525,7 @@ class ArrayDecoderMixin:
             else:
                 data.extend(tokens)
         except Exception as e:
-            raise ValueError(f"{cls.__module__}.{cls.__qualname__} failed to decode") from e
+            raise ValueError(f"[{cls.__name__}] failed to decode") from e
                 
         return result
     
@@ -547,7 +552,9 @@ class ArrayDecoderMixin:
                 for x in data:
                     group = encoder(x) if encoder else x
                     if len(group) != group_size:
-                        raise ValueError(f"encoder returned {len(group)} tokens, expected {group_size}")
+                        raise ValueError(
+                            f"[{type(self).__name__}] expected {group_size} tokens from encoder, got {len(group)}"
+                            )
                     tokens.extend(group)
             elif encoder:
                 tokens.extend(encoder(x) for x in data)
@@ -555,7 +562,7 @@ class ArrayDecoderMixin:
                 tokens.extend(data)
                 
         except Exception as e:
-            raise ValueError(f"{type(self).__module__}.{type(self).__qualname__} failed to encode") from e
+            raise ValueError(f"[{type(self).__name__}] failed to encode") from e
         
         return tokens
     
@@ -605,7 +612,7 @@ class ArrayDecoderMixin:
 
 class TypeDictMixin:
     
-    KEY_TYPES: dict[Any, Callable] | None = None
+    KEY_TYPES: Optional[dict[Any, Callable]] = None
     TYPE_DEFAULT: Callable = str
     
     def key_type(self, key:Any):
@@ -623,7 +630,7 @@ class TypeDictMixin:
     def coerce_dict(self, dictionary:dict):
         for k, v in dictionary.items():
             self.coerce(k,v)
-
+            
 
 class DictDefaultMixin(TypeDictMixin):
     
@@ -776,7 +783,7 @@ class FilePathMixin:
     EXTENSION: Optional[str] = None
     
     def _name_fallback_(self):
-        raise ValueError("No name fallback provided")
+        raise ValueError("[{type(self).__name__}] name fallback was not provided")
     
     @classmethod
     def from_file(
@@ -791,7 +798,9 @@ class FilePathMixin:
         path_ext = (path.suffix or "").removeprefix(".")
         
         if extension is not None and path_ext != extension:
-            raise ValueError(f"Wrong extension, expected '{extension}', got '{path_ext}'")
+            raise ValueError(
+                "file has invalid extension, expected '{extension}', got '{path_ext}' instead"
+                )
             
         return super().from_file(path=path,**kwargs)
       
@@ -805,15 +814,21 @@ class FilePathMixin:
         extension = self.EXTENSION if extension is None else extension
         path_ext = (path.suffix or "").removeprefix(".")
                 
-        if not path_ext and extension is not None:
+        if not path_ext:
+            if extension is None:
+                raise ValueError(
+                    "cannot resolve default filename as extension was not provided"
+                    )
             name = self._name_fallback_()
             if name is None:
-                raise ValueError("Cannot resolve default filename as fallback returned None")
+                raise ValueError(
+                    "cannot resolve default filename as the name fallback returned None"
+                    )
             path = (path / name).with_suffix('.' + extension)
         elif extension is not None and path_ext != extension:
-            raise ValueError(f"Wrong extension, expected '{extension}', got '{path_ext}'")
-        
-            
+            raise ValueError(
+                "file has invalid extension, expected '{extension}', got '{path_ext}' instead"
+                )
         super().to_file(path=path)
         
 
@@ -931,7 +946,7 @@ class FolderLoaderMixin:
         folder_path = Path(path)
         
         if not folder_path.is_dir():
-            raise ValueError("Given path is not a directory.")
+            raise ValueError("provided path is not a directory.")
         
         for item in data:
             encoder(item, folder_path)

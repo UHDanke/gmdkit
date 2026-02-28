@@ -102,3 +102,6 @@ class ObjectGroupDict(FilePathMixin,PlistDecoderMixin,DictClass):
     ENCODER = staticmethod(obj_group_to_dict)
     EXTENSION = "plist"
     
+    def _name_fallback_(self):
+        return "objectgroup"
+    
