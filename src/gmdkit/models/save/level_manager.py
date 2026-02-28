@@ -29,13 +29,17 @@ ALLOW_KWARGS = {"LLM_01","LLM_03"}
 
 class LevelSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     
-    DEFAULT_PATH = LOCAL_LEVELS_PATH
     COMPRESSED = True
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
     
     DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER,default=read_plist,allow_kwargs=ALLOW_KWARGS))
     ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER,default=write_plist,allow_kwargs=ALLOW_KWARGS))
+    
+    EXTENSION = "dat"
+    
+    def _name_fallback_(self):
+        return "CCLocalLevels"
     
     if TYPE_CHECKING:
         @classmethod
@@ -48,7 +52,7 @@ if __name__ == "__main__":
     import time
 
     _start = time.perf_counter()
-    level_data = LevelSave.from_file()
+    level_data = LevelSave.from_file(LOCAL_LEVELS_PATH)
     levels = level_data[lvl_save.LEVELS]
     binary = level_data[lvl_save.BINARY]
     lists = level_data[lvl_save.LISTS]

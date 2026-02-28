@@ -48,18 +48,19 @@ GAME_SAVE_KWARGS = {}
 class GameSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(from_node_dict(GAME_SAVE_DECODERS,exclude=GAME_SAVE_NODES),key_start=to_numkey,default=read_plist,allow_kwargs=GAME_SAVE_KWARGS))
     ENCODER = staticmethod(dict_cast(to_node_dict(GAME_SAVE_ENCODERS,exclude=GAME_SAVE_NODES),key_end=str,default=write_plist,allow_kwargs=GAME_SAVE_KWARGS))
-    DEFAULT_PATH = GAME_MANAGER_PATH
     COMPRESSED = True
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
-
-
+    EXTENSION = "dat"
+    
+    def _name_fallback_(self):
+        return "CCGameManager"
 
 if __name__ == "__main__":
     
     import time
 
     _start = time.perf_counter()
-    game_data = GameSave.from_file()
+    game_data = GameSave.from_file(GAME_MANAGER_PATH)
     _end = time.perf_counter()
     print(f"Load took {_end - _start:.6f} seconds")

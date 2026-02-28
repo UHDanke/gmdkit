@@ -201,8 +201,6 @@ class PlistDecoderMixin:
             path:Optional[PathString]=None, 
             **kwargs):
         
-        path = path or getattr(self, "path", None)
-        
         string = self.to_string(**kwargs)
         
         with open(path,"w") as file:
@@ -710,6 +708,7 @@ class CompressFileMixin:
     COMPRESSION: Optional[Literal['zlib', 'gzip', 'deflate']] = None
     CYPHER: Optional[bytes] = None
     
+    
     @classmethod
     def from_string(
             cls,
@@ -748,12 +747,33 @@ class CompressFileMixin:
             string = compress_string(string, compression=compression, xor_key=cypher)
         
         return string
+    
+    @classmethod
+    def from_file(cls, path:PathString, **kwargs) -> Self:
+        
+        with open(path, "r") as file:
+            string = file.read()
+            
+        new = cls.from_string(string, **kwargs)
+        new.path = path
+        return new
+    
+    
+    def to_file(self, 
+            path:Optional[PathString]=None, 
+            **kwargs):
+        
+        path = path or getattr(self, "path", None)
+        
+        string = self.to_string(**kwargs)
+        
+        with open(path,"w") as file:
+            file.write(string)
         
 
 class FilePathMixin:
     
     EXTENSION: Optional[str] = None
-    DEFAULT_PATH: Optional[PathString] = None
     
     def _name_fallback_(self):
         raise ValueError("No name fallback provided")
@@ -766,14 +786,8 @@ class FilePathMixin:
             **kwargs: Any
             ) -> Self:
         
-        path = cls.DEFAULT_PATH if path is None else path
+        path = Path(path or '.')
         extension = cls.EXTENSION if extension is None else extension
-        
-        if path is None:
-            path = Path()
-        else:
-            path = Path(path)
-        
         path_ext = (path.suffix or "").removeprefix(".")
         
         if extension is not None and path_ext != extension:
@@ -787,7 +801,7 @@ class FilePathMixin:
             extension:Optional[str]=None,
             **kwargs):
         
-        path = Path(path or self.DEFAULT_PATH or '.')
+        path = Path(path or '.')
         extension = self.EXTENSION if extension is None else extension
         path_ext = (path.suffix or "").removeprefix(".")
                 

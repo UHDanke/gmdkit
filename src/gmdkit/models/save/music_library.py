@@ -5,8 +5,8 @@ import re
 
 # Package Imports
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, CompressFileMixin
-from gmdkit.serialization.type_cast import dict_cast, to_string
+from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, CompressFileMixin, FilePathMixin
+from gmdkit.serialization.type_cast import to_string
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
  
@@ -94,16 +94,20 @@ class TagList(ArtistList):
 
 
 @dataclass_decoder(slots=True, separator="|")
-class MusicLibrary(CompressFileMixin,DataclassDecoderMixin):
+class MusicLibrary(FilePathMixin,CompressFileMixin,DataclassDecoderMixin):
     version: int
     artists: ArtistList = field_decoder(decoder=ArtistList.from_string, encoder=to_string)
     songs: SongList = field_decoder(decoder=SongList.from_string, encoder=to_string)
     tags: TagList = field_decoder(decoder=TagList.from_string, encoder=to_string)
-                
-MusicLibrary.DEFAULT_PATH = MUSIC_LIBRARY_PATH
-MusicLibrary.COMPRESSION = "zlib"
+    
+    def _name_fallback_(self):
+        return "musiclibrary"
 
+
+MusicLibrary.COMPRESSED =  True
+MusicLibrary.COMPRESSION = "zlib"
+MusicLibrary.EXTENSION = "dat"
 
 
 if __name__ == "__main__":
-    music_library = MusicLibrary.from_file()
+    music_library = MusicLibrary.from_file(MUSIC_LIBRARY_PATH)

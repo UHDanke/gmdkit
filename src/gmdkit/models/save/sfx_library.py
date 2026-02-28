@@ -5,7 +5,8 @@ from typing import Sequence, Self
 from gmdkit.serialization.mixins import (
     ArrayDecoderMixin, DataclassDecoderMixin,
     DelimiterMixin, 
-    CompressFileMixin
+    CompressFileMixin,
+    FilePathMixin
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.serialization.type_cast import to_string
@@ -57,13 +58,16 @@ class CreditList(SFXList):
 
 
 @dataclass_decoder(slots=True,from_array=True,separator="|")
-class SFXLibrary(CompressFileMixin,DataclassDecoderMixin):
+class SFXLibrary(FilePathMixin,CompressFileMixin,DataclassDecoderMixin):
     files: SFXList = field_decoder(decoder=SFXList.from_string, encoder=to_string)
     sfx_credits: CreditList = field_decoder(decoder=CreditList.from_string, encoder=to_string)
     
-SFXLibrary.DEFAULT_PATH = SFX_LIBRARY_PATH
+    def _name_fallback_(self):
+        return "sfxlibrary"
+    
+SFXLibrary.COMPRESSED =  True
 SFXLibrary.COMPRESSION = "zlib"
-
+SFXLibrary.EXTENSION = "dat"
 
 if __name__ == "__main__":
-    sfx_library = SFXLibrary.from_file()
+    sfx_library = SFXLibrary.from_file(SFX_LIBRARY_PATH)
