@@ -54,8 +54,8 @@ class SmartPrefabList(PlistDecoderMixin,ListClass):
 def to_prefab_list(key:str, node:Element, **kwargs) -> tuple[str,SmartPrefabList]:
     return key, SmartPrefabList.from_node(node=node, **kwargs)
 
-def from_prefab_list(prefab_list:SmartPrefabList, **kwargs) -> tuple[str,Element]:
-    return prefab_list.to_node(**kwargs)
+def from_prefab_list(key:str, prefab_list:SmartPrefabList, **kwargs) -> tuple[str,Element]:
+    return key, prefab_list.to_node(**kwargs)
 
 class SmartPrefabLayout(PlistDecoderMixin,DictClass):
     DECODER = staticmethod(to_prefab_list)
@@ -78,6 +78,11 @@ class SmartTemplate(FilePathMixin,PlistDecoderMixin,DictClass):
     ENCODER = staticmethod(dict_cast(to_node_dict(TEMPLATE_ENCODERS,exclude=TEMPLATE_NODES),key_end=str,default=write_plist,allow_kwargs=TEMPLATE_KWARGS))
     ENCODER_KEY = 10
     EXTENSION = "gmdt"
+    
+    def _name_fallback_(self):
+        container = self.CONTAINER
+        data = self if container is None else getattr(self, container)
+        return data[smart_template.NAME]   
 
 def to_template(node:Element, **kwargs) -> SmartTemplate:
     return SmartTemplate.from_node(node=node, **kwargs)

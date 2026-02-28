@@ -30,12 +30,7 @@ class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
     
     def _name_fallback_(self):
         container = self.CONTAINER
-        
-        if container is None:
-            data = self
-        else:
-            data = getattr(self, container)
-            
+        data = self if container is None else getattr(self, container)
         return data[lvl_prop.NAME]    
     
     @property

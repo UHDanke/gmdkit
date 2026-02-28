@@ -19,12 +19,7 @@ class LevelPack(FilePathMixin,PlistDecoderMixin,DictClass):
 
     def _name_fallback_(self):
         container = self.CONTAINER
-        
-        if container is None:
-            data = self
-        else:
-            data = getattr(self, container)
-            
+        data = self if container is None else getattr(self, container)
         return data[list_prop.NAME]
     
     if TYPE_CHECKING:

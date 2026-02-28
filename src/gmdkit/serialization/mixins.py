@@ -787,26 +787,19 @@ class FilePathMixin:
             extension:Optional[str]=None,
             **kwargs):
         
-        path = self.DEFAULT_PATH if path is None else path
+        path = Path(path or self.DEFAULT_PATH or '.')
         extension = self.EXTENSION if extension is None else extension
-        
-        if path is None: 
-            path = Path()
-        else:
-            path = Path(path)
-            
         path_ext = (path.suffix or "").removeprefix(".")
-        
-        if extension is not None and path_ext != extension:
-            raise ValueError(f"Wrong extension, expected '{extension}', got '{path_ext}'")
-            
-        if not path.suffix:
+                
+        if not path_ext and extension is not None:
             name = self._name_fallback_()
             if name is None:
                 raise ValueError("Cannot resolve default filename as fallback returned None")
-                
             path = (path / name).with_suffix('.' + extension)
+        elif extension is not None and path_ext != extension:
+            raise ValueError(f"Wrong extension, expected '{extension}', got '{path_ext}'")
         
+            
         super().to_file(path=path)
         
 
