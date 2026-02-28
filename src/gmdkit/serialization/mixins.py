@@ -29,6 +29,36 @@ from gmdkit.serialization.functions import (
 )
 
 
+class FileStringMixin:
+    
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not callable(getattr(cls, "to_string", None)):
+            raise TypeError(f"{cls.__name__} must implement to_string()")
+        if not callable(getattr(cls, "from_string", None)):
+            raise TypeError(f"{cls.__name__} must implement from_string()")
+        
+    @classmethod
+    def from_file(cls, path:PathString, **kwargs) -> Self:
+        
+        with open(path, "r") as file:
+            string = file.read()
+            
+        new = cls.from_string(string, **kwargs)
+        new.path = path
+        return new
+    
+    
+    def to_file(self, 
+            path:PathString, 
+            **kwargs):
+        
+        string = self.to_string(**kwargs)
+        
+        with open(path,"w") as file:
+            file.write(string)
+    
+    
 class PlistDecoderMixin:
     
     ENCODER: Optional[PlistEncoder] = None
@@ -203,7 +233,7 @@ class PlistDecoderMixin:
     
     
     def to_file(self, 
-            path:Optional[PathString]=None, 
+            path:PathString, 
             **kwargs):
         
         string = self.to_string(**kwargs)
@@ -610,6 +640,7 @@ class ArrayDecoderMixin:
         return separator.join(tokens)
 
 
+# TODO REDO
 class TypeDictMixin:
     
     KEY_TYPES: Optional[dict[Any, Callable]] = None
@@ -631,7 +662,7 @@ class TypeDictMixin:
         for k, v in dictionary.items():
             self.coerce(k,v)
             
-
+# TODO REDO
 class DictDefaultMixin(TypeDictMixin):
     
     KEY_DEFAULTS: dict[str, Any] | None = None
@@ -714,6 +745,8 @@ class CompressFileMixin:
     COMPRESSED: bool = False
     COMPRESSION: Optional[Literal['zlib', 'gzip', 'deflate']] = None
     CYPHER: Optional[bytes] = None
+    ERRORS: Optional[str] = None
+    LEVEL: Optional[int] = None
     
     
     @classmethod
@@ -723,15 +756,17 @@ class CompressFileMixin:
             compressed:Optional[bool]=None,
             compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
             cypher:Optional[bytes]=None,
+            errors:Optional[str]=None,
             **kwargs
             ) -> Self:
         
         compressed = cls.COMPRESSED if compressed is None else compressed
         compression = cls.COMPRESSION if compression is None else compression
         cypher = cls.CYPHER if cypher is None else cypher
+        errors = cls.ERRORS if errors is None else errors
         
         if compressed:
-            string = decompress_string(string, compression=compression, xor_key=cypher)
+            string = decompress_string(string, compression=compression, xor_key=cypher,errors=errors)
             
         return super().from_string(string, **kwargs)
     
@@ -741,42 +776,22 @@ class CompressFileMixin:
             compressed:Optional[bool]=None,
             compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
             cypher:Optional[bytes]=None,
+            level:Optional[int]=None,
             **kwargs
             ) -> str:
         
         compressed = self.COMPRESSED if compressed is None else compressed
         compression = self.COMPRESSION if compression is None else compression
         cypher = self.CYPHER if cypher is None else cypher
+        level = self.level if level is None else level
         
         string = super().to_string(**kwargs)
     
         if compressed:
-            string = compress_string(string, compression=compression, xor_key=cypher)
+            string = compress_string(string, compression=compression, xor_key=cypher,level=level)
         
         return string
     
-    @classmethod
-    def from_file(cls, path:PathString, **kwargs) -> Self:
-        
-        with open(path, "r") as file:
-            string = file.read()
-            
-        new = cls.from_string(string, **kwargs)
-        new.path = path
-        return new
-    
-    
-    def to_file(self, 
-            path:Optional[PathString]=None, 
-            **kwargs):
-        
-        path = path or getattr(self, "path", None)
-        
-        string = self.to_string(**kwargs)
-        
-        with open(path,"w") as file:
-            file.write(string)
-        
 
 class FilePathMixin:
     
@@ -788,14 +803,19 @@ class FilePathMixin:
     @classmethod
     def from_file(
             cls, 
-            path:Optional[PathString]=None,
+            path:PathString,
             extension:Optional[str]=None,
             **kwargs: Any
             ) -> Self:
         
-        path = Path(path or '.')
+        path = Path(path)
         extension = cls.EXTENSION if extension is None else extension
         path_ext = (path.suffix or "").removeprefix(".")
+        
+        if path.is_dir():
+            raise ValueError(
+                "expected file, got directory instead"
+                )
         
         if extension is not None and path_ext != extension:
             raise ValueError(
@@ -825,10 +845,12 @@ class FilePathMixin:
                     "cannot resolve default filename as the name fallback returned None"
                     )
             path = (path / name).with_suffix('.' + extension)
+            
         elif extension is not None and path_ext != extension:
             raise ValueError(
                 "file has invalid extension, expected '{extension}', got '{path_ext}' instead"
                 )
+            
         super().to_file(path=path)
         
 

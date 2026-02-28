@@ -5,7 +5,14 @@ import re
 
 # Package Imports
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin, CompressFileMixin, FilePathMixin
+from gmdkit.serialization.mixins import (
+    DataclassDecoderMixin, 
+    ArrayDecoderMixin, 
+    DelimiterMixin, 
+    CompressFileMixin, 
+    FilePathMixin,
+    FileStringMixin
+    )
 from gmdkit.serialization.type_cast import to_string
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
@@ -94,7 +101,7 @@ class TagList(ArtistList):
 
 
 @dataclass_decoder(slots=True, separator="|")
-class MusicLibrary(FilePathMixin,CompressFileMixin,DataclassDecoderMixin):
+class MusicLibrary(FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     version: int
     artists: ArtistList = field_decoder(decoder=ArtistList.from_string, encoder=to_string)
     songs: SongList = field_decoder(decoder=SongList.from_string, encoder=to_string)

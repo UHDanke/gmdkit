@@ -10,7 +10,8 @@ from gmdkit.serialization.mixins import (
     PlistDecoderMixin,
     FilePathMixin,
     DelimiterMixin,
-    CompressFileMixin
+    CompressFileMixin,
+    FileStringMixin
     )
 from gmdkit.serialization.type_cast import serialize, to_string, to_numkey
 from gmdkit.serialization.functions import dict_cast, write_plist
@@ -34,7 +35,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
         return cls.from_string(string)
     
     
-class ObjectList(CompressFileMixin,ArrayDecoderMixin,ListClass):
+class ObjectList(FileStringMixin,CompressFileMixin,ArrayDecoderMixin,ListClass):
     
     SEPARATOR = ";"
     KEEP_SEPARATOR = True

@@ -67,16 +67,20 @@ class GameSave(FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     COMPRESSED = True
     COMPRESSION = "gzip"
     CYPHER = bytes([11])
+    ERRORS = "print_errors"
     EXTENSION = "dat"
+    
+    DEFAULT_PATH = GAME_MANAGER_PATH
     
     def _name_fallback_(self):
         return "CCGameManager"
+    
 
 if __name__ == "__main__":
     
     import time
 
     _start = time.perf_counter()
-    game_data = GameSave.from_file(GAME_MANAGER_PATH)
+    game_data = GameSave.from_file(GameSave.DEFAULT_PATH)
     _end = time.perf_counter()
     print(f"Load took {_end - _start:.6f} seconds")

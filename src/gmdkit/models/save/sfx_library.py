@@ -6,7 +6,8 @@ from gmdkit.serialization.mixins import (
     ArrayDecoderMixin, DataclassDecoderMixin,
     DelimiterMixin, 
     CompressFileMixin,
-    FilePathMixin
+    FilePathMixin,
+    FileStringMixin
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.serialization.type_cast import to_string
@@ -58,7 +59,7 @@ class CreditList(SFXList):
 
 
 @dataclass_decoder(slots=True,from_array=True,separator="|")
-class SFXLibrary(FilePathMixin,CompressFileMixin,DataclassDecoderMixin):
+class SFXLibrary(FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     files: SFXList = field_decoder(decoder=SFXList.from_string, encoder=to_string)
     sfx_credits: CreditList = field_decoder(decoder=CreditList.from_string, encoder=to_string)
     

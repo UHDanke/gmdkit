@@ -2,6 +2,7 @@
 from typing import Callable, Literal, Optional, Any, get_type_hints
 from functools import partial
 from inspect import signature
+import codecs
 import numpy as np
 from dataclasses import field, fields, dataclass, MISSING
 import sys
@@ -23,6 +24,13 @@ from gmdkit.utils.typing import (
     )
 
 
+def print_errors(e: UnicodeDecodeError) -> tuple[str, int]:
+    print(f"UnicodeDecodeError: {e.object[e.start:e.end]} at position {e.start}")
+    return ("?", e.end)
+
+codecs.register_error("print_errors", print_errors)
+
+
 def xor(data: bytes, key: bytes) -> bytes:
     d = np.frombuffer(data, dtype=np.uint8)
     k = np.frombuffer(key * (len(data) // len(key) + 1), dtype=np.uint8)[:len(data)]
@@ -32,7 +40,9 @@ def xor(data: bytes, key: bytes) -> bytes:
 def decompress_string(
         string:str,
         xor_key:Optional[bytes]=None,
-        compression:Optional[Literal["zlib","gzip","deflate","auto"]]="auto"
+        compression:Optional[Literal["zlib","gzip","deflate","auto"]]="auto",
+        encoding:str="utf-8",
+        errors:str="replace"
         ) -> str:
     
     byte_stream = string.encode()
@@ -56,14 +66,15 @@ def decompress_string(
         case _:
             raise ValueError(f"unsupported decompression method: {compression}")
 
-    return byte_stream.decode("utf-8",errors='replace')
+    return byte_stream.decode("utf-8",errors=errors)
 
 
 def compress_string(
         string:str,
         xor_key:Optional[bytes]=None,
         compression:Optional[Literal["zlib","gzip","deflate"]]="gzip",
-        level: int = 9
+        encoding:str="utf-8",
+        level:int=6
         ) -> str:
     
     byte_stream = string.encode()
@@ -85,7 +96,7 @@ def compress_string(
     if xor_key is not None:
         byte_stream = xor(byte_stream, key=xor_key)
     
-    return byte_stream.decode()
+    return byte_stream.decode(encoding=encoding)
 
 
 def read_plist(node:Element) -> [int,float,str,bool,dict,list]:
