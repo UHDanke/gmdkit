@@ -222,12 +222,12 @@ class PlistDecoderMixin:
 
 class DataclassDecoderMixin:
     
-    SEPARATOR: str = ','
-    MAX_SPLIT: Optional[int] = None
-    FROM_ARRAY: bool = True
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
     CONDITION: Optional[KeyValueCondition] = None
+    FROM_ARRAY: bool = True
+    SEPARATOR: str = ','
+    MAX_SPLIT: Optional[int] = None
     
     @classmethod
     def from_tokens(
@@ -382,11 +382,11 @@ class DataclassDecoderMixin:
 
 class DictDecoderMixin:
     
-    SEPARATOR: str = ','
     ENCODER: Optional[StringDictEncoder] = staticmethod(dict_serializer)
     DECODER: Optional[StringDictDecoder] = None
     CONTAINER: Optional[str] = None
     CONDITION: Optional[KeyValueCondition] = None
+    SEPARATOR: str = ','
     
     @classmethod
     def from_tokens(
@@ -484,12 +484,12 @@ class DictDecoderMixin:
 
 class ArrayDecoderMixin:
     
-    SEPARATOR: str = ','
-    KEEP_SEPARATOR: bool = False
-    GROUP_SIZE: int = 1
     ENCODER: Optional[StringEncoder] = staticmethod(serialize)
     DECODER: Optional[StringDecoder] = None
     CONTAINER: Optional[str] = None
+    GROUP_SIZE: int = 1
+    SEPARATOR: str = ','
+    KEEP_SEPARATOR: bool = False
     
     @classmethod
     def from_tokens(
@@ -842,9 +842,9 @@ class LoadContentMixin:
         
     def load_content(self, content_keys:Optional[set]=None):
         
-        target = content_keys if content_keys is not None else getattr(self, "CONTENT_KEYS", None)
-    
+        target = self.CONTENT_KEYS if content_keys is None else content_keys
         available = self.keys()
+        
         if target is not None:
             key_set = available & target
         else:
@@ -860,9 +860,9 @@ class LoadContentMixin:
             
     def save_content(self, content_keys:Optional[set]=None):
         
-        target = content_keys if content_keys is not None else getattr(self, "CONTENT_KEYS", None)
-    
+        target = self.CONTENT_KEYS if content_keys is None else content_keys
         available = self.keys()
+        
         if target is not None:
             key_set = available & target
         else:
