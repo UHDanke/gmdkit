@@ -783,7 +783,7 @@ class CompressFileMixin:
         compressed = self.COMPRESSED if compressed is None else compressed
         compression = self.COMPRESSION if compression is None else compression
         cypher = self.CYPHER if cypher is None else cypher
-        level = self.level if level is None else level
+        level = self.LEVEL if level is None else level
         
         string = super().to_string(**kwargs)
     
