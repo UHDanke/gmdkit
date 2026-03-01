@@ -17,6 +17,24 @@ class GzipString:
     def save(self, string:str) -> None:
         self.string = compress_string(string)
         
+    @classmethod
+    def from_string(cls, string:str, load:bool=True):
+        
+        new = cls(string)
+        
+        if load:
+            new.load()
+            
+        return new
+    
+    
+    def to_string(self, save:bool=True):
+        
+        if save:
+            self.save()
+        
+        return self.string
+        
 
 class ObjectString(GzipString):
     

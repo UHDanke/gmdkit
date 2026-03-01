@@ -35,16 +35,15 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
         return cls.from_string(string)
     
     
-class ObjectList(FileStringMixin,CompressFileMixin,ArrayDecoderMixin,ListClass):
+class ObjectList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Object.from_string
     ENCODER = staticmethod(to_string)
-    COMPRESSED = False
     
 
-class ObjectGroup:
+class ObjectGroup(FileStringMixin):
     
     __slots__ = ("string","objects")
     

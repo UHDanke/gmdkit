@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.utils.types import ListClass
-from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin,DelimiterMixin
+from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin,DelimiterMixin,FileStringMixin
 from gmdkit.serialization.functions import dataclass_decoder
 
 
@@ -11,7 +11,7 @@ class Guideline(DataclassDecoderMixin):
     color: float = 0
 
 
-class GuidelineList(DelimiterMixin,ArrayDecoderMixin,ListClass):
+class GuidelineList(FileStringMixin,DelimiterMixin,ArrayDecoderMixin,ListClass):
     
     __slots__ = ()
     

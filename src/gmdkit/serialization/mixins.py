@@ -31,13 +31,6 @@ from gmdkit.serialization.functions import (
 
 class FileStringMixin:
     
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        if not callable(getattr(cls, "to_string", None)):
-            raise TypeError(f"{cls.__name__} must implement to_string()")
-        if not callable(getattr(cls, "from_string", None)):
-            raise TypeError(f"{cls.__name__} must implement from_string()")
-        
     @classmethod
     def from_file(cls, path:PathString, **kwargs) -> Self:
         
@@ -713,11 +706,16 @@ class DelimiterMixin:
             **kwargs
             ) -> Self:
         
-        start_delimiter = cls.START_DELIMITER if start_delimiter is None else start_delimiter
-        end_delimiter = cls.END_DELIMITER if end_delimiter is None else end_delimiter
+        if string:        
+            start_delimiter = cls.START_DELIMITER if start_delimiter is None else start_delimiter
+            end_delimiter = cls.END_DELIMITER if end_delimiter is None else end_delimiter
+            
+            if start_delimiter: 
+                string = string.removeprefix(start_delimiter)
+            
+            if end_delimiter: 
+                string = string.removesuffix(end_delimiter)
         
-        if start_delimiter: string = string.removeprefix(start_delimiter)
-        if end_delimiter: string = string.removesuffix(end_delimiter)
         return super().from_string(string, *args, **kwargs)
     
     
@@ -733,6 +731,7 @@ class DelimiterMixin:
         end_delimiter = self.END_DELIMITER if end_delimiter is None else end_delimiter
         
         string = super().to_string(*args, **kwargs)
+        
         if string:
             if start_delimiter: string = start_delimiter + string
             if end_delimiter: string = string + end_delimiter
@@ -745,7 +744,7 @@ class CompressFileMixin:
     COMPRESSED: bool = False
     COMPRESSION: Optional[Literal['zlib', 'gzip', 'deflate']] = None
     CYPHER: Optional[bytes] = None
-    ERRORS: Optional[str] = None
+    ERRORS: Optional[str] = "replace"
     LEVEL: Optional[int] = None
     
     
