@@ -28,6 +28,9 @@ def match_enum(enum_format):
         case 'demon rating':
             return 'enums.DemonRating'
         
+        case 'toggle cbs':
+            return 'enums.ToggleCBS'
+        
         case _:
             return
 

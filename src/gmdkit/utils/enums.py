@@ -554,3 +554,8 @@ class TemplateType(Enum):
     LONG_SLOPE_SIDE_LEFT_BOTTOM = "J"
     LONG_SLOPE_CENTER_LEFT_TOP = "K"
     LONG_SLOPE_SIDE_LEFT_TOP = "L"
+    
+class ToggleCBS(EnumClass):
+    DEFAULT = 0
+    ON = 1
+    OFF = 2
