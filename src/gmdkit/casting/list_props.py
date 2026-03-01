@@ -35,6 +35,7 @@ LIST_TYPES = {
     'k22': int,
     'k42': int,
     'k46': int,
+    'k47': int,
     'k60': int,
     'k83': int,
     'k84': int,
