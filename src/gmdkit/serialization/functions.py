@@ -2,7 +2,6 @@
 from typing import Callable, Literal, Optional, Any, get_type_hints
 from functools import partial
 from inspect import signature
-import codecs
 import numpy as np
 from dataclasses import field, fields, dataclass, MISSING
 import sys
@@ -24,13 +23,6 @@ from gmdkit.utils.typing import (
     )
 
 
-def print_errors(e: UnicodeDecodeError) -> tuple[str, int]:
-    print(f"UnicodeDecodeError: {e.object[e.start:e.end]} at position {e.start}")
-    return ("?", e.end)
-
-codecs.register_error("print_errors", print_errors)
-
-
 def xor(data: bytes, key: bytes) -> bytes:
     d = np.frombuffer(data, dtype=np.uint8)
     k = np.frombuffer(key * (len(data) // len(key) + 1), dtype=np.uint8)[:len(data)]
@@ -41,8 +33,6 @@ def decompress_string(
         string:str,
         xor_key:Optional[bytes]=None,
         compression:Optional[Literal["zlib","gzip","deflate","auto"]]="auto",
-        encoding:str="utf-8",
-        errors:str="replace"
         ) -> str:
     
     byte_stream = string.encode()
@@ -56,7 +46,7 @@ def decompress_string(
         case 'zlib':
             byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
         case 'gzip':
-            byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS | 16) 
+            byte_stream = gzip.decompress(byte_stream) 
         case 'deflate':
             byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
         case 'auto':
@@ -66,19 +56,18 @@ def decompress_string(
         case _:
             raise ValueError(f"unsupported decompression method: {compression}")
 
-    return byte_stream.decode("utf-8",errors=errors)
+    return byte_stream.decode("utf-8",errors="ignore")
 
 
 def compress_string(
         string:str,
         xor_key:Optional[bytes]=None,
         compression:Optional[Literal["zlib","gzip","deflate"]]="gzip",
-        encoding:str="utf-8",
         level:int=6
         ) -> str:
     
     byte_stream = string.encode()
-        
+    
     match compression:
         case 'zlib':
             byte_stream = zlib.compress(byte_stream, wbits=zlib.MAX_WBITS, level=level)
@@ -96,7 +85,7 @@ def compress_string(
     if xor_key is not None:
         byte_stream = xor(byte_stream, key=xor_key)
     
-    return byte_stream.decode(encoding=encoding)
+    return byte_stream.decode()
 
 
 def read_plist(node:Element) -> [int,float,str,bool,dict,list]:
@@ -229,6 +218,19 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
     for i in range(0, length, 2):
         if node[i].tag != 'k':
             raise ValueError(f"expected key tag 'k' at index {i}, got '{node[i].tag}'")
+
+
+def get_plist_root(node:ET.Element) -> ET.Element:
+    if node.tag != "plist":
+        raise ValueError(f"expected root node to be <plist>, got <{node.tag}> instead")
+        
+    root = node.find("dict")
+        
+    if root is None:
+        raise ValueError("plist does not contain a <dict> sub-element")
+    
+    return root
+
 
 
 def from_plist_string(string: str) -> dict:

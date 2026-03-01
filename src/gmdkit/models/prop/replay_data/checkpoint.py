@@ -1,7 +1,6 @@
 # Package Imports
 from gmdkit.serialization.mixins import DataclassDecoderMixin, DelimiterMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.replay_data.persistent import PersistentData
 
 
@@ -15,6 +14,6 @@ class CheckpointData(DelimiterMixin,DataclassDecoderMixin):
     taps: int
     points: int
     time: float = field_decoder(decoder=lambda string: int(string) / 100000, encoder=lambda value: str(int(value * 100000)))
-    persistent_data: PersistentData = field_decoder(decoder=PersistentData.from_string,encoder=to_string)
+    persistent_data: PersistentData = field_decoder(decoder=PersistentData.from_string,encoder=PersistentData.to_string)
 
 CheckpointData.END_DELIMITER = ","

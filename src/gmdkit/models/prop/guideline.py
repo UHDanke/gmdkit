@@ -18,8 +18,8 @@ class GuidelineList(FileStringMixin,DelimiterMixin,ArrayDecoderMixin,ListClass):
     SEPARATOR = "~"
     END_DELIMITER = "~"
     GROUP_SIZE = 2
-    DECODER = staticmethod(Guideline.from_tokens)
-    ENCODER = staticmethod(Guideline.to_tokens)
+    DECODER = Guideline.from_tokens
+    ENCODER = Guideline.to_tokens
     
     def clean(self):
         

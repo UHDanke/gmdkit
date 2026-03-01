@@ -7,10 +7,10 @@ from gmdkit.serialization.mixins import (
     DelimiterMixin, 
     CompressFileMixin,
     FilePathMixin,
-    FileStringMixin
+    FileStringMixin,
+    DefaultPathMixin
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.serialization.type_cast import to_string
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import SFX_LIBRARY_PATH
 
@@ -44,8 +44,8 @@ SFXFile.END_DELIMITER = ";"
 class SFXList(ArrayDecoderMixin, ListClass):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
-    DECODER = staticmethod(SFXFile.from_string)
-    ENCODER = staticmethod(to_string)
+    DECODER = SFXFile.from_string
+    ENCODER = SFXFile.to_string
 
 
 @dataclass_decoder(slots=True,from_array=True,separator=",")
@@ -53,15 +53,19 @@ class Credits(DelimiterMixin,DataclassDecoderMixin):
     name: str
     website: str
 
+Credits.END_DELIMITER = ";"
 
-class CreditList(SFXList):
+class CreditList(ArrayDecoderMixin, ListClass):
+    SEPARATOR = ";"
+    KEEP_SEPARATOR = True
     DECODER = Credits.from_string
-
+    ENCODER = Credits.to_string
+    
 
 @dataclass_decoder(slots=True,from_array=True,separator="|")
-class SFXLibrary(FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
-    files: SFXList = field_decoder(decoder=SFXList.from_string, encoder=to_string)
-    sfx_credits: CreditList = field_decoder(decoder=CreditList.from_string, encoder=to_string)
+class SFXLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
+    files: SFXList = field_decoder(decoder=SFXList.from_string, encoder=SFXList.to_string)
+    sfx_credits: CreditList = field_decoder(decoder=CreditList.from_string, encoder=CreditList.to_string)
     
     def _name_fallback_(self):
         return "sfxlibrary"
@@ -69,6 +73,7 @@ class SFXLibrary(FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecode
 SFXLibrary.COMPRESSED =  True
 SFXLibrary.COMPRESSION = "zlib"
 SFXLibrary.EXTENSION = "dat"
+SFXLibrary.DEFAULT_PATH = SFX_LIBRARY_PATH
 
 if __name__ == "__main__":
-    sfx_library = SFXLibrary.from_file(SFX_LIBRARY_PATH)
+    sfx_library = SFXLibrary.from_default_path()

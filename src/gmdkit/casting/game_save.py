@@ -6,6 +6,7 @@ from gmdkit.models.object import ObjectGroupDict
 from gmdkit.models.prop.dpad import MoveButton, JumpButton, SingleLayout, DualLayout
 from gmdkit.models.prop.song_info import SongInfoList
 
+
 GAME_SAVE_DECODERS = {
     "customObjectDict": ObjectGroupDict.from_node,
     "GLM_01": LevelMapping.from_node,

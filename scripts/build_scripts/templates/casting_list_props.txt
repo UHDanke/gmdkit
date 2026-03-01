@@ -1,9 +1,6 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.serialization.type_cast import (
-    to_string, to_node,
-    decode_text, encode_text
-    )
+from gmdkit.serialization.type_cast import decode_text, encode_text
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.level import LevelMapping
 
@@ -21,3 +18,5 @@ LIST_ENCODERS = {{
 LIST_TYPES = {{
 {list_types}
 }}
+
+LIST_NODES = {{'k97'}}

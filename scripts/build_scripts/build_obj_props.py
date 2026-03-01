@@ -169,7 +169,7 @@ def get_obj_types(gd_type, gd_format, key):
         case _:
             return
 
-def decode_obj_props(gd_type, gd_format, key):
+def decode_obj_props(gd_type, gd_format):
     
     match gd_type:
         
@@ -224,7 +224,7 @@ def decode_obj_props(gd_type, gd_format, key):
         case _:
             return
 
-def encode_obj_props(gd_type, gd_format, key):
+def encode_obj_props(gd_type, gd_format):
     
     match gd_type:
         
@@ -282,8 +282,8 @@ def main():
                 None if g['alias'].isna().all()
                 else tuple(a for a in g['alias'] if pd.notna(a))
             ),
-            'decode': decode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
-            'encode': encode_obj_props(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
+            'decode': decode_obj_props(g['type'].iloc[0], g['format'].iloc[0]),
+            'encode': encode_obj_props(g['type'].iloc[0], g['format'].iloc[0]),
             'type': get_obj_types(g['type'].iloc[0], g['format'].iloc[0], g.index[0]),
         })
         .apply(pd.Series)

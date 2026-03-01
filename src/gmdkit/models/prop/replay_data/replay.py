@@ -23,12 +23,12 @@ class ReplayInfo(DataclassDecoderMixin):
     game_version: int
     game_binary: int
     version: int
-    persistent_data: PersistentData = field_decoder(decoder=PersistentData.from_string,encoder=to_string)
+    persistent_data: PersistentData = field_decoder(decoder=PersistentData.from_string,encoder=PersistentData.to_string)
 
 
 @dataclass_decoder(slots=True,from_array=True,separator=":",default_optional=True)
 class ReplayEvent(DataclassDecoderMixin):
-    event_id: ReplayEventID = field_decoder(default=ReplayEventID(0),decoder=ReplayEventID.from_string,encoder=to_string)
+    event_id: ReplayEventID = field_decoder(default=ReplayEventID(0),decoder=ReplayEventID.from_string,encoder=str)
     event_data: str = field_decoder(default="")
 
 
@@ -57,7 +57,6 @@ class ReplayInput(DataclassDecoderMixin):
     delta_step : int
     event: Any = field_decoder(default_factory=ReplayEvent,optional=True,decoder=process_events,encoder=to_string)
 
-# RobTop PLEASE use a sane serialization format you are getting lost in the commas
 # Checkpoint data also uses commas so maxsplit needs to be specified here
 ReplayInput.MAX_SPLIT = 1
 
@@ -66,5 +65,5 @@ class ReplayEvents(DelimiterMixin, ArrayDecoderMixin, ListClass):
     
     SEPARATOR = ";"
     DECODER = ReplayInput.from_string  
-    ENCODER = to_string
+    ENCODER = ReplayInput.to_string
 

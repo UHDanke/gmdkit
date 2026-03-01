@@ -11,9 +11,9 @@ from gmdkit.serialization.mixins import (
     DelimiterMixin, 
     CompressFileMixin, 
     FilePathMixin,
-    FileStringMixin
+    FileStringMixin,
+    DefaultPathMixin
     )
-from gmdkit.serialization.type_cast import to_string
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
  
@@ -35,7 +35,7 @@ class ArtistList(DelimiterMixin, ArrayDecoderMixin, ListClass):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Artist.from_string
-    ENCODER = staticmethod(to_string)
+    ENCODER = Artist.to_string
 
 
 class SongTagList(DelimiterMixin, ArrayDecoderMixin, ListClass):
@@ -58,9 +58,9 @@ class Song(DelimiterMixin, DataclassDecoderMixin):
     artist_id: int
     file_size: int
     duration: int
-    tags: SongTagList = field_decoder(decoder=SongTagList.from_string, encoder=to_string)
+    tags: SongTagList = field_decoder(decoder=SongTagList.from_string, encoder=SongTagList.to_string)
     music_platform: int
-    extra_artists: SongArtistList = field_decoder(decoder=SongArtistList.from_string, encoder=to_string)
+    extra_artists: SongArtistList = field_decoder(decoder=SongArtistList.from_string, encoder=SongArtistList.to_string)
     external_link: str = field_decoder(decoder=unquote,encoder=lambda x: quote(x,safe=""))
     is_new: bool
     priority_order: int
@@ -84,8 +84,11 @@ class Song(DelimiterMixin, DataclassDecoderMixin):
 Song.END_DELIMITER = ";"
 
 
-class SongList(ArtistList):
+class SongList(DelimiterMixin, ArrayDecoderMixin, ListClass):
+    SEPARATOR = ";"
+    KEEP_SEPARATOR = True
     DECODER = Song.from_string
+    ENCODER = Song.to_string
 
 
 @dataclass_decoder(slots=True, separator=",")
@@ -96,16 +99,19 @@ class Tag(DelimiterMixin, DataclassDecoderMixin):
 Tag.END_DELIMITER = ";"
 
 
-class TagList(ArtistList):
+class TagList(DelimiterMixin, ArrayDecoderMixin, ListClass):
+    SEPARATOR = ";"
+    KEEP_SEPARATOR = True
     DECODER = Tag.from_string
+    ENCODER = Tag.to_string
 
 
 @dataclass_decoder(slots=True, separator="|")
-class MusicLibrary(FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
+class MusicLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     version: int
-    artists: ArtistList = field_decoder(decoder=ArtistList.from_string, encoder=to_string)
-    songs: SongList = field_decoder(decoder=SongList.from_string, encoder=to_string)
-    tags: TagList = field_decoder(decoder=TagList.from_string, encoder=to_string)
+    artists: ArtistList = field_decoder(decoder=ArtistList.from_string, encoder=ArtistList.to_string)
+    songs: SongList = field_decoder(decoder=SongList.from_string, encoder=SongList.to_string)
+    tags: TagList = field_decoder(decoder=TagList.from_string, encoder=TagList.to_string)
     
     def _name_fallback_(self):
         return "musiclibrary"
@@ -114,7 +120,7 @@ class MusicLibrary(FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDeco
 MusicLibrary.COMPRESSED =  True
 MusicLibrary.COMPRESSION = "zlib"
 MusicLibrary.EXTENSION = "dat"
-
+MusicLibrary.DEFAULT_PATH = MUSIC_LIBRARY_PATH
 
 if __name__ == "__main__":
-    music_library = MusicLibrary.from_file(MUSIC_LIBRARY_PATH)
+    music_library = MusicLibrary.from_default_path()

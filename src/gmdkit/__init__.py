@@ -10,6 +10,8 @@ __all__ = [
     "LevelList",
     "LevelPack", 
     "LevelPackList",
+    "ObjectString", 
+    "ReplayString",
     "Object", 
     "ObjectList",
     "GameSave", 
@@ -29,5 +31,6 @@ from .models.level import Level, LevelList
 from .models.level_pack import LevelPack, LevelPackList
 from .models.object import Object, ObjectList
 from .models.template import SmartTemplate, SmartPrefab, SmartLayout
+from .models.prop.gzip import ObjectString, ReplayString
 from .models.save.game_manager import GameSave
 from .models.save.level_manager import LevelSave

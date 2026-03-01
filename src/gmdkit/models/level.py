@@ -23,9 +23,9 @@ class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
     
     if TYPE_CHECKING:
         @classmethod
-        def from_file(cls, path:PathString, load_data:bool=True, load_content:bool=True, **kwargs) -> Self: ...
+        def from_file(cls, path:PathString, load_content:bool=True, **kwargs) -> Self: ...
     
-        def to_file(cls, path:PathString, save_data:bool=True, save_content:bool=True, **kwargs): ...
+        def to_file(cls, path:PathString, save_content:bool=True, **kwargs): ...
     
     
     def _name_fallback_(self):
@@ -67,23 +67,23 @@ class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
         return new
 
 
-def to_level(node:Element, load_level_data:bool=True, load_level_content:bool=False, **kwargs) -> Level:
-    return Level.from_node(node=node,load_data=load_level_data,load_content=load_level_content)
+def to_level(node:Element, load_level_content:bool=False, **kwargs) -> Level:
+    return Level.from_node(node=node,load_content=load_level_content)
 
-def from_level(level:Level,save_level_data:bool=True, save_level_content:bool=False, **kwargs) -> Element:
-    return level.to_node(save_data=save_level_data,save_content=save_level_content)
+def from_level(level:Level, save_level_content:bool=False, **kwargs) -> Element:
+    return level.to_node(save_content=save_level_content)
 
-def level_from_file(path:PathString, load_level_data:bool=True, load_level_content:bool=False, **kwargs) -> Level:
-    return Level.from_file(load_data=load_level_data,load_content=load_level_content)
+def level_from_file(path:PathString, load_level_content:bool=False, **kwargs) -> Level:
+    return Level.from_file(load_content=load_level_content)
 
-def level_to_file(level:Level,path:PathString, save_level_data:True=False, save_level_content:bool=False, **kwargs) -> Element:
-    return level.to_file(path=path,save_data=save_level_data,save_content=save_level_content)
+def level_to_file(level:Level,path:PathString, save_level_content:bool=False, **kwargs) -> Element:
+    return level.to_file(path=path,save_content=save_level_content)
 
-def dict_to_level(key:str, node:Element, load_level_data:bool=True, **kwargs) -> Level:
-    return (int(key), Level.from_node(node=node,load_data=load_level_data,load_content=False))
+def dict_to_level(key:str, node:Element, load_level_content:bool=False, **kwargs) -> Level:
+    return (int(key), Level.from_node(node=node,load_content=load_level_content))
 
-def level_to_dict(key:int, level:Level, save_level_data:bool=True, **kwargs) -> Element:
-    return (str(key), level.to_node(save_data=save_level_data,save_content=False))
+def level_to_dict(key:int, level:Level, save_level_content:bool=False, **kwargs) -> Element:
+    return (str(key), level.to_node(save_content=save_level_content))
 
 
 class LevelList(FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
@@ -102,15 +102,15 @@ class LevelList(FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
 
     if TYPE_CHECKING:
         @classmethod
-        def from_file(cls, path:PathString, load_level_data:bool=False, load_level_content:bool=False, **kwargs) -> Self: ...
+        def from_file(cls, path:PathString, load_level_content:bool=False, **kwargs) -> Self: ...
         
-        def to_file(self, path:PathString, save_level_data:bool=False, save_level_content:bool=False, **kwargs): ...
+        def to_file(self, path:PathString, save_level_content:bool=False, **kwargs): ...
 
 
         @classmethod
-        def from_folder(cls, path:PathString, load_level_data:bool=False, load_level_content:bool=False, **kwargs) -> Self: ...
+        def from_folder(cls, path:PathString, load_level_content:bool=False, **kwargs) -> Self: ...
         
-        def to_folder(self, path:PathString, save_level_data:bool=False, save_level_content:bool=False, **kwargs): ...
+        def to_folder(self, path:PathString, save_level_content:bool=False, **kwargs): ...
 
 
 class LevelMapping(PlistDecoderMixin,DictClass):

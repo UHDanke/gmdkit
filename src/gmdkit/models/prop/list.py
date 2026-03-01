@@ -1,6 +1,3 @@
-# Imports
-from typing import Optional
-
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
@@ -15,9 +12,43 @@ class IntList(ArrayDecoderMixin,ListClass):
     
     SEPARATOR = ","
     GROUP_SIZE = 1
-    ENCODER = str
     DECODER = int
-        
+    ENCODER = str
+
+
+@dataclass_decoder(slots=True, separator="~", from_array=True)
+class IntPair(DataclassDecoderMixin):
+    key: int = 0
+    value: int = 0
+
+
+
+class IntPairList(ArrayDecoderMixin,ListClass):
+    
+    __slots__ = ()
+    
+    SEPARATOR = "."
+    GROUP_SIZE = 2
+    DECODER = IntPair.from_tokens
+    ENCODER = IntPair.to_tokens
+    
+    def __init__(self, **kwargs):
+        items = [IntPair(k,v) for k,v in kwargs.items()]
+        super().__init__(items)
+   
+    def keys(self):
+        return self.unique_values(lambda x: [x.key])
+    
+    def values(self):
+        return self.unique_values(lambda x: [x.value])
+    
+    def remap_keys(self, dictionary:dict):
+        if dictionary:
+            for pair in self:
+                k = pair.key
+                pair.key = dictionary.get(k, k)
+                
+
     
 class IDList(IntList):
     
@@ -42,39 +73,6 @@ class EventList(IntList):
 class GroupList(IDList):
     
     __slots__ = ()
-
-
-@dataclass_decoder(slots=True, separator="~", from_array=True)
-class IntPair(DataclassDecoderMixin):
-    key: int = 0
-    value: int = 0
-
-
-
-class IntPairList(ArrayDecoderMixin,ListClass):
-    
-    __slots__ = ()
-    
-    SEPARATOR = "."
-    GROUP_SIZE = 2
-    DECODER = staticmethod(IntPair.from_tokens)
-    ENCODER = staticmethod(IntPair.to_tokens)
-    
-    def __init__(self, **kwargs):
-        items = [IntPair(k,v) for k,v in kwargs.items()]
-        super().__init__(items)
-   
-    def keys(self):
-        return self.unique_values(lambda x: [x.key])
-    
-    def values(self):
-        return self.unique_values(lambda x: [x.value])
-    
-    def remap_keys(self, dictionary:dict):
-        if dictionary:
-            for pair in self:
-                k = pair.key
-                pair.key = dictionary.get(k, k)
 
                     
 class RemapList(IntPairList):

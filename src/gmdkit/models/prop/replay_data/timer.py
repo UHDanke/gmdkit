@@ -1,7 +1,6 @@
 # Package Imports
 from gmdkit.serialization.mixins import DataclassDecoderMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.replay_data.remaps import RemapData
 
 
@@ -19,4 +18,4 @@ class TimerData(DataclassDecoderMixin):
     trigger_id: int
     control_id: int
     paused: bool
-    remaps: RemapData = field_decoder(decoder=RemapData.from_string,encoder=to_string)
+    remaps: RemapData = field_decoder(decoder=RemapData.from_string,encoder=RemapData.to_string)

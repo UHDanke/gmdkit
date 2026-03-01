@@ -10,10 +10,9 @@ from gmdkit.serialization.mixins import (
     PlistDecoderMixin,
     FilePathMixin,
     DelimiterMixin,
-    CompressFileMixin,
     FileStringMixin
     )
-from gmdkit.serialization.type_cast import serialize, to_string, to_numkey
+from gmdkit.serialization.type_cast import serialize, to_numkey
 from gmdkit.serialization.functions import dict_cast, write_plist
 from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
 from gmdkit.defaults.objects import OBJECT_DEFAULT
@@ -40,7 +39,7 @@ class ObjectList(ArrayDecoderMixin,ListClass):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Object.from_string
-    ENCODER = staticmethod(to_string)
+    ENCODER = Object.to_string
     
 
 class ObjectGroup(FileStringMixin):

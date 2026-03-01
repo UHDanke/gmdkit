@@ -25,19 +25,6 @@ def from_float(obj:float) -> str:
     else:
         return f"{obj:.{decimals}f}".rstrip('0').rstrip('.')
 
-def to_float_from_int(string:str, scale=0) -> str:
-    return int(string) / 10**scale
-
-def from_float_to_int(obj:float, scale=0) -> str:
-    return str(int(obj * 10**scale))
-
-
-def args_to_int(*args):
-    return (int(a) for a in args)
-
-def args_to_str(*args):
-    return (str(a) for a in args)
-
 def to_string(obj:Any, **kwargs) -> str:
     if obj is None:
         return ""

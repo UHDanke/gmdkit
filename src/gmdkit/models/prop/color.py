@@ -3,7 +3,6 @@ from typing import Optional
 
 # Package Imports
 from gmdkit.utils.types import ListClass
-from gmdkit.serialization.type_cast import to_string
 from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.defaults.color_ids import default_color
@@ -23,7 +22,7 @@ class Color(DataclassDecoderMixin):
     opacity: float = 0.0
     disable_opacity: bool = field_decoder(default=False,optional=True)
     copy_id: int = field_decoder(default=0,optional=True)
-    hsv: HSV = field_decoder(default_factory=HSV,optional=True,decoder=HSV.from_string,encoder=to_string)
+    hsv: HSV = field_decoder(default_factory=HSV,optional=True,decoder=HSV.from_string,encoder=HSV.to_string)
     to_red: int = 0
     to_green: int = 0
     to_blue: int = 0
@@ -86,7 +85,7 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass):
     SEPARATOR = '|'
     END_DELIMITER = "|"
     DECODER = Color.from_string
-    ENCODER = staticmethod(to_string)
+    ENCODER = Color.to_string
     
     def get_channels(self, condition):
         return self.unique_values(lambda color: (color.channel,))

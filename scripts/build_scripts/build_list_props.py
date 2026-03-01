@@ -7,7 +7,7 @@ FILEPATH = "src/gmdkit/casting/list_props.py"
 FOLDERPATH = "src/gmdkit/mappings/list_prop/"
 
 
-def get_lvl_types(gd_type, gd_format, key):
+def get_lvl_types(gd_type, gd_format):
     
     match gd_type:
         
@@ -41,7 +41,7 @@ def get_lvl_types(gd_type, gd_format, key):
         case _: return
 
 
-def decode_level_props(gd_type, gd_format, key):
+def decode_level_props(gd_type, gd_format):
     
     match gd_type:
         
@@ -79,7 +79,7 @@ def decode_level_props(gd_type, gd_format, key):
         case _: return
 
 
-def encode_level_props(gd_type, gd_format, key):
+def encode_level_props(gd_type, gd_format):
     
     match gd_type:
         
@@ -100,13 +100,13 @@ def encode_level_props(gd_type, gd_format, key):
                     return 'encode_text'
                 
                 case 'int list':
-                    return 'to_string'
+                    return 'IntList.to_string'
                 
                 case _: 
                     return
         case 'dict':
             if gd_format=="level map":
-                return "to_node"
+                return "LevelMapping.to_node"
         
         case _: return
 
@@ -116,9 +116,9 @@ def main():
     list_table['id'] = list_table['id'].apply(lambda x: int(x) if str(x).isdigit() else str(x))
     
     # Compute decode/encode/type for all rows
-    list_table['decode'] = list_table.apply(lambda row: decode_level_props(row['type'], row['format'], row['id']), axis=1)
-    list_table['encode'] = list_table.apply(lambda row: encode_level_props(row['type'], row['format'], row['id']), axis=1)
-    list_table['lvl_type'] = list_table.apply(lambda row: get_lvl_types(row['type'], row['format'], row['id']), axis=1)
+    list_table['decode'] = list_table.apply(lambda row: decode_level_props(row['type'], row['format']), axis=1)
+    list_table['encode'] = list_table.apply(lambda row: encode_level_props(row['type'], row['format']), axis=1)
+    list_table['lvl_type'] = list_table.apply(lambda row: get_lvl_types(row['type'], row['format']), axis=1)
 
     list_class = (
         list_table.dropna(how='all')

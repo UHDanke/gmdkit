@@ -32,7 +32,7 @@ def match_enum(enum_format):
             return
 
 
-def get_lvl_types(gd_type, gd_format, key):
+def get_lvl_types(gd_type, gd_format):
     
     match gd_type:
         
@@ -54,20 +54,17 @@ def get_lvl_types(gd_type, gd_format, key):
                 case 'int list':
                     return 'IntList'
                 
-                case 'gzip':
-                    
-                    match key:
-                        case 'k4':
-                            return 'ObjectString'
-                        
-                        case 'k34':
-                            return 'ReplayString'
+                case 'replay string':
+                    return 'ReplayString'
+                
+                case 'object string':
+                    return 'ObjectString'
                         
                 case _: return 'str'
                 
         case _: return
 
-def decode_level_props(gd_type, gd_format, key):
+def decode_level_props(gd_type, gd_format):
     
     match gd_type:
         
@@ -92,21 +89,18 @@ def decode_level_props(gd_type, gd_format, key):
                 case 'int list':
                     return 'IntList.from_string'
                 
-                case 'gzip':
-                    
-                    match key:
-                        case 'k4':
-                            return 'ObjectString'
-                        
-                        case 'k34':
-                            return 'ReplayString'
+                case 'replay string':
+                    return 'ReplayString.from_string'
+                
+                case 'object string':
+                    return 'ObjectString.from_string'
                         
                 case _:
                     return
                 
         case _: return
         
-def encode_level_props(gd_type, gd_format, key):
+def encode_level_props(gd_type, gd_format):
     
     match gd_type:
         
@@ -127,10 +121,13 @@ def encode_level_props(gd_type, gd_format, key):
                     return 'encode_text'
                 
                 case 'int list':
-                    return 'to_string'
+                    return 'IntList.to_string'
                 
-                case 'gzip':
-                    return 'zip_string'
+                case 'replay string':
+                    return 'ReplayString.to_string'
+                
+                case 'object string':
+                    return 'ObjectString.to_string'
                 
                 case _: 
                     return
@@ -142,9 +139,9 @@ def main():
     level_table['id'] = level_table['id'].apply(lambda x: int(x) if str(x).isdigit() else str(x))
     
     # Compute decode/encode/type for all rows
-    level_table['decode'] = level_table.apply(lambda row: decode_level_props(row['type'], row['format'], row['id']), axis=1)
-    level_table['encode'] = level_table.apply(lambda row: encode_level_props(row['type'], row['format'], row['id']), axis=1)
-    level_table['lvl_type'] = level_table.apply(lambda row: get_lvl_types(row['type'], row['format'], row['id']), axis=1)
+    level_table['decode'] = level_table.apply(lambda row: decode_level_props(row['type'], row['format']), axis=1)
+    level_table['encode'] = level_table.apply(lambda row: encode_level_props(row['type'], row['format']), axis=1)
+    level_table['lvl_type'] = level_table.apply(lambda row: get_lvl_types(row['type'], row['format']), axis=1)
     
     level_class = (
         level_table.dropna(how='all')

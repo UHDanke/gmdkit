@@ -3,10 +3,12 @@ from typing import Optional
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
+from gmdkit.serialization.mixins import FileStringMixin
 from gmdkit.serialization.functions import decompress_string, compress_string
 from gmdkit.models.prop.replay_data.replay import ReplayInfo, ReplayEvents
 
-class GzipString:
+
+class GzipString(FileStringMixin):
         
     def __init__(self, string:Optional[str]=None):
         self.string = string or str()
@@ -26,8 +28,7 @@ class GzipString:
             new.load()
             
         return new
-    
-    
+        
     def to_string(self, save:bool=True):
         
         if save:

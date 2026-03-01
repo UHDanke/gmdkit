@@ -10,8 +10,6 @@ from gmdkit.serialization.mixins import (
     ArrayDecoderMixin,
     DataclassDecoderMixin
     )
-from gmdkit.serialization.type_cast import to_string
-
 
 class RemapChain(DelimiterMixin, ArrayDecoderMixin, ListClass):
     
@@ -30,5 +28,5 @@ class RemapChain(DelimiterMixin, ArrayDecoderMixin, ListClass):
 @dataclass_decoder(slots=True, separator='-', from_array=True)
 class RemapData(DataclassDecoderMixin):
     
-    remap_ids: RemapChain = field_decoder(decoder=RemapChain.from_string,encoder=to_string)
+    remap_ids: RemapChain = field_decoder(decoder=RemapChain.from_string,encoder=RemapChain.to_string)
     root_id: int
