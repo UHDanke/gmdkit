@@ -26,17 +26,21 @@ class Color(DataclassDecoderMixin):
     to_red: int = 0
     to_green: int = 0
     to_blue: int = 0
-    time_delta: float = 0.0
+    time_delta: float = field_decoder(default=0.0,optional=True)
     to_opacity: float = 0.0
-    duration: float = field_decoder(default=False,optional=True)
+    duration: float = field_decoder(default=0.0,optional=True)
     copy_opacity: bool = field_decoder(default=False,optional=True)
     disable_legacy_hsv: bool = False
 
     
     @classmethod
-    def default(cls, color_id:int):        
-        return cls(default_color(color_id))
-
+    def default(cls, color_id:int):
+        string = default_color(color_id)
+        return cls.from_string(string)
+    
+    def is_default(self):
+        return self == type(self).default(self.channel)
+    
     def set_rgba(
             self, 
             red:Optional[int]=None,

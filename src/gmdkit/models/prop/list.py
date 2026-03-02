@@ -2,7 +2,6 @@
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import ArrayDecoderMixin, DataclassDecoderMixin
 from gmdkit.serialization.functions import dataclass_decoder
-from gmdkit.utils.misc import split_digit_list, join_digit_list
 from gmdkit.utils.enums import GameEvents
 
 
@@ -20,8 +19,7 @@ class IntList(ArrayDecoderMixin,ListClass):
 class IntPair(DataclassDecoderMixin):
     key: int = 0
     value: int = 0
-
-
+    
 
 class IntPairList(ArrayDecoderMixin,ListClass):
     
@@ -47,7 +45,6 @@ class IntPairList(ArrayDecoderMixin,ListClass):
             for pair in self:
                 k = pair.key
                 pair.key = dictionary.get(k, k)
-                
 
     
 class IDList(IntList):
@@ -68,11 +65,6 @@ class EventList(IntList):
     SEPARATOR = "."
     
     DECODER = GameEvents.from_string
-    
-
-class GroupList(IDList):
-    
-    __slots__ = ()
 
                     
 class RemapList(IntPairList):
@@ -114,17 +106,3 @@ class RemapList(IntPairList):
             for pair in self:
                 v = pair.value
                 pair.value = dictionary.get(v, v)
-                
-                
-class DigitList(ListClass):
-    
-    LEADING_DIGIT = 1
-    
-    @classmethod
-    def from_string(cls, string:str):
-        return cls(split_digit_list(int(string), cls.LEADING_DIGIT))
-    
-    
-    def to_string(self):
-        return str(join_digit_list(self, self.LEADING_DIGIT))
-    

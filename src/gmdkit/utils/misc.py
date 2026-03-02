@@ -66,25 +66,4 @@ def next_free(
         range_search(start, vmin, -1)
     
     return result
-
-
-def split_digit_list(value:int, leading_digit:Literal[1,2,3,4,5,6,7,8,9]=1):
-    
-    if value < 0:
-        raise ValueError("Value must be non-negative")
-    
-    s = str(value)
-    
-    if not s.startswith(leading_digit):
-        raise ValueError("Value must have {leading_digit} as a leading digit")
-    
-    return [int(d) for d in s[1:]]
-    
-
-def join_digit_list(digit_list, leading_digit:Literal[1,2,3,4,5,6,7,8,9]=1):
-    return int(
-        leading_digit +
-        "".join(str(max(0, min(int(d), 9))) for d in digit_list)
-        )
-        
     

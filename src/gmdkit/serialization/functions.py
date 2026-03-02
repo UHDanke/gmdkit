@@ -194,7 +194,7 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
     key_el = node[0]
     val_el = node[1]
     
-    array_header = key_el.tag == 'k' and key_el.text == '_isArr' and val_el.tag == 't' and val_el.text is None
+    array_header = key_el.tag == 'k' and key_el.text in ['_isArr','_IsArr'] and val_el.tag == 't' and val_el.text is None
     encoder_header = key_el.tag == 'k' and key_el.text == 'kCEK' and val_el.tag == 'i' and val_el.text is not None
     
     if is_array:
@@ -204,10 +204,9 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
                 )
     elif encoder_key is not None:
         if not encoder_header:
-            if key_el.tag != 'k' or key_el.text != 'kCEK' or val_el.tag != 'i':
-                raise ValueError(
-                    f"malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'"
-                    )
+            raise ValueError(
+                f"malformed encoded struct header, expected '<k>kCEK</k><i>{encoder_key}</i>', got '{ET.tostring(key_el).decode()}{ET.tostring(val_el).decode()}'"
+                )
         elif val_el.text != str(encoder_key):
             raise ValueError(f"encoder key does not match, expected '{encoder_key}', got '{val_el.text}'")
     elif array_header:
@@ -243,7 +242,7 @@ def to_plist_string(data:[dict,list]) -> str:
     node = write_plist(data)
     node.tag = "dict"
     root.append(node)
-    return ET.tostring(root, encoding='unicode').decode()
+    return ET.tostring(root, encoding='unicode')
 
 
 def from_plist_file(path: PathString) -> dict:

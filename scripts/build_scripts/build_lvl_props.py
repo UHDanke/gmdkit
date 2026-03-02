@@ -93,10 +93,10 @@ def decode_level_props(gd_type, gd_format):
                     return 'IntList.from_string'
                 
                 case 'replay string':
-                    return 'ReplayString.from_string'
+                    return 'ReplayString'
                 
                 case 'object string':
-                    return 'ObjectString.from_string'
+                    return 'ObjectString'
                         
                 case _:
                     return

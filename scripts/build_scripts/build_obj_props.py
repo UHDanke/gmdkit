@@ -201,10 +201,10 @@ def decode_obj_props(gd_type, gd_format):
                 case 'groups' | 'parent_groups':
                     return 'IDList.from_string'
                 
-                case  'events':
+                case 'events':
                     return "EventList.from_string"
                 
-                case  'weights' | 'sequence' | 'group weights' | 'group counts':
+                case 'weights' | 'sequence' | 'group weights' | 'group counts':
                     return 'IntPairList.from_string'
                 
                 case 'remaps' |'group remaps':
@@ -242,28 +242,31 @@ def encode_obj_props(gd_type, gd_format):
                     return 'encode_text'
                 
                 case 'hsv':
-                    return 'to_string'
+                    return 'HSV.to_string'
                 
                 case 'particle':
-                    return 'to_string'
+                    return 'Particle.to_string'
                 
-                case 'groups' | 'parent_groups' | 'events':
-                    return 'to_string'
+                case 'groups' | 'parent_groups':
+                    return 'IDList.to_string'
+                
+                case 'events':
+                    return "EventList.to_string"
                 
                 case  'weights' | 'sequence' | 'group weights' | 'group counts':
-                    return 'to_string'
+                    return 'IntPairList.to_string'
                 
                 case 'remaps' |'group remaps':
-                    return 'to_string'
+                    return 'RemapList.to_string'
                     
                 case 'colors':
-                    return 'to_string'
+                    return 'ColorList.to_string'
                 
                 case 'guidelines':
-                    return 'to_string'
+                    return 'GuidelineList.to_string'
                 
                 case 'color':
-                    return 'to_string'
+                    return 'Color.to_string'
                 
                 case _:
                     return 'str'

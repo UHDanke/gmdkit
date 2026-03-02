@@ -5,7 +5,7 @@ from typing import Optional
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.mixins import FileStringMixin
 from gmdkit.serialization.functions import decompress_string, compress_string
-from gmdkit.models.prop.replay_data.replay import ReplayInfo, ReplayEvents
+from gmdkit.models.prop.replay import ReplayInfo, ReplayEvents
 
 
 class GzipString(FileStringMixin):

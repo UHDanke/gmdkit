@@ -32,9 +32,9 @@ from gmdkit.serialization.functions import (
 class FileStringMixin:
     
     @classmethod
-    def from_file(cls, path:PathString, **kwargs) -> Self:
+    def from_file(cls, path:PathString, encoding="utf-8", **kwargs) -> Self:
         
-        with open(path, "r", encoding="utf-8") as file:
+        with open(path, "r", encoding=encoding) as file:
             string = file.read()
             
         new = cls.from_string(string, **kwargs)
@@ -42,13 +42,11 @@ class FileStringMixin:
         return new
     
     
-    def to_file(self, 
-            path:PathString, 
-            **kwargs):
+    def to_file(self, path:PathString, encoding="utf-8", **kwargs):
         
         string = self.to_string(**kwargs)
         
-        with open(path, "w", encoding="utf-8") as file:
+        with open(path, "w", encoding=encoding) as file:
             file.write(string)
 
 
@@ -77,7 +75,7 @@ class DefaultPathMixin:
         self.to_file(path, **kwargs)
             
             
-class PlistDecoderMixin:
+class PlistDecoderMixin(FileStringMixin):
     
     ENCODER: Optional[PlistEncoder] = None
     DECODER: Optional[PlistDecoder] = None
@@ -229,35 +227,14 @@ class PlistDecoderMixin:
         return string
     
     
-    @classmethod
-    def from_file(cls, path:PathString, **kwargs) -> Self:
-        
-        with open(path, "r", encoding="utf-8") as file:
-            string = file.read()
-            
-        new = cls.from_string(string, **kwargs)
-        new.path = path
-        return new
-    
-    
-    def to_file(self, 
-            path:PathString, 
-            **kwargs):
-        
-        string = self.to_string(**kwargs)
-        
-        with open(path,"w", encoding="utf-8") as file:
-            file.write(string)
-    
-    
     def update_file(self, **kwargs):
         self.to_file(path=self.path, **kwargs)
         
         
-    def reload_file(self, **kwargs):
+    def reload_file(self, encoding="utf-8", **kwargs):
         
         try:
-            with open(self.path, "r", encoding="utf-8") as file:
+            with open(self.path, "r", encoding=encoding) as file:
                 string = file.read()
             
             node = ET.fromstring(string)        

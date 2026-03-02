@@ -1,22 +1,18 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.serialization.type_cast import (
-    to_string,
-    zip_string,
-    decode_text, encode_text
-    )
+from gmdkit.serialization.type_cast import decode_text, encode_text
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 
 
 LEVEL_DECODERS = {
     'k3': decode_text,
-    'k4': ObjectString.from_string,
+    'k4': ObjectString,
     'k7': enums.LevelDifficulty.from_string,
     'k8': enums.OfficialSongs.from_string,
     'k10': enums.LevelRating.from_string,
     'k21': enums.LevelType.from_string,
-    'k34': ReplayString.from_string,
+    'k34': ReplayString,
     'k75': enums.EpicRating.from_string,
     'k76': enums.DemonRating.from_string,
     'k88': IntList.from_string,
@@ -25,8 +21,8 @@ LEVEL_DECODERS = {
     'k105': IntList.from_string,
     'k109': IntList.from_string,
     'k110': IntList.from_string,
-    'k119': ReplayString.from_string,
-    'k120': ReplayString.from_string,
+    'k119': ReplayString,
+    'k120': ReplayString,
     'k125': enums.ToggleCBS.from_string,
 }
 

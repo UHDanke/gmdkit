@@ -2,21 +2,16 @@
 from pathlib import Path
 
 # Package Imports
-from gmdkit.models.save import GameSave
-from gmdkit.models.serialization import to_plist_file
-from gmdkit.models.object import ObjectList
+from gmdkit import GameSave, ObjectString
+from gmdkit.mappings import lvl_prop
 from gmdkit.functions.object import to_user_coins
 
 save_path = Path("data/dat/")
 data_path = Path("data/txt/object_string/official")
 
 output_path = Path("data/gmd/official")
-output_original_path = output_path / 'original'
-output_copy_path = output_path / 'copy'
 
 output_path.mkdir(parents=True, exist_ok=True)
-output_original_path.mkdir(parents=True, exist_ok=True)
-output_copy_path.mkdir(parents=True, exist_ok=True)
 
 save_folders = {p.name: p for p in save_path.iterdir() if p.is_dir()}
 data_folders = {p.name: p for p in data_path.iterdir() if p.is_dir()}
@@ -31,30 +26,20 @@ for folder in common:
     for key, data in game_data["GLM_01"].items():
         
         level_file = data_path / folder / f"{key}.txt"
-        
-        name = data.get("k2", key)
             
         print(f"Processing level with ID {data['k1']}...")
             
         try:
-            with open(level_file, "r", encoding="utf-8", errors="ignore") as f:
-                object_string = f.read()
-                object_string = object_string.strip().replace("\x00", "")
-                data["k4"] = object_string
-                to_plist_file(data, output_original_path / f"{name}.gmd")
-                
-                objects = ObjectList.from_string(object_string, encoded=True)
-                objects.apply(to_user_coins)
-                object_string = objects.to_string(encoded=True) 
-                data["k4"] = object_string
-                data.pop('k37',None)
-                data.pop('k1')
-                data.pop('k38',None)
-                data['k21'] = 2
-                to_plist_file(data, output_copy_path / f"{name}.gmd")               
-                
+            
+            data[lvl_prop.OBJECT_STRING] = ObjectString.from_file(level_file,encoding="latin-1")
+            
+            data.objects.apply(to_user_coins)
+            
+            data[lvl_prop.TYPE] = 2
+            
+            data.to_file(output_path)
         except FileNotFoundError:
             print("No object string file found, skipping.")
             continue
         
-        print(f"Saved {name}.gmd")
+        print(f"Saved {data[lvl_prop.NAME]}.gmd")
