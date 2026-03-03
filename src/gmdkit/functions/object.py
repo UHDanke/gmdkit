@@ -1,6 +1,6 @@
 # Imports
 import math
-from typing import Any
+from typing import Any, Optional
 
 # Package Imports
 from gmdkit.models.object import Object
@@ -22,15 +22,26 @@ def reset_pos(obj:Object):
     if obj.get(obj_prop.Y) is not None:
         obj[obj_prop.X] = 0
 
+def reset_colors(obj:Object) -> None:
+    """
+    Removes colors and color indexes from an object.
 
-def reset_colors(obj:Object):
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+
+    Returns
+    -------
+    None.
+
+    """
     obj.pop(
         obj_prop.COLOR_1,
         obj_prop.COLOR_1_INDEX,
         obj_prop.COLOR_2,
         obj_prop.COLOR_2_INDEX
         )
-
 
 def clean_duplicate_groups(obj:Object) -> None:
     """
@@ -51,7 +62,7 @@ def clean_duplicate_groups(obj:Object) -> None:
         
         obj[obj_prop.GROUPS][:] = set(groups)
 
-
+# TODO REDO
 def recolor_shaders(obj:Object) -> None:
     """
     Makes shader triggers use white color instead of object outline.
@@ -95,28 +106,7 @@ def fix_lighter(obj:Object, replacement:int=color_id.WHITE) -> None:
     if obj.get(obj_prop.COLOR_1) == color_id.LIGHTER:
         
         obj[obj_prop.COLOR_1] = replacement
-    
 
-def pop_zeros(obj:Object) -> None:
-    """
-    Removes object properties with value 0.
-
-    Parameters
-    ----------
-    obj : Object
-        The object to modify.
-
-    Returns
-    -------
-    None.
-
-    """
-    for key, value in obj.items():
-        
-        if value == 0:
-            obj.pop(key)
-            
-  
 def offset_position(
         obj:Object,
         offset_x:float=0,
@@ -145,23 +135,46 @@ def offset_position(
     if obj.get(obj_prop.Y) is not None:
         obj[obj_prop.Y] += offset_y
 
-
+# TODO DOCS
 def scale_position(
         obj:Object,
         scale_x:float=1.00,scale_y:float=1.00,
-        center_x:float|None=None, center_y:float|None=None, 
+        center_x:Optional[float]=None, center_y:Optional[float]=None, 
         only_move:bool=False
         ) -> None:
+    """
+    
+
+    Parameters
+    ----------
+    obj : Object
+        DESCRIPTION.
+    scale_x : float, optional
+        DESCRIPTION. The default is 1.00.
+    scale_y : float, optional
+        DESCRIPTION. The default is 1.00.
+    center_x : Optional[float], optional
+        DESCRIPTION. The default is None.
+    center_y : Optional[float], optional
+        DESCRIPTION. The default is None.
+    only_move : bool, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    None
+
+    """
     
     if not only_move:
         obj[obj_prop.SCALE_X] = obj.get(obj_prop.SCALE_X, 1.00) * scale_x
         obj[obj_prop.SCALE_Y] = obj.get(obj_prop.SCALE_Y, 1.00) * scale_y
     
     if center_x is not None and (x:=obj.get(obj_prop.X)) is not None:
-        obj[obj_prop.X] = scale_x * (x - center_x)
+        obj[obj_prop.X] = center_x + scale_x * (x - center_x)
      
-    if center_y is not None and (y:=obj.get(obj_prop.X)) is not None:
-        obj[obj_prop.Y] = scale_y * (y - center_y)
+    if center_y is not None and (y:=obj.get(obj_prop.Y)) is not None:
+        obj[obj_prop.Y] = center_y+scale_y * (y - center_y)
 
 
 def rotate_position(
@@ -211,15 +224,41 @@ def delete_keys(obj:Object, keys:list[int|str]):
                   
             
 def to_user_coins(obj:Object) -> None:
+    """
+    Converts secret coins into user coins.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+
+    Returns
+    -------
+    None
+
+    """
     
-    if obj.get(obj_prop.ID) == obj_id.collectible.SECRET_COIN:
+    if obj.get(obj_prop.ID) != obj_id.collectible.SECRET_COIN:
+        return
         
-        obj[obj_prop.ID] = obj_id.collectible.USER_COIN
-        
-        obj.pop(obj_prop.trigger.collectible.coin.COIN_ID, None)
+    obj[obj_prop.ID] = obj_id.collectible.USER_COIN
+    obj.pop(obj_prop.trigger.collectible.coin.COIN_ID, None)
 
 
-def fix_transform(obj) -> None:
+def fix_transform(obj:Object) -> None:
+    """
+    Normalizes the rotation and scale of an object.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+
+    Returns
+    -------
+    None
+
+    """
 
     if (scale_x:=obj.get(obj_prop.SCALE_X,1.00)) < -1:
         obj[obj_prop.SCALE_X] = -scale_x

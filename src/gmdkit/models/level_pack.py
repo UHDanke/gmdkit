@@ -28,12 +28,6 @@ class LevelPack(FilePathMixin,PlistDecoderMixin,DictClass):
     
         def to_file(cls, path:PathString, save_data:bool=True, **kwargs): ...
 
-
-def to_pack(node:Element, load_pack_data:bool=True, **kwargs) -> LevelPack:
-    return LevelPack.from_node(node=node,load_data=load_pack_data)
-
-def from_pack(pack:LevelPack, save_pack_data:bool=True, **kwargs) -> Element:
-    return pack.to_node(save_data=save_pack_data)
         
 def pack_from_file(path:PathString, load_pack_data:bool=True, **kwargs) -> LevelPack:
     return LevelPack.from_file(load_data=load_pack_data)
@@ -46,8 +40,8 @@ class LevelPackList(FolderLoaderMixin,PlistDecoderMixin,ListClass):
     
     __slots__ = ()
     
-    DECODER = staticmethod(to_pack)
-    ENCODER = staticmethod(from_pack)
+    DECODER = LevelPack.from_node
+    ENCODER = LevelPack.to_node
     IS_ARRAY = True
     EXTENSION = "plist"
     

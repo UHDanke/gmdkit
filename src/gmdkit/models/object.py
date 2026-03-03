@@ -3,17 +3,17 @@ from typing import Self, Optional
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.utils.typing import Element
 from gmdkit.serialization.mixins import (
     DictDecoderMixin, 
     ArrayDecoderMixin,
     PlistDecoderMixin,
     FilePathMixin,
     DelimiterMixin,
-    FileStringMixin
+    FileStringMixin,
+    LoadPlistContentMixin
     )
 from gmdkit.serialization.type_cast import serialize, to_numkey
-from gmdkit.serialization.functions import dict_cast, write_plist
+from gmdkit.serialization.functions import dict_cast, write_plist, kv_wrap
 from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 
@@ -71,36 +71,29 @@ class ObjectGroup(FileStringMixin):
     
     
     @classmethod
-    def from_string(cls, string:str, load_objects:bool=True):
+    def from_string(cls, string:str, load_content:bool=True):
         
         new = cls(string)
         
-        if load_objects:
+        if load_content:
             new.load()
             
         return new
     
     
-    def to_string(self, save_objects:bool=True):
+    def to_string(self, save_content:bool=True):
         
-        if save_objects:
+        if save_content:
             self.save()
         
         return self.string
-    
-    
-def dict_to_obj_group(key:str, node:Element, load_object_group:bool=True, **kwargs) -> tuple[int,ObjectGroup]:
-    return (int(key),ObjectGroup.from_string(node.text,load_objects=load_object_group))
 
-def obj_group_to_dict(key:int, obj_group:ObjectGroup, save_object_group:bool=True, **kwargs) -> tuple[str,Element]:
-    return (str(key), write_plist(obj_group.to_string(save_objects=save_object_group)))
-    
 
-class ObjectGroupDict(FilePathMixin,PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(dict_to_obj_group)
-    ENCODER = staticmethod(obj_group_to_dict)
+class ObjectGroupDict(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
+    DECODER = staticmethod(kv_wrap(int,ObjectGroup))
+    ENCODER = staticmethod(kv_wrap(str,lambda x: write_plist(x.to_string())))
     EXTENSION = "plist"
+    LOAD_CONTENT = False
     
     def _name_fallback_(self):
         return "objectgroup"
-    

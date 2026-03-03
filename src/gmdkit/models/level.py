@@ -1,32 +1,23 @@
-# Imports
-from typing import Self, TYPE_CHECKING
-
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.utils.typing import PathString, Element
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.serialization.mixins import PlistDecoderMixin, FilePathMixin, LoadContentMixin, FolderLoaderMixin
-from gmdkit.serialization.functions import dict_cast, from_node_dict, to_node_dict, read_plist, write_plist
+from gmdkit.serialization.mixins import PlistDecoderMixin, FilePathMixin, LoadPlistContentMixin, FolderLoaderMixin
+from gmdkit.serialization.functions import (
+    dict_cast, from_node_dict, to_node_dict, read_plist, write_plist, get_load_keys, kv_wrap, args_wrap
+    )
 from gmdkit.casting.level_props import LEVEL_ENCODERS, LEVEL_DECODERS, LEVEL_TYPES
 from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
 
 
-class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
+class Level(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LEVEL_DECODERS),default=read_plist))
     ENCODER = staticmethod(dict_cast(to_node_dict(LEVEL_ENCODERS),default=write_plist))
     ENCODER_KEY = 4
     EXTENSION = "gmd"
-    CONTENT_KEYS = {k for k, v in LEVEL_TYPES.items() if hasattr(v, "load") and hasattr(v, "save")}
-    
-    
-    if TYPE_CHECKING:
-        @classmethod
-        def from_file(cls, path:PathString, load_content:bool=True, **kwargs) -> Self: ...
-    
-        def to_file(cls, path:PathString, save_content:bool=True, **kwargs): ...
-    
+    SELECTORS = get_load_keys(LEVEL_TYPES)
+
     
     def _name_fallback_(self):
         container = self.CONTAINER
@@ -65,56 +56,26 @@ class Level(LoadContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
         new[lvl_prop.NAME] = name
                 
         return new
-
-
-def to_level(node:Element, load_level_content:bool=False, **kwargs) -> Level:
-    return Level.from_node(node=node,load_content=load_level_content)
-
-def from_level(level:Level, save_level_content:bool=False, **kwargs) -> Element:
-    return level.to_node(save_content=save_level_content)
-
-def level_from_file(path:PathString, load_level_content:bool=False, **kwargs) -> Level:
-    return Level.from_file(load_content=load_level_content)
-
-def level_to_file(level:Level,path:PathString, save_level_content:bool=False, **kwargs) -> Element:
-    return level.to_file(path=path,save_content=save_level_content)
-
-def dict_to_level(key:str, node:Element, load_level_content:bool=False, **kwargs) -> Level:
-    return (int(key), Level.from_node(node=node,load_content=load_level_content))
-
-def level_to_dict(key:int, level:Level, save_level_content:bool=False, **kwargs) -> Element:
-    return (str(key), level.to_node(save_content=save_level_content))
-
-
-class LevelList(FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
+   
+    
+class LevelList(LoadPlistContentMixin,FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
     
     __slots__ = ()
     
-    DECODER = staticmethod(to_level)
-    ENCODER = staticmethod(from_level)
+    DECODER = Level.from_node
+    ENCODER = Level.to_node
     IS_ARRAY = True
     EXTENSION = "plist"
     
-    FOLDER_DECODER = staticmethod(level_from_file)
-    FOLDER_ENCODER = staticmethod(level_to_file)
+    FOLDER_DECODER = staticmethod(args_wrap(Level.from_file,1))
+    FOLDER_ENCODER = staticmethod(args_wrap(Level.to_file,2))
     FOLDER_EXTENSION = "gmd"
     
-
-    if TYPE_CHECKING:
-        @classmethod
-        def from_file(cls, path:PathString, load_level_content:bool=False, **kwargs) -> Self: ...
-        
-        def to_file(self, path:PathString, save_level_content:bool=False, **kwargs): ...
+    LOAD_CONTENT = False
 
 
-        @classmethod
-        def from_folder(cls, path:PathString, load_level_content:bool=False, **kwargs) -> Self: ...
-        
-        def to_folder(self, path:PathString, save_level_content:bool=False, **kwargs): ...
-
-
-class LevelMapping(PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(dict_to_level)   
-    ENCODER = staticmethod(level_to_dict)  
-    
+class LevelMapping(LoadPlistContentMixin,PlistDecoderMixin,DictClass):
+    DECODER = staticmethod(kv_wrap(int, Level.from_node))   
+    ENCODER = staticmethod(kv_wrap(str, Level.to_node))  
+    LOAD_CONTENT = False
     

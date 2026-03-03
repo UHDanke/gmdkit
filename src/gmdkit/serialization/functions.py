@@ -88,7 +88,7 @@ def compress_string(
     return byte_stream.decode()
 
 
-def read_plist(node:Element) -> [int,float,str,bool,dict,list]:
+def read_plist(node:Element) -> int|bool|float|str|dict|list:
     
     match node.tag:
         case 'i':
@@ -229,7 +229,6 @@ def get_plist_root(node:ET.Element) -> ET.Element:
         raise ValueError("plist does not contain a <dict> sub-element")
     
     return root
-
 
 
 def from_plist_string(string: str) -> dict:
@@ -462,11 +461,57 @@ def dict_cast(
     return cast_func
 
 
+def pass_kwargs(**kwargs):
+    return kwargs
+
+def kv_wrap(
+        key_func: Optional[Callable[[Any], Any]] = None,
+        value_func: Optional[Callable[..., Any]] = None,
+        kwarg_handler: Optional[Callable[..., dict[str, Any]]] = pass_kwargs,
+        ) -> Callable:
+    
+    def wrap(key, value, **kwargs) -> tuple:
+        processed_kwargs = kwarg_handler(**kwargs) if kwarg_handler is not None else {}
+        return (
+            key_func(key) if key_func is not None else key,
+            value_func(value, **processed_kwargs) if value_func is not None else value,
+        )
+    
+    return wrap
+
+
+def args_wrap(
+        func: Callable[..., Any],
+        max_args: Optional[int] = None,
+        kwarg_handler: Optional[Callable[[dict[str, Any]], dict[str, Any]]] = pass_kwargs,
+        ) -> Callable:
+    
+    def wrap(*args, **kwargs) -> Any:
+        return func(
+            *(args[:max_args] if max_args is not None else args),
+           **(kwarg_handler(**kwargs) if kwarg_handler is not None else {}),
+        )
+    
+    return wrap
+
+
+def get_load_keys(func_dict:dict[Callable]) -> set:
+    return {k for k, v in func_dict.items() if hasattr(v, "load") and hasattr(v, "save")}
+
+
 def from_node_wrap(function:Callable):
     def get_node_text(node, **kwargs):
         return function(node.text, **kwargs)
     
     return get_node_text
+
+
+def to_node_wrap(function:Callable):
+    def return_node(value, **kwargs):
+        string = function(value, **kwargs)
+        return write_plist(string)
+    
+    return return_node
 
 
 def from_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):
@@ -480,14 +525,6 @@ def from_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]
             d[k] = from_node_wrap(f)
             
     return d
-
-
-def to_node_wrap(function:Callable):
-    def return_node(value, **kwargs):
-        string = function(value, **kwargs)
-        return write_plist(string)
-    
-    return return_node
 
 
 def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):

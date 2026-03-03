@@ -3,7 +3,7 @@ from copy import deepcopy
 from typing import Literal, Callable
 
 # Package Imports
-from gmdkit.mappings import obj_prop, obj_id, color_prop, color_id
+from gmdkit.mappings import obj_prop, obj_id, color_id
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.functions.object_list import boundaries, add_groups
 from gmdkit.models.level import Level, LevelList
@@ -47,7 +47,7 @@ def merge_levels(level_list:LevelList, override_colors:bool=True):
     
     main_level = deepcopy(level_list[0])
     main_colors = main_level.start[obj_prop.level.COLORS]
-    main_channels = main_colors.unique_values(lambda color: [color.get(color_prop.CHANNEL)])
+    main_channels = main_colors.unique_values(lambda color: [color.channel])
         
     for level in level_list[1:]:
         
@@ -57,13 +57,13 @@ def merge_levels(level_list:LevelList, override_colors:bool=True):
         group_colors = colors.get_custom()
         
         for color in group_colors:
-            color_channel = color.get(color_prop.CHANNEL)
+            color_channel = color.channel
             
             if override_colors:
                 if color_channel in main_channels:
                     main_colors[:] = [
                         c for c in main_colors
-                        if c.get(color_prop.CHANNEL) != color
+                        if c.channel != color
                     ]
                 
                 main_colors.append(color)
@@ -86,10 +86,10 @@ def disable_start_pos(obj:Object):
 
 
 def level_color_triggers(level:Level):
-    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.get(color_prop.CHANNEL) in color_id.LEVEL)
+    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
     level.objects += create_color_triggers(colors)
 
-
+# TODO REDO
 def obj_list_group(obj_list:ObjectList):
     ids = compile_id_context(obj_list)
     g, = next_free(values=ids["group_id"].get_ids(),vmin=1,vmax=9999,count=1)

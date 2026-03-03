@@ -4,7 +4,8 @@ from gmdkit.serialization.mixins import (
     PlistDecoderMixin, 
     CompressFileMixin, 
     FilePathMixin, 
-    DefaultPathMixin
+    DefaultPathMixin,
+    LoadPlistContentMixin
     )
 from gmdkit.constants.paths.save import GAME_MANAGER_PATH
 from gmdkit.serialization.type_cast import to_numkey
@@ -15,7 +16,7 @@ from gmdkit.casting.game_save import GAME_SAVE_DECODERS, GAME_SAVE_ENCODERS, GAM
 GAME_SAVE_KWARGS = {}
 
 
-class GameSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
+class GameSave(DefaultPathMixin,FilePathMixin,LoadPlistContentMixin,CompressFileMixin,PlistDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(from_node_dict(GAME_SAVE_DECODERS,exclude=GAME_SAVE_NODES),key_start=to_numkey,default=read_plist,allow_kwargs=GAME_SAVE_KWARGS))
     ENCODER = staticmethod(dict_cast(to_node_dict(GAME_SAVE_ENCODERS,exclude=GAME_SAVE_NODES),key_end=str,default=write_plist,allow_kwargs=GAME_SAVE_KWARGS))
     COMPRESSED = True
@@ -23,6 +24,7 @@ class GameSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistDecoderMixi
     CYPHER = bytes([11])
     EXTENSION = "dat"
     DEFAULT_PATH = GAME_MANAGER_PATH
+    LOAD_CONTENT = False
     
     def _name_fallback_(self):
         return "CCGameManager"

@@ -7,6 +7,8 @@ from os import PathLike
 PathString = str|PathLike
 PlistStruct = dict|list|tuple
 NumKey = int|str
+RGBA = tuple[int,int,int,float]
+
 
 class Caster(Protocol):
     def __call__(self, value: Any, **kwargs:Any) -> Any : ...

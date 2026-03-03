@@ -65,15 +65,14 @@ def trigger_to_color(obj:Object) -> Color:
     p_2 = obj[obj_prop.trigger.color.PLAYER_1]
     
     if p_1 and p_2:
-        i = 0
+        color.player = SelectPlayer.ALL
     elif not p_1 and not p_2:
-        i = -1
+        color.player = SelectPlayer.NONE
     elif p_1:
-        i = 1
+        color.player = SelectPlayer.P1
     elif p_2:
-        i = 2
+        color.player = SelectPlayer.P2
         
-    color.player = SelectPlayer(i)
     color.blending = obj.get(obj_prop.trigger.color.BLENDING,False)
     color.channel = obj.get(obj_prop.trigger.color.CHANNEL,0)
     color.opacity = obj.get(obj_prop.trigger.color.OPACITY,0)
@@ -86,7 +85,7 @@ def trigger_to_color(obj:Object) -> Color:
 
 def create_color_triggers(
         color_list:ColorList, 
-        ignore_defaults:bool=True, 
+        ignore_default:bool=True, 
         pos_x:float=0, 
         pos_y:float=0
         ) -> ObjectList:
@@ -107,25 +106,25 @@ def create_color_triggers(
     ObjectListx
         An ObjectList containing the generated color triggers.
     """
-    objs = ObjectList()
+    obj_list = ObjectList()
     
     y = pos_y
     x = pos_x
         
     for color in color_list:
         
-        if ignore_defaults and color.is_default():
+        if ignore_default and color.is_default():
             continue
             
         obj = color_to_trigger(color)
             
-        objs.append(obj)
+        obj_list.append(obj)
         obj.update({
             obj_prop.X: x,
             obj_prop.Y: y
             })
         y += -30
     
-    return objs
+    return obj_list
         
         

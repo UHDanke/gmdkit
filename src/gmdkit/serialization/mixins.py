@@ -243,7 +243,30 @@ class PlistDecoderMixin(FileStringMixin):
             raise RuntimeError(f"[{type(self).__name__}] failed to reload plist") from e
             
         self.load_data(node=root,**kwargs)
+
+
+    def invoke(
+            self, 
+            method:str, 
+            target:Optional[set]=None, 
+            is_array:Optional[bool]=None, 
+            **kwargs
+            ):
         
+        is_array = type(self).IS_ARRAY if is_array is None else is_array
+        
+        if is_array:
+            items = enumerate(self)
+            values = (v for i, v in items if target is None or i in target)
+        else:
+            items = self.items()
+            values = (v for k, v in items if target is None or k in target)
+        
+        for value in values:
+            value_method = getattr(value, method, None)
+            if callable(value_method):
+                value_method(**kwargs)
+
 
 class DataclassDecoderMixin:
     
@@ -752,7 +775,7 @@ class CompressFileMixin:
             compressed:Optional[bool]=None,
             compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
             cypher:Optional[bytes]=None,
-            level:Optional[int]=None,
+            compression_level:Optional[int]=None,
             **kwargs
             ) -> str:
         
@@ -766,7 +789,7 @@ class CompressFileMixin:
         
         if compressed:
             kw = {}
-            if level is not None: kw["level"] = level
+            if compression_level is not None: kw["level"] = compression_level
                 
             string = compress_string(string, compression=compression,xor_key=cypher,**kw)
         
@@ -834,63 +857,37 @@ class FilePathMixin:
         super().to_file(path=path,**kwargs)
         
 
-class LoadContentMixin:
+class LoadPlistContentMixin:
     
-    CONTENT_KEYS: Optional[set] = None
+    SELECTORS: Optional[set] = None
+    LOAD_CONTENT: bool = True
+    SAVE_CONTENT: bool = True
     
     @classmethod
-    def from_node(cls, node:ET.Element, load_content:bool=True, content_keys:Optional[set]=None, **kwargs):
-        
-        new = super().from_node(node, **kwargs)
-        
-        if load_content: 
-            new.load_content(content_keys=content_keys)
+    def from_string(cls, string:str, load_content:Optional[bool]=None, content_selectors:Optional[set]=None, **kwargs):
+        new = super().from_string(string, **kwargs)
+        if load_content if load_content is not None else cls.LOAD_CONTENT:
+            new.load(selectors=content_selectors)
             
         return new
     
     
-    def to_node(self, save_content:bool=True, content_keys:Optional[set]=None, **kwargs):
+    def to_string(self, save_content:Optional[bool]=None, content_selectors:Optional[set]=None, **kwargs):
         
-        if save_content:
-            self.save_content(content_keys=content_keys)
+        if save_content if save_content is not None else type(self).SAVE_CONTENT:
+            self.save(selectors=content_selectors)
         
-        return super().to_node(**kwargs)
-
+        return super().to_string(**kwargs)
         
-    def load_content(self, content_keys:Optional[set]=None):
         
-        target = type(self).CONTENT_KEYS if content_keys is None else content_keys
-        available = self.keys()
-        
-        if target is not None:
-            key_set = available & target
-        else:
-            key_set = available
-        
-        for key in key_set:
-            value = self.get(key)
-            load = getattr(value, "load", None)
-    
-            if load is not None and callable(load):
-                load()
+    def load(self, selectors:Optional[set]=None,**kwargs):
+        target = type(self).SELECTORS if selectors is None else selectors
+        self.invoke("load",target=target,**kwargs)
         
             
-    def save_content(self, content_keys:Optional[set]=None):
-        
-        target = type(self).CONTENT_KEYS if content_keys is None else content_keys
-        available = self.keys()
-        
-        if target is not None:
-            key_set = available & target
-        else:
-            key_set = available
-            
-        for key in key_set:
-            value = self.get(key)
-            save = getattr(value, "save", None)
-    
-            if save is not None and callable(save):
-                save()
+    def save(self, selectors:Optional[set]=None,**kwargs):
+        target = type(self).SELECTORS if selectors is None else selectors
+        self.invoke("save",target=target,**kwargs)
 
 
 class FolderLoaderMixin:

@@ -1,17 +1,19 @@
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.serialization.type_cast import to_string, to_numkey, to_node
-from gmdkit.utils.typing import Element
+from gmdkit.serialization.type_cast import to_numkey
 from gmdkit.serialization.mixins import (
     PlistDecoderMixin, 
     FilePathMixin, 
-    DataclassDecoderMixin
+    DataclassDecoderMixin,
+    LoadPlistContentMixin
     )
 from gmdkit.serialization.functions import (
     dict_cast, 
     from_node_dict, to_node_dict, 
     read_plist, write_plist, 
-    dataclass_decoder
+    dataclass_decoder,
+    kv_wrap,
+    get_load_keys
     )
 from gmdkit.mappings import smart_prefab, smart_template
 from gmdkit.models.object import ObjectGroup
@@ -31,76 +33,52 @@ class SmartLayout(DataclassDecoderMixin):
     bottom_right: TemplateType
 
 
-PREFAB_DECODERS = {
-    smart_prefab.OBJECT_STRING: ObjectGroup.from_string,
-    }
-
-PREFAB_ENCODERS = {
-    smart_prefab.OBJECT_STRING: to_string,
-    }
-
+PREFAB_DECODERS = {smart_prefab.OBJECT_STRING: ObjectGroup}
+PREFAB_ENCODERS = {smart_prefab.OBJECT_STRING: ObjectGroup.to_string}
+PREFAB_TYPES = {smart_prefab.OBJECT_STRING: ObjectGroup}
 PREFAB_KWARGS = {smart_prefab.OBJECT_STRING}
 
 
-class SmartPrefab(PlistDecoderMixin,DictClass):
+class SmartPrefab(LoadPlistContentMixin,PlistDecoderMixin,DictClass):
     DECODER = staticmethod(dict_cast(from_node_dict(PREFAB_DECODERS),key_start=to_numkey,default=read_plist,allow_kwargs=PREFAB_KWARGS))
     ENCODER = staticmethod(dict_cast(to_node_dict(PREFAB_ENCODERS),key_end=str,default=write_plist,allow_kwargs=PREFAB_KWARGS))
     ENCODER_KEY = 11
-    
-
-def to_prefab(node:Element, **kwargs) -> SmartPrefab:
-    return SmartPrefab.from_node(node=node, **kwargs)
-
-def from_prefab(prefab:SmartPrefab, **kwargs) -> Element:
-    return prefab.to_node(**kwargs)
+    SELECTORS = get_load_keys(PREFAB_TYPES)
 
 
-class SmartPrefabList(PlistDecoderMixin,ListClass):
-    DECODER = staticmethod(to_prefab)
-    ENCODER = staticmethod(from_prefab)
+class SmartPrefabList(LoadPlistContentMixin,PlistDecoderMixin,ListClass):
+    DECODER = SmartPrefab.from_node
+    ENCODER = SmartPrefab.to_node
     IS_ARRAY = True   
 
-def to_prefab_list(key:str, node:Element, **kwargs) -> tuple[str,SmartPrefabList]:
-    return key, SmartPrefabList.from_node(node=node, **kwargs)
 
-def from_prefab_list(key:str, prefab_list:SmartPrefabList, **kwargs) -> tuple[str,Element]:
-    return key, prefab_list.to_node(**kwargs)
+class SmartPrefabLayout(LoadPlistContentMixin,PlistDecoderMixin,DictClass):
+    DECODER = staticmethod(kv_wrap(value_func=SmartPrefabList.from_node))
+    ENCODER = staticmethod(kv_wrap(value_func=SmartPrefabList.to_node))
 
-class SmartPrefabLayout(PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(to_prefab_list)
-    ENCODER = staticmethod(from_prefab_list)
 
-TEMPLATE_DECODERS = {
-    smart_template.VARIATIONS: SmartPrefabLayout.from_node
-    }
-
-TEMPLATE_ENCODERS = {
-    smart_template.VARIATIONS: to_node
-    }
-
+TEMPLATE_DECODERS = {smart_template.VARIATIONS: SmartPrefabLayout.from_node}
+TEMPLATE_ENCODERS = {smart_template.VARIATIONS: SmartPrefabLayout.to_node}
+TEMPLATE_TYPES = {smart_template.VARIATIONS: SmartPrefabLayout}
 TEMPLATE_KWARGS = {smart_template.VARIATIONS}
 
-TEMPLATE_NODES = {smart_template.VARIATIONS}
 
-class SmartTemplate(FilePathMixin,PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(dict_cast(from_node_dict(TEMPLATE_DECODERS,exclude=TEMPLATE_NODES),key_start=to_numkey,default=read_plist,allow_kwargs=TEMPLATE_KWARGS))
-    ENCODER = staticmethod(dict_cast(to_node_dict(TEMPLATE_ENCODERS,exclude=TEMPLATE_NODES),key_end=str,default=write_plist,allow_kwargs=TEMPLATE_KWARGS))
+class SmartTemplate(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
+    DECODER = staticmethod(dict_cast(TEMPLATE_DECODERS,key_start=to_numkey,default=read_plist,allow_kwargs=TEMPLATE_KWARGS))
+    ENCODER = staticmethod(dict_cast(TEMPLATE_ENCODERS,key_end=str,default=write_plist,allow_kwargs=TEMPLATE_KWARGS))
     ENCODER_KEY = 10
     EXTENSION = "gmdt"
+    SELECTORS = get_load_keys(TEMPLATE_TYPES)
     
     def _name_fallback_(self):
         container = self.CONTAINER
         data = self if container is None else getattr(self, container)
         return data[smart_template.NAME]   
 
-def to_template(node:Element, **kwargs) -> SmartTemplate:
-    return SmartTemplate.from_node(node=node, **kwargs)
 
-def from_template(template:SmartTemplate, **kwargs) -> Element:
-    return template.to_node(**kwargs)
-
-class SmartTemplateList(FilePathMixin,PlistDecoderMixin,ListClass):
-    DECODER = staticmethod(to_template)
-    ENCODER = staticmethod(from_template)
+class SmartTemplateList(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,ListClass):
+    DECODER = SmartTemplate.from_node
+    ENCODER = SmartTemplate.to_node
     IS_ARRAY = True
     EXTENSION = "plist"
+    LOAD_CONTENT = False

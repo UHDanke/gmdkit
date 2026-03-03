@@ -1,6 +1,5 @@
 # Imports
-from typing import Any, Literal
-from collections.abc import Callable
+from typing import Any, Literal, Optional, Callable
 from statistics import mean, median
 import math
 
@@ -9,6 +8,7 @@ from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.list import IDList
 
+# TODO REVIEW
 def add_groups(obj_list:ObjectList, groups):
     
     for obj in obj_list:
@@ -19,7 +19,7 @@ def add_groups(obj_list:ObjectList, groups):
             raise ValueError("Group Limit exceeded.")
         g.extend(new)
         
-
+# TODO REDO
 def index_objects(obj_list:ObjectList, start:int=0) -> None:
     """
     Adds an index key to all objects in the list.
@@ -30,7 +30,7 @@ def index_objects(obj_list:ObjectList, start:int=0) -> None:
     obj_list : ObjectList
         The objects to modify.
         
-    start : TYPE, optional
+    start : int, optional
         The value to start indexing from. Defaults to 0.
 
     Returns
@@ -42,8 +42,22 @@ def index_objects(obj_list:ObjectList, start:int=0) -> None:
         obj.index = i
 
 
-def brickify(obj_list, height: int | None = None):
-    
+def brickify(obj_list:ObjectList, height:Optional[int]=None) -> ObjectList:
+    """
+    Repositions all objects in the list into a compact brick.
+
+    Parameters
+    ----------
+    obj_list : ObjectList
+        The objects to modify.
+    height : Optional[int], optional
+        The height of the brick. Determined automatically if None.
+
+    Returns
+    -------
+    None
+
+    """
     if height is None:
         height = math.ceil(math.sqrt(len(obj_list)))
     
@@ -65,7 +79,7 @@ def brickify(obj_list, height: int | None = None):
         else:
             Y-=30
 
-
+# TODO REVIEW
 def group_objects(
         obj_list:ObjectList, 
         key_func:Callable=lambda obj: obj.get(obj_prop.ID),
@@ -301,9 +315,12 @@ def compile_keyframe_ids(obj_list:ObjectList) -> dict[int,ObjectList]:
     return result
 
 
+def get_keyframe_id(obj:Object):
+    return obj.get(obj_prop.trigger.keyframe.KEY_ID, 0) 
+
 def compile_keyframe_groups(
         obj_list:ObjectList, 
-        function:Callable=lambda obj: obj.get(obj_prop.trigger.keyframe.KEY_ID, 0) 
+        function:Callable=get_keyframe_id
         ) -> dict[int|None,list[Any]]:
     """
     Compiles keyframe properties by group IDs that reference them.
@@ -513,31 +530,49 @@ def boundaries(
         
     return min_x, min_y, center_x, center_y, max_x, max_y
 
+
 def grid_align(
         obj_list:ObjectList,
-        unit_x:float|None=None,
-        unit_y:float|None=None,
+        unit_x:Optional[float]=None,
+        unit_y:Optional[float]=None,
         offset_x:float=0,
         offset_y:float=0,
-        snap:Literal["round", "floor", "ceil"]="round"
+        snap_func:Callable=round
         ) -> None:
+    """
+    Alings a list of objects to a grid of a given size.
     
-    if not (unit_x or unit_y): return
+    Parameters
+    ----------
+    obj_list : ObjectList
+        The objects to modify.
+    unit_x : Optional[float], optional
+        The grid's X width. The default is None.
+    unit_y : Optional[float], optional
+        The grid's Y width. The default is None.
+    offset_x : float, optional
+        The grid's X offset. The default is 0.
+    offset_y : float, optional
+        The grid's Y offset. The default is 0.
+    snap_func : Callable, optional
+        The function used to snap the position of the objects. Uses round() by default.
+        
+    Returns
+    -------
+    None
+        
+    """
     
-    snap_func = {
-        "round": round,
-        "floor": math.floor,
-        "ceil": math.ceil,
-    }.get(snap,"round")
+    if not (unit_x or unit_y) or not callable(snap_func): return
     
     for obj in obj_list:
         if unit_x is not None:
-            obj.x = snap_func((obj.x - offset_x) / unit_x) * unit_x + offset_x
-
+            obj[obj_prop.X] = snap_func((obj.get(obj_prop.X) - offset_x) / unit_x) * unit_x + offset_x
+            
         if unit_y is not None:
-            obj.y = snap_func((obj.y - offset_y) / unit_y) * unit_y + offset_y
+            obj[obj_prop.Y] = snap_func((obj.get(obj_prop.Y) - offset_y) / unit_y) * unit_y + offset_y
 
-
+# TODO TEST
 def warp_objects(
         obj_list:ObjectList,
         only_move:bool=False,
@@ -630,7 +665,7 @@ def warp_objects(
         if y is not None:
             obj[obj_prop.Y] = m10 * dx + m11 * dy + center_y 
 
-
+# TODO TEST
 def align_objects(
         obj_list:ObjectList,
         keep_alignment:bool=False,
@@ -662,11 +697,11 @@ def align_objects(
     
     y_axis : bool, optional
         Whether objects are aligned on the y axis. Defaults to True.
-
+    
     Returns
     -------
     None
-
+    
     """
     if not x_axis and not y_axis:
         return
