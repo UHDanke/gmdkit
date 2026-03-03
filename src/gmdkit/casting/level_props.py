@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.serialization.type_cast import decode_text, encode_text
+from gmdkit.serialization.type_cast import decode_text, encode_text, get_string
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
@@ -31,8 +31,8 @@ LEVEL_DECODERS = {
 
 LEVEL_ENCODERS = {
     'k3': encode_text,
-    'k4': ObjectString.to_string,
-    'k34': ReplayString.to_string,
+    'k4': get_string,
+    'k34': get_string,
     'k88': IntList.to_string,
     'k91': IntList.to_string,
     'k101': PositionList.to_string,
@@ -40,8 +40,8 @@ LEVEL_ENCODERS = {
     'k105': IntList.to_string,
     'k109': IntList.to_string,
     'k110': IntList.to_string,
-    'k119': ReplayString.to_string,
-    'k120': ReplayString.to_string,
+    'k119': get_string,
+    'k120': get_string,
 }
 
 

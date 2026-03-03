@@ -136,10 +136,10 @@ def encode_level_props(gd_type, gd_format):
                     return 'PositionList.to_string'
                 
                 case 'replay string':
-                    return 'ReplayString.to_string'
+                    return 'get_string'
                 
                 case 'object string':
-                    return 'ObjectString.to_string'
+                    return 'get_string'
                 
                 case _: 
                     return

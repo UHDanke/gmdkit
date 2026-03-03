@@ -35,7 +35,7 @@ class GzipString(FileStringMixin):
             self.save()
         
         return self.string
-        
+    
 
 class ObjectString(GzipString):
     

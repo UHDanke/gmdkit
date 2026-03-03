@@ -91,7 +91,7 @@ class ObjectGroup(FileStringMixin):
 
 class ObjectGroupDict(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
     DECODER = staticmethod(kv_wrap(int,ObjectGroup))
-    ENCODER = staticmethod(kv_wrap(str,lambda x: write_plist(x.to_string())))
+    ENCODER = staticmethod(kv_wrap(str,lambda x: write_plist(x.string)))
     EXTENSION = "plist"
     LOAD_CONTENT = False
     

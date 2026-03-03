@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.serialization.type_cast import to_numkey
+from gmdkit.serialization.type_cast import to_numkey, get_string
 from gmdkit.serialization.mixins import (
     PlistDecoderMixin, 
     FilePathMixin, 
@@ -34,7 +34,7 @@ class SmartLayout(DataclassDecoderMixin):
 
 
 PREFAB_DECODERS = {smart_prefab.OBJECT_STRING: ObjectGroup}
-PREFAB_ENCODERS = {smart_prefab.OBJECT_STRING: ObjectGroup.to_string}
+PREFAB_ENCODERS = {smart_prefab.OBJECT_STRING: get_string}
 PREFAB_TYPES = {smart_prefab.OBJECT_STRING: ObjectGroup}
 PREFAB_KWARGS = {smart_prefab.OBJECT_STRING}
 
