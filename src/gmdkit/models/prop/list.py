@@ -29,11 +29,7 @@ class IntPairList(ArrayDecoderMixin,ListClass):
     GROUP_SIZE = 2
     DECODER = IntPair.from_tokens
     ENCODER = IntPair.to_tokens
-    
-    def __init__(self, **kwargs):
-        items = [IntPair(k,v) for k,v in kwargs.items()]
-        super().__init__(items)
-   
+       
     def keys(self):
         return self.unique_values(lambda x: [x.key])
     

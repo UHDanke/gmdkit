@@ -1,7 +1,8 @@
 # Package Imports
 from gmdkit.utils import enums
 from gmdkit.serialization.type_cast import decode_text, encode_text
-from gmdkit.models.prop.list import IntList, IntPairList
+from gmdkit.models.prop.list import IntList
+from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 
 
