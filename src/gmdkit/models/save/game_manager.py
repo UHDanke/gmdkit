@@ -12,7 +12,7 @@ from gmdkit.serialization.functions import dict_cast, from_node_dict, to_node_di
 from gmdkit.casting.game_save import GAME_SAVE_DECODERS, GAME_SAVE_ENCODERS, GAME_SAVE_NODES
 
 
-GAME_SAVE_KWARGS = {}
+GAME_SAVE_KWARGS = set()
 
 
 class GameSave(DefaultPathMixin,FilePathMixin,LoadPlistContentMixin,CompressFileMixin,PlistDecoderMixin,DictClass):

@@ -1,5 +1,5 @@
 # Imports
-from typing import Iterable, Literal
+from typing import Iterable
 
 
 def next_free(

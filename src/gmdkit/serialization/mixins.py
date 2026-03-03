@@ -110,17 +110,35 @@ class PlistDecoderMixin(FileStringMixin):
         
         start = 2 if is_array or encoder_key is not None else 0
         index_range = range(start, len(node), 2)
-        
+    
+        use_kwargs = bool(kwargs)
+    
         if decoder:
             if is_array:
-                data.extend(decoder(node[i+1],**kwargs) for i in index_range)
+                append_func = data.append
+                if use_kwargs:
+                    for i in index_range:
+                        append_func(decoder(node[i + 1], **kwargs))
+                else:
+                    for i in index_range:
+                        append_func(decoder(node[i + 1]))
             else:
-                data.update(decoder(node[i].text,node[i+1],**kwargs) for i in index_range)
+                set_item = data.__setitem__
+                if use_kwargs:
+                    for i in index_range:
+                        set_item(*decoder(node[i].text, node[i + 1], **kwargs))
+                else:
+                    for i in index_range:
+                        set_item(*decoder(node[i].text, node[i + 1]))
         else:
             if is_array:
-                data.extend(read_plist(node[i+1]) for i in index_range)
+                append_func = data.append
+                for i in index_range:
+                    append_func(read_plist(node[i + 1]))
             else:
-                data.update((node[i].text, read_plist(node[i+1])) for i in index_range)
+                set_item = data.__setitem__
+                for i in index_range:
+                    set_item(node[i].text, read_plist(node[i + 1]))
 
     
     def save_data(
@@ -457,12 +475,14 @@ class DictDecoderMixin:
         result = cls()
         data = result if container is None else getattr(result, container)
         
-        it = iter(tokens)
-        pairs = zip(it, it)
-        # pairs = zip(tokens[::2], tokens[1::2])
-        
         try:
-            data.update(pairs if decoder is None else (decoder(k, v) for k, v in pairs))
+            it = iter(tokens)
+            if decoder:
+                for k, v in zip(it, it):
+                    dk, dv = decoder(k, v)
+                    data[dk] = dv
+            else:
+                data.update(zip(it, it))
         except Exception as e:
             raise ValueError(f"[{cls.__name__}] failed to decode") from e
         
@@ -482,19 +502,25 @@ class DictDecoderMixin:
         container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
             
-        try:
-            return [
-                part
-                for key, value in data.items()
-                if condition is None or condition(key, value)
-                for part in encoder(key, value)
-            ]
-        except Exception as e:
-            raise ValueError(
-                f"[{type(self).__name__}] failed to encode"
-                ) from e
-            
+        result = []
     
+        try:
+            if encoder:
+                for key, value in data.items():
+                    if condition is None or condition(key, value):
+                        result.extend(encoder(key, value))
+            else:
+                for key, value in data.items():
+                    if condition is None or condition(key, value):
+                        result.append(key)
+                        result.append(value)
+    
+            return result
+    
+        except Exception as e:
+            raise ValueError(f"[{type(data).__name__}] failed to encode") from e
+                
+            
     @classmethod
     def from_string(
             cls, 

@@ -1,5 +1,5 @@
 # Imports
-from typing import Any
+from typing import Any, Optional, Callable
 from operator import attrgetter
 import base64
 from enum import Enum, IntEnum
@@ -11,10 +11,10 @@ from gmdkit.utils.typing import NumKey
 get_string = attrgetter("string")
 
 def to_bool(string:str) -> bool:
-    return bool(int(string))
+    return string == "1"
 
 def from_bool(obj:bool) -> str:
-    return str(int(bool(obj)))
+    return "1" if obj else "0"
     
 def from_float(obj:float) -> str:
     return str(int(obj)) if obj.is_integer() else str(obj)
@@ -55,25 +55,44 @@ def encode_text(string:str) -> str:
     return encoded_bytes.decode("utf-8")
 
 
-def serialize(obj:Any) -> str:
-    
+def serialize(obj: Any) -> str:
     t = type(obj)
-    
-    if t is str: return obj
+    if t is str:   return obj
+    if t is bool:  return from_bool(obj)
+    if t is int:   return str(obj)
     if t is float: return from_float(obj)
-    if t is int: return str(obj)
-    if t is bool: return from_bool(obj)
     if obj is None: return ""
     if isinstance(obj, IntEnum): return str(obj.value)
-    if isinstance(obj, Enum): return str(obj.value)
-    if isinstance(obj, float): return from_float(obj)
-    if isinstance(obj, int): return str(obj)
-    if isinstance(obj, bool): return from_bool(obj)
-    
+    if isinstance(obj, Enum):    return str(obj.value)
     return to_string(obj)
 
 
 def dict_serializer(key:NumKey, value:Any):
     return (str(key), serialize(value))
 
-        
+def dict_cast(
+        functions: dict,
+        allow_kwargs: Optional[set] = None,
+        key_start: Optional[Callable] = None,
+        key_end: Optional[Callable] = None,
+        default: Optional[Callable] = None,
+        ) -> Callable:
+    f_get = functions.get
+    has_kwargs: set = allow_kwargs or set()
+    has_default: bool = callable(default)
+    kc_start: bool = callable(key_start)
+    kc_end: bool = callable(key_end)
+
+    def cast_func(key: Any, value: Any) -> tuple:
+        if kc_start:
+            key = key_start(key)  # type: ignore[misc]
+        func = f_get(key)
+        if func is not None:
+            value = func(value) if not has_kwargs else func(value, **{})
+        elif has_default:
+            value = default(value)  # type: ignore[misc]
+        if kc_end:
+            key = key_end(key)  # type: ignore[misc]
+        return key, value
+
+    return cast_func

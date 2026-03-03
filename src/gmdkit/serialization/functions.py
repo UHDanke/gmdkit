@@ -13,7 +13,7 @@ from enum import Enum
 
 # Package Imports
 from gmdkit.serialization.type_cast import (
-    from_float, from_bool, to_bool
+    from_float, from_bool, to_bool, dict_cast
     )
 from gmdkit.utils.typing import (
     StringDictDecoder, 
@@ -423,43 +423,6 @@ def field_decoder(
         d.pop("metadata")
         
     return field(*args, **d)
-
-
-def dict_cast(
-        functions: dict[Any,Callable],
-        allow_kwargs: Optional[set] = None,
-        key_start: Optional[Callable] = None,
-        key_end: Optional[Callable] = None,
-        default: Optional[Callable] = None,
-        ):
-    has_kwargs = allow_kwargs or set()
-    f_get = functions.get
-    has_default = callable(default)
-    kc_start = callable(key_start)
-    kc_end = callable(key_end)
-
-    def cast_func(key: Any, value: Any, **kwargs) -> tuple[Any, Any]:
-        
-        if kc_start:
-            key = key_start(key)
-            
-        func = f_get(key)
-
-        if func is not None:
-            
-            value = func(value, **kwargs) if key in has_kwargs else func(value)
-            
-        elif has_default:
-            value = default(value)
-
-        if kc_end:
-            key = key_end(key)
-        
-
-        return key, value
-
-    return cast_func
-
 
 def pass_kwargs(**kwargs):
     return kwargs
