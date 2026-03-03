@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.serialization.type_cast import to_numkey, get_string
+from gmdkit.serialization.type_cast import get_string
 from gmdkit.serialization.mixins import (
     PlistDecoderMixin, 
     FilePathMixin, 
@@ -40,7 +40,7 @@ PREFAB_KWARGS = {smart_prefab.OBJECT_STRING}
 
 
 class SmartPrefab(LoadPlistContentMixin,PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(dict_cast(from_node_dict(PREFAB_DECODERS),key_start=to_numkey,default=read_plist,allow_kwargs=PREFAB_KWARGS))
+    DECODER = staticmethod(dict_cast(from_node_dict(PREFAB_DECODERS),key_start=int,default=read_plist,allow_kwargs=PREFAB_KWARGS))
     ENCODER = staticmethod(dict_cast(to_node_dict(PREFAB_ENCODERS),key_end=str,default=write_plist,allow_kwargs=PREFAB_KWARGS))
     ENCODER_KEY = 11
     SELECTORS = get_load_keys(PREFAB_TYPES)
@@ -64,7 +64,7 @@ TEMPLATE_KWARGS = {smart_template.VARIATIONS}
 
 
 class SmartTemplate(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(dict_cast(TEMPLATE_DECODERS,key_start=to_numkey,default=read_plist,allow_kwargs=TEMPLATE_KWARGS))
+    DECODER = staticmethod(dict_cast(TEMPLATE_DECODERS,key_start=int,default=read_plist,allow_kwargs=TEMPLATE_KWARGS))
     ENCODER = staticmethod(dict_cast(TEMPLATE_ENCODERS,key_end=str,default=write_plist,allow_kwargs=TEMPLATE_KWARGS))
     ENCODER_KEY = 10
     EXTENSION = "gmdt"

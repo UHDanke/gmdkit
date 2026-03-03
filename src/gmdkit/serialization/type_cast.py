@@ -20,7 +20,9 @@ def from_float(obj:float) -> str:
     return str(int(obj)) if obj.is_integer() else str(obj)
 
 def to_numkey(key:str) -> NumKey:
-    return int(key) if key.isdigit() else key
+    if key[0] == 'k':
+        return key
+    return int(key)
 
 def to_string(obj: Any, **kwargs) -> str:
     method = getattr(obj, "to_string", None)
@@ -69,6 +71,7 @@ def serialize(obj:Any) -> str:
     if isinstance(obj, bool): return from_bool(obj)
     
     return to_string(obj)
+
 
 def dict_serializer(key:NumKey, value:Any):
     return (str(key), serialize(value))

@@ -94,10 +94,11 @@ class PlistDecoderMixin(FileStringMixin):
             **kwargs
             ):
         
-        is_array = type(self).IS_ARRAY if is_array is None else is_array
-        encoder_key = type(self).ENCODER_KEY if encoder_key is None else encoder_key
-        decoder = type(self).DECODER if decoder is None else decoder
-        container = type(self).CONTAINER if container is None else container
+        cls = type(self)
+        is_array = cls.IS_ARRAY if is_array is None else is_array
+        encoder_key = cls.ENCODER_KEY if encoder_key is None else encoder_key
+        decoder = cls.DECODER if decoder is None else decoder
+        container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
         
         try:
@@ -130,10 +131,11 @@ class PlistDecoderMixin(FileStringMixin):
             container:Optional[int]=None,
             **kwargs):
         
-        is_array = type(self).IS_ARRAY if is_array is None else is_array
-        encoder_key = type(self).ENCODER_KEY if encoder_key is None else encoder_key
-        encoder = type(self).ENCODER if encoder is None else encoder
-        container = type(self).CONTAINER if container is None else container
+        cls = type(self)
+        is_array = cls.IS_ARRAY if is_array is None else is_array
+        encoder_key = cls.ENCODER_KEY if encoder_key is None else encoder_key
+        encoder = cls.ENCODER if encoder is None else encoder
+        container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
         
         node = ET.Element("d")
@@ -347,9 +349,10 @@ class DataclassDecoderMixin:
             encoder:Optional[StringDictEncoder]=None
             ) -> Sequence[str]:
         
-        from_array = type(self).FROM_ARRAY if from_array is None else from_array
-        condition = type(self).CONDITION if condition is None else condition
-        encoder = type(self).ENCODER if encoder is None else encoder
+        cls = type(self)
+        from_array = cls.FROM_ARRAY if from_array is None else from_array
+        condition = cls.CONDITION if condition is None else condition
+        encoder = cls.ENCODER if encoder is None else encoder
         
         parts = []
         
@@ -454,15 +457,14 @@ class DictDecoderMixin:
         result = cls()
         data = result if container is None else getattr(result, container)
         
-        if decoder is None:
-            data.update(zip(tokens[::2], tokens[1::2]))
-        else:
-            try:
-                data.update(decoder(k, v) for k, v in zip(tokens[::2], tokens[1::2]))
-            except Exception as e:
-                raise ValueError(
-                    f"[{cls.__name__}] failed to decode"
-                    ) from e
+        it = iter(tokens)
+        pairs = zip(it, it)
+        # pairs = zip(tokens[::2], tokens[1::2])
+        
+        try:
+            data.update(pairs if decoder is None else (decoder(k, v) for k, v in pairs))
+        except Exception as e:
+            raise ValueError(f"[{cls.__name__}] failed to decode") from e
         
         return result
     
@@ -474,9 +476,10 @@ class DictDecoderMixin:
             container:Optional[str]=None
             ) -> Sequence[str]:
         
-        encoder = type(self).ENCODER if encoder is None else encoder
-        condition = type(self).CONDITION if condition is None else condition
-        container = type(self).CONTAINER if container is None else container
+        cls = type(self)
+        encoder = cls.ENCODER if encoder is None else encoder
+        condition = cls.CONDITION if condition is None else condition
+        container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
             
         try:
@@ -567,9 +570,10 @@ class ArrayDecoderMixin:
             container:Optional[str]=None
             ) -> Sequence[str]:
         
-        encoder = type(self).ENCODER if encoder is None else encoder
-        group_size = type(self).GROUP_SIZE if group_size is None else group_size
-        container = type(self).CONTAINER if container is None else container
+        cls = type(self)
+        encoder = cls.ENCODER if encoder is None else encoder
+        group_size = cls.GROUP_SIZE if group_size is None else group_size
+        container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
         
         tokens = []
@@ -627,8 +631,10 @@ class ArrayDecoderMixin:
             keep_separator:Optional[bool]=None,
             **kwargs
             ) -> str:
-        separator = type(self).SEPARATOR if separator is None else separator        
-        keep_separator = type(self).KEEP_SEPARATOR if keep_separator is None else keep_separator
+        
+        cls = type(self)
+        separator = cls.SEPARATOR if separator is None else separator        
+        keep_separator = cls.KEEP_SEPARATOR if keep_separator is None else keep_separator
         separator = '' if keep_separator else separator
         
         tokens = self.to_tokens(**kwargs)
@@ -672,8 +678,9 @@ class DelimiterMixin:
             **kwargs
             ) -> str:
         
-        start_delimiter = type(self).START_DELIMITER if start_delimiter is None else start_delimiter
-        end_delimiter = type(self).END_DELIMITER if end_delimiter is None else end_delimiter
+        cls = type(self)
+        start_delimiter = cls.START_DELIMITER if start_delimiter is None else start_delimiter
+        end_delimiter = cls.END_DELIMITER if end_delimiter is None else end_delimiter
         
         string = super().to_string(*args, **kwargs)
         
@@ -720,10 +727,10 @@ class CompressFileMixin:
             **kwargs
             ) -> str:
         
-        
-        compressed = type(self).COMPRESSED if compressed is None else compressed
-        compression = type(self).COMPRESSION if compression is None else compression
-        cypher = type(self).CYPHER if cypher is None else cypher
+        cls = type(self)
+        compressed = cls.COMPRESSED if compressed is None else compressed
+        compression = cls.COMPRESSION if compression is None else compression
+        cypher = cls.CYPHER if cypher is None else cypher
         
         string = super().to_string(**kwargs)
         
@@ -871,8 +878,9 @@ class FolderLoaderMixin:
             container:Optional[str]=None,
             ):
         
-        encoder = type(self).FOLDER_ENCODER if encoder is None else encoder
-        container = type(self).CONTAINER if container is None else container
+        cls = type(self)
+        encoder = cls.FOLDER_ENCODER if encoder is None else encoder
+        container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
             
         folder_path = Path(path)
