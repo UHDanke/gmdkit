@@ -1,21 +1,25 @@
 # Imports
 from typing import Callable, Any
 import base64
+from functools import lru_cache
 
 # Package Imports
 from gmdkit.serialization import options
 from gmdkit.utils.typing import NumKey
 
-
+@lru_cache(maxsize=32)
 def to_bool(string:str) -> bool:
     return bool(int(string))
 
-
+@lru_cache(maxsize=32)
 def from_bool(obj:bool) -> str:
     return str(int(bool(obj)))
     
-    
+@lru_cache(maxsize=1024)
 def from_float(obj:float) -> str:
+    if obj == 0:
+        return "0"
+    
     decimals = options.float_precision.get()
     if decimals is None:
         if obj.is_integer():
@@ -37,10 +41,10 @@ def to_string(obj:Any, **kwargs) -> str:
 
     raise TypeError(f"Object of type {type(obj).__name__} is not serializable")
 
-
+@lru_cache(maxsize=1024)
 def to_numkey(key:str) -> NumKey:
     if key.isdigit():
-        key = int(key)
+        return int(key)
     return key
 
 def to_node(obj:Any, **kwargs) -> str:
@@ -105,7 +109,7 @@ def encode_text(string:str) -> str:
     
     return encoded_bytes.decode("utf-8")
 
-    
+
 def serialize(obj:Any) -> str:
     
     if isinstance(obj, str):
@@ -126,7 +130,7 @@ def serialize(obj:Any) -> str:
     else:
         return to_string(obj)
 
-
+@lru_cache(maxsize=1024)
 def dict_serializer(key:NumKey, value:Any):
     return (str(key), serialize(value))
 

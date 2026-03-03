@@ -42,6 +42,3 @@ if __name__ == "__main__":
     
     _end = time.perf_counter()
     print(f"Load took {_end - _start:.6f} seconds")
-    _start = _end
-    _end = time.perf_counter()
-    print(f"Save took {_end - _start:.6f} seconds")
