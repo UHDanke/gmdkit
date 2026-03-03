@@ -62,7 +62,7 @@ class DefaultPathMixin:
         if path is None:
             raise ValueError("[{cls.__name__}] default path does not exist")
         
-        return cls.from_file(path)
+        return cls.from_file(path,**kwargs)
     
     
     def to_default_path(self, **kwargs):
