@@ -1,7 +1,8 @@
 # Package Imports
 from gmdkit.utils import enums
 from gmdkit.serialization.type_cast import decode_text, encode_text
-from gmdkit.models.prop.list import IntList, IntPairList
+from gmdkit.models.prop.list import IntList
+from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 
 
@@ -17,7 +18,7 @@ LEVEL_DECODERS = {
     'k76': enums.DemonRating.from_string,
     'k88': IntList.from_string,
     'k91': IntList.from_string,
-    'k101': IntPairList.from_string,
+    'k101': PositionList.from_string,
     'k104': IntList.from_string,
     'k105': IntList.from_string,
     'k109': IntList.from_string,
@@ -34,7 +35,7 @@ LEVEL_ENCODERS = {
     'k34': ReplayString.to_string,
     'k88': IntList.to_string,
     'k91': IntList.to_string,
-    'k101': IntPairList.to_string,
+    'k101': PositionList.to_string,
     'k104': IntList.to_string,
     'k105': IntList.to_string,
     'k109': IntList.to_string,
@@ -95,7 +96,7 @@ LEVEL_TYPES = {
     'k90': int,
     'k91': IntList,
     'k95': int,
-    'k101': IntPairList,
+    'k101': PositionList,
     'k102': int,
     'k103': int,
     'k104': IntList,
