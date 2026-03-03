@@ -57,6 +57,9 @@ def get_lvl_types(gd_type, gd_format):
                 case 'int list':
                     return 'IntList'
                 
+                case 'int pair list':
+                    return 'IntPairList'
+                
                 case 'replay string':
                     return 'ReplayString'
                 
@@ -92,6 +95,9 @@ def decode_level_props(gd_type, gd_format):
                 case 'int list':
                     return 'IntList.from_string'
                 
+                case 'int pair list':
+                    return 'IntPairList.from_string'
+                
                 case 'replay string':
                     return 'ReplayString'
                 
@@ -125,6 +131,9 @@ def encode_level_props(gd_type, gd_format):
                 
                 case 'int list':
                     return 'IntList.to_string'
+                
+                case 'int pair list':
+                    return 'IntPairList.to_string'
                 
                 case 'replay string':
                     return 'ReplayString.to_string'
