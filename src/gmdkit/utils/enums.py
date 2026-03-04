@@ -559,3 +559,16 @@ class ToggleCBS(EnumClass):
     DEFAULT = 0
     ON = 1
     OFF = 2
+    
+class SequenceResetType(EnumClass):
+    RESET_FULL = 0
+    RESET_STEP = 1
+    
+class TimeControlStopType(EnumClass):
+    START = 0
+    STOP = 1
+
+class PulseColorType(EnumClass):
+    COLOR = 0
+    HSV = 1
+    
