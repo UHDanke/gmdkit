@@ -564,7 +564,7 @@ class SequenceResetType(EnumClass):
     RESET_FULL = 0
     RESET_STEP = 1
     
-class TimeControlStopType(EnumClass):
+class TimeControlType(EnumClass):
     START = 0
     STOP = 1
 

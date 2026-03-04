@@ -111,6 +111,15 @@ def match_enum(enum_format):
         
         case 'gamemode':
             return 'enums.Gamemode'
+
+        case 'sequence reset':
+            return 'enums.SequenceResetType'
+
+        case 'time control stop':
+            return 'enums.TimeControlType'
+        
+        case 'pulse color type':
+            return 'enums.PulseColorType'
         
         case _:
             return
