@@ -1,21 +1,19 @@
+# Imports
+from typing import Any
+
 # Package Imports
 from gmdkit.utils.types import DictClass
-from gmdkit.utils.typing import Element
 from gmdkit.serialization.mixins import PlistDecoderMixin, FilePathMixin
+from gmdkit.serialization.functions import kv_wrap
 
 
-class SongInfo(PlistDecoderMixin,DictClass):
+class SongInfo(PlistDecoderMixin,DictClass[str,Any]):
     ENCODER_KEY = 6
-    
-def to_song(key:str, node:Element, **kwargs) -> tuple[int,SongInfo]:
-    return int(key), SongInfo.from_node(node=node, **kwargs)
 
-def from_song(key:int, song_info:SongInfo, **kwargs) -> tuple[str,Element]:
-    return str(key), song_info.to_node(**kwargs)
 
-class SongInfoList(FilePathMixin,PlistDecoderMixin,DictClass):
-    DECODER = staticmethod(to_song)
-    ENCODER = staticmethod(from_song)
+class SongInfoList(FilePathMixin,PlistDecoderMixin,DictClass[int,SongInfo]):
+    DECODER = staticmethod(kv_wrap(int,SongInfo.from_node))
+    ENCODER = staticmethod(kv_wrap(str,SongInfo.to_node))
     EXTENSION = "plist"
     
     def _name_fallback_(self):

@@ -1,3 +1,6 @@
+# Imports
+from typing import Any
+
 # Package Imports
 from gmdkit.utils.types import DictClass
 from gmdkit.serialization.mixins import (
@@ -14,7 +17,7 @@ from gmdkit.casting.game_save import GAME_SAVE_DECODERS, GAME_SAVE_ENCODERS, GAM
 GAME_SAVE_KWARGS = set()
 
 
-class GameSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixin,DictClass):
+class GameSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixin,DictClass[str,Any]):
     DECODER = staticmethod(dict_cast(from_node_dict(GAME_SAVE_DECODERS,exclude=GAME_SAVE_NODES),default=read_plist,allow_kwargs=GAME_SAVE_KWARGS))
     ENCODER = staticmethod(dict_cast(to_node_dict(GAME_SAVE_ENCODERS,exclude=GAME_SAVE_NODES),default=write_plist,allow_kwargs=GAME_SAVE_KWARGS))
     COMPRESSED = True

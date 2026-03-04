@@ -5,14 +5,14 @@ from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.models.prop.timer import TimerData
 
 
-class ItemDict(DictDecoderMixin,DictClass):
+class ItemDict(DictDecoderMixin,DictClass[int,int]):
     
     SEPARATOR = "|"
     DECODER = staticmethod(lambda k, v:(int(k),int(v)))
     ENCODER = staticmethod(lambda k, v:(str(k),str(v))) 
 
 
-class TimerDict(ItemDict):
+class TimerDict(ItemDict[int,TimerData]):
     
     DECODER = staticmethod(lambda k, v: (int(k),TimerData.from_string(v)))
     ENCODER = staticmethod(lambda k, v: (str(k),v.to_string()))

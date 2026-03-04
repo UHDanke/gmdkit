@@ -1,3 +1,6 @@
+# Imports
+from typing import Any
+
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.models.object import Object, ObjectList
@@ -10,7 +13,7 @@ from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
 
 
-class Level(FilePathMixin,PlistLoaderMixin,DictClass):
+class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LEVEL_DECODERS),default=read_plist))
     ENCODER = staticmethod(dict_cast(to_node_dict(LEVEL_ENCODERS),default=write_plist))
@@ -58,7 +61,7 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass):
         return new
    
     
-class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass):
+class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass[Level]):
     
     __slots__ = ()
     
@@ -74,7 +77,7 @@ class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass):
     LOAD_CONTENT = False
 
 
-class LevelMapping(PlistLoaderMixin,DictClass):
+class LevelMapping(PlistLoaderMixin,DictClass[int,Level]):
     DECODER = staticmethod(kv_wrap(int, Level.from_node))   
     ENCODER = staticmethod(kv_wrap(str, Level.to_node))  
     LOAD_CONTENT = False

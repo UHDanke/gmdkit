@@ -10,7 +10,7 @@ class Position(DataclassDecoderMixin):
     y: float = 0
     
 
-class PositionList(ArrayDecoderMixin,ListClass):
+class PositionList(ArrayDecoderMixin,ListClass[Position]):
     
     __slots__ = ()
     

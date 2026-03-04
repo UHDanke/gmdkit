@@ -11,7 +11,7 @@ from gmdkit.serialization.mixins import (
     DataclassDecoderMixin
     )
 
-class RemapChain(DelimiterMixin, ArrayDecoderMixin, ListClass):
+class RemapChain(DelimiterMixin, ArrayDecoderMixin, ListClass[int]):
     
     SEPARATOR = "_"
     END_DELIMITER = "_"

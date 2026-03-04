@@ -11,7 +11,7 @@ class Guideline(DataclassDecoderMixin):
     color: float = 0
 
 
-class GuidelineList(FileStringMixin,DelimiterMixin,ArrayDecoderMixin,ListClass):
+class GuidelineList(FileStringMixin,DelimiterMixin,ArrayDecoderMixin,ListClass[Guideline]):
     
     __slots__ = ()
     

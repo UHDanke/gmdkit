@@ -1,8 +1,9 @@
 # Imports
-from typing import Self, Optional
+from typing import Self, Optional, Any
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
+from gmdkit.utils.typing import NumKey
 from gmdkit.serialization.mixins import (
     DictDecoderMixin, 
     ArrayDecoderMixin,
@@ -17,7 +18,7 @@ from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 
 
-class Object(DelimiterMixin,DictDecoderMixin,DictClass):
+class Object(DelimiterMixin,DictDecoderMixin,DictClass[NumKey,Any]):
     
     SEPARATOR = ","
     END_DELIMITER = ";"
@@ -32,7 +33,7 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
         return cls.from_string(string)
     
     
-class ObjectList(ArrayDecoderMixin,ListClass):
+class ObjectList(ArrayDecoderMixin,ListClass[Object]):
     
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
@@ -87,7 +88,7 @@ class ObjectGroup(FileStringMixin):
         return self.string
 
 
-class ObjectGroupDict(FilePathMixin,PlistLoaderMixin,DictClass):
+class ObjectGroupDict(FilePathMixin,PlistLoaderMixin,DictClass[int,ObjectGroup]):
     DECODER = staticmethod(kv_wrap(int,ObjectGroup))
     ENCODER = staticmethod(kv_wrap(str,lambda x: write_plist(x.string)))
     EXTENSION = "plist"

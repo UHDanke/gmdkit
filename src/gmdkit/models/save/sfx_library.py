@@ -41,7 +41,7 @@ class SFXFile(DelimiterMixin,DataclassDecoderMixin):
 
 SFXFile.END_DELIMITER = ";"
 
-class SFXList(ArrayDecoderMixin, ListClass):
+class SFXList(ArrayDecoderMixin, ListClass[SFXFile]):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = SFXFile.from_string
@@ -55,7 +55,7 @@ class Credits(DelimiterMixin,DataclassDecoderMixin):
 
 Credits.END_DELIMITER = ";"
 
-class CreditList(ArrayDecoderMixin, ListClass):
+class CreditList(ArrayDecoderMixin, ListClass[Credits]):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Credits.from_string

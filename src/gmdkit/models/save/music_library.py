@@ -31,21 +31,21 @@ class Artist(DelimiterMixin, DataclassDecoderMixin):
 Artist.END_DELIMITER = ";"
 
 
-class ArtistList(DelimiterMixin, ArrayDecoderMixin, ListClass):
+class ArtistList(DelimiterMixin, ArrayDecoderMixin, ListClass[Artist]):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Artist.from_string
     ENCODER = Artist.to_string
 
 
-class SongTagList(DelimiterMixin, ArrayDecoderMixin, ListClass):
+class SongTagList(DelimiterMixin, ArrayDecoderMixin, ListClass[int]):
     START_DELIMITER = "."
     END_DELIMITER = "."
     SEPARATOR = "."
     DECODER = int
 
 
-class SongArtistList(ArrayDecoderMixin, ListClass):
+class SongArtistList(ArrayDecoderMixin, ListClass[int]):
     SEPARATOR = "."
     GROUP_SIZE = 1
     DECODER = int
@@ -84,7 +84,7 @@ class Song(DelimiterMixin, DataclassDecoderMixin):
 Song.END_DELIMITER = ";"
 
 
-class SongList(DelimiterMixin, ArrayDecoderMixin, ListClass):
+class SongList(DelimiterMixin, ArrayDecoderMixin, ListClass[Song]):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Song.from_string
@@ -99,7 +99,7 @@ class Tag(DelimiterMixin, DataclassDecoderMixin):
 Tag.END_DELIMITER = ";"
 
 
-class TagList(DelimiterMixin, ArrayDecoderMixin, ListClass):
+class TagList(DelimiterMixin, ArrayDecoderMixin, ListClass[Tag]):
     SEPARATOR = ";"
     KEEP_SEPARATOR = True
     DECODER = Tag.from_string

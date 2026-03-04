@@ -5,7 +5,7 @@ from gmdkit.serialization.functions import dataclass_decoder
 from gmdkit.utils.enums import GameEvents
 
 
-class IntList(ArrayDecoderMixin,ListClass):
+class IntList(ArrayDecoderMixin,ListClass[int]):
     
     __slots__ = ()
     
@@ -21,7 +21,7 @@ class IntPair(DataclassDecoderMixin):
     value: int = 0
     
 
-class IntPairList(ArrayDecoderMixin,ListClass):
+class IntPairList(ArrayDecoderMixin,ListClass[IntPair]):
     
     __slots__ = ()
     
@@ -36,7 +36,7 @@ class IntPairList(ArrayDecoderMixin,ListClass):
     def values(self):
         return self.unique_values(lambda x: [x.value])
     
-    def remap_keys(self, dictionary:dict):
+    def remap_keys(self, dictionary:dict[int,int]):
         if dictionary:
             for pair in self:
                 k = pair.key
@@ -49,12 +49,12 @@ class IDList(IntList):
     
     SEPARATOR = "."
     
-    def remap(self, key_value_map:dict):
+    def remap(self, key_value_map:dict[int,int]):
         kv_get = key_value_map.get
         self[:] = [kv_get(x,x) for x in self]
 
 
-class EventList(IntList):
+class EventList(IntList[GameEvents]):
     
     __slots__ = ()
     
@@ -68,7 +68,7 @@ class RemapList(IntPairList):
     __slots__ = ()
     
     @classmethod
-    def from_dict(cls, data:dict):
+    def from_dict(cls, data:dict[int,int]):
         
         result = cls()
         
@@ -78,7 +78,7 @@ class RemapList(IntPairList):
         return result
     
     
-    def to_dict(self):
+    def to_dict(self) -> dict[int,int]:
         
         result = {}
         

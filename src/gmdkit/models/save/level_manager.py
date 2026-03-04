@@ -1,3 +1,6 @@
+# Imports
+from typing import Any
+
 # Package Imports
 from gmdkit.utils.types import DictClass
 from gmdkit.serialization.mixins import (
@@ -15,7 +18,7 @@ from gmdkit.casting.level_save import LEVEL_SAVE_DECODER, LEVEL_SAVE_ENCODER
 ALLOW_KWARGS = {"LLM_01","LLM_03"}
 
 
-class LevelSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixin,DictClass):
+class LevelSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixin,DictClass[str,Any]):
     
     DECODER = staticmethod(dict_cast(LEVEL_SAVE_DECODER,default=read_plist,allow_kwargs=ALLOW_KWARGS))
     ENCODER = staticmethod(dict_cast(LEVEL_SAVE_ENCODER,default=write_plist,allow_kwargs=ALLOW_KWARGS))
@@ -25,7 +28,7 @@ class LevelSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixi
     EXTENSION = "dat"
     DEFAULT_PATH = LOCAL_LEVELS_PATH
     LOAD_CONTENT = False
-    SAVE_CONTENT = False
+    
     def _name_fallback_(self):
         return "CCLocalLevels"
     

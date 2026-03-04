@@ -82,7 +82,7 @@ class Color(DataclassDecoderMixin):
         return "#{:02X}{:02X}{:02X}".format(r, g, b)
 
 
-class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass):
+class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
 
     __slots__ = ()
     

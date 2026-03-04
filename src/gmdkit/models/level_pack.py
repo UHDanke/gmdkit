@@ -1,16 +1,15 @@
 # Imports
-from typing import TYPE_CHECKING, Self
+from typing import Any
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.utils.typing import PathString, Element
 from gmdkit.serialization.mixins import PlistDecoderMixin, FilePathMixin, FolderLoaderMixin
 from gmdkit.serialization.functions import dict_cast, from_node_dict, to_node_dict, read_plist, write_plist
 from gmdkit.casting.list_props import LIST_ENCODERS, LIST_DECODERS, LIST_NODES
 from gmdkit.mappings import list_prop
 
 
-class LevelPack(FilePathMixin,PlistDecoderMixin,DictClass):
+class LevelPack(FilePathMixin,PlistDecoderMixin,DictClass[str,Any]):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LIST_DECODERS,exclude=LIST_NODES),default=read_plist))
     ENCODER = staticmethod(dict_cast(to_node_dict(LIST_ENCODERS,exclude=LIST_NODES),default=write_plist))
@@ -21,22 +20,9 @@ class LevelPack(FilePathMixin,PlistDecoderMixin,DictClass):
         container = self.CONTAINER
         data = self if container is None else getattr(self, container)
         return data[list_prop.NAME]
-    
-    if TYPE_CHECKING:
-        @classmethod
-        def from_file(cls, path:PathString, load_data:bool=True, **kwargs) -> Self: ...
-    
-        def to_file(cls, path:PathString, save_data:bool=True, **kwargs): ...
-
-        
-def pack_from_file(path:PathString, load_pack_data:bool=True, **kwargs) -> LevelPack:
-    return LevelPack.from_file(load_data=load_pack_data)
-
-def pack_to_file(pack:LevelPack,path:PathString, save_pack_data:bool=True, **kwargs) -> Element:
-    return pack.to_file(path=path,save_data=save_pack_data)
 
 
-class LevelPackList(FolderLoaderMixin,PlistDecoderMixin,ListClass):
+class LevelPackList(FolderLoaderMixin,PlistDecoderMixin,ListClass[LevelPack]):
     
     __slots__ = ()
     
@@ -45,21 +31,6 @@ class LevelPackList(FolderLoaderMixin,PlistDecoderMixin,ListClass):
     IS_ARRAY = True
     EXTENSION = "plist"
     
-    FOLDER_DECODER = staticmethod(pack_from_file)
-    FOLDER_ENCODER = staticmethod(pack_to_file)
+    FOLDER_DECODER = LevelPack.from_file
+    FOLDER_ENCODER = LevelPack.to_file
     FOLDER_EXTENSION = "gmdl"
-    
-
-    if TYPE_CHECKING:
-        @classmethod
-        def from_file(cls, path:PathString, load_pack_data:bool=True, **kwargs) -> Self: ...
-        
-        def to_file(self, path:PathString, save_pack_data:bool=True, **kwargs): ...
-
-
-        @classmethod
-        def from_folder(cls, path:PathString, load_pack_data:bool=True, **kwargs) -> Self: ...
-        
-        def to_folder(self, path:PathString, save_pack_data:bool=True, **kwargs): ...
-        
-    
