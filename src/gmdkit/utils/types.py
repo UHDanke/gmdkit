@@ -7,7 +7,7 @@ from collections.abc import Iterable, Callable
 from enum import IntEnum
 
 
-class ListClass(list):
+class ListClass(list[Any]):
     
     def __init__(self, *args):
         super().__init__(*args)
@@ -283,7 +283,7 @@ class ListClass(list):
         return result if result is not None else set()
 
         
-class DictClass(dict):
+class DictClass(dict[Any,Any]):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
