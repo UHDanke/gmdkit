@@ -1,6 +1,6 @@
 # Imports
 from typing import Callable, Literal, Optional, Any, get_type_hints
-from functools import partial
+from functools import partial, lru_cache
 from inspect import signature
 import numpy as np
 from dataclasses import field, fields, dataclass, MISSING
@@ -21,6 +21,18 @@ from gmdkit.utils.typing import (
     PathString,
     Element
     )
+
+
+def get_cls(self):
+    return type(self)
+
+@lru_cache(maxsize=1024)
+def get_fields(cls):
+    return fields(cls)
+
+@lru_cache(maxsize=1024)
+def get_field_names(cls):
+    return {f.name for f in fields(cls)}
 
 
 def xor(data: bytes, key: bytes) -> bytes:
@@ -318,7 +330,8 @@ def dataclass_decoder(
         encoders = {}
         has_kwargs = set()
         
-        for i, f in enumerate(fields(cls),start=1):
+        fields = get_fields(cls)
+        for i, f in enumerate(fields,start=1):
             meta = f.metadata
             name = f.name
             key = meta.get("key") 

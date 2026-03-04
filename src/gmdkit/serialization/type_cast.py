@@ -3,7 +3,7 @@ from typing import Any, Optional, Callable
 from operator import attrgetter
 import base64
 from enum import Enum, IntEnum
-
+from functools import lru_cache
 # Package Imports
 from gmdkit.utils.typing import NumKey
 
@@ -20,7 +20,7 @@ def from_float(obj:float) -> str:
     return str(int(obj)) if obj.is_integer() else str(obj)
 
 def to_numkey(key:str) -> NumKey:
-    if key[0] == 'k':
+    if key.startswith("k"):
         return key
     return int(key)
 
@@ -80,19 +80,60 @@ def dict_cast(
     f_get = functions.get
     has_kwargs: set = allow_kwargs or set()
     has_default: bool = callable(default)
-    kc_start: bool = callable(key_start)
-    kc_end: bool = callable(key_end)
-
-    def cast_func(key: Any, value: Any) -> tuple:
-        if kc_start:
-            key = key_start(key)  # type: ignore[misc]
-        func = f_get(key)
-        if func is not None:
-            value = func(value) if not has_kwargs else func(value, **{})
-        elif has_default:
-            value = default(value)  # type: ignore[misc]
-        if kc_end:
-            key = key_end(key)  # type: ignore[misc]
-        return key, value
+    use_start: bool = callable(key_start)
+    use_end: bool = callable(key_end)
+    
+    if use_start and use_end:
+        if has_kwargs:
+            def cast_func(key: Any, value: Any, **kwargs):
+                key = key_start(key)
+                func = f_get(key)
+                value = func(value, **kwargs) if func else (default(value) if has_default else value)
+                key = key_end(key)
+                return key, value
+        else:
+            def cast_func(key: Any, value: Any, **kwargs):
+                key = key_start(key)
+                func = f_get(key)
+                value = func(value) if func else (default(value) if has_default else value)
+                key = key_end(key)
+                return key, value
+    elif use_start:
+        if has_kwargs:
+            def cast_func(key: Any, value: Any, **kwargs):
+                key = key_start(key)
+                func = f_get(key)
+                value = func(value, **kwargs) if func else (default(value) if has_default else value)
+                return key, value
+        else:
+            def cast_func(key: Any, value: Any, **kwargs):
+                key = key_start(key)
+                func = f_get(key)
+                value = func(value) if func else (default(value) if has_default else value)
+                return key, value
+    elif use_end:
+        if has_kwargs:
+            def cast_func(key: Any, value: Any, **kwargs):
+                func = f_get(key)
+                value = func(value, **kwargs) if func else (default(value) if has_default else value)
+                key = key_end(key)
+                return key, value
+        else:
+            def cast_func(key: Any, value: Any, **kwargs):
+                func = f_get(key)
+                value = func(value) if func else (default(value) if has_default else value)
+                key = key_end(key)
+                return key, value
+    else:
+        if has_kwargs:
+            def cast_func(key: Any, value: Any, **kwargs):
+                func = f_get(key)
+                value = func(value, **kwargs) if func else (default(value) if has_default else value)
+                return key, value
+        else:
+            def cast_func(key: Any, value: Any, **kwargs):
+                func = f_get(key)
+                value = func(value) if func else (default(value) if has_default else value)
+                return key, value
 
     return cast_func

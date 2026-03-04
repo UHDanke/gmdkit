@@ -24,12 +24,11 @@ class Object(DelimiterMixin,DictDecoderMixin,DictClass):
     END_DELIMITER = ";"
     DECODER = staticmethod(dict_cast(PROPERTY_DECODERS,key_start=to_numkey))
     ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,key_end=str,default=serialize))
-    DEFAULTS = OBJECT_DEFAULT
-
+    
     @classmethod
     def default(cls, object_id:int) -> Self:
                 
-        string = cls.DEFAULTS.get(object_id, f"1,{object_id},2,0,3,0;")
+        string = OBJECT_DEFAULT.get(object_id, f"1,{object_id},2,0,3,0;")
         
         return cls.from_string(string)
     
@@ -60,7 +59,7 @@ class ObjectGroup(FileStringMixin):
     
     
     def save(self, objects:Optional[ObjectList]=None) -> str:
-        objects = getattr(self, "objects", None) if objects is not None else objects
+        objects = getattr(self, "objects", None) if objects is None else objects
     
         if objects is None:
             return self.string

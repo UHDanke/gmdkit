@@ -8,8 +8,6 @@ from typing import (
     Callable, Sequence,
     )
 
-import glob
-
 # Package Imports
 from gmdkit.serialization.type_cast import (
     serialize, dict_serializer
@@ -24,7 +22,8 @@ from gmdkit.utils.typing import (
 from gmdkit.serialization.functions import (
     decompress_string, compress_string,
     read_plist, write_plist,
-    validate_dict_node, get_plist_root
+    validate_dict_node, get_plist_root,
+    get_fields, get_field_names
 )
 
 
@@ -87,16 +86,14 @@ class PlistDecoderMixin(FileStringMixin):
     def load_data(
             self,
             node:ET.Element, 
-            is_array:Optional[bool]=None,
-            encoder_key:Optional[int]=None,
             decoder:Optional[PlistEncoder]=None,
             container:Optional[int]=None,
             **kwargs
             ):
         
         cls = type(self)
-        is_array = cls.IS_ARRAY if is_array is None else is_array
-        encoder_key = cls.ENCODER_KEY if encoder_key is None else encoder_key
+        is_array = cls.IS_ARRAY
+        encoder_key = cls.ENCODER_KEY
         decoder = cls.DECODER if decoder is None else decoder
         container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
@@ -109,8 +106,8 @@ class PlistDecoderMixin(FileStringMixin):
         data.clear()
         
         start = 2 if is_array or encoder_key is not None else 0
-        index_range = range(start, len(node), 2)
-    
+        length = len(node)
+        index_range = range(start, length, 2)
         use_kwargs = bool(kwargs)
     
         if decoder:
@@ -143,15 +140,13 @@ class PlistDecoderMixin(FileStringMixin):
     
     def save_data(
             self,
-            is_array:Optional[bool]=None,
-            encoder_key:Optional[int]=None,
             encoder:Optional=None,
             container:Optional[int]=None,
             **kwargs):
         
         cls = type(self)
-        is_array = cls.IS_ARRAY if is_array is None else is_array
-        encoder_key = cls.ENCODER_KEY if encoder_key is None else encoder_key
+        is_array = cls.IS_ARRAY
+        encoder_key = cls.ENCODER_KEY
         encoder = cls.ENCODER if encoder is None else encoder
         container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
@@ -162,19 +157,21 @@ class PlistDecoderMixin(FileStringMixin):
             ET.SubElement(node, 'k').text = '_isArr'
             ET.SubElement(node, 't')
             items = enumerate(data, start=1)
-            if encoder:
-                def write(k, v): return f'k_{k}', encoder(v, **kwargs)
-            else:
-                def write(k, v): return f'k_{k}', write_plist(v)
+            write = (
+                (lambda k, v: (f'k_{k}', encoder(v, **kwargs)))
+                if encoder else
+                (lambda k, v: (f'k_{k}', write_plist(v)))
+            )
         else:
             if encoder_key is not None:
                 ET.SubElement(node, 'k').text = 'kCEK'
                 ET.SubElement(node, 'i').text = str(encoder_key)
             items = data.items()
-            if encoder:
-                def write(k, v): return encoder(k, v, **kwargs)
-            else:
-                def write(k, v): return k, write_plist(v)
+            write = (
+                (lambda k, v: encoder(k, v, **kwargs))
+                if encoder else
+                (lambda k, v: (k, write_plist(v)))
+            )
     
         sub = ET.SubElement
         append = node.append
@@ -300,17 +297,15 @@ class DataclassDecoderMixin:
     def from_tokens(
             cls,
             tokens:Sequence[str],
-            from_array:Optional[bool]=None, 
             decoder:Optional[StringDictDecoder]=None,
-            decoder_kwargs:bool=False,
             **kwargs
             ) -> Self:
         
-        from_array = cls.FROM_ARRAY if from_array is None else from_array
+        from_array = cls.FROM_ARRAY
         decoder = cls.DECODER if decoder is None else decoder
         
         class_args = {}
-        f = fields(cls)
+        f = get_fields(cls)
         f_len = len(f) * (1 if from_array else 2)
         length = len(tokens)
         
@@ -319,7 +314,7 @@ class DataclassDecoderMixin:
                 f"[{cls.__name__}] expected at most {f_len} tokens, got {length}"
                 )
         
-        if from_array:            
+        if from_array:
             for field, token in zip(f, tokens):
                 try:
                     key, value = decoder(field.name, token)
@@ -329,6 +324,8 @@ class DataclassDecoderMixin:
                         ) from e
                 class_args[key] = value
         else:
+            n = get_field_names(cls)
+            
             if length % 2 != 0:
                 raise ValueError(
                     f"[{cls.__name__}] expected an even number of key-value tokens, got {length}"
@@ -342,33 +339,29 @@ class DataclassDecoderMixin:
                     value = encoded_value
                 else:
                     try:
-                        if decoder_kwargs:
-                            key, value = decoder(encoded_key, encoded_value, **kwargs)
-                        else:
-                            key, value = decoder(encoded_key, encoded_value)
+                        key, value = decoder(encoded_key, encoded_value)
                     except Exception as e:
                         raise ValueError(
                             f"[{cls.__name__}] failed to decode key / value pair {1+i//2}"
                             ) from e
-                        
-                if hasattr(cls, key):
+                
+                if key in n:
                     class_args[key] = value
                 else:
                     raise ValueError(
                         f"[{cls.__name__}] got unexpected field '{key}'"
                         )
         return cls(**class_args)
-        
+    
     
     def to_tokens(
             self,
-            from_array:Optional[bool]=None,
             condition:Optional[Callable]=None,
             encoder:Optional[StringDictEncoder]=None
             ) -> Sequence[str]:
         
         cls = type(self)
-        from_array = cls.FROM_ARRAY if from_array is None else from_array
+        from_array = cls.FROM_ARRAY
         condition = cls.CONDITION if condition is None else condition
         encoder = cls.ENCODER if encoder is None else encoder
         
@@ -380,12 +373,14 @@ class DataclassDecoderMixin:
         )
         
         skip_fields = set()
-        if condition is not None:
+        if condition is not None and from_array:
             for key, value in reversed(field_data):
                 if condition(key, value):
                     skip_fields.add(key)
-                elif from_array:
+                else:
                     break
+        elif condition is not None:
+            skip_fields = {k for k, v in field_data if condition(k, v)}
                     
         for key, value in field_data:
             
@@ -414,14 +409,12 @@ class DataclassDecoderMixin:
     @classmethod
     def from_string(
             cls, 
-            string:str, 
-            separator:Optional[str]=None,
-            max_split:Optional[int]=None,
+            string:str,
             **kwargs
             ) -> Self:
         
-        separator = cls.SEPARATOR if separator is None else separator
-        max_split = cls.MAX_SPLIT if max_split is None else max_split
+        separator = cls.SEPARATOR
+        max_split = cls.MAX_SPLIT
         
         if not string:
             return cls()
@@ -435,12 +428,11 @@ class DataclassDecoderMixin:
             
         
     def to_string(
-            self, 
-            separator:Optional[str]=None, 
+            self,
             **kwargs
             ) -> str:
         
-        separator = type(self).SEPARATOR if separator is None else separator
+        separator = type(self).SEPARATOR
         
         parts = self.to_tokens(**kwargs)
         
@@ -524,12 +516,11 @@ class DictDecoderMixin:
     @classmethod
     def from_string(
             cls, 
-            string:str, 
-            separator:Optional[str]=None, 
+            string:str,
             **kwargs,
             ) -> Self:
         
-        separator = cls.SEPARATOR if separator is None else separator
+        separator = cls.SEPARATOR
         
         if string == "":
             return cls()
@@ -540,11 +531,10 @@ class DictDecoderMixin:
     
     
     def to_string(
-            self, 
-            separator:Optional[str]=None, 
+            self,
             **kwargs
             ) -> str:
-        separator = type(self).SEPARATOR if separator is None else separator
+        separator = type(self).SEPARATOR
         
         parts = self.to_tokens(**kwargs)
         return separator.join(parts)
@@ -564,25 +554,27 @@ class ArrayDecoderMixin:
             cls, 
             tokens:Sequence[str],
             decoder:Optional[StringDecoder]=None,
-            group_size:Optional[int]=None,
             container:Optional[str]=None
             ) -> Self:
         
         decoder = cls.DECODER if decoder is None else decoder
-        group_size = cls.GROUP_SIZE if group_size is None else group_size
         container = cls.CONTAINER if container is None else container
+        group_size = cls.GROUP_SIZE
         
         result = cls()
         data = result if container is None else getattr(result, container)
-        
+        append = data.append
+        extend = data.extend
         try:
             if group_size > 1:
+                if len(tokens) % group_size != 0:
+                    raise ValueError("token count not divisible by group size")
                 for i in range(0, len(tokens), group_size):
-                    data.append(decoder(tokens[i:i + group_size]) if decoder else tokens[i:i + group_size])
+                    append(decoder(tokens[i:i + group_size]) if decoder else tokens[i:i + group_size])
             elif decoder:
-                data.extend(decoder(token) for token in tokens)
+                extend(decoder(token) for token in tokens)
             else:
-                data.extend(tokens)
+                extend(tokens)
         except Exception as e:
             raise ValueError(f"[{cls.__name__}] failed to decode") from e
                 
@@ -592,19 +584,18 @@ class ArrayDecoderMixin:
     def to_tokens(
             self,
             encoder:Optional[StringEncoder]=None,
-            group_size:Optional[int]=None,
             container:Optional[str]=None
             ) -> Sequence[str]:
         
         cls = type(self)
         encoder = cls.ENCODER if encoder is None else encoder
-        group_size = cls.GROUP_SIZE if group_size is None else group_size
         container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
+        group_size = cls.GROUP_SIZE
         
-        tokens = []
         try:
             if group_size > 1:
+                tokens = []
                 for x in data:
                     group = encoder(x) if encoder else x
                     if len(group) != group_size:
@@ -612,28 +603,25 @@ class ArrayDecoderMixin:
                             f"[{type(self).__name__}] expected {group_size} tokens from encoder, got {len(group)}"
                             )
                     tokens.extend(group)
+                return tokens
             elif encoder:
-                tokens.extend(encoder(x) for x in data)
+                return [encoder(x) for x in data]
             else:
-                tokens.extend(data)
+                return list(data)
                 
         except Exception as e:
             raise ValueError(f"[{type(self).__name__}] failed to encode") from e
-        
-        return tokens
     
     
     @classmethod
     def from_string(
             cls, 
-            string:str, 
-            separator:Optional[str]=None,
-            keep_separator:Optional[bool]=None,
+            string:str,
             **kwargs
             ) -> Self:
         
-        separator = cls.SEPARATOR if separator is None else separator
-        keep_separator = cls.KEEP_SEPARATOR if keep_separator is None else keep_separator
+        separator = cls.SEPARATOR
+        keep_separator = cls.KEEP_SEPARATOR
         
         result = cls()
         
@@ -653,15 +641,11 @@ class ArrayDecoderMixin:
     
     def to_string(
             self, 
-            separator:Optional[str]=None,
-            keep_separator:Optional[bool]=None,
             **kwargs
             ) -> str:
         
         cls = type(self)
-        separator = cls.SEPARATOR if separator is None else separator        
-        keep_separator = cls.KEEP_SEPARATOR if keep_separator is None else keep_separator
-        separator = '' if keep_separator else separator
+        separator = '' if cls.KEEP_SEPARATOR else cls.SEPARATOR
         
         tokens = self.to_tokens(**kwargs)
         
@@ -677,15 +661,12 @@ class DelimiterMixin:
     def from_string(
             cls,
             string:str,
-            *args,
-            start_delimiter:Optional[str]=None,
-            end_delimiter:Optional[str]=None,
             **kwargs
             ) -> Self:
         
         if string:        
-            start_delimiter = cls.START_DELIMITER if start_delimiter is None else start_delimiter
-            end_delimiter = cls.END_DELIMITER if end_delimiter is None else end_delimiter
+            start_delimiter = cls.START_DELIMITER
+            end_delimiter = cls.END_DELIMITER
             
             if start_delimiter: 
                 string = string.removeprefix(start_delimiter)
@@ -693,29 +674,31 @@ class DelimiterMixin:
             if end_delimiter: 
                 string = string.removesuffix(end_delimiter)
         
-        return super().from_string(string, *args, **kwargs)
+        return super().from_string(string, **kwargs)
     
     
     def to_string(
             self,
-            *args,
-            start_delimiter:Optional[str]=None,
-            end_delimiter:Optional[str]=None,
             **kwargs
             ) -> str:
         
-        cls = type(self)
-        start_delimiter = cls.START_DELIMITER if start_delimiter is None else start_delimiter
-        end_delimiter = cls.END_DELIMITER if end_delimiter is None else end_delimiter
+        string = super().to_string(**kwargs)
         
-        string = super().to_string(*args, **kwargs)
-        
-        if string:
-            if start_delimiter: string = start_delimiter + string
-            if end_delimiter: string = string + end_delimiter
-        
-        return string
+        if not string:
+            return string
 
+        cls = type(self)
+        start_delim = cls.START_DELIMITER
+        end_delim = cls.END_DELIMITER
+
+        if start_delim and end_delim:
+            string = f"{start_delim}{string}{end_delim}"
+        elif start_delim:
+            string = f"{start_delim}{string}"
+        elif end_delim:
+            string = f"{string}{end_delim}"
+
+        return string
 
 class CompressFileMixin:
     
@@ -729,14 +712,12 @@ class CompressFileMixin:
             cls,
             string:str,
             compressed:Optional[bool]=None,
-            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
-            cypher:Optional[bytes]=None,
             **kwargs
             ) -> Self:
         
         compressed = cls.COMPRESSED if compressed is None else compressed
-        compression = cls.COMPRESSION if compression is None else compression
-        cypher = cls.CYPHER if cypher is None else cypher
+        compression = cls.COMPRESSION
+        cypher = cls.CYPHER
         
         if compressed:
             string = decompress_string(string, compression=compression, xor_key=cypher)
@@ -747,16 +728,14 @@ class CompressFileMixin:
     def to_string(
             self,
             compressed:Optional[bool]=None,
-            compression:Optional[Literal['zlib', 'gzip', 'deflate']]=None,
-            cypher:Optional[bytes]=None,
             compression_level:Optional[int]=None,
             **kwargs
             ) -> str:
         
         cls = type(self)
         compressed = cls.COMPRESSED if compressed is None else compressed
-        compression = cls.COMPRESSION if compression is None else compression
-        cypher = cls.CYPHER if cypher is None else cypher
+        compression = cls.COMPRESSION
+        cypher = cls.CYPHER
         
         string = super().to_string(**kwargs)
         
@@ -880,7 +859,7 @@ class FolderLoaderMixin:
             container:Optional[str]=None,
             **kwargs
             ):
-        
+        # TODO RAISE
         extension = cls.FOLDER_EXTENSION if extension is None else extension
         decoder = cls.FOLDER_DECODER if decoder is None else decoder
         container = cls.CONTAINER if container is None else container
@@ -888,9 +867,7 @@ class FolderLoaderMixin:
         new = cls()
         data = new if container is None else getattr(new, container)
         
-        folder_path = str(Path(path) / ('*.' + extension))
-        
-        for file_path in glob.glob(folder_path):
+        for file_path in Path(path).glob(f'*.{extension}'):
             item = decoder(file_path, **kwargs)
             data.append(item)
         
