@@ -22,7 +22,7 @@ k20,PRACTICE_MODE_BEST,int,,,
 k21,TYPE,int,level type,,
 k22,LIKE_RATING,int,,,
 k23,LENGTH_TYPE,int,length,,
-k24,M_24,int,,,
+k24,DISLIKES,int,,,unused
 k25,IS_DEMON,bool,,,
 k26,STARS,int,,,
 k27,FEATURE_SCORE,int,,,

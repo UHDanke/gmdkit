@@ -85,7 +85,7 @@ id,alias,type,format,comment
 45,trigger.pulse.FADE_IN,float,seconds,pulse fade in duration
 46,trigger.pulse.HOLD,float,seconds,pulse hold duration
 47,trigger.pulse.FADE_OUT,float,seconds,pulse fade out duration
-48,trigger.pulse.USE_HSV,bool,,color / hsv selector
+48,trigger.pulse.COLOR_TYPE,int,pulse color type,color / hsv selector
 49,trigger.pulse.HSV,string,hsv,color HSV options
 49,trigger.color.HSV,string,hsv,
 49,trigger.effect.HSV,string,hsv,
@@ -662,10 +662,10 @@ id,alias,type,format,comment
 326,trigger.edit_adv_follow.M_326,float,#N/A,
 327,trigger.adv_follow.BREAK_FORCE_RAND,float,,
 327,trigger.edit_adv_follow.M_327,float,#N/A,
-328,trigger.adv_follow.BREAK_ANGLE,int,,
-328,trigger.edit_adv_follow.M_328,int,#N/A,
-329,trigger.adv_follow.BREAK_ANGLE_RAND,int,,
-329,trigger.edit_adv_follow.M_329,int,#N/A,
+328,trigger.adv_follow.BREAK_ANGLE,float,,
+328,trigger.edit_adv_follow.M_328,float,#N/A,
+329,trigger.adv_follow.BREAK_ANGLE_RAND,float,,
+329,trigger.edit_adv_follow.M_329,float,#N/A,
 330,trigger.adv_follow.BREAK_STEER,float,,
 330,trigger.edit_adv_follow.M_330,float,#N/A,
 331,trigger.adv_follow.BREAK_STEER_RAND,float,,
@@ -830,7 +830,7 @@ id,alias,type,format,comment
 436,trigger.sequence.MODE,int,sequence mode,
 437,trigger.sequence.MIN_INTERVAL,float,seconds,
 438,trigger.sequence.RESET_TIME,float,seconds,
-439,trigger.sequence.RESET_TYPE,bool,,
+439,trigger.sequence.RESET_TYPE,int,sequence reset,
 440,trigger.collectible.PARTICLE,int,,
 441,trigger.spawn.ORDERED,bool,,
 442,trigger.spawn.REMAPS,string,group remaps,
@@ -866,7 +866,7 @@ id,alias,type,format,comment
 469,trigger.time.IGNORE_TIMEWARP,bool,,
 470,trigger.time.MOD,float,,
 471,trigger.time.START_PAUSED,bool,,
-472,trigger.time_control.STOP,bool,,
+472,trigger.time_control.STOP,int,time control stop,
 473,trigger.time.STOP_TIME,float,,
 473,trigger.time_event.TARGET_TIME,float,,
 474,trigger.time.STOP,bool,,
@@ -1065,7 +1065,7 @@ kA15,level.SONG_FADE_IN,bool,,
 kA16,level.SONG_FADE_OUT,bool,,
 kA17,level.GROUND_LINE,int,,
 kA18,level.FONT,int,,
-kA19,start_pos.TARGET_ORDER,bool,,
+kA19,start_pos.TARGET_ORDER,int,,
 kA20,level.REVERSE_MODE,bool,,
 kA20,start_pos.REVERSE_MODE,bool,,
 kA21,start_pos.DISABLE,bool,,
