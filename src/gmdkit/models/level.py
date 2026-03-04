@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.serialization.mixins import PlistDecoderMixin, FilePathMixin, LoadPlistContentMixin, FolderLoaderMixin
+from gmdkit.serialization.mixins import FilePathMixin, PlistLoaderMixin, FolderLoaderMixin
 from gmdkit.serialization.functions import (
     dict_cast, from_node_dict, to_node_dict, read_plist, write_plist, get_load_keys, kv_wrap, args_wrap
     )
@@ -10,7 +10,7 @@ from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
 
 
-class Level(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
+class Level(FilePathMixin,PlistLoaderMixin,DictClass):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LEVEL_DECODERS),default=read_plist))
     ENCODER = staticmethod(dict_cast(to_node_dict(LEVEL_ENCODERS),default=write_plist))
@@ -58,7 +58,7 @@ class Level(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
         return new
    
     
-class LevelList(LoadPlistContentMixin,FolderLoaderMixin,FilePathMixin,PlistDecoderMixin,ListClass):
+class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass):
     
     __slots__ = ()
     
@@ -69,12 +69,12 @@ class LevelList(LoadPlistContentMixin,FolderLoaderMixin,FilePathMixin,PlistDecod
     
     FOLDER_DECODER = staticmethod(args_wrap(Level.from_file,1))
     FOLDER_ENCODER = staticmethod(args_wrap(Level.to_file,2))
-    FOLDER_EXTENSION = "gmd"
+    FOLDER_EXTENSION = Level.EXTENSION
     
     LOAD_CONTENT = False
 
 
-class LevelMapping(LoadPlistContentMixin,PlistDecoderMixin,DictClass):
+class LevelMapping(PlistLoaderMixin,DictClass):
     DECODER = staticmethod(kv_wrap(int, Level.from_node))   
     ENCODER = staticmethod(kv_wrap(str, Level.to_node))  
     LOAD_CONTENT = False

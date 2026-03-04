@@ -48,7 +48,7 @@ class FileStringMixin:
             file.write(string)
 
 
-class DefaultPathMixin:
+class DefaultPathMixin(FileStringMixin):
     
     DEFAULT_PATH: Optional[PathString] = None
     
@@ -749,7 +749,7 @@ class CompressFileMixin:
         return string
     
 
-class FilePathMixin:
+class FilePathMixin(FileStringMixin):
     
     EXTENSION: Optional[str] = None
     
@@ -810,7 +810,7 @@ class FilePathMixin:
         super().to_file(path=path,**kwargs)
         
 
-class LoadPlistContentMixin:
+class PlistLoaderMixin(PlistDecoderMixin):
     
     SELECTORS: Optional[set] = None
     LOAD_CONTENT: bool = True
@@ -859,10 +859,13 @@ class FolderLoaderMixin:
             container:Optional[str]=None,
             **kwargs
             ):
-        # TODO RAISE
+        
         extension = cls.FOLDER_EXTENSION if extension is None else extension
         decoder = cls.FOLDER_DECODER if decoder is None else decoder
         container = cls.CONTAINER if container is None else container
+        
+        if extension is None:
+            raise ValueError("extension is None")
         
         new = cls()
         data = new if container is None else getattr(new, container)

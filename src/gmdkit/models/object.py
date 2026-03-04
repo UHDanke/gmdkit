@@ -6,11 +6,10 @@ from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.serialization.mixins import (
     DictDecoderMixin, 
     ArrayDecoderMixin,
-    PlistDecoderMixin,
     FilePathMixin,
     DelimiterMixin,
     FileStringMixin,
-    LoadPlistContentMixin
+    PlistLoaderMixin
     )
 from gmdkit.serialization.type_cast import serialize, to_numkey
 from gmdkit.serialization.functions import dict_cast, write_plist, kv_wrap
@@ -88,7 +87,7 @@ class ObjectGroup(FileStringMixin):
         return self.string
 
 
-class ObjectGroupDict(LoadPlistContentMixin,FilePathMixin,PlistDecoderMixin,DictClass):
+class ObjectGroupDict(FilePathMixin,PlistLoaderMixin,DictClass):
     DECODER = staticmethod(kv_wrap(int,ObjectGroup))
     ENCODER = staticmethod(kv_wrap(str,lambda x: write_plist(x.string)))
     EXTENSION = "plist"
