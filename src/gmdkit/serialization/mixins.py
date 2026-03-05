@@ -22,7 +22,7 @@ from gmdkit.serialization.functions import (
     decompress_string, compress_string,
     read_plist, write_plist,
     validate_dict_node, get_plist_root,
-    get_fields, get_field_names
+    get_fields, get_field_names, get_field_names_ordered
 )
 
 
@@ -324,7 +324,7 @@ class DataclassDecoderMixin:
                         key, value = decoder(field.name, token)
                     except Exception as e:
                         raise ValueError(
-                            f"[{cls.__name__}] failed to decode field '{field.name}'"
+                            f"[{cls.__name__}] failed to decode field '{field.name}' {tokens}"
                         ) from e
                     class_args[key] = value
         else:
@@ -366,8 +366,7 @@ class DataclassDecoderMixin:
         condition = cls.CONDITION if condition is None else condition
         encoder = cls.ENCODER if encoder is None else encoder
         
-        field_names = get_field_names(cls)
-        field_data = [(key, getattr(self, key)) for key in field_names]
+        field_data = [(key, getattr(self, key)) for key in get_field_names_ordered(cls)]
         
         if condition is not None:
             if from_array:
@@ -380,7 +379,7 @@ class DataclassDecoderMixin:
                 field_data = field_data[:end]
             else:
                 field_data = [(k, v) for k, v in field_data if not condition(k, v)]
-        
+                
         parts = []
         if encoder is None:
             for key, value in field_data:
@@ -458,7 +457,9 @@ class DictDecoderMixin:
         it = iter(tokens)
         if decoder:
             try:
-                data.update({dk: dv for k, v in zip(it, it) for dk, dv in (decoder(k, v),)})
+                for k, v in zip(it, it):
+                    dk, dv = decoder(k, v)
+                    data[dk] = dv
             except Exception as e:
                 raise ValueError(f"[{cls.__name__}] failed to decode") from e
         else:

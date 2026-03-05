@@ -31,9 +31,12 @@ def get_fields(cls):
     return fields(cls)
 
 @lru_cache(maxsize=1024)
-def get_field_names(cls):
+def get_field_names(cls) -> set[str]:
     return {f.name for f in fields(cls)}
 
+@lru_cache(maxsize=1024)
+def get_field_names_ordered(cls) -> tuple[str, ...]:
+    return tuple(f.name for f in fields(cls))
 
 def xor(data: bytes, key: bytes) -> bytes:
     d = np.frombuffer(data, dtype=np.uint8)
