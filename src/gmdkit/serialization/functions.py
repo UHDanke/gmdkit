@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Literal, Optional, Any, get_type_hints
+from typing import Callable, Literal, Optional, Any, get_type_hints, TypeVar, overload
 from functools import partial, lru_cache
 from inspect import signature
 import numpy as np
@@ -297,6 +297,40 @@ def encoder_from_type(type_hint:Any):
         return lambda x: str(x.value)
     
     raise ValueError(f"unsupported type hint: {type_hint}")
+
+
+_T = TypeVar("_T")
+
+@overload
+def dataclass_decoder(
+    cls: type[_T],
+    *,
+    decoder: Optional[StringDictDecoder] = ...,
+    encoder: Optional[StringDictEncoder] = ...,
+    condition: Optional[Callable] = ...,
+    separator: Optional[str] = ...,
+    from_array: Optional[bool] = ...,
+    auto_key: Optional[Callable] = ...,
+    default_optional: bool = ...,
+    default_kwargs: bool = ...,
+    **kwargs,
+) -> type[_T]: ...
+
+
+@overload
+def dataclass_decoder(
+    cls: None = None,
+    *,
+    decoder: Optional[StringDictDecoder] = ...,
+    encoder: Optional[StringDictEncoder] = ...,
+    condition: Optional[Callable] = ...,
+    separator: Optional[str] = ...,
+    from_array: Optional[bool] = ...,
+    auto_key: Optional[Callable] = ...,
+    default_optional: bool = ...,
+    default_kwargs: bool = ...,
+    **kwargs,
+) -> Callable[[type[_T]], type[_T]]: ...
 
 
 def dataclass_decoder(

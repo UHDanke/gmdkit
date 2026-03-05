@@ -1,6 +1,5 @@
 # Imports
 from pathlib import Path
-from dataclasses import fields
 import xml.etree.ElementTree as ET
 from typing import (
     Any, Self, Literal, 
@@ -64,11 +63,11 @@ class DefaultPathMixin(FileStringMixin):
     
     
     def to_default_path(self, **kwargs):
-        
-        path = type(self).DEFAULT_PATH
+        cls = type(self)
+        path = cls.DEFAULT_PATH
         
         if path is None:
-            raise ValueError("[{type(self).__name__}]  default path does not exist")
+            raise ValueError("[{cls.__name__}]  default path does not exist")
             
         self.to_file(path, **kwargs)
             
@@ -101,7 +100,7 @@ class PlistDecoderMixin(FileStringMixin):
         try:
             validate_dict_node(node, is_array=is_array, encoder_key=encoder_key)
         except Exception as e:
-            raise RuntimeError(f"[{type(self).__name__}] failed to validate node") from e
+            raise RuntimeError(f"[{cls.__name__}] failed to validate node") from e
         
         data.clear()
         
@@ -303,54 +302,56 @@ class DataclassDecoderMixin:
         
         from_array = cls.FROM_ARRAY
         decoder = cls.DECODER if decoder is None else decoder
-        
-        class_args = {}
+                
         f = get_fields(cls)
-        f_len = len(f) * (1 if from_array else 2)
         length = len(tokens)
-        
+        f_len = len(f) if from_array else len(f) * 2
+
         if length > f_len:
             raise ValueError(
                 f"[{cls.__name__}] expected at most {f_len} tokens, got {length}"
-                )
+            )
         
+        class_args = {}
+    
         if from_array:
-            for field, token in zip(f, tokens):
-                try:
-                    key, value = decoder(field.name, token)
-                except Exception as e:
-                    raise ValueError(
-                        f"[{cls.__name__}] failed to decode field '{field.name}'"
+            if decoder is None:
+                class_args = {field.name: token for field, token in zip(f, tokens)}
+            else:
+                class_args = {}
+                for field, token in zip(f, tokens):
+                    try:
+                        key, value = decoder(field.name, token)
+                    except Exception as e:
+                        raise ValueError(
+                            f"[{cls.__name__}] failed to decode field '{field.name}'"
                         ) from e
-                class_args[key] = value
+                    class_args[key] = value
         else:
-            n = get_field_names(cls)
-            
             if length % 2 != 0:
                 raise ValueError(
                     f"[{cls.__name__}] expected an even number of key-value tokens, got {length}"
-                    )            
-                
-            for i in range(0, length, 2):
-                encoded_key, encoded_value = tokens[i], tokens[i + 1]
-                
-                if decoder is None:
-                    key = encoded_key
-                    value = encoded_value
-                else:
+                )
+            field_names = get_field_names(cls)
+            it = iter(tokens)
+    
+            if decoder is None:
+                for key, value in zip(it, it):              
+                    if key not in field_names:
+                        raise ValueError(f"[{cls.__name__}] got unexpected field '{key}'")
+                    class_args[key] = value
+            else:
+                for raw_key, raw_value in zip(it, it):
                     try:
-                        key, value = decoder(encoded_key, encoded_value)
+                        key, value = decoder(raw_key, raw_value)
                     except Exception as e:
                         raise ValueError(
-                            f"[{cls.__name__}] failed to decode key / value pair {1+i//2}"
-                            ) from e
-                
-                if key in n:
+                            f"[{cls.__name__}] failed to decode key '{raw_key}'"
+                        ) from e
+                    if key not in field_names:
+                        raise ValueError(f"[{cls.__name__}] got unexpected field '{key}'")
                     class_args[key] = value
-                else:
-                    raise ValueError(
-                        f"[{cls.__name__}] got unexpected field '{key}'"
-                        )
+    
         return cls(**class_args)
     
     
@@ -365,44 +366,39 @@ class DataclassDecoderMixin:
         condition = cls.CONDITION if condition is None else condition
         encoder = cls.ENCODER if encoder is None else encoder
         
-        parts = []
+        field_names = get_field_names(cls)
+        field_data = [(key, getattr(self, key)) for key in field_names]
         
-        field_data = tuple(
-            (field.name, getattr(self, field.name))
-            for field in fields(self)
-        )
-        
-        skip_fields = set()
-        if condition is not None and from_array:
-            for key, value in reversed(field_data):
-                if condition(key, value):
-                    skip_fields.add(key)
-                else:
-                    break
-        elif condition is not None:
-            skip_fields = {k for k, v in field_data if condition(k, v)}
-                    
-        for key, value in field_data:
-            
-            if skip_fields and key in skip_fields:
-                continue
-            
-            if encoder is None:
-                encoded_key = key
-                encoded_value = value
+        if condition is not None:
+            if from_array:
+                end = len(field_data)
+                for key, value in reversed(field_data):
+                    if condition(key, value):
+                        end -= 1
+                    else:
+                        break
+                field_data = field_data[:end]
             else:
+                field_data = [(k, v) for k, v in field_data if not condition(k, v)]
+        
+        parts = []
+        if encoder is None:
+            for key, value in field_data:
+                if not from_array:
+                    parts.append(key)
+                parts.append(value)
+        else:
+            for key, value in field_data:
                 try:
-                    encoded_key, encoded_value = encoder(key, value)
+                    ek, ev = encoder(key, value)
                 except Exception as e:
                     raise ValueError(
-                        f"[{type(self).__name__}] failed to encode field '{key}'"
-                        ) from e
-                    
-            if not from_array:
-                parts.append(encoded_key)
-                
-            parts.append(encoded_value)
-            
+                        f"[{cls.__name__}] failed to encode field '{key}'"
+                    ) from e
+                if not from_array:
+                    parts.append(ek)
+                parts.append(ev)
+        
         return parts
     
         
@@ -427,16 +423,8 @@ class DataclassDecoderMixin:
         return cls.from_tokens(tokens,**kwargs)
             
         
-    def to_string(
-            self,
-            **kwargs
-            ) -> str:
-        
-        separator = type(self).SEPARATOR
-        
-        parts = self.to_tokens(**kwargs)
-        
-        return separator.join(parts)
+    def to_string(self,**kwargs) -> str:
+        return type(self).SEPARATOR.join(self.to_tokens(**kwargs))
 
 
 class DictDecoderMixin:
@@ -467,16 +455,14 @@ class DictDecoderMixin:
         result = cls()
         data = result if container is None else getattr(result, container)
         
-        try:
-            it = iter(tokens)
-            if decoder:
-                for k, v in zip(it, it):
-                    dk, dv = decoder(k, v)
-                    data[dk] = dv
-            else:
-                data.update(zip(it, it))
-        except Exception as e:
-            raise ValueError(f"[{cls.__name__}] failed to decode") from e
+        it = iter(tokens)
+        if decoder:
+            try:
+                data.update({dk: dv for k, v in zip(it, it) for dk, dv in (decoder(k, v),)})
+            except Exception as e:
+                raise ValueError(f"[{cls.__name__}] failed to decode") from e
+        else:
+            data.update(zip(it, it))
         
         return result
     
@@ -496,21 +482,20 @@ class DictDecoderMixin:
             
         result = []
     
-        try:
-            if encoder:
+        if encoder:
+            try:
                 for key, value in data.items():
                     if condition is None or condition(key, value):
                         result.extend(encoder(key, value))
-            else:
-                for key, value in data.items():
-                    if condition is None or condition(key, value):
-                        result.append(key)
-                        result.append(value)
+            except Exception as e:
+                raise ValueError(f"[{cls.__name__}] failed to encode") from e
+        else:
+            for key, value in data.items():
+                if condition is None or condition(key, value):
+                    result.append(key)
+                    result.append(value)
     
-            return result
-    
-        except Exception as e:
-            raise ValueError(f"[{type(data).__name__}] failed to encode") from e
+        return result
                 
             
     @classmethod
@@ -534,10 +519,7 @@ class DictDecoderMixin:
             self,
             **kwargs
             ) -> str:
-        separator = type(self).SEPARATOR
-        
-        parts = self.to_tokens(**kwargs)
-        return separator.join(parts)
+        return type(self).SEPARATOR.join(self.to_tokens(**kwargs))
 
 
 class ArrayDecoderMixin:
@@ -600,7 +582,7 @@ class ArrayDecoderMixin:
                     group = encoder(x) if encoder else x
                     if len(group) != group_size:
                         raise ValueError(
-                            f"[{type(self).__name__}] expected {group_size} tokens from encoder, got {len(group)}"
+                            f"[{cls.__name__}] expected {group_size} tokens from encoder, got {len(group)}"
                             )
                     tokens.extend(group)
                 return tokens
@@ -610,7 +592,7 @@ class ArrayDecoderMixin:
                 return list(data)
                 
         except Exception as e:
-            raise ValueError(f"[{type(self).__name__}] failed to encode") from e
+            raise ValueError(f"[{cls.__name__}] failed to encode") from e
     
     
     @classmethod
@@ -896,4 +878,5 @@ class FolderLoaderMixin:
         
         for item in data:
             encoder(item, folder_path)
+
             

@@ -9,10 +9,41 @@ RGBA = tuple[int,int,int,float]
 
 
 def color_is_editable(color:Color) -> bool:
-    return color.get(color.channel) not in color_id.PRESET
+    """
+    Checks if the color can have its values overriden.
+
+    Parameters
+    ----------
+    color : Color
+        The color to check.
+
+    Returns
+    -------
+    bool
+
+    """
+    return color.channel not in color_id.PRESET
 
 
 def color_fade(color_1:Color, color_2:Color, percent:float) -> RGBA:
+    """
+    Calculates an intermediary color between two colors.
+
+    Parameters
+    ----------
+    color_1 : Color
+        The original color.
+    color_2 : Color
+        The new color.
+    percent : float
+        How much of the new color will be mixed in with the original one.
+
+    Returns
+    -------
+    RGBA
+        DESCRIPTION.
+
+    """
     r1, g1, b1, a1 = color_1.get_rgba()
     r2, g2, b2, a2 = color_2.get_rgba()
 
@@ -25,7 +56,19 @@ def color_fade(color_1:Color, color_2:Color, percent:float) -> RGBA:
 
 
 def color_to_trigger(color:Color) -> Object:
-    
+    """
+    Converts a Color to a Color 
+
+    Parameters
+    ----------
+    color : Color
+        The color to convert.
+
+    Returns
+    -------
+    Object
+
+    """
     obj = Object.default(obj_id.trigger.COLOR)
     obj[obj_prop.trigger.color.RED] = color.red
     obj[obj_prop.trigger.color.GREEN] = color.green
@@ -53,6 +96,19 @@ def color_to_trigger(color:Color) -> Object:
 
 
 def trigger_to_color(obj:Object) -> Color:
+    """
+    Converts a color trigger to a Color.
+
+    Parameters
+    ----------
+    obj : Object
+        The color object to convert.
+
+    Returns
+    -------
+    Color
+
+    """
     
     if obj[obj_prop.ID] != obj_id.trigger.COLOR: return
     

@@ -1,5 +1,5 @@
 # Imports
-from typing import Any, Literal, Optional, Callable
+from typing import Any, Literal, Optional, Callable, Sequence
 from statistics import mean, median
 import math
 
@@ -8,41 +8,50 @@ from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.list import IDList
 
-# TODO REVIEW
-def add_groups(obj_list:ObjectList, groups):
-    
-    for obj in obj_list:
-        g = obj.setdefault(obj_prop.GROUPS, IDList())
-        new = set(groups) - set(g)
-        
-        if len(g) + len(new) > 10:
-            raise ValueError("Group Limit exceeded.")
-        g.extend(new)
-        
-# TODO REDO
-def index_objects(obj_list:ObjectList, start:int=0) -> None:
+
+
+ObjectListMapping = dict[Optional[int],ObjectList]
+ObjectMapping = dict[int,Object]
+
+
+def add_groups(obj_list:ObjectList, groups:Sequence[int]):
     """
-    Adds an index key to all objects in the list.
-    Useful for tracking the load order of an object or for identifying a particular object when using compilation tools.
-    
+    Adds groups to every object in the list.
+
     Parameters
     ----------
     obj_list : ObjectList
-        The objects to modify.
-        
-    start : int, optional
-        The value to start indexing from. Defaults to 0.
+        The list of objects to modify.
+    groups : Sequence[int]
+        The groups to add to the objects.
+
+    Raises
+    ------
+    ValueError
+        If new group count on the object would exceed 10.
 
     Returns
     -------
     None.
 
     """
-    for i, obj in enumerate(obj_list, start=start):
-        obj.index = i
+    group_set = set(groups)
+    
+    if len(group_set) > 10:
+        raise ValueError("cannot add more than 10 groups")
+    
+    for obj in obj_list:
+        g = obj.setdefault(obj_prop.GROUPS,IDList())
+        g_set = set(g)
+        
+        new = group_set + g_set
+        
+        if len(new) > 10:
+            raise ValueError(f"expected at most 10 groups, got {len(new)}")
+        
+        g[:] = new
 
-
-def brickify(obj_list:ObjectList, height:Optional[int]=None) -> ObjectList:
+def brickify(obj_list:ObjectList, height:Optional[int]=None):
     """
     Repositions all objects in the list into a compact brick.
 
@@ -55,7 +64,7 @@ def brickify(obj_list:ObjectList, height:Optional[int]=None) -> ObjectList:
 
     Returns
     -------
-    None
+    None.
 
     """
     if height is None:
@@ -96,7 +105,7 @@ def group_objects(
     return {k:value_func(v) for k, v in new.items()}
 
 
-def clean_gid_parents(obj_list:ObjectList) -> None:
+def clean_gid_parents(obj_list:ObjectList):
     """
     Removes invisible group ID parents and removes any duplicate references found.
 
@@ -107,7 +116,7 @@ def clean_gid_parents(obj_list:ObjectList) -> None:
 
     Returns
     -------
-    None
+    None.
 
     """
     seen = set()
@@ -124,8 +133,7 @@ def clean_gid_parents(obj_list:ObjectList) -> None:
     
             obj[obj_prop.PARENT_GROUPS][:] = new
                 
-    
-def compile_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
+def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
     """
     Compiles objects by their group IDs.
 
@@ -136,8 +144,9 @@ def compile_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
 
     Returns
     -------
-    groups : dict[int, ObjectList]
-        A dictionary mapping all objects contained in a group to a group ID.
+    groups : dict[Optional[int], ObjectList]
+        A dictionary mapping all objects contained in a group to a group ID. 
+        Objects without a group ID are keyed by None.
     """
     groups = {}
     
@@ -157,8 +166,9 @@ def compile_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
     
     return groups
 
-
-def compile_parents(obj_list:ObjectList) -> tuple[dict[int|None, ObjectList],dict[int,Object],dict[int,Object],dict[int,Object]]:
+def compile_parents(
+        obj_list:ObjectList
+        ) -> tuple[ObjectListMapping,ObjectMapping,ObjectMapping,ObjectMapping]:
     """
     Compiles objects by their groups, group id parents and their group and area parents.
 
@@ -169,20 +179,17 @@ def compile_parents(obj_list:ObjectList) -> tuple[dict[int|None, ObjectList],dic
 
     Returns
     -------
-    groups : dict[int, ObjectList]
+    groups : ObjectListMapping
         A dictionary mapping all objects contained in a group to a group ID.
-        
-    group_id_parents: dict[int,Object]
+    group_id_parents: ObjectMapping
         A dictionary mapping the group ID parent object to a group ID.
         Has priority over other area / group parents if marked as area / group parent.
-        
-    group_parents: dict[int,Object]
+    group_parents: ObjectMapping
         A dictionary mapping the group parent object to a group ID.
         If multiple exist, the one with smallest x then y position is returned, respecting game mechanics.
         Skipped if no group id parent exists.
         If no group parent exists, the area parent is also the group parent.
-        
-    area_parents: dict[int,Object]
+    area_parents: ObjectMapping
         A dictionary mapping the area parent object to a group ID.
         If multiple exist, the one with smallest x then y position is returned, respecting game mechanics.
         Skipped if no group id parent exists.
@@ -241,7 +248,12 @@ def compile_parents(obj_list:ObjectList) -> tuple[dict[int|None, ObjectList],dic
     return groups, gid_parents, group_parents, area_parents
         
         
-def compile_chunks(obj_list:ObjectList, chunk_size:float=100, origin:tuple[float,float]=(0,0), function:Callable=ObjectList) -> dict[tuple[int,int],Any]:
+def compile_chunks(
+        obj_list:ObjectList, 
+        chunk_size:float=100, 
+        origin:tuple[float,float]=(0,0), 
+        function:Callable=ObjectList
+        ) -> dict[tuple[int,int],Any]:
     """
     Compiles objects into their containing chunk.
     Defaults to the chunks the game uses for loading objects.
@@ -250,13 +262,10 @@ def compile_chunks(obj_list:ObjectList, chunk_size:float=100, origin:tuple[float
     ----------
     obj_list : ObjectList
         DESCRIPTION.
-        
     chunk_size : float, optional
-        The width and height of a chunk. Defaults to 100.
-        
+        The width and height of a chunk. Defaults to 100 units.
     origin : tuple[float,float], optional
         The origin coordinates of the chunk grid. Defaults to (0,0).
-        
     function : Callable, optional
         A function to apply on each object list after compiling. Defaults to ObjectList.
 
@@ -281,7 +290,7 @@ def compile_chunks(obj_list:ObjectList, chunk_size:float=100, origin:tuple[float
     return {k:function(v) for k, v in result.items()}
 
 
-def compile_keyframe_ids(obj_list:ObjectList) -> dict[int,ObjectList]:
+def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
     """
     Compiles keyframe objects by their keyframe ID.
 
@@ -292,8 +301,9 @@ def compile_keyframe_ids(obj_list:ObjectList) -> dict[int,ObjectList]:
 
     Returns
     -------
-    keyframe_ids : dict[int,ObjectList]
+    keyframe_ids : ObjectListMapping
         A dictionary mapping keyframe IDs to keyframe objects.
+        
     """
     result = dict()
     
@@ -313,7 +323,6 @@ def compile_keyframe_ids(obj_list:ObjectList) -> dict[int,ObjectList]:
         value.sort(key=lambda obj: obj.get(obj_prop.trigger.keyframe.INDEX,0))
         
     return result
-
 
 def get_keyframe_id(obj:Object):
     return obj.get(obj_prop.trigger.keyframe.KEY_ID, 0) 
@@ -538,7 +547,7 @@ def grid_align(
         offset_x:float=0,
         offset_y:float=0,
         snap_func:Callable=round
-        ) -> None:
+        ):
     """
     Alings a list of objects to a grid of a given size.
     
@@ -559,7 +568,7 @@ def grid_align(
         
     Returns
     -------
-    None
+    None.
         
     """
     
@@ -673,7 +682,7 @@ def align_objects(
         center_gparent:bool=False,
         x_axis:bool=True,
         y_axis:bool=True
-        ) -> None:
+        ):
     """
     Aligns objects within a group at equal intervals, similar to the Align X / Align Y editor functions.
     Linked objects are aligned as one group, centered on their mean center.
@@ -681,17 +690,13 @@ def align_objects(
     Parameters
     ----------
     obj_list : ObjectList
-        The objects to align.
-        
+        The objects to align. 
     keep_alignment : bool, optional
         Makes objects that share the same position aligned together instead of individually. Defaults to False.
-    
     ignore_links: bool, optional
         Whether linked groups are ignored. Defaults to False.
-        
     center_gparent : bool, optional
         Use the linked group's group parent instead of its mean center. Defaults to False.
-    
     x_axis : bool, optional
         Whether objects are aligned on the x axis. Defaults to True.
     

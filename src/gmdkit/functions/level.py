@@ -8,6 +8,20 @@ from gmdkit.serialization.enums import (
 )
 
 def get_difficulty_rating(level:Level) -> LevelDifficulty:
+    """
+    Gets the difficulty rating of a level.
+
+    Parameters
+    ----------
+    level : Level
+        The level to check.
+
+    Returns
+    -------
+    LevelDifficulty
+        An enum specifying the level's difficulty.
+
+    """
     if level.get(lvl_prop.RATING,0) == 0:
         return LevelDifficulty.NA
     
@@ -61,6 +75,20 @@ def get_difficulty_rating(level:Level) -> LevelDifficulty:
 
 
 def get_feature_rating(level:Level) -> FeatureRating:
+    """
+    Gets the feature rating of a level.
+    
+    Parameters
+    ----------
+    level : Level
+        The level to check.
+        
+    Returns
+    -------
+    FeatureRating
+        An enum specifying the level's feature rating.
+        
+    """
     match level.get(lvl_prop.EPIC_RATING, 0):
         
         case EpicRating.EPIC:
@@ -84,6 +112,20 @@ def get_feature_rating(level:Level) -> FeatureRating:
 
 
 def get_timely_type(level:Level) -> TimelyType:
+    """
+    Gets the timely (daily, weekly, event) type of a level.
+    
+    Parameters
+    ----------
+    level : Level
+        The level to check.
+        
+    Returns
+    -------
+    TimelyType
+        An enum specifying the level's timely type.
+        
+    """
     tid = level.get(lvl_prop.TIMELY_ID)
     
     if tid is None:

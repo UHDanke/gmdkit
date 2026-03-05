@@ -1,13 +1,26 @@
 # Imports
 import math
-from typing import Any, Optional
+from typing import Optional
 
 # Package Imports
 from gmdkit.models.object import Object
 from gmdkit.mappings import color_id, obj_prop, obj_id
     
 
-def reset_transforms(obj:Object):      
+def reset_transforms(obj:Object):
+    """
+    Resets an object's rotation, scale and warp.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+
+    Returns
+    -------
+    None.
+
+    """
     obj.discard(
         obj_prop.ROTATION,
         obj_prop.SCALE_X,
@@ -17,6 +30,19 @@ def reset_transforms(obj:Object):
         )
     
 def reset_pos(obj:Object):
+    """
+    Resets an object's position.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+
+    Returns
+    -------
+    None.
+
+    """
     if obj.get(obj_prop.X) is not None:
         obj[obj_prop.X] = 0
     if obj.get(obj_prop.Y) is not None:
@@ -62,7 +88,6 @@ def clean_duplicate_groups(obj:Object) -> None:
         
         obj[obj_prop.GROUPS][:] = set(groups)
 
-# TODO REDO
 def recolor_shaders(obj:Object) -> None:
     """
     Makes shader triggers use white color instead of object outline.
@@ -85,8 +110,6 @@ def recolor_shaders(obj:Object) -> None:
             
             obj[obj_prop.COLOR_1] = color_id.WHITE
 
-
-
 def fix_lighter(obj:Object, replacement:int=color_id.WHITE) -> None:
     """
     Replaces the base lighter color of an object (which crashes the game) with another color.
@@ -96,7 +119,7 @@ def fix_lighter(obj:Object, replacement:int=color_id.WHITE) -> None:
     obj : Object
         The object to modify.
     replacement : int, optional
-        DESCRIPTION. Defaults to white.
+        The replacement color, defaults to color_id.WHITE.
 
     Returns
     -------
@@ -135,38 +158,39 @@ def offset_position(
     if obj.get(obj_prop.Y) is not None:
         obj[obj_prop.Y] += offset_y
 
-# TODO DOCS
 def scale_position(
         obj:Object,
-        scale_x:float=1.00,scale_y:float=1.00,
-        center_x:Optional[float]=None, center_y:Optional[float]=None, 
-        only_move:bool=False
-        ) -> None:
+        scale_x:float=1.00,
+        scale_y:float=1.00,
+        center_x:Optional[float]=None, 
+        center_y:Optional[float]=None, 
+        lock_scale:bool=False
+        ):
     """
-    
+    Scales and moves an object relative to a position.
 
     Parameters
     ----------
     obj : Object
-        DESCRIPTION.
+        The object to modify.
     scale_x : float, optional
-        DESCRIPTION. The default is 1.00.
+        The X scaling applied, defaults to 1.00.
     scale_y : float, optional
-        DESCRIPTION. The default is 1.00.
+        The Y scaling applied, defaults to 1.00.
     center_x : Optional[float], optional
-        DESCRIPTION. The default is None.
+        The X position of the center reference, movement is not applied on X axis if left as None.
     center_y : Optional[float], optional
-        DESCRIPTION. The default is None.
-    only_move : bool, optional
-        DESCRIPTION. The default is False.
+        The Y position of the center reference, movement is not applied on X axis if left as None.
+    lock_scale : bool, optional
+        Only moves the object without scaling if True, defaults to False.
 
     Returns
     -------
-    None
+    None.
 
     """
     
-    if not only_move:
+    if not lock_scale:
         obj[obj_prop.SCALE_X] = obj.get(obj_prop.SCALE_X, 1.00) * scale_x
         obj[obj_prop.SCALE_Y] = obj.get(obj_prop.SCALE_Y, 1.00) * scale_y
     
@@ -176,15 +200,35 @@ def scale_position(
     if center_y is not None and (y:=obj.get(obj_prop.Y)) is not None:
         obj[obj_prop.Y] = center_y+scale_y * (y - center_y)
 
-
 def rotate_position(
         obj:Object,
         angle:float=0, 
-        center_x:float|None=None, center_y:float|None=None, 
-        only_move:bool=False
+        center_x:Optional[float]=None, 
+        center_y:Optional[float]=None, 
+        lock_rotation:bool=False
         ):
+    """
+    Rotates and moves an object relative to a position.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to modify.
+    angle : float, optional
+        The angle of the rotation that will be applied, defaults to 0.
+    center_x : Optional[float], optional
+        The X position of the center reference, movement is not applied on X axis if left as None.
+    center_y : Optional[float], optional
+        The Y position of the center reference, movement is not applied on X axis if left as None.
+    lock_rotation : bool, optional
+        Only moves the object without rotation if True, defaults to False.
+    Returns
+    -------
+    None.
+
+    """
     
-    if not only_move:
+    if not lock_rotation:
         skew_x = obj.get(obj_prop.SKEW_X)
         skew_y = obj.get(obj_prop.SKEW_Y)
         
@@ -207,23 +251,8 @@ def rotate_position(
 
         obj[obj_prop.X] = dx * math.cos(th) - dy * math.sin(th)
         obj[obj_prop.Y] = dx * math.sin(th) + dy * math.cos(th)
-
-
-def remap_keys(obj:Object, keys:list[int|str], value_map:dict[Any,Any]):
-    
-    for key in set(keys) & obj.keys():
-    
-        obj[key] = value_map.get(obj[key], obj[key])
-
-    
-def delete_keys(obj:Object, keys:list[int|str]):
-    
-    for key in set(keys) & obj.keys():
-        
-        obj.pop(key)
-                  
-            
-def to_user_coins(obj:Object) -> None:
+                       
+def to_user_coins(obj:Object):
     """
     Converts secret coins into user coins.
 
@@ -234,7 +263,7 @@ def to_user_coins(obj:Object) -> None:
 
     Returns
     -------
-    None
+    None.
 
     """
     
@@ -244,8 +273,7 @@ def to_user_coins(obj:Object) -> None:
     obj[obj_prop.ID] = obj_id.collectible.USER_COIN
     obj.pop(obj_prop.trigger.collectible.coin.COIN_ID, None)
 
-
-def fix_transform(obj:Object) -> None:
+def fix_transform(obj:Object):
     """
     Normalizes the rotation and scale of an object.
 
@@ -256,7 +284,7 @@ def fix_transform(obj:Object) -> None:
 
     Returns
     -------
-    None
+    None.
 
     """
 
