@@ -22,7 +22,7 @@ def normalize_actions(x):
 
 def render_rule(d):
     parts = []
-    keys = ['id_type']
+    keys = []
         
     for k, v in d.items():
         if v is not None:
@@ -61,12 +61,14 @@ def render_rule_keys(dictionary):
         )
     
     return ',\n'.join(mlist)
-        
+
 def main():
     remap_table = pd.read_csv(CSV_PATH)
     remap_table = remap_table.dropna(how="all")
     remap_table.columns = remap_table.columns.str.replace(' ', '_')
-    remap_table["type"] = remap_table["type"].str.replace(' ', '_')
+    remap_table["type"] = (
+        "IDType." + remap_table["type"].str.replace(' ', '_').str.upper()
+    )
     remap_table = remap_table.where(pd.notnull(remap_table), None)
     
     # First convert strings to int where possible
@@ -114,13 +116,11 @@ def main():
     )
     
     if unique_functions:
-        id_funcs = "from gmdkit.utils.id_functions import (\n    " + (
+        id_funcs = "from gmdkit.other.id_functions import (\n    " + (
             ",\n    ".join(unique_functions)
             ) + "\n)"
     else:
         id_funcs = ""
-
-    unique_types = remap_table["id_type"].dropna().unique().tolist()
     
     result = defaultdict(list)
     
@@ -133,8 +133,6 @@ def main():
     with open(TEMPLATE_PATH, "r") as tempfile:
             
         template = tempfile.read()
-            
-    unique_type_str = repr(set(unique_types))           
     
     base_id_rules = render_rule_tuple(result.pop(None,{}))
     obj_id_rules = render_rule_keys(result)
@@ -142,7 +140,6 @@ def main():
     with open(FILEPATH, "w") as file:
         file.write(template.format(
             rule_funcs=id_funcs,
-            unique_types=unique_type_str,
             base_id_rules=base_id_rules,
             obj_id_rules=obj_id_rules,
             ))

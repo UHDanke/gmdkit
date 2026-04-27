@@ -9,13 +9,13 @@ from gmdkit.models.prop.gzip import ObjectString, ReplayString
 LEVEL_DECODERS = {
     'k3': decode_text,
     'k4': ObjectString,
-    'k7': enums.LevelDifficulty.from_string,
-    'k8': enums.OfficialSongs.from_string,
-    'k10': enums.LevelRating.from_string,
-    'k21': enums.LevelType.from_string,
+    'k7': enums.LevelDifficulty,
+    'k8': enums.OfficialSongs,
+    'k10': enums.LevelRating,
+    'k21': enums.LevelType,
     'k34': ReplayString,
-    'k75': enums.EpicRating.from_string,
-    'k76': enums.DemonRating.from_string,
+    'k75': enums.EpicRating,
+    'k76': enums.DemonRating,
     'k88': IntList.from_string,
     'k91': IntList.from_string,
     'k101': PositionList.from_string,
@@ -25,7 +25,7 @@ LEVEL_DECODERS = {
     'k110': IntList.from_string,
     'k119': ReplayString,
     'k120': ReplayString,
-    'k125': enums.ToggleCBS.from_string,
+    'k125': enums.ToggleCBS,
 }
 
 

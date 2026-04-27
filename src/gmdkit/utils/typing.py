@@ -1,5 +1,5 @@
 # Imports
-from typing import Any, Protocol, Callable, Iterable
+from typing import Any, Protocol, Callable, Iterable, Literal
 from xml.etree.ElementTree import Element
 from os import PathLike
 
@@ -8,7 +8,7 @@ PathString = str|PathLike
 PlistStruct = dict|list|tuple
 NumKey = int|str
 RGBA = tuple[int,int,int,float]
-
+FixedRotation = Literal[0,90,180,270,360,-90,-180,-270]
 
 class Caster(Protocol):
     def __call__(self, value: Any, **kwargs:Any) -> Any : ...

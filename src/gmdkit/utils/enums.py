@@ -1,8 +1,22 @@
 # Imports
-from enum import Enum
+from enum import IntEnum
 
-# Package Imports
-from gmdkit.utils.types import EnumClass
+class EnumClass(IntEnum):
+    
+    @classmethod
+    def from_string(cls, string: str):
+        return cls(int(string))
+
+    @classmethod
+    def _missing_(cls, value):
+        member = cls._value2member_map_.get(value)
+        if member is None:
+            v = int(value)
+            member = int.__new__(cls, v)
+            member._name_ = f"UNKNOWN_{'N' if v <0 else ''}{abs(v)}"
+            member._value_ = v
+            cls._value2member_map_[v] = member
+        return member
 
 
 class OldColor(EnumClass):
@@ -79,7 +93,7 @@ class TouchMode(EnumClass):
     ON = 1
     OFF = 2
     
-class SelectPlayer(EnumClass):
+class TargetPlayer(EnumClass):
     NONE = -1
     ALL = 0
     P1 = 1
@@ -96,7 +110,7 @@ class StopMode(EnumClass):
     PAUSE = 1
     RESUME = 2
 
-class SelectAxis(EnumClass):
+class TargetAxis(EnumClass):
     NONE = 0
     X = 1
     Y = 2
@@ -247,6 +261,17 @@ class ArrowDir(EnumClass):
     LEFT = 3
     RIGHT = 4
     
+    def flip(self):
+        cls = type(self)
+        opposites = {
+            cls.UP: cls.DOWN,
+            cls.DOWN: cls.UP,
+            cls.LEFT: cls.RIGHT,
+            cls.RIGHT: cls.LEFT,
+        }
+        return opposites.get(self, cls.NONE)
+
+    
 class AdvFollowInit(EnumClass):
     INIT = 0
     SET = 1
@@ -366,7 +391,6 @@ class SpikeBallAnim(EnumClass):
     IDLE03 = 7
     FROMATTACK03 = 8
     
-    
 class Gamemode(EnumClass):
     CUBE = 0
     SHIP = 1
@@ -409,11 +433,26 @@ class LevelDifficulty(EnumClass):
     HARD = 3
     HARDER = 4
     INSANE = 5
+    HARD_DEMON = 6
+    EASY_DEMON = 7
+    MEDIUM_DEMON = 8
+    INSANE_DEMON = 9
+    EXTREME_DEMON = 10
+
+class ListDifficulty(EnumClass):    
+    NA = -1
+    AUTO = 0
+    EASY = 1
+    NORMAL = 2
+    HARD = 3
+    HARDER = 4
+    INSANE = 5
     EASY_DEMON = 6
     MEDIUM_DEMON = 7
     HARD_DEMON = 8
     INSANE_DEMON = 9
     EXTREME_DEMON = 10
+
 
 class LevelLength(EnumClass):
     TINY = 0
@@ -482,6 +521,7 @@ class FeatureRating(EnumClass):
     
 class DemonRating(EnumClass):
     HARD = 0
+    UNKNOWN = 1
     EASY = 3
     MEDIUM = 4
     INSANE = 5
@@ -492,9 +532,6 @@ class LevelType(EnumClass):
     LOCAL = 2
     SAVED = 3
     ONLINE = 4
-    
-class ListType(EnumClass):
-    LOCAL = 2
 
 class TimelyType(EnumClass):
     NONE = 0
@@ -518,42 +555,6 @@ class ReplayEventID(EnumClass):
     LEFT_P2 = 7
     RIGHT_P2 = 8
     CHECKPOINT = 99
-    
-    
-class TemplatePosition(EnumClass):
-    CENTER = 0
-    TOP = 1
-    BOTTOM = 2
-    LEFT = 3
-    RIGHT = 4
-    TOP_LEFT = 5
-    TOP_RIGHT = 6
-    BOTTOM_LEFT = 7
-    BOTTOM_RIGHT = 8
-
-class TemplateType(Enum):
-    NONE = "0"
-    SQUARE = "1"
-    SLOPE_BOTTOM_RIGHT = "2"
-    SLOPE_BOTTOM_LEFT = "3"
-    SLOPE_TOP_RIGHT = "4"
-    SLOPE_TOP_LEFT = "5"
-    LONG_SLOPE_CENTER_BOTTOM_RIGHT = "6"
-    LONG_SLOPE_SIDE_BOTTOM_RIGHT = "7"
-    LONG_SLOPE_CENTER_BOTTOM_LEFT = "8"
-    LONG_SLOPE_SIDE_BOTTOM_LEFT = "9"
-    LONG_SLOPE_CENTER_TOP_RIGHT = "A"
-    LONG_SLOPE_SIDE_TOP_RIGHT = "B"
-    LONG_SLOPE_CENTER_TOP_LEFT = "C"
-    LONG_SLOPE_SIDE_TOP_LEFT = "D"
-    LONG_SLOPE_CENTER_RIGHT_TOP = "E"
-    LONG_SLOPE_SIDE_RIGHT_TOP = "F"
-    LONG_SLOPE_CENTER_RIGHT_BOTTOM = "G"
-    LONG_SLOPE_SIDE_RIGHT_BOTTOM = "H"
-    LONG_SLOPE_CENTER_LEFT_BOTTOM = "I"
-    LONG_SLOPE_SIDE_LEFT_BOTTOM = "J"
-    LONG_SLOPE_CENTER_LEFT_TOP = "K"
-    LONG_SLOPE_SIDE_LEFT_TOP = "L"
     
 class ToggleCBS(EnumClass):
     DEFAULT = 0

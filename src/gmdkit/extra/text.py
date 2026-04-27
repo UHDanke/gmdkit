@@ -1,12 +1,5 @@
-# Imports
-from typing import Literal, Tuple
 
-# Package Imports
-from gmdkit.models.object import Object, ObjectList
-from gmdkit.serialization.types import DictClass
-
-
-def fnt_load(path) -> dict:
+def font_load(path) -> dict:
     
     result = {}
     
@@ -16,7 +9,6 @@ def fnt_load(path) -> dict:
         
         tokens = line.split()
         first = tokens.pop(0)
-        print(first, tokens)
         data = {}
 
         for t in tokens:
@@ -69,66 +61,11 @@ def fnt_load(path) -> dict:
         
     return result
 
-font = fnt_load(r"D:\SteamLibrary\steamapps\common\Geometry Dash\Resources\bigFont-uhd.fnt")
 
-def center(self, string):
-    
-    # individual text objects are center-left aligned
-    pass
+if __name__ == "__main__":
+    font = font_load(r"E:\SteamLibrary\steamapps\common\Geometry Dash\Resources\bigFont-uhd.fnt")
 
 
-class TextObject:
-    
-    __slots__ = ("objects","len_x","len_y","center_x","center_y")
-
-
-class FontObject(DictClass):
-    
-    def __init__(self, path):
-        
-        font_data = fnt_load(path)
-        
-        super().__init__(font_data)
-        
-    
-    
-    def render_text(self, string):
-        
-        cursor_x = 0
-        cursor_y = 0
-        line_height = self["common"]["lineHeight"]
-        
-        
-        for c in string:
-            pass
-            
-            
-                    
-    
-    def split_text_object(obj:Object, split_len:int=1) -> ObjectList:
-        
-        pass
-    
-    
-    def create_text_objects(
-            string, 
-            groups,
-            max_len:int|None=None,
-            max_wrap_len:int|None=None,
-            kerning:int=0,            
-            position:Tuple[float,float]=(0,0),
-            anchor_x:Literal["left","center","right"]|None=None,
-            anchor_y:Literal["top","middle","bottom"]|None=None,
-            align_x:Literal["left","center","right","justify"]="left",
-            align_y:Literal["top","middle","bottom"]="center", 
-            ) -> ObjectList:
-        
-        anchor_x = anchor_x or "center" if align_x == "justify" else align_x
-        
-        anchor_y = anchor_y or align_y
-        
-        
-        
         
             
     

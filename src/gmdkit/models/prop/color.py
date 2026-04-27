@@ -6,7 +6,7 @@ from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.defaults.color_ids import default_color
-from gmdkit.utils.enums import SelectPlayer
+from gmdkit.utils.enums import TargetPlayer
 from gmdkit.models.prop.hsv import HSV
 
 
@@ -16,7 +16,7 @@ class Color(DataclassDecoderMixin):
     red: int = 0
     green: int = 0
     blue: int = 0
-    player: SelectPlayer = field_decoder(default=SelectPlayer(-1),decoder=SelectPlayer.from_string,encoder=str)
+    player: TargetPlayer = field_decoder(default=TargetPlayer(-1),decoder=TargetPlayer.from_string,encoder=str)
     blending: bool = field_decoder(default=False,optional=True)
     channel: int = 0
     opacity: float = 0.0

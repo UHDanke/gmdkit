@@ -1,5 +1,49 @@
 # Imports
-from typing import Iterable
+from typing import Iterable, Callable, ParamSpec, TypeVar
+from enum import Enum
+from functools import lru_cache
+
+# Package Imports (only gmdkit.utils is allowed)
+from gmdkit.utils.enums import ArrowDir
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def typed_cache(maxsize=128, typed=False):
+    def decorator(f: Callable[P, R]) -> Callable[P, R]:
+        return lru_cache(maxsize=maxsize,typed=typed)(f)  # type: ignore
+    return decorator
+
+@typed_cache(maxsize=256)
+def normalize_orientation(rotation:float, flip_x:bool=False, flip_y:bool=False):
+    rotation = round(rotation%360/90)
+    
+    match rotation:
+        case 0:
+            h = ArrowDir.RIGHT
+            v = ArrowDir.DOWN
+        case 1:
+            h = ArrowDir.DOWN
+            v = ArrowDir.LEFT
+        case 2:
+            h = ArrowDir.LEFT
+            v = ArrowDir.UP
+        case 3:
+            h = ArrowDir.UP
+            v = ArrowDir.RIGHT
+    
+    h = h.flip() if flip_x else h
+    v = v.flip() if flip_y else v
+    
+    return h,v
+
+
+@typed_cache(maxsize=256)
+def get_enum_values(cls):
+    if not isinstance(cls, Enum):
+        raise ValueError(f"expected enum, got {cls.__name__}")
+    
+    return {e.value for e in cls}
 
 
 def next_free(

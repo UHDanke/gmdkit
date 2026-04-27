@@ -1,6 +1,7 @@
 # Imports
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from contextlib import contextmanager
 from typing import (
     Any, Self, Literal, 
     Optional, 
@@ -47,6 +48,18 @@ class FileStringMixin:
             file.write(string)
 
 
+    @classmethod
+    @contextmanager
+    def open(cls, path: PathString, encoding="utf-8", **kwargs):
+        instance = cls.from_file(path, encoding=encoding, **kwargs)
+        try:
+            yield instance
+        except Exception:
+            raise
+        else:
+            instance.to_file(path, encoding=encoding)
+
+
 class DefaultPathMixin(FileStringMixin):
     
     DEFAULT_PATH: Optional[PathString] = None
@@ -70,7 +83,19 @@ class DefaultPathMixin(FileStringMixin):
             raise ValueError("[{cls.__name__}]  default path does not exist")
             
         self.to_file(path, **kwargs)
-            
+    
+    
+    @classmethod
+    @contextmanager
+    def open_default(cls, **kwargs):
+        instance = cls.from_default_path(**kwargs)
+        try:
+            yield instance
+        except Exception:
+            raise
+        else:
+            instance.to_default_path(**kwargs)
+
             
 class PlistDecoderMixin(FileStringMixin):
     
@@ -195,6 +220,7 @@ class PlistDecoderMixin(FileStringMixin):
         except Exception as e:
             raise RuntimeError(f"[{cls.__name__}] failed to load node") from e
         return new
+    
     
     def to_node(self, node:Optional[ET.Element]=None, **kwargs):
         
@@ -737,7 +763,7 @@ class FilePathMixin(FileStringMixin):
     EXTENSION: Optional[str] = None
     
     def _name_fallback_(self):
-        raise ValueError("[{type(self).__name__}] name fallback was not provided")
+        raise ValueError(f"[{type(self).__name__}] name fallback was not provided")
     
     @classmethod
     def from_file(

@@ -7,8 +7,7 @@ import math
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.list import IDList
-
-
+from gmdkit.functions.object import get_keyframe_id
 
 ObjectListMapping = dict[Optional[int],ObjectList]
 ObjectMapping = dict[int,Object]
@@ -103,6 +102,12 @@ def group_objects(
         v.append(obj)
         
     return {k:value_func(v) for k, v in new.items()}
+
+def from_ids(object_ids:Sequence):
+    obj_list = ObjectList()
+    for i in object_ids:
+        obj_list.append(Object.default(i))
+    return obj_list
 
 
 def clean_gid_parents(obj_list:ObjectList):
@@ -246,8 +251,7 @@ def compile_parents(
             
     
     return groups, gid_parents, group_parents, area_parents
-        
-        
+               
 def compile_chunks(
         obj_list:ObjectList, 
         chunk_size:float=100, 
@@ -289,7 +293,6 @@ def compile_chunks(
             
     return {k:function(v) for k, v in result.items()}
 
-
 def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
     """
     Compiles keyframe objects by their keyframe ID.
@@ -323,9 +326,6 @@ def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
         value.sort(key=lambda obj: obj.get(obj_prop.trigger.keyframe.INDEX,0))
         
     return result
-
-def get_keyframe_id(obj:Object):
-    return obj.get(obj_prop.trigger.keyframe.KEY_ID, 0) 
 
 def compile_keyframe_groups(
         obj_list:ObjectList, 
@@ -379,8 +379,7 @@ def compile_keyframe_groups(
         
     return result
     
-
-def compile_links(obj_list:ObjectList) -> tuple[dict[int, ObjectList],dict[int,Object],dict[int,Object]]:
+def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,ObjectMapping]:
     """
     Compiles objects by their linked group ID and their group and area parents.
 
@@ -391,15 +390,15 @@ def compile_links(obj_list:ObjectList) -> tuple[dict[int, ObjectList],dict[int,O
 
     Returns
     -------
-    links : dict[int, ObjectList]
+    links : ObjectListMapping
         A dictionary mapping all objects contained in a linked group to a link ID.
 
-    group_parents: dict[int,Object]
+    group_parents: ObjectMapping
         A dictionary mapping the linked group parent object to a link ID.
         If multiple exist, the one with smallest x then y position is returned, respecting game mechanics.
         If no group parent exists, the area parent is also the group parent.
         
-    area_parents: dict[int,Object]
+    area_parents: ObjectMapping
         A dictionary mapping the linked area parent object to a link ID.
         If multiple exist, the one with smallest x then y position is returned, respecting game mechanics.
         If no area parent exists, the group parent is also the area parent.
@@ -432,8 +431,7 @@ def compile_links(obj_list:ObjectList) -> tuple[dict[int, ObjectList],dict[int,O
             
     return links, group_parents, area_parents
 
-
-def compile_spawn_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
+def compile_spawn_groups(obj_list:ObjectList) -> ObjectListMapping:
     """
     Compiles spawn triggers by their group IDs.
 
@@ -444,7 +442,7 @@ def compile_spawn_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
 
     Returns
     -------
-    spawn_groups : dict[int|None,ObjectList]
+    spawn_groups : ObjectListMapping
         A dictionary mapping all spawn trigger objects to a group ID.
 
     """
@@ -457,8 +455,7 @@ def compile_spawn_groups(obj_list:ObjectList) -> dict[int|None,ObjectList]:
         group.sort(key=lambda obj: obj.get(obj_prop.X,0))
     
     return spawn_groups
-      
-      
+         
 def boundaries(
         obj_list:ObjectList, 
         center_type:Literal["midpoint","mean","median"]="mean"
@@ -538,7 +535,6 @@ def boundaries(
         min_y = center_y = max_y = 0.0
         
     return min_x, min_y, center_x, center_y, max_x, max_y
-
 
 def grid_align(
         obj_list:ObjectList,
@@ -662,7 +658,7 @@ def warp_objects(
             
             else:
                 obj[obj_prop.SKEW_X] = obj_skew_x
-                obj[obj_prop.SKEW_Y] = obj_scale_y
+                obj[obj_prop.SKEW_Y] = obj_skew_y
         
         x = obj.get(obj_prop.X, 0)
         y = obj.get(obj_prop.Y, 0)

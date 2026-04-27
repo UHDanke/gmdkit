@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.models.object import Object
-from gmdkit.mappings import obj_prop, color_prop
+from gmdkit.mappings import obj_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 
 
@@ -135,10 +135,10 @@ def special_color(color_id) -> bool:
     return not (1 <= color_id <= 999)
 
 def get_one_color_channel(color) -> int|None:
-    return color.pluck(color_prop.CHANNEL)
+    return color.channel
 
 def get_one_color_copy(color) -> int|None:
-    return color.pluck(color_prop.COPY_ID)
+    return color.copy_id
 
 def get_color_channels(color_list) -> set[int]:
     return color_list.unique_values(get_one_color_channel)    
@@ -160,27 +160,27 @@ def get_special_color_copies(color_list) -> set[int]:
 
 def remap_custom_color_channels(color_list, kvm):
     for color in color_list:
-        i = color.get(color_prop.CHANNEL)
+        i = color.channel
         if custom_color(i):
-            color[color_prop.CHANNEL] = kvm.get(i,i)
+            color.channel = kvm.get(i,i)
 
 def remap_custom_color_copies(color_list, kvm):
     for color in color_list:
-        i = color.get(color_prop.COPY_ID)
+        i = color.copy_id
         if custom_color(i):
-            color[color_prop.COPY_ID] = kvm.get(i,i)
+            color.copy_id = kvm.get(i,i)
 
 def remap_special_color_channels(color_list, kvm):
     for color in color_list:
-        i = color.get(color_prop.CHANNEL)
+        i = color.channel
         if special_color(i):
-            color[color_prop.CHANNEL] = kvm.get(i,i)
+            color.channel = kvm.get(i,i)
             
 def remap_special_base_color_copies(color_list, kvm):
     for color in color_list:
-        i = color.get(color_prop.COPY_ID)
+        i = color.copy_id
         if special_color(i):
-            color[color_prop.COPY_ID] = kvm.get(i,i)
+            color.copy_id = kvm.get(i,i)
 
 def get_base_color(obj:Object) -> int:
     return COLOR_1_DEFAULT.get(obj.get(obj_prop.ID,0))

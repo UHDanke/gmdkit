@@ -1,10 +1,7 @@
 # Package Imports
 from gmdkit.mappings import obj_id, obj_prop
-from gmdkit.other.id_classes import IDRule, RuleHandler
+from gmdkit.other.id_classes import IDRule, RuleHandler, IDType, IDActions
 {rule_funcs}
-
-
-ID_TYPES = {unique_types}
     
 
 ID_RULES = RuleHandler(

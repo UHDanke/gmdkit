@@ -5,7 +5,28 @@ from typing import Optional
 # Package Imports
 from gmdkit.models.object import Object
 from gmdkit.mappings import color_id, obj_prop, obj_id
-    
+
+
+def get_keyframe_id(obj:Object) -> int:
+    """
+    Retrieves a keyframe's key ID.
+
+    Parameters
+    ----------
+    obj : Object
+        The object to retrieve from.
+
+    Returns
+    -------
+    keyframe_id: int
+
+    """
+    if (key:=obj.get(obj_prop.trigger.keyframe.KEY_ID)) is not None:
+        return key
+    if obj_id.trigger.KEYFRAME != obj.get(obj_prop.ID):
+        return 0
+    return
+        
 
 def reset_transforms(obj:Object):
     """

@@ -1,6 +1,6 @@
 # Imports
 from typing import Callable, Literal, Optional, Any, get_type_hints, TypeVar, overload
-from functools import partial, lru_cache
+from functools import partial
 from inspect import signature
 import numpy as np
 from dataclasses import field, fields, dataclass, MISSING
@@ -21,22 +21,34 @@ from gmdkit.utils.typing import (
     PathString,
     Element
     )
+from gmdkit.utils.misc import typed_cache
 
 
-def get_cls(self):
-    return type(self)
-
-@lru_cache(maxsize=1024)
+@typed_cache(maxsize=256)
 def get_fields(cls):
     return fields(cls)
 
-@lru_cache(maxsize=1024)
+@typed_cache(maxsize=256)
 def get_field_names(cls) -> set[str]:
     return {f.name for f in fields(cls)}
 
-@lru_cache(maxsize=1024)
+@typed_cache(maxsize=256)
 def get_field_names_ordered(cls) -> tuple[str, ...]:
     return tuple(f.name for f in fields(cls))
+
+@typed_cache(maxsize=256)
+def has_field(cls, key:str):
+    return key in get_field_names(cls)
+          
+def set_field(obj, key:str, value):
+    if not has_field(type(obj),key):
+        raise KeyError(key)
+    setattr(obj, key, value)
+
+def get_field(obj, key:str):
+    if not has_field(type(obj),key):
+        raise KeyError(key)
+    return getattr(obj, key)   
 
 def xor(data: bytes, key: bytes) -> bytes:
     d = np.frombuffer(data, dtype=np.uint8)

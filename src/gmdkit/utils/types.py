@@ -1,10 +1,9 @@
-# Package Imports
-from gmdkit.serialization.functions import filter_kwargs
-
 # Imports
 from typing import Self, Any
 from collections.abc import Iterable, Callable
-from enum import IntEnum
+
+# Package Imports
+from gmdkit.serialization.functions import filter_kwargs
 
 
 class ListClass(list[Any]):
@@ -383,20 +382,3 @@ class DictClass(dict[Any,Any]):
                 return [self.pop(k) for k in keys if k in self]
         else:
             return [self.pop(k, None) for k in keys]
-
-
-class EnumClass(IntEnum):
-    
-    @classmethod
-    def from_string(cls, string: str):
-        return cls(int(string))
-
-    @classmethod
-    def _missing_(cls, value):
-        member = cls._value2member_map_.get(value)
-        if member is None:
-            member = int.__new__(cls, value)
-            member._name_ = f"UNKNOWN_{'N' if value <0 else ''}{abs(value)}"
-            member._value_ = value
-            cls._value2member_map_[value] = member
-        return member

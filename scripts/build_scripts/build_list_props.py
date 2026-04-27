@@ -7,21 +7,32 @@ FILEPATH = "src/gmdkit/casting/list_props.py"
 FOLDERPATH = "src/gmdkit/mappings/list_prop/"
 
 
+
+def match_enum(enum_format):
+    
+    match enum_format:
+        case 'difficulty':
+            return 'enums.ListDifficulty'
+        case 'list type':
+            return 'enums.LevelType'
+        case _:
+            return
+
+
 def get_lvl_types(gd_type, gd_format):
     
     match gd_type:
         
         case 'int' | 'integer' | 'number':
             
-            match gd_format:
-                
-                case 'list type':
-                    return 'enums.ListType'
-                
-                case 'bool': 
-                    return 'bool'
-                
-                case _: return 'int'
+            if (enum:=match_enum(gd_format)):
+                return enum
+            else:
+                match gd_format:
+                    case "bool":
+                        return "bool"
+                    case _:
+                        return 'int'
                 
         case 'float' | 'real':
             return 'float'
@@ -35,9 +46,11 @@ def get_lvl_types(gd_type, gd_format):
                 case _: return 'str'
         
         case 'dict':
-            if gd_format=="level map":
-                return "LevelMapping"
-            
+            match gd_format:
+                case "level_map":
+                    return "LevelMapping"
+                case _:
+                    return "dict"
         case _: return
 
 
@@ -46,17 +59,15 @@ def decode_level_props(gd_type, gd_format):
     match gd_type:
         
         case 'int' | 'integer' | 'number':
-            
-            match gd_format:
                 
-                case 'list type':
-                    return 'enums.ListType.from_string'
-                
-                case 'bool': 
-                    return 'bool'
-                
-                case _: 
-                    return
+            if (enum:=match_enum(gd_format)):
+                return enum
+            else:
+                match gd_format:
+                    case "bool":
+                        return "bool"
+                    case _:
+                        return
                 
         case 'float' | 'real':
             return

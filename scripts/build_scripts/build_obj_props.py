@@ -29,7 +29,7 @@ def match_enum(enum_format):
             return 'enums.PickupMode'
         
         case 'select axis':
-            return 'enums.SelectAxis'
+            return 'enums.TargetAxis'
         
         case 'option':
             return 'enums.Option'
@@ -47,7 +47,7 @@ def match_enum(enum_format):
             return 'enums.GradientLayer'
         
         case 'select player':
-            return 'enums.SelectPlayer'
+            return 'enums.TargetPlayer'
         
         case 'enter mode':
             return 'enums.EnterMode'
@@ -184,7 +184,7 @@ def decode_obj_props(gd_type, gd_format):
         
         case 'int' | 'integer' | 'number':
             if (enum:=match_enum(gd_format)):
-                return enum+'.from_string'
+                return enum
             else:
                 return 'int'
         

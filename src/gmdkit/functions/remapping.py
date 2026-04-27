@@ -1,38 +1,39 @@
 # Imports
-from typing import Any, Generator, Literal
-from collections.abc import Callable
-from collections.abc import Iterable
-from dataclasses import dataclass
+from typing import Any, Optional, Generator, Literal
+from collections.abc import Callable, Iterable, Sequence
+from dataclasses import dataclass, field
 
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id
-from gmdkit.models.object import ObjectList, Object
+from gmdkit.models.object import ObjectList
 from gmdkit.casting.id_rules import ID_RULES, IDRule
 from gmdkit.functions.misc import next_free
 from gmdkit.functions.object_list import compile_keyframe_groups
 
-
-class IDType:
+@dataclass
+class IDGroup:
     
-    def __init__(self):
-        self.ids = list()
-        self.ignored = set()
-        self.min = -2147483648
-        self.max = 2147483647
-    
+    ids: list = field(default_factory=list)
+    ignored: set = field(default_factory=set)
+    vmin: int = -2147483648
+    vmax: int = 2147483647
     
     def get_ids(
-        self,
-        default:bool|None = None,
-        fixed:bool|None = None,
-        remappable:bool|None = None,
-        reference:bool|None = None,
-        in_range:bool = False,
-        remap:bool = False,
-        condition:Callable|None=None
-    ) -> set[int]:
+            self,
+            default:Optional[bool] = None,
+            fixed:Optional[bool] = None,
+            remappable:Optional[bool] = None,
+            reference:Optional[bool] = None,
+            in_range:bool = False,
+            remap:bool = False,
+            condition:Optional[Callable]=None,
+            has_tags:Optional[Sequence[str]]=None,
+            ) -> set[int]:
 
         result = set()
+        
+        has_cond = callable(condition)
+        
         for i in self.ids:
             
             if in_range and not self.min <= i.get("val",0) <= self.max:
@@ -50,7 +51,10 @@ class IDType:
             if reference is not None and i.get("reference", False) != reference:
                 continue
             
-            if condition and callable(condition) and not condition(i):
+            if has_cond and not condition(i):
+                continue
+            
+            if has_tags:
                 continue
             
             if remap and (new_ids:=i.get("remaps",set())):
@@ -65,8 +69,10 @@ class IDType:
     
     
     def get_limits(self):
+        
         self.min = -2147483648
         self.max = 2147483647
+        
         for i in self.ids:
             self.min = max(i.get("min",self.min), self.min)
             self.max = min(i.get("max",self.max), self.max)

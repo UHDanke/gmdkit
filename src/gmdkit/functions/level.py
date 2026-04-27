@@ -1,7 +1,7 @@
 # Package Imports
 from gmdkit.mappings import lvl_prop
 from gmdkit.models.level import Level
-from gmdkit.serialization.enums import (
+from gmdkit.utils.enums import (
     LevelDifficulty, LevelRating, DemonRating, 
     EpicRating, FeatureRating,
     TimelyType

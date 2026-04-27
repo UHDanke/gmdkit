@@ -25,7 +25,10 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
     def _name_fallback_(self):
         container = self.CONTAINER
         data = self if container is None else getattr(self, container)
-        return data[lvl_prop.NAME]    
+        name = data.get(lvl_prop.NAME)
+        if name is None:
+            return str(data[lvl_prop.ID])
+        return name   
     
     @property
     def start(self) -> Object:
@@ -76,6 +79,8 @@ class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass[Level
     
     LOAD_CONTENT = False
 
+    def _name_fallback_(self):
+        return "level_list"
 
 class LevelMapping(PlistLoaderMixin,DictClass[int,Level]):
     DECODER = staticmethod(kv_wrap(int, Level.from_node))   
