@@ -13,12 +13,25 @@ def try_convert_int(val):
 
 
 def normalize_actions(x):
+    
     if not isinstance(x, str):
         return x
+    
     x = x.strip()
+    
     if not x:
         return pd.NA
-    return repr({i.strip() for i in x.split(",") if i.strip()})
+    
+    actions = set()
+    
+    for i in x.split(","):
+        
+        i = i.strip().replace(" ","_").upper()
+        
+        if i:
+            actions.add(i)
+            
+    return f"({', '.join(f'IDActions.{i}' for i in actions)})"
 
 def render_rule(d):
     parts = []

@@ -16,7 +16,7 @@ ID_MAX =  2147483647
 class IDType(IntEnum):
     GROUP_ID = 0  
     ITEM_ID = 1
-    TIMER_ID = 2
+    TIME_ID = 2
     COLLISION_ID = 3
     COLOR_ID = 4
     CONTROL_ID = 5
