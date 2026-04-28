@@ -69,6 +69,7 @@ class IDActions(IntEnum):
     PERSIST_ITEM = 28
     TRACK_COLLISION = 29
     CHECK_COLLISION = 30
+    LINKED_OBJECTS = 31
 
 
 @dataclass(slots=True)
