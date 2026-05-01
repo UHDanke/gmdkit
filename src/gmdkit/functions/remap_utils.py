@@ -105,14 +105,12 @@ def combine_objects(*objects:ObjectList, id_func:Callable):
             av = v.get("values")
             tv = v.get("targets",av)
             coll = vals & tv
-            print(vals,av,tv,coll)
             
             if coll:
                 new = next_free(vals,start=last_ids.get(k),vmin=ids.vmin,vmax=ids.vmax,count=len(coll))
                 if new:
                     last_ids[k] = new[-1]
                 kv_map = dict(zip(coll,new))
-                print(kv_map)
                 ids.remap_objects(kv_map)
                 vals.update(new)
                 
