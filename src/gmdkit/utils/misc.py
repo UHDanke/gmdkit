@@ -45,7 +45,6 @@ def get_enum_values(cls):
     
     return {e.value for e in cls}
 
-
 def next_free(
         values:Iterable[int],
         start:int|None=None,

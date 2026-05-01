@@ -2,9 +2,10 @@
 from typing import Callable, Any, Optional, Sequence
 from dataclasses import dataclass, field
 from enum import IntEnum
+import copy
 
 # Package Imports
-from gmdkit.models.object import Object
+from gmdkit.models.object import Object, ObjectList
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.other.id_functions import obj_can_be_spawned
 
@@ -14,27 +15,31 @@ ID_MAX =  2147483647
 
 
 class IDType(IntEnum):
-    GROUP_ID = 0  
-    ITEM_ID = 1
-    TIME_ID = 2
-    COLLISION_ID = 3
-    COLOR_ID = 4
-    CONTROL_ID = 5
-    LINK_ID = 6
-    TRIGGER_CHANNEL = 7
-    ENTER_CHANNEL = 8
-    MATERIAL_ID = 9
-    EFFECT_ID = 10
-    GRADIENT_ID = 11
-    FORCE_ID = 12
-    KEYFRAME_ID = 13
-    SFX_ID = 14
-    SONG_ID = 15
-    UNIQUE_SFX_ID = 16
-    SFX_GROUP = 17
-    SONG_CHANNEL = 18
-    REMAP_BASE = 19
-    REMAP_TARGET = 20
+    LABEL = -2
+    GENERIC = -1
+    ANY = 0
+    GROUP_ID = 1  
+    ITEM_ID = 2
+    TIME_ID = 3
+    COLLISION_ID = 4
+    COLOR_ID = 5
+    CONTROL_ID = 6
+    LINK_ID = 7
+    TRIGGER_CHANNEL = 8
+    ENTER_CHANNEL = 9
+    MATERIAL_ID = 10
+    EFFECT_ID = 11
+    GRADIENT_ID = 12
+    FORCE_ID = 13
+    KEYFRAME_ID = 14
+    SFX_ID = 15
+    SONG_ID = 16
+    UNIQUE_SFX_ID = 17
+    SFX_GROUP = 18
+    SONG_CHANNEL = 19
+    REMAP_BASE = 20
+    REMAP_TARGET = 21
+    
 
 
 class IDActions(IntEnum):
@@ -96,7 +101,7 @@ class Identifier:
 
     def __post_init__(self):
         
-        if type(self.id_val) is tuple:
+        if type(self.id_val) is tuple and not self.iterable:
             self.iterable = True
             
         elif self.id_val == self.default:
@@ -104,23 +109,131 @@ class Identifier:
             self.fixed = True
 
 
-    def remap_obj(self, kv_map: dict, override: bool = False) -> None:
+    def remap_obj(self, kv_map: dict, override: bool = False):
         if not override and (self.fixed or self.default) or not kv_map:
             return
 
-        if callable(self.replace):
-            val = self.obj.get(self.obj_prop_id)
+        obj = self.obj
+        pid = self.obj_prop_id
+        
+        if self.replace is not None and callable(self.replace):
+            val = obj.get(pid)
+            
             if val is not None:
-                self.replace(val, kv_map)
-
+                obj[pid] = self.replace(val, kv_map)
+                
         elif (new := kv_map.get(self.id_val)) is not None:
-            self.obj[self.obj_prop_id] = new
+            obj[pid] = new
 
 
-@dataclass(slots=True)
+@dataclass(slots=True)           
+class IdentifierList:
+    
+    values: tuple[Identifier] = field(default_factory=tuple)
+    ignored: set[int] = field(default_factory=set)
+    vmin: int = ID_MIN
+    vmax: int = ID_MAX        
+    
+    def __post_init__(self):
+        if type(self.values) is not tuple:
+            self.values = tuple(self.values)
+        self.get_limits()
+        
+    def get_limits(self) -> (int,int):
+        self.vmin = max((i.id_min for i in self.values), default=ID_MIN)
+        self.vmax = min((i.id_max for i in self.values), default=ID_MAX)
+    
+        return self.vmin, self.vmax
+
+    def filter_values(
+            self,
+            default:Optional[bool] = None,
+            fixed:Optional[bool] = None,
+            remappable:Optional[bool] = None,
+            reference:Optional[bool] = None,
+            condition:Optional[Callable]=None,
+            has_tags:Optional[Sequence[IDActions]]=None,
+            has_types:Optional[Sequence[IDType]]=None
+            ) -> set[int]:
+
+        result = []
+        has_cond = callable(condition)
+        
+        for i in self.values:
+            
+            if has_types and i.id_type not in has_types:
+                continue
+            
+            if default is not None and i.default != default:
+                continue
+            
+            if fixed is not None and i.fixed != fixed:
+                continue
+            
+            if remappable is not None and i.remappable != remappable:
+                continue
+
+            if reference is not None and i.reference != reference:
+                continue
+            
+            if has_cond and not condition(i):
+                continue
+            
+            if has_tags and i.actions not in i.has_tags:
+                continue
+            
+            result.append(i)
+        
+        return self.__class__(values=result)
+    
+    def get_ids(
+            self,
+            in_range:bool = False,
+            min_value:Optional[int] = None,
+            max_value:Optional[int] = None,
+            remap:bool = False,
+            include_original:bool = True
+            ) -> set|dict[set]:
+        
+        ids = self.values        
+        low = min_value if min_value is not None else self.vmin
+        high = max_value if max_value is not None else self.vmax
+        
+        result = set()
+        
+        for i in ids:
+            vals = i.id_val if i.iterable else (i.id_val,)
+        
+            for v in vals:
+                if in_range and not (low <= v <= high):
+                    continue
+                
+                n = min(max(v, self.vmin), self.vmax)
+                
+                if remap and i.remappable and i.remaps:
+                    if v in i.remaps:
+                        r = i.remaps[v]
+                        r = min(max(r, self.vmin), self.vmax)
+                        result.add(r)
+                        
+                        if include_original:
+                            result.add(n)
+                    else:
+                        result.add(n)
+                else:
+                    result.add(n)
+        
+        return result
+
+    def remap_objects(self, kv_map: dict, override: bool = False): 
+        for v in self.values:
+            v.remap_obj(kv_map=kv_map,override=override)
+        
+        
+@dataclass(slots=True,frozen=True)
 class IDRule:
     obj_prop_id: int | str
-    id_type: str
+    id_type: IDType
     condition: Optional[Callable] = None
     function: Optional[Callable] = None
     fallback: Optional[Callable] = None
@@ -133,8 +246,22 @@ class IDRule:
     id_min: int = ID_MIN
     id_max: int = ID_MAX
     actions: Optional[tuple] = None
-
-    def get_ids(self, obj: Object):
+    
+    def is_matched(
+            self,
+            id_types:Optional[Sequence[IDType]]=None,
+            reference:Optional[bool]=None,
+            actions: Optional[tuple]=None
+            ):
+        if id_types and self.id_type not in id_types:
+            return False
+        if reference is not None and self.reference != reference:
+            return False
+        if actions and self.id_type not in id_types:
+            return False
+        return True
+        
+    def get_id(self, obj: Object):
         val = obj.get(self.obj_prop_id)
         
         default = self.default(obj) if callable(self.default) else self.default
@@ -157,10 +284,13 @@ class IDRule:
             val = tuple(val)
             if not val:
                 return
+            fixed = self.fixed
         elif val is None:
             return
         
-        fixed = self.fixed(obj) if callable(self.fixed) else self.fixed
+        else:            
+            fixed = self.fixed(val) if callable(self.fixed) else self.fixed
+        
         remappable = self.remappable(obj) if callable(self.remappable) else self.remappable
     
         return Identifier(
@@ -178,94 +308,82 @@ class IDRule:
             actions = self.actions,
             replace = self.replace,
         )
-
+    
 
 @dataclass(slots=True)
 class RuleHandler:
     
     base: tuple[IDRule] = field(default_factory=tuple)
     by_id: dict[int|str, tuple[IDRule]] = field(default_factory=dict)
-
-    def get_ids(self, obj: Object):
-        
-        oid = obj.get(obj_prop.ID, obj_id.LEVEL_START)
-        rules = self.by_id.get(oid)
-        
-        if rules is not None:
-            for rule in rules:
-                yield from rule.get_ids(obj)
-
-        if oid != obj_id.LEVEL_START and self.base:
-            for rule in self.base:
-                yield from rule.get_ids(obj)
-
-
-@dataclass(slots=True)           
-class IdentifierList:
     
-    ids: list[Identifier] = field(default_factory=list)
-    ignored: set[int] = field(default_factory=set)
-    vmin: int = ID_MIN
-    vmax: int = ID_MAX
+    def compile_rules(self, **kwargs):
+        
+        base = tuple(i for i in self.base if i.is_matched(**kwargs))
+        by_id = {}
+        
+        for k, v in self.by_id.items():
+            r = tuple(i for i in v if i.is_matched(**kwargs))
+            if r:
+                by_id[k] = r
+            
+        return self.__class__(base=base,by_id=by_id)
     
-    def get_ids(
-            self,
-            default:Optional[bool] = None,
-            fixed:Optional[bool] = None,
-            remappable:Optional[bool] = None,
-            reference:Optional[bool] = None,
-            in_range:bool = False,
-            remap:bool = False,
-            condition:Optional[Callable]=None,
-            has_tags:Optional[Sequence[str]]=None,
-            ) -> set[int]:
-
-        result = set()
+    def combine_rules(self, *rules):
         
-        has_cond = callable(condition)
+        base = set()
+        by_id = {}
+        rule_list = [self, *rules]
         
-        for i in self.ids:
+        for r in rule_list:
+            base.update(r.base)
             
-            
-            if in_range and not self.min <= i.id_val <= self.max:
-                continue
-            
-            if default is not None and i.default != default:
-                continue
-            
-            if fixed is not None and i.fixed != fixed:
-                continue
-            
-            if remappable is not None and i.remappable != remappable:
-                continue
-
-            if reference is not None and i.reference != reference:
-                continue
-            
-            if has_cond and not condition(i):
-                continue
-            
-            if has_tags:
-                continue
-            
-            if remap and (new_ids:=i.remaps):
-                for n in new_ids:
-                    n = min(max(n, self.vmin), self.vmax)
-                    result.add(n)
-            else:
-                n = min(max(i.id_val, self.vmin), self.vmax)
-                result.add(n)
+            for k,v in r.by_id:
+                by_id.setdefault(k,set()).update(v)
         
-        return result
+        return self.__class_(base=tuple(base),by_id={k:tuple(v) for k,v in by_id.items()})
+        
+    def compile_ids(
+            self, 
+            obj_list: ObjectList,
+            by_type:bool=False,
+            type_groups:Optional[Sequence[set]]=None
+            ):
+        
+        result = {}
+        
+        for obj in obj_list:
+            oid = obj.get(obj_prop.ID, 0)
+            rules = self.by_id.get(oid)
+            
+            if rules is not None:
+                for rule in rules:
+                    if (i:= rule.get_id(obj)) is not None:
+                        result.setdefault(i.id_type,[]).append(i)
     
-    
-    def get_limits(self):
+            if oid != obj_id.LEVEL_START and self.base:
+                for rule in self.base:
+                    if (i:= rule.get_id(obj)) is not None:
+                        result.setdefault(i.id_type,[]).append(i)
         
-        self.vmin = ID_MIN
-        self.vmax = ID_MAX
-        
-        for i in self.ids:
-            self.min = max(i.vmin, self.min)
-            self.max = min(i.vmax, self.max)
-        
-        return self.min, self.max
+        if by_type:
+            if type_groups is not None:
+                seen = set()
+                grouped = {}
+                
+                seen.update(type_groups)
+                for g in type_groups:
+                    
+                    grouped[g] = tuple(
+                        v
+                        for t in g if t in result
+                        for v in result[t]
+                    )
+            
+                for t in seen:
+                    result.pop(t, None)
+            
+                result.update(grouped)
+            
+            return {k: IdentifierList(values=v) for k,v in result.items()}
+            
+        return IdentifierList(values=(i for l in result.values() for i in l))

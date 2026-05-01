@@ -358,7 +358,6 @@ def compile_keyframe_groups(
             continue
         
         if function is not None and callable(function) and (value:=function(obj)) is not None:
-            
             groups = obj.get(obj_prop.GROUPS)
             
             if groups:
@@ -375,7 +374,7 @@ def compile_keyframe_groups(
     
     for key, value in result.items():
         
-        result[key] = list(result[key]).sort()
+        result[key] = tuple(sorted(result[key]))
         
     return result
     
@@ -459,7 +458,7 @@ def compile_spawn_groups(obj_list:ObjectList) -> ObjectListMapping:
 def boundaries(
         obj_list:ObjectList, 
         center_type:Literal["midpoint","mean","median"]="mean"
-        ) -> tuple[float,float,float,float,float,float]:
+        ) -> dict[str,float]:
     """
     Compiles the boundaries of a group of objects.
     Only the center position is considered, the object's texture is ignored.
@@ -479,23 +478,8 @@ def boundaries(
 
     Returns
     -------
-    min_x : float
-        Minimum X coordinate.
-    
-    min_y : float
-        Minimum Y coordinate.
-        
-    center_x : float
-        Center X coordinate.
-        
-    center_y : float
-        Center Y coordinate.
-     
-    max_x : float
-        Maximum X coordinate.
-        
-    max_y : float
-        Maximum Y coordinate.
+    bounds : dict
+        A dictionary containing min_x, min_y, center_x, center_y, max_x, max_y
     """
     x = []
     y = []
@@ -534,7 +518,7 @@ def boundaries(
     else:
         min_y = center_y = max_y = 0.0
         
-    return min_x, min_y, center_x, center_y, max_x, max_y
+    return {"min_x": min_x, "min_y":min_y, "center_x":center_x, "center_y":center_y, "max_x":max_x, "max_y": max_y}
 
 def grid_align(
         obj_list:ObjectList,
@@ -770,3 +754,20 @@ def align_objects(
     if x_axis: per_axis('x', obj_prop.X)
     
     if y_axis: per_axis('y', obj_prop.Y)
+
+# TODO
+def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_limit:float=0):
+    
+    objs = sorted(obj_list, key=lambda obj: obj.get(obj_prop.X,0))
+    
+    groups = {}
+    
+    x = None
+    for obj in objs:
+        ox = obj.get(obj_prop.X)
+        if x is None or ox is not None and ox-x > forward_limit:
+            x = ox
+        gx = groups.setdefault(x, [])
+        gx.append(obj)
+        
+    return {k: function(v) for k,v in groups.items()}

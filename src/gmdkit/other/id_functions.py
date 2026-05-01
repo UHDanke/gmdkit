@@ -163,24 +163,28 @@ def remap_custom_color_channels(color_list, kvm):
         i = color.channel
         if custom_color(i):
             color.channel = kvm.get(i,i)
+    return color_list
 
 def remap_custom_color_copies(color_list, kvm):
     for color in color_list:
         i = color.copy_id
         if custom_color(i):
             color.copy_id = kvm.get(i,i)
+    return color_list
 
 def remap_special_color_channels(color_list, kvm):
     for color in color_list:
         i = color.channel
         if special_color(i):
             color.channel = kvm.get(i,i)
-            
+    return color_list
+           
 def remap_special_base_color_copies(color_list, kvm):
     for color in color_list:
         i = color.copy_id
         if special_color(i):
             color.copy_id = kvm.get(i,i)
+    return color_list
 
 def get_base_color(obj:Object) -> int:
     return COLOR_1_DEFAULT.get(obj.get(obj_prop.ID,0))
@@ -271,10 +275,13 @@ def item_persist_timer(obj:Object) -> bool:
 
 def remap(x, kvm):
     x.remap(kvm)
+    return x
     
 def remap_pairs_keys(pairs, kvm):
     pairs.remap_keys(kvm)
+    return pairs
 
 def remap_pairs_vals(pairs, kvm):
     pairs.remap_vals(kvm)
+    return pairs
     

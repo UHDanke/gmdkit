@@ -13,7 +13,11 @@ from gmdkit.functions.color import create_color_triggers
 from gmdkit.utils.misc import next_free
 
 
-def boundary_offset(level_list:LevelList,vertical_stack:bool=False,block_offset:int=30):
+def boundary_offset(
+        level_list:LevelList,
+        vertical_stack:bool=False,
+        block_offset:int=30
+        ):
     
     i = None
     
@@ -79,13 +83,9 @@ def merge_levels(level_list:LevelList, override_colors:bool=True):
     return main_level
 
 
-def disable_start_pos(obj:Object):
-    if obj.get(obj_prop.ID)!=obj_id.trigger.START_POSITION:
-        return
-    obj[obj_prop.start_pos.DISABLE] = True
 
 
-def level_color_triggers(level:Level):
+def create_level_color_triggers(level:Level):
     colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
     level.objects += create_color_triggers(colors)
 
@@ -153,23 +153,6 @@ def regroup_levels(level_list:LevelList, ignored_ids:dict|None=None, reserved_id
             collisions.setdefault(k,set()).update(v.get_ids())
 
 
-def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_limit:float=0):
-    
-    objs = sorted(obj_list, key=lambda obj: obj.get(obj_prop.X,0))
-    
-    groups = {}
-    
-    x = None
-    for obj in objs:
-        ox = obj.get(obj_prop.X)
-        if x is None or ox is not None and ox-x > forward_limit:
-            x = ox
-        gx = groups.setdefault(x, [])
-        gx.append(obj)
-        
-    return {k: function(v) for k,v in groups.items()}
-
-
 def start_pos_fix(
         obj_list:ObjectList, 
         target_id:int,
@@ -213,30 +196,6 @@ def start_pos_fix(
         add_groups(objs+[event], (i,))
     
     return events
-    
-    
-    
-    
-
-def level_area_start_pos_fix():
-    
-    AREA_TRIGGERS = [
-        obj_id.trigger.area.MOVE,
-        obj_id.trigger.area.ROTATE,
-        obj_id.trigger.area.SCALE,
-        obj_id.trigger.area.FADE,
-        obj_id.trigger.area.TINT,
-        obj_id.trigger.area.EDIT_MOVE,
-        obj_id.trigger.area.EDIT_ROTATE,
-        obj_id.trigger.area.EDIT_SCALE,
-        obj_id.trigger.area.EDIT_FADE,
-        obj_id.trigger.area.EDIT_TINT,
-        obj_id.trigger.area.STOP
-        ]
-
-    return
-        
-    
     
 
 

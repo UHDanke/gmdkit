@@ -352,5 +352,10 @@ def fix_transform(obj:Object):
         obj.pop(obj_prop.ROTATION, None)
     else:
         obj[obj_prop.ROTATION] = rotation
-    
+
+
+def disable_start_pos(obj:Object):
+    if obj.get(obj_prop.ID)!=obj_id.trigger.START_POSITION:
+        return
+    obj[obj_prop.start_pos.DISABLE] = True
 

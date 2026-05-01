@@ -1,7 +1,8 @@
 # Package Imports
 from gmdkit.mappings import obj_prop, color_id, obj_id
 from gmdkit.models.object import ObjectList, Object
-from gmdkit.models.prop.color import Color, ColorList, SelectPlayer
+from gmdkit.models.prop.color import Color, ColorList
+from gmdkit import enums
 from gmdkit.models.prop.hsv import HSV
 
 
@@ -121,13 +122,13 @@ def trigger_to_color(obj:Object) -> Color:
     p_2 = obj[obj_prop.trigger.color.PLAYER_1]
     
     if p_1 and p_2:
-        color.player = SelectPlayer.ALL
+        color.player = enums.TargetPlayer.ALL
     elif not p_1 and not p_2:
-        color.player = SelectPlayer.NONE
+        color.player = enums.TargetPlayer.NONE
     elif p_1:
-        color.player = SelectPlayer.P1
+        color.player = enums.TargetPlayer.P1
     elif p_2:
-        color.player = SelectPlayer.P2
+        color.player = enums.TargetPlayer.P2
         
     color.blending = obj.get(obj_prop.trigger.color.BLENDING,False)
     color.channel = obj.get(obj_prop.trigger.color.CHANNEL,0)
