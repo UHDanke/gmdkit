@@ -33,44 +33,38 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
     
     @property
     def start(self) -> Object:
-        objstr = self.get(lvl_prop.OBJECT_STRING)
-        
-        if objstr is None:
-            raise RuntimeError("Object string is missing.")
-        
+        objstr = self.setdefault(lvl_prop.OBJECT_STRING, ObjectString())
+                
         if not hasattr(objstr, "start"):
-            raise RuntimeError("Object string is not loaded.")
+            objstr.load()
 
         return getattr(objstr, "start")
     
     @start.setter
     def start(self, value: Object):
-        objstr = self.get(lvl_prop.OBJECT_STRING, ObjectString())
+        objstr = self.setdefault(lvl_prop.OBJECT_STRING, ObjectString())
         
         if not hasattr(objstr, "start"):
-            raise RuntimeError("Object string is not loaded.")
-    
+            objstr.load()
+            
         setattr(objstr, "start", value)
         
     @property
     def objects(self) -> ObjectList:
-        objstr = self.get(lvl_prop.OBJECT_STRING)
-        
-        if objstr is None:
-            raise RuntimeError("Object string is missing.")
+        objstr = self.setdefault(lvl_prop.OBJECT_STRING, ObjectString())
         
         if not hasattr(objstr, "objects"):
-            raise RuntimeError("Object string is not loaded.")
+            objstr.load()
 
         return getattr(objstr, "objects")
     
     @objects.setter
     def objects(self, value: ObjectList):
-        objstr = self.get(lvl_prop.OBJECT_STRING, ObjectString())
+        objstr = self.setdefault(lvl_prop.OBJECT_STRING, ObjectString())
         
         if not hasattr(objstr, "objects"):
-            raise RuntimeError("Object string is not loaded.")
-    
+            objstr.load()
+            
         setattr(objstr, "objects", value)
         
     @classmethod

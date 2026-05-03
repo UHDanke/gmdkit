@@ -46,43 +46,6 @@ def boundary_offset(
 
 
 
-def merge_levels(level_list:LevelList, override_colors:bool=True):
-    
-    main_level = deepcopy(level_list[0])
-    main_colors = main_level.start[obj_prop.level.COLORS]
-    main_channels = main_colors.unique_values(lambda color: [color.channel])
-        
-    for level in level_list[1:]:
-        
-        main_level.objects += level.objects
-        
-        colors = level.start[obj_prop.level.COLORS]
-        group_colors = colors.get_custom()
-        
-        for color in group_colors:
-            color_channel = color.channel
-            
-            if override_colors:
-                if color_channel in main_channels:
-                    main_colors[:] = [
-                        c for c in main_colors
-                        if c.channel != color
-                    ]
-                
-                main_colors.append(color)
-                main_channels.add(color_channel)
-                
-            else:
-                if color_channel in main_channels:
-                    continue
-                else:
-                    main_colors.append(color)
-                    main_channels.add(color_channel)
-    
-    return main_level
-
-
-
 
 def create_level_color_triggers(level:Level):
     colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)

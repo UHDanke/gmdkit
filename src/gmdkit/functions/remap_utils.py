@@ -13,14 +13,36 @@ from gmdkit.utils.misc import next_free
 from gmdkit.functions.object import clean_duplicate_groups
 from gmdkit.functions.object_list import compile_keyframe_groups, clean_gid_parents, add_groups
 
+
 def create_text_id_rule(
         regex:str,
         id_type:IDType,
         condition:Optional[Callable]=None,
         id_min:Optional[int]=None,
         id_max:Optional[int]=None
-        ):
-    
+        ) -> IDRule:
+    """
+    Compiles an ID rule that retrieves a group ID from a text object field.
+
+    Parameters
+    ----------
+    regex : str
+        DESCRIPTION.
+    id_type : IDType
+        DESCRIPTION.
+    condition : Optional[Callable], optional
+        DESCRIPTION. The default is None.
+    id_min : Optional[int], optional
+        DESCRIPTION. The default is None.
+    id_max : Optional[int], optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    IDRule
+        DESCRIPTION.
+
+    """
     pattern = re.compile(regex)
     
     def function(text: str):
@@ -116,6 +138,28 @@ def offset_object_ids(
         rules:RuleHandler=ID_RULES,
         groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
+    """
+    Offsets 
+
+    Parameters
+    ----------
+    objects : ObjectList|Level
+        DESCRIPTION.
+    id_offset : Optional[dict], optional
+        DESCRIPTION. The default is None.
+    ignore_ids : Optional[dict], optional
+        DESCRIPTION. The default is None.
+    rules : RuleHandler, optional
+        DESCRIPTION. The default is ID_RULES.
+    groups : Optional[Sequence[Sequence[IDType]]], optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    objects : TYPE
+        DESCRIPTION.
+
+    """
     
     ignore_ids = ignore_ids or {}
     id_offset = id_offset or {}
@@ -287,18 +331,26 @@ def combine_levels(*levels:Level):
     
     
 def objs_from_ids(id_list, condition: Optional[Callable] = None):
+    
+    seen = set()  
     new = ObjectList()
     
     for i in id_list:
         obj = i.obj
         
-        if obj is None: continue
-        if obj in new: continue
+        if obj is None:
+            continue
+        
+        obj_str = obj.to_string()
+        
+        if obj_str in seen: 
+            continue
         
         if condition is not None and callable(condition) and not condition(i):
             continue
         
         new.append(obj)
+        seen.add(obj_str)
     
     return new
 
@@ -365,4 +417,9 @@ def free_unused_colors(lvl:Level, ignore_ids:dict):
     if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:        
         lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
     
-
+def strip_intersection(
+        base:ObjectList,
+        objects:ObjectList
+        ):
+    str_set = set(base.to_tokens())
+    return objects.where(lambda obj: obj.to_string() not in str_set)

@@ -103,7 +103,7 @@ class Identifier:
         if type(self.id_val) is tuple and not self.iterable:
             self.iterable = True
             
-        elif self.id_val == self.default:
+        if not self.iterable and self.id_val == self.default:
             self.is_default = True
             #self.fixed = True
 
@@ -163,7 +163,7 @@ class IdentifierList:
             if has_types and i.id_type not in has_types:
                 continue
             
-            if default is not None and i.default != default:
+            if default is not None and i.is_default != default:
                 continue
             
             if fixed is not None and i.fixed != fixed:
@@ -207,7 +207,7 @@ class IdentifierList:
                 if in_range and not (low <= v <= high):
                     continue
                 
-                n = min(max(v, self.vmin), self.vmax)
+                n = v
                 
                 if remap and i.remappable and i.remaps:
                     if v in i.remaps:
@@ -368,7 +368,7 @@ class RuleHandler:
             source: ObjectList|Level,
             by_type:bool=False,
             type_groups:Optional[Sequence[set]]=None
-            ):
+            ) -> IdentifierList|dict[Sequence[IDType]|IDType,IdentifierList]:
         
         result = {}
         cls = type(source)
