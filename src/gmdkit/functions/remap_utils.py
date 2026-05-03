@@ -169,7 +169,6 @@ def remap_objects(*objects:ObjectList|Level, id_func:Callable):
                 if new:
                     last_ids[k] = new[-1]
                 kv_map = dict(zip(coll,new))
-                print(k, kv_map)
                 ids.remap_objects(kv_map)
                 vals.update(new)
     
