@@ -5,10 +5,9 @@ from typing import Literal, Callable
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id, color_id
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.functions.object_list import boundaries, add_groups
+from gmdkit.functions.object_list import boundaries, add_groups, group_objects_x
 from gmdkit.models.level import Level, LevelList
 from gmdkit.functions.object import offset_position
-from gmdkit.functions.remapping import regroup, compile_id_context
 from gmdkit.functions.color import create_color_triggers
 from gmdkit.utils.misc import next_free
 
@@ -89,13 +88,6 @@ def create_level_color_triggers(level:Level):
     colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
     level.objects += create_color_triggers(colors)
 
-# TODO REDO
-def obj_list_group(obj_list:ObjectList):
-    ids = compile_id_context(obj_list)
-    g, = next_free(values=ids["group_id"].get_ids(),vmin=1,vmax=9999,count=1)
-    add_groups(obj_list,{g})
-    return g,
-
 
 def level_add_toggles(lvl_list:LevelList):
     init_toggles = ObjectList()
@@ -140,17 +132,7 @@ def level_add_toggles(lvl_list:LevelList):
         
     return init_toggles
 
-def regroup_levels(level_list:LevelList, ignored_ids:dict|None=None, reserved_ids:dict|None=None, remaps:Literal["none","naive","search"]="none"):
-    ignored_ids = ignored_ids or {}
-    reserved_ids = reserved_ids or {}
-    collisions = reserved_ids
-    
-    for lvl in level_list:
-        #print(collisions)
-        objs = [lvl.start] + lvl.objects
-        regroup(objs, ignored_ids=ignored_ids, reserved_ids=collisions)
-        for k, v in objs.id_context.items():
-            collisions.setdefault(k,set()).update(v.get_ids())
+
 
 
 def start_pos_fix(

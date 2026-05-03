@@ -78,8 +78,6 @@ def next_free(
     new_ids : list[int]
         A list of ids returned.
     """
-    used = set(values)
-    used.add(0)
     result = []
 
     def range_search(start: int, stop: int, step: int):
@@ -88,19 +86,19 @@ def next_free(
         while (i < stop if step > 0 else i > stop):
             if len(result) >= count:
                 break
-            if i not in used:
+            if i not in values:
                 result.append(i)
             i += step
 
 
     if vmin > vmax: return result
     if start is None:
-        start = 0 if vmin <= 0 else vmin
+        start = 1 if vmin <= 0 else vmin
     else:
         if start < vmin:
             start = vmin
         elif start > vmax:
-            start = -1 if vmin < 0 else vmax
+            start = 0 if vmin < 0 else vmax
         
     if start is not None and start <= vmax:
         range_search(start, vmax, 1)

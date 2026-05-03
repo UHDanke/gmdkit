@@ -4,6 +4,7 @@ from typing import Any
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.models.object import Object, ObjectList
+from gmdkit.models.prop.gzip import ObjectString
 from gmdkit.serialization.mixins import FilePathMixin, PlistLoaderMixin, FolderLoaderMixin
 from gmdkit.serialization.functions import (
     dict_cast, from_node_dict, to_node_dict, read_plist, write_plist, get_load_keys, kv_wrap, args_wrap
@@ -42,7 +43,15 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
 
         return getattr(objstr, "start")
     
+    @start.setter
+    def start(self, value: Object):
+        objstr = self.get(lvl_prop.OBJECT_STRING, ObjectString())
+        
+        if not hasattr(objstr, "start"):
+            raise RuntimeError("Object string is not loaded.")
     
+        setattr(objstr, "start", value)
+        
     @property
     def objects(self) -> ObjectList:
         objstr = self.get(lvl_prop.OBJECT_STRING)
@@ -55,6 +64,15 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
 
         return getattr(objstr, "objects")
     
+    @objects.setter
+    def objects(self, value: ObjectList):
+        objstr = self.get(lvl_prop.OBJECT_STRING, ObjectString())
+        
+        if not hasattr(objstr, "objects"):
+            raise RuntimeError("Object string is not loaded.")
+    
+        setattr(objstr, "objects", value)
+        
     @classmethod
     def default(cls, name:str, **kwargs):
         

@@ -183,5 +183,3 @@ def create_color_triggers(
         y += -30
     
     return obj_list
-        
-        

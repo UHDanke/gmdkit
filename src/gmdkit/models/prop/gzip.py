@@ -169,7 +169,7 @@ class ObjectString(GzipString):
         string = start.to_string() + objects.to_string()
         super().save(string)
         return self.string
-    
+        
 
 class ReplayString(GzipString):
     """

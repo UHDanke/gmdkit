@@ -2,10 +2,9 @@
 from typing import Callable, Any, Optional, Sequence
 from dataclasses import dataclass, field
 from enum import IntEnum
-import copy
 
 # Package Imports
-from gmdkit.models.object import Object, ObjectList
+from gmdkit import Level, Object, ObjectList
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.other.id_functions import obj_can_be_spawned
 
@@ -106,11 +105,11 @@ class Identifier:
             
         elif self.id_val == self.default:
             self.is_default = True
-            self.fixed = True
+            #self.fixed = True
 
 
     def remap_obj(self, kv_map: dict, override: bool = False):
-        if not override and (self.fixed or self.default) or not kv_map:
+        if not override and self.fixed or not kv_map:
             return
 
         obj = self.obj
@@ -341,29 +340,52 @@ class RuleHandler:
                 by_id.setdefault(k,set()).update(v)
         
         return self.__class_(base=tuple(base),by_id={k:tuple(v) for k,v in by_id.items()})
+    
+    def fetch_ids(
+            self,
+            obj:Object,
+            result:Optional[dict]=None
+            ):
+        
+        result = {} if result is None else result
+        oid = obj.get(obj_prop.ID, 0)
+        rules = self.by_id.get(oid)
+            
+        if rules is not None:
+            for rule in rules:
+                if (i:= rule.get_id(obj)) is not None:
+                    result.setdefault(i.id_type,[]).append(i)
+    
+        if oid != obj_id.LEVEL_START and self.base:
+            for rule in self.base:
+                if (i:= rule.get_id(obj)) is not None:
+                    result.setdefault(i.id_type,[]).append(i)
+        
+        return result
         
     def compile_ids(
             self, 
-            obj_list: ObjectList,
+            source: ObjectList|Level,
             by_type:bool=False,
             type_groups:Optional[Sequence[set]]=None
             ):
         
         result = {}
+        cls = type(source)
         
-        for obj in obj_list:
-            oid = obj.get(obj_prop.ID, 0)
-            rules = self.by_id.get(oid)
-            
-            if rules is not None:
-                for rule in rules:
-                    if (i:= rule.get_id(obj)) is not None:
-                        result.setdefault(i.id_type,[]).append(i)
-    
-            if oid != obj_id.LEVEL_START and self.base:
-                for rule in self.base:
-                    if (i:= rule.get_id(obj)) is not None:
-                        result.setdefault(i.id_type,[]).append(i)
+        if issubclass(cls, Level):
+            self.fetch_ids(source.objects,result)
+            for obj in source.objects:
+                self.fetch_ids(obj,result)
+                
+        elif issubclass(cls, ObjectList):            
+            for obj in source:
+                self.fetch_ids(obj,result)
+        
+        else:
+            for obj in source:
+                if issubclass(obj, Object):
+                    self.fetch_ids(obj,result)
         
         if by_type:
             if type_groups is not None:

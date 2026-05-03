@@ -1,5 +1,5 @@
 # Imports
-from typing import Optional
+from typing import Optional, Sequence
 
 # Package Imports
 from gmdkit.utils.types import ListClass
@@ -96,3 +96,27 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
     
     def get_copies(self):
         return self.unique_values(lambda color: (color.copy_id,))
+    
+    def discard_duplicates(self):
+        seen = set()
+        i = 0
+
+        while i < len(self):
+            channel = self[i].channel
+            if channel in seen:
+                del self[i]
+            else:
+                seen.add(channel)
+                i += 1
+    
+    def add_colors(self, colors:Sequence[Color], override:bool=False):
+        index = {c.channel: i for i, c in enumerate(self.colors)}
+
+        for color in colors:
+            if color.channel in index:
+                if override:
+                    self.colors[index[color.channel]] = color
+            else:
+                index[color.channel] = len(self.colors)
+                self.colors.append(color)
+            
