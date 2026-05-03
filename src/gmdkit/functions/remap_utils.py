@@ -102,6 +102,12 @@ ID_RULES_REGROUP = ID_RULES.compile_rules(id_types=(
     IDType.GRADIENT_ID
     ))
 
+ID_RULES_REGROUP_COLOR = ID_RULES.compile_rules(id_types=(
+    *ID_SET_REGROUP,
+    IDType.COLOR_ID,
+    IDType.FORCE_ID,
+    IDType.GRADIENT_ID
+    ))
 
 def offset_object_ids(
         objects:ObjectList|Level,
@@ -184,7 +190,7 @@ def remap_objects_regroup(
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         rules:RuleHandler=ID_RULES_REGROUP,
-        groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,),
+        groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,(IDType.COLOR_ID,)),
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
@@ -231,7 +237,7 @@ def remap_objects_build_helper(
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         rules:RuleHandler=ID_RULES_REGROUP,
-        groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,),
+        groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,(IDType.COLOR_ID,)),
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
