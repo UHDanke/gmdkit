@@ -1,5 +1,6 @@
 # Imports
 from typing import Iterable, Callable, ParamSpec, TypeVar
+import tkinter as tk
 from enum import Enum
 from functools import lru_cache
 
@@ -13,6 +14,34 @@ def typed_cache(maxsize=128, typed=False):
     def decorator(f: Callable[P, R]) -> Callable[P, R]:
         return lru_cache(maxsize=maxsize,typed=typed)(f)  # type: ignore
     return decorator
+
+
+class Clipboard:
+    def __init__(self):
+        self.root = None
+
+    def __enter__(self):
+        self.root = tk.Tk()
+        self.root.withdraw()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            self.root.update()
+        finally:
+            self.root.destroy()
+
+    def get(self) -> str:
+        try:
+            return self.root.clipboard_get()
+        except tk.TclError:
+            return ""
+
+    def set(self, text: str):
+        self.root.clipboard_clear()
+        self.root.clipboard_append(text)
+        self.root.update()
+        
 
 @typed_cache(maxsize=256)
 def normalize_orientation(rotation:float, flip_x:bool=False, flip_y:bool=False):
