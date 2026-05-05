@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Any, Optional, Sequence
+from typing import Callable, Any, Optional, Sequence, Iterable
 from dataclasses import dataclass, field
 from enum import IntEnum
 
@@ -76,6 +76,18 @@ class IDActions(IntEnum):
     LINKED_OBJECTS = 31
 
 
+def compile_type_groups(*groups):
+    
+    result = []
+    
+    for g in groups:
+        if not isinstance(g, Iterable):
+            g = (g,)
+        result.add(frozenset(g))
+    
+    return frozenset(result)
+
+
 @dataclass(slots=True)
 class Identifier:
     # required
@@ -108,10 +120,9 @@ class Identifier:
             #self.fixed = True
 
 
-    def remap_obj(self, kv_map: dict, override: bool = False):
+    def remap_obj(self, kv_map:dict, override:bool=False):
         if not override and self.fixed or not kv_map:
             return
-
         obj = self.obj
         pid = self.obj_prop_id
         
@@ -224,7 +235,7 @@ class IdentifierList:
         
         return result
 
-    def remap_objects(self, kv_map: dict, override: bool = False): 
+    def remap_objects(self, kv_map:dict, override:bool=False): 
         for v in self.values:
             v.remap_obj(kv_map=kv_map,override=override)
         
@@ -336,10 +347,10 @@ class RuleHandler:
         for r in rule_list:
             base.update(r.base)
             
-            for k,v in r.by_id:
+            for k,v in r.by_id.items():
                 by_id.setdefault(k,set()).update(v)
         
-        return self.__class_(base=tuple(base),by_id={k:tuple(v) for k,v in by_id.items()})
+        return self.__class__(base=tuple(base),by_id={k:tuple(v) for k,v in by_id.items()})
     
     def fetch_ids(
             self,
@@ -374,7 +385,7 @@ class RuleHandler:
         cls = type(source)
         
         if issubclass(cls, Level):
-            self.fetch_ids(source.objects,result)
+            self.fetch_ids(source.start,result)
             for obj in source.objects:
                 self.fetch_ids(obj,result)
                 
@@ -384,7 +395,7 @@ class RuleHandler:
         
         else:
             for obj in source:
-                if issubclass(obj, Object):
+                if issubclass(type(obj), Object):
                     self.fetch_ids(obj,result)
         
         if by_type:
@@ -392,20 +403,19 @@ class RuleHandler:
                 seen = set()
                 grouped = {}
                 
-                seen.update(type_groups)
                 for g in type_groups:
-                    
+                    seen.update(g)
                     grouped[g] = tuple(
                         v
                         for t in g if t in result
                         for v in result[t]
                     )
             
-                for t in seen:
-                    result.pop(t, None)
-            
+                for g in seen:
+                    result.pop(g, None)
+                    
                 result.update(grouped)
-            
+                        
             return {k: IdentifierList(values=v) for k,v in result.items()}
             
         return IdentifierList(values=(i for l in result.values() for i in l))

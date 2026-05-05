@@ -91,7 +91,7 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
     DECODER = Color.from_string
     ENCODER = Color.to_string
     
-    def get_channels(self, condition):
+    def get_channels(self):
         return self.unique_values(lambda color: (color.channel,))
     
     def get_copies(self):
@@ -110,13 +110,13 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
                 i += 1
     
     def add_colors(self, colors:Sequence[Color], override:bool=False):
-        index = {c.channel: i for i, c in enumerate(self.colors)}
+        index = {c.channel: i for i, c in enumerate(self)}
 
         for color in colors:
             if color.channel in index:
                 if override:
-                    self.colors[index[color.channel]] = color
+                    self[index[color.channel]] = color
             else:
-                index[color.channel] = len(self.colors)
-                self.colors.append(color)
+                index[color.channel] = len(self)
+                self.append(color)
             

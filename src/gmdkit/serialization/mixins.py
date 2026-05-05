@@ -350,7 +350,7 @@ class DataclassDecoderMixin:
                         key, value = decoder(field.name, token)
                     except Exception as e:
                         raise ValueError(
-                            f"[{cls.__name__}] failed to decode field '{field.name}' {tokens}"
+                            f"[{cls.__name__}] failed to decode field '{field.name}': '{token}'"
                         ) from e
                     class_args[key] = value
         else:

@@ -54,7 +54,7 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
         objstr = self.setdefault(lvl_prop.OBJECT_STRING, ObjectString())
         
         if not hasattr(objstr, "objects"):
-            objstr.load()
+            raise RuntimeError()
 
         return getattr(objstr, "objects")
     
@@ -63,7 +63,8 @@ class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
         objstr = self.setdefault(lvl_prop.OBJECT_STRING, ObjectString())
         
         if not hasattr(objstr, "objects"):
-            objstr.load()
+            raise RuntimeError()
+            #objstr.load()
             
         setattr(objstr, "objects", value)
         

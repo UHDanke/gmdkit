@@ -135,10 +135,10 @@ def special_color(color_id) -> bool:
     return not (1 <= color_id <= 999)
 
 def get_one_color_channel(color) -> int|None:
-    return color.channel
+    return (color.channel,)
 
 def get_one_color_copy(color) -> int|None:
-    return color.copy_id
+    return (color.copy_id,)
 
 def get_color_channels(color_list) -> set[int]:
     return color_list.unique_values(get_one_color_channel)    

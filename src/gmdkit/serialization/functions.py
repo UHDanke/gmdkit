@@ -591,7 +591,7 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     for fn in functions:
         params = signature(fn).parameters
         if params:
-            kw = {k: kwargs[k] for k in kw_keys & params}
+            kw = {k: kwargs[k] for k in kw_keys & set(params)}
             if kw:
                 result.append(partial(fn, **kw))
             else:

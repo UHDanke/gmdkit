@@ -81,13 +81,14 @@ def color_to_trigger(color:Color) -> Object:
         case _: pass
     
     if (v:=color.blending): obj[obj_prop.trigger.color.BLENDING] = v
-    if (v:=color.channel): obj[obj_prop.trigger.color.CHANNEL] = v
+    if (v:=color.channel):
+        obj[obj_prop.trigger.color.CHANNEL] = v
     
     obj[obj_prop.trigger.color.OPACITY] = color.opacity
     
     if (v:=color.copy_id): obj[obj_prop.trigger.color.COPY_ID] = v
     
-    if not Color.CONDITION(v:=color.hsv): obj[obj_prop.trigger.color.HSV] = v
+    if not Color.CONDITION("hsv",v:=color.hsv): obj[obj_prop.trigger.color.HSV] = v
     
     obj[obj_prop.trigger.color.DURATION] = 0
     
@@ -174,12 +175,11 @@ def create_color_triggers(
             continue
             
         obj = color_to_trigger(color)
-            
-        obj_list.append(obj)
         obj.update({
             obj_prop.X: x,
             obj_prop.Y: y
             })
         y += -30
+        obj_list.append(obj)
     
     return obj_list

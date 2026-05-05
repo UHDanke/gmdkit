@@ -6,7 +6,7 @@ import re
 # Package Imports
 from gmdkit.casting.id_rules import ID_RULES
 from gmdkit.other.id_classes import IDType, IDRule, RuleHandler
-from gmdkit import Level, ObjectList
+from gmdkit import Level, Object, ObjectList
 from gmdkit.models.prop.color import ColorList
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.utils.misc import next_free
@@ -73,19 +73,19 @@ def create_text_id_rule(
         **optionals
     )
 
-ID_SET_BASE = (
+ID_SET_BASE = frozenset((
     IDType.GROUP_ID,
     IDType.ITEM_ID,
     IDType.TIME_ID,
     IDType.COLLISION_ID
-    )
+    ))
 
-ID_SET_REGROUP = (
+ID_SET_REGROUP = frozenset((
     *ID_SET_BASE,
     IDType.CONTROL_ID,
     IDType.REMAP_BASE,
     IDType.REMAP_TARGET
-    )
+    ))
 
 ID_RULE_TEXT_NUMBER = create_text_id_rule(
     regex=r"^\d+$",
@@ -115,7 +115,8 @@ EDITOR_LAYER_RULES = RuleHandler(base=(
 
 ID_RULES_COPY = ID_RULES.compile_rules(id_types=(
     IDType.LINK_ID,
-    IDType.KEYFRAME_ID
+    IDType.KEYFRAME_ID,
+    IDType.GRADIENT_ID
     ))
 
 ID_RULES_REGROUP = ID_RULES.compile_rules(id_types=(
@@ -131,6 +132,7 @@ ID_RULES_REGROUP_COLOR = ID_RULES.compile_rules(id_types=(
     IDType.GRADIENT_ID
     ))
 
+
 def offset_object_ids(
         objects:ObjectList|Level,
         id_offset:Optional[dict]=None,
@@ -138,28 +140,6 @@ def offset_object_ids(
         rules:RuleHandler=ID_RULES,
         groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
-    """
-    Offsets 
-
-    Parameters
-    ----------
-    objects : ObjectList|Level
-        DESCRIPTION.
-    id_offset : Optional[dict], optional
-        DESCRIPTION. The default is None.
-    ignore_ids : Optional[dict], optional
-        DESCRIPTION. The default is None.
-    rules : RuleHandler, optional
-        DESCRIPTION. The default is ID_RULES.
-    groups : Optional[Sequence[Sequence[IDType]]], optional
-        DESCRIPTION. The default is None.
-
-    Returns
-    -------
-    objects : TYPE
-        DESCRIPTION.
-
-    """
     
     ignore_ids = ignore_ids or {}
     id_offset = id_offset or {}
@@ -167,13 +147,11 @@ def offset_object_ids(
     io_all = id_offset.get(IDType.ANY,set())
     
     ids = rules.compile_ids(objects, by_type=True, type_groups=groups)
-    ignore_ids = ignore_ids or {}
-    ig_all = ignore_ids.get(IDType.ANY,set())
     
     for k,v in ids.items():
-        ig = ignore_ids.get(k,set())
+        ig = ignore_ids.get(k,set()) | ig_all
         io = id_offset.get(k,io_all)
-        old = v.get_ids() - ig | ig_all
+        old = v.get_ids() - ig
         new = {i + io for i in old}
         kv_map = dict(zip(old,new))
         ids.remap_objects(kv_map)
@@ -181,40 +159,110 @@ def offset_object_ids(
     return objects
 
 
-def remap_objects(*objects:ObjectList|Level, id_func:Callable):
-    result = []
-    id_dict = {}
+def remap_object_ids(
+        objects:ObjectList|Level,
+        ignore_ids:Optional[dict]=None,
+        id_ranges:Optional[dict]=None,
+        reassign_all:bool=False,
+        override_fixed:bool=False,
+        rules:RuleHandler=ID_RULES,
+        groups:Optional[Sequence[Sequence[IDType]]]=None
+        ):
+    
+    ignore_ids = ignore_ids or {}
+    id_ranges = id_ranges or {}
+    ig_all = ignore_ids.get(IDType.ANY,set())
+    ir_all = id_ranges.get(IDType.ANY,set())
+    
+    ids = rules.compile_ids(objects, by_type=True, type_groups=groups)
+    
+    for k,v in ids.items():
+        ig = ignore_ids.get(k,set()) | ig_all
+        ir = (id_ranges.get(k,set()) | ir_all) - ig
+        used = v.get_ids()
+        old = used - ig
+        old = {x for x in old if v.vmin <= x <= v.vmax}
+        
+        range_search = bool(ir)
+        
+        if range_search:
+            range_min = max(v.vmin,min(ir))
+            range_max = min(v.vmax,max(ir))
+            
+            if not reassign_all:
+                old -= ir
+                ir -= used
+            
+        else:
+            range_min = v.vmin
+            range_max = v.vmax
+        print("old",old)
+        new = next_free(
+            ir,
+            vmin=range_min,
+            vmax=range_max,
+            count=len(old),
+            in_range=range_search
+            )
+        kv_map = dict(zip(old,new))
+        if k == (IDType.COLOR_ID,):
+            print(k,"map",kv_map)
+        v.remap_objects(kv_map,override=override_fixed)
+        
+    return objects
+
+
+def remap_objects(
+        *objects:ObjectList|Level,
+        id_func:Callable,
+        override_fixed:bool=False,
+        ignore_ids:Optional[dict]=None, 
+        include_ids:Optional[dict]=None,
+        ):
+    result = []   
+    
+    ignore_ids = ignore_ids or {}
+    include_ids = include_ids or {}
+    ig_all = ignore_ids.get(IDType.ANY,set())
+    ic_all = include_ids.get(IDType.ANY,set())
+    
+    ig_dict = {k: v | ig_all for k,v in ignore_ids.items()}
+    ic_dict = {}
+    
+    for k, v in include_ids.items():
+        ic_dict[k] = v | ic_all | ig_dict.get(k,set())
+        
     last_ids = {}
     
     for objl in objects:
-        objl_copy = copy.deepcopy(objl)
-        result.append(objl_copy)
+        objl = copy.deepcopy(objl)
+        result.append(objl)
         
-        id_map = id_func(objl_copy)
+        id_map = id_func(objl)
         
         for k,v in id_map.items():
-            vals = id_dict.setdefault(k,set())
-            ids = v["ids"]
+            ic = ic_dict.setdefault(k,set())
+            ig = ig_dict.setdefault(k,set())
+            ids = v.get("ids")
             av = v.get("values", set())
             tv = v.get("targets", av)
-            coll = vals & tv
+            coll = ic & tv - ig
             
-            vals.update(av)
-            vals.update(tv)
+            ic.update(av)
+            ic.update(tv)
             
             if coll:
                 new = next_free(
-                    vals,
+                    ic,
                     start=last_ids.get(k),
                     vmin=ids.vmin,
                     vmax=ids.vmax,
                     count=len(coll)
                     )
-                if new:
-                    last_ids[k] = new[-1]
+                if new: last_ids[k] = new[-1]
                 kv_map = dict(zip(coll,new))
-                ids.remap_objects(kv_map)
-                vals.update(new)
+                ids.remap_objects(kv_map,override=override_fixed)
+                ic.update(new)
     
     return result
 
@@ -222,26 +270,23 @@ def remap_objects(*objects:ObjectList|Level, id_func:Callable):
 def remap_objects_copy(*objects:ObjectList|Level):
     
     def id_func(obj_list):
-        ids = ID_RULES_COPY.compile_ids(obj_list, by_type=True)
+        ids = ID_RULES_COPY.combine_rules(EDITOR_LAYER_RULES).compile_ids(obj_list, by_type=True)
         return {k:{"ids":v,"values":v.get_ids()} for k,v in ids.items()}
     
     return remap_objects(*objects, id_func=id_func)
 
 
 def remap_objects_regroup(
-        *objects:ObjectList, 
+        *objects:ObjectList|Level, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
+        override_fixed:bool=False,
         rules:RuleHandler=ID_RULES_REGROUP,
         groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,(IDType.COLOR_ID,)),
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
-    ignore_ids = ignore_ids or {}
-    include_ids = include_ids or {}
-    ig_all = ignore_ids.get(IDType.ANY,set())
-    ic_all = include_ids.get(IDType.ANY,set())
-    
+    ref_groups = () if ref_groups is None else ref_groups
     
     def id_func(obj_list):
         ids = rules.compile_ids(obj_list, by_type=True,type_groups=groups)
@@ -249,8 +294,6 @@ def remap_objects_regroup(
         
         for k,v in ids.items():
             k_ = result.setdefault(k,{})
-            ig = ignore_ids.get(k,set())
-            ic = include_ids.get(k,set())
             
             if k in ref_groups:
                 id_base = v.filter_values(reference=False).get_ids()
@@ -264,21 +307,24 @@ def remap_objects_regroup(
             
             k_["ids"] = v
             k_["values"] = av
-            k_["target"] = (tv - ig | ig_all) | (ic | ic_all)
+            k_["target"] = tv
             
         return result
-    
-    result = combine_objects(*objects, id_func=id_func)
-    result.apply(clean_duplicate_groups)
-    clean_gid_parents(result)
-    
-    return result
+        
+    return remap_objects(
+        *objects, 
+        id_func=id_func,
+        ignore_ids=ignore_ids,
+        include_ids=include_ids,
+        override_fixed=override_fixed
+        )
 
 
 def remap_objects_build_helper(
         *objects:ObjectList, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
+        override_fixed:bool=False,
         rules:RuleHandler=ID_RULES_REGROUP,
         groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,(IDType.COLOR_ID,)),
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
@@ -290,6 +336,7 @@ def remap_objects_build_helper(
         *objects,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
+        override_fixed=override_fixed,
         rules=rules,
         groups=groups,
         ref_groups=ref_groups        
@@ -297,7 +344,6 @@ def remap_objects_build_helper(
 
 
 def combine_objects(*objects:ObjectList):
-    
     objects = remap_objects_copy(*objects)
     
     result = objects[0]
@@ -416,10 +462,20 @@ def free_unused_colors(lvl:Level, ignore_ids:dict):
     
     if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:        
         lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
+
+
+def obj_canon_string(obj:Object):
+    d = copy.deepcopy(obj)
+    items = sorted(d.items(), key=lambda x: x[0])
+    d.clear()
+    d.update(items)
+    
+    return d.to_string()
+    
     
 def strip_intersection(
         base:ObjectList,
         objects:ObjectList
         ):
-    str_set = set(base.to_tokens())
-    return objects.where(lambda obj: obj.to_string() not in str_set)
+    str_set = set(obj_canon_string(obj) for obj in base)
+    return objects.where(lambda obj: obj_canon_string(obj) not in str_set)

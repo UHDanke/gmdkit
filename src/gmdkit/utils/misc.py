@@ -1,5 +1,5 @@
 # Imports
-from typing import Iterable, Callable, ParamSpec, TypeVar
+from typing import Iterable, Callable, ParamSpec, TypeVar, Optional
 import tkinter as tk
 from enum import Enum
 from functools import lru_cache
@@ -76,10 +76,11 @@ def get_enum_values(cls):
 
 def next_free(
         values:Iterable[int],
-        start:int|None=None,
+        start:Optional[int]=None,
         vmin:int=-2**31,
         vmax:int=2**31-1,
-        count:int=1
+        count:int=1,
+        in_range:bool=False
         ) -> list[int]:
     """
     Returns the next unused integer from a list, within the given limits.
@@ -102,6 +103,9 @@ def next_free(
     count : int, optional
         The number of values to return. Defaults to 1.
         
+    in_range : bool, optional
+        Whether to return integers from values (True) or not part of values (False)
+        
     Returns
     -------
     new_ids : list[int]
@@ -115,7 +119,7 @@ def next_free(
         while (i < stop if step > 0 else i > stop):
             if len(result) >= count:
                 break
-            if i not in values:
+            if (i in values) == in_range:
                 result.append(i)
             i += step
 
@@ -130,10 +134,10 @@ def next_free(
             start = 0 if vmin < 0 else vmax
         
     if start is not None and start <= vmax:
-        range_search(start, vmax, 1)
+        range_search(start, vmax+1, 1)
 
     if len(result) < count and start is not None and start >= vmin:
-        range_search(start, vmin, -1)
+        range_search(start, vmin-1, -1)
     
     return result
     
