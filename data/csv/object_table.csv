@@ -2600,16 +2600,16 @@ object id,gd class,community alias,gmdkit alias,editor tab,tab index
 3002,EnhancedGameObject,Inverse Circle Wave Animation,,7,14
 3004,RingObject,Spider Orb,orb.SPIDER,6,13
 3005,EffectGameObject,Spider Pad,pad.SPIDER,6,4
-3006,EnterEffectObject,Area Move Trigger,trigger.area.MOVE,13,19
-3007,EnterEffectObject,Area Rotate Trigger,trigger.area.ROTATE,13,20
-3008,EnterEffectObject,Area Scale Trigger,trigger.area.SCALE,13,21
-3009,EnterEffectObject,Area Fade Trigger,trigger.area.FADE,13,22
-3010,EnterEffectObject,Area Tint Trigger,trigger.area.TINT,13,23
-3011,EnterEffectObject,Edit Area Move Trigger,trigger.area.EDIT_MOVE,13,24
-3012,EnterEffectObject,Edit Area Rotate Trigger,trigger.area.EDIT_ROTATE,13,25
-3013,EnterEffectObject,Edit Area Scale Trigger,trigger.area.EDIT_SCALE,13,26
-3014,EnterEffectObject,Edit Area Fade Trigger,trigger.area.EDIT_FADE,13,27
-3015,EnterEffectObject,Edit Area Tint Trigger,trigger.area.EDIT_TINT,13,28
+3006,EnterEffectObject,Area Move Trigger,trigger.AREA_MOVE,13,19
+3007,EnterEffectObject,Area Rotate Trigger,trigger.AREA_ROTATE,13,20
+3008,EnterEffectObject,Area Scale Trigger,trigger.AREA_SCALE,13,21
+3009,EnterEffectObject,Area Fade Trigger,trigger.AREA_FADE,13,22
+3010,EnterEffectObject,Area Tint Trigger,trigger.AREA_TINT,13,23
+3011,EnterEffectObject,Edit Area Move Trigger,trigger.EDIT_AREA_MOVE,13,24
+3012,EnterEffectObject,Edit Area Rotate Trigger,trigger.EDIT_AREA_ROTATE,13,25
+3013,EnterEffectObject,Edit Area Scale Trigger,trigger.EDIT_AREA_SCALE,13,26
+3014,EnterEffectObject,Edit Area Fade Trigger,trigger.EDIT_AREA_FADE,13,27
+3015,EnterEffectObject,Edit Area Tint Trigger,trigger.EDIT_AREA_TINT,13,28
 3016,AdvancedFollowTriggerObject,Advanced Follow Trigger,trigger.ADV_FOLLOW,13,15
 3017,EnterEffectObject,Enter Move Trigger,trigger.enter.MOVE,13,120
 3018,EnterEffectObject,Enter Rotate Trigger,trigger.enter.ROTATE,13,121
@@ -2618,7 +2618,7 @@ object id,gd class,community alias,gmdkit alias,editor tab,tab index
 3021,EnterEffectObject,Enter Tint Trigger,trigger.enter.TINT,13,124
 3022,TeleportPortalObject,Teleport Trigger,trigger.TELEPORT,13,88
 3023,EnterEffectObject,Enter Stop Trigger,trigger.enter.STOP,13,125
-3024,EnterEffectObject,Area Stop Trigger,trigger.area.STOP,13,29
+3024,EnterEffectObject,Area Stop Trigger,trigger.AREA_STOP,13,29
 3027,TeleportPortalObject,Teleport Orb,orb.TELEPORT,6,14
 3029,ArtTriggerGameObject,Change Background Trigger,trigger.CHANGE_BG,13,30
 3030,ArtTriggerGameObject,Change Ground Trigger,trigger.CHANGE_GR,13,31
