@@ -9,7 +9,7 @@ color id,,obj_prop.COLOR_1,,,,get_base_color,0,"color, alpha",special_color,FALS
 color id,,obj_prop.COLOR_2,,,,get_secondary_color,0,"color, alpha",special_color,FALSE,1,1101,FALSE,TRUE
 color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.COPY_ID,,,,,,color,special_color,FALSE,1,1101,FALSE,TRUE
 color id,obj_id.trigger.PULSE,obj_prop.trigger.pulse.TARGET_ID,pulse_target_channel,,,,0,follow color,special_color,TRUE,1,1101,FALSE,FALSE
-color id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,get_effect_tint_channel,follow color,special_color,FALSE,1,1101,FALSE,TRUE
+color id,obj_id.trigger.AREA_TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,get_effect_tint_channel,follow color,special_color,FALSE,1,1101,FALSE,TRUE
 color id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.TINT_CHANNEL,,,,,get_effect_tint_channel,follow color,special_color,FALSE,1,1101,FALSE,TRUE
 color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,get_custom_color_channels,remap_custom_color_channels,,,"color, alpha",FALSE,FALSE,1,1101,TRUE,FALSE
 color id,obj_id.LEVEL_START,obj_prop.level.COLORS,,get_custom_color_copies,remap_custom_color_copies,,,"follow color, follow alpha",FALSE,FALSE,1,1101,TRUE,TRUE
@@ -402,21 +402,21 @@ group id,4536,obj_prop.trigger.collectible.GROUP_ID,,,,,get_collectible_default_
 group id,4536,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,particles,FALSE,FALSE,1,9999,FALSE,FALSE
 group id,4539,obj_prop.trigger.collectible.GROUP_ID,,,,,get_collectible_default_group_id,"spawn, toggle",FALSE,FALSE,1,9999,FALSE,FALSE
 group id,4539,obj_prop.trigger.collectible.PARTICLE   ,,,,,0,particles,FALSE,FALSE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.TARGET_ID,,,,,0,move,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.TARGET_ID,,,,,0,"move, scale",FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.TARGET_ID,,,,,0,"move, rotate",FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.TARGET_ID,,,,,0,alpha,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.TARGET_ID,,,,,0,color,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_MOVE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_SCALE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_ROTATE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_FADE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
-group id,obj_id.trigger.area.EDIT_TINT,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_MOVE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_SCALE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_ROTATE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_FADE,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_TINT,obj_prop.trigger.effect.CENTER_ID,,,,,get_area_default_center,follow position,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_MOVE,obj_prop.trigger.effect.TARGET_ID,,,,,0,move,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_SCALE,obj_prop.trigger.effect.TARGET_ID,,,,,0,"move, scale",FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_ROTATE,obj_prop.trigger.effect.TARGET_ID,,,,,0,"move, rotate",FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_FADE,obj_prop.trigger.effect.TARGET_ID,,,,,0,alpha,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.AREA_TINT,obj_prop.trigger.effect.TARGET_ID,,,,,0,color,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.EDIT_AREA_MOVE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.EDIT_AREA_SCALE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.EDIT_AREA_ROTATE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.EDIT_AREA_FADE,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
+group id,obj_id.trigger.EDIT_AREA_TINT,obj_prop.trigger.effect.TARGET_ID,area_use_group_id,,,,0,edit effect,FALSE,TRUE,1,9999,FALSE,FALSE
 group id,obj_id.LEVEL_START,obj_prop.level.PLAYER_SPAWN,,,,,0,follow position,FALSE,FALSE,1,9999,FALSE,FALSE
 item id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.TARGET_ITEM_ID,item_edit_target_is_item,,,,,set item,FALSE,TRUE,1,9999,FALSE,FALSE
 time id,obj_id.trigger.ITEM_EDIT,obj_prop.trigger.item_edit.TARGET_ITEM_ID,item_edit_target_is_timer,,,,,set item,FALSE,TRUE,1,9999,FALSE,FALSE
@@ -594,23 +594,23 @@ trigger channel,obj_id.trigger.ARROW,obj_prop.trigger.arrow.TARGET_CHANNEL,,,,,0
 trigger channel,obj_id.trigger.START_POSITION,obj_prop.start_pos.TARGET_CHANNEL,,,,,0,set item,FALSE,FALSE,,,FALSE,FALSE
 trigger channel,,obj_prop.trigger.CHANNEL,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,,0,,FALSE,FALSE,0,1000,FALSE,TRUE
-effect id,obj_id.trigger.area.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
-effect id,obj_id.trigger.area.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
-effect id,obj_id.trigger.area.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
-effect id,obj_id.trigger.area.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
-effect id,obj_id.trigger.area.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
-effect id,obj_id.trigger.area.STOP,obj_prop.trigger.effect.TARGET_ID,,,,,0,stop effect,FALSE,TRUE,,,FALSE,TRUE
+effect id,obj_id.trigger.AREA_MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
+effect id,obj_id.trigger.AREA_SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
+effect id,obj_id.trigger.AREA_ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
+effect id,obj_id.trigger.AREA_FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
+effect id,obj_id.trigger.AREA_TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
+effect id,obj_id.trigger.AREA_STOP,obj_prop.trigger.effect.TARGET_ID,,,,,0,stop effect,FALSE,TRUE,,,FALSE,TRUE
 effect id,obj_id.trigger.enter.MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.enter.SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.enter.ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.enter.FADE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.enter.TINT,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.enter.STOP,obj_prop.trigger.effect.EFFECT_ID,,,,,0,stop effect,FALSE,FALSE,,,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_MOVE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_SCALE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_ROTATE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_FADE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
-effect id,obj_id.trigger.area.EDIT_TINT,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
+effect id,obj_id.trigger.EDIT_AREA_MOVE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
+effect id,obj_id.trigger.EDIT_AREA_SCALE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
+effect id,obj_id.trigger.EDIT_AREA_ROTATE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
+effect id,obj_id.trigger.EDIT_AREA_FADE,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
+effect id,obj_id.trigger.EDIT_AREA_TINT,obj_prop.trigger.effect.TARGET_ID,area_use_effect_id,,,,0,edit effect,FALSE,TRUE,,,FALSE,FALSE
 enter channel,,obj_prop.ENTER_CHANNEL,,,,,0,,FALSE,FALSE,-32768,32767,FALSE,TRUE
 enter channel,22,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,,FALSE,TRUE,-32768,32767,FALSE,FALSE
 enter channel,24,obj_prop.trigger.enter_preset.ENTER_CHANNEL,,,,,0,,FALSE,TRUE,-32768,32767,FALSE,FALSE

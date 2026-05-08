@@ -2,67 +2,67 @@
 from gmdkit.mappings import obj_id, obj_prop
 from gmdkit.other.id_classes import IDRule, RuleHandler, IDType, IDActions
 from gmdkit.other.id_functions import (
+    item_edit_first_is_timer,
+    remap_special_base_color_copies,
+    get_default_shockline_target,
+    get_rotate_default_aim,
+    get_base_color,
+    remap,
+    get_area_default_center,
+    edit_adv_follow_use_group,
+    item_persist_item,
+    get_default_instant_coll_block_a,
+    special_color,
+    get_custom_color_channels,
+    get_secondary_color,
+    stop_use_group,
+    item_compare_second_is_timer,
+    get_values,
+    get_rotate_default_aim_target,
+    get_default_shockwave_target,
+    item_label_display_item,
+    spawn_keep_remap,
+    get_collectible_default_group_id,
+    get_special_color_copies,
+    edit_adv_follow_use_control_id,
+    get_song_default_volume_group,
+    get_default_lens_circle_target,
+    item_edit_second_is_item,
+    get_special_color_channels,
+    remap_special_color_channels,
+    get_default_motion_blur_target,
+    get_collectible_default_item_id,
+    get_default_instant_coll_block_b,
+    item_compare_second_is_item,
+    item_edit_target_is_item,
+    get_sfx_default_volume_group,
+    remap_pairs_vals,
+    get_effect_tint_channel,
+    item_label_display_timer,
+    remap_custom_color_channels,
+    get_default_collision_block_a,
     pulse_target_channel,
+    get_default_bulge_target,
     get_default_pinch_target,
+    get_default_keyframe_group,
+    get_keys,
+    get_default_radial_blur_target,
+    get_gray_scale_default_color,
+    item_compare_first_is_timer,
+    item_compare_first_is_item,
     get_default_collision_block_b,
     pulse_target_group,
-    item_persist_item,
-    get_base_color,
-    edit_adv_follow_use_group,
-    get_default_radial_blur_target,
-    remap_custom_color_channels,
-    item_edit_target_is_timer,
-    item_edit_second_is_item,
-    item_compare_first_is_timer,
-    edit_adv_follow_use_control_id,
-    get_secondary_color,
-    area_use_group_id,
-    item_edit_second_is_timer,
-    get_values,
-    get_song_default_volume_group,
-    remap,
-    item_compare_second_is_timer,
-    item_label_display_timer,
-    get_sfx_default_volume_group,
-    get_default_collision_block_a,
-    get_gray_scale_default_color,
-    get_collectible_default_item_id,
-    remap_special_color_channels,
-    item_compare_second_is_item,
-    area_use_effect_id,
-    get_default_lens_circle_target,
-    get_area_default_center,
-    get_default_bulge_target,
-    item_edit_target_is_item,
-    spawn_keep_remap,
-    get_special_color_channels,
-    item_edit_first_is_timer,
-    get_effect_tint_channel,
-    get_custom_color_channels,
-    remap_custom_color_copies,
-    item_label_display_item,
-    item_persist_timer,
-    get_default_motion_blur_target,
-    get_collectible_default_group_id,
-    get_rotate_default_aim_target,
-    stop_use_group,
-    get_default_instant_coll_block_b,
-    remap_pairs_vals,
-    item_compare_first_is_item,
-    get_keys,
-    get_default_shockline_target,
     get_custom_color_copies,
-    get_special_color_copies,
-    item_edit_first_is_item,
-    get_default_keyframe_group,
-    get_rotate_default_aim,
-    get_default_shockwave_target,
-    remap_special_base_color_copies,
+    area_use_group_id,
+    item_edit_target_is_timer,
+    item_edit_second_is_timer,
     remap_pairs_keys,
-    special_color,
-    get_default_instant_coll_block_a,
-    get_move_default_target,
-    stop_use_control_id
+    stop_use_control_id,
+    area_use_effect_id,
+    remap_custom_color_copies,
+    item_persist_timer,
+    item_edit_first_is_item,
+    get_move_default_target
 )
     
 
@@ -103,7 +103,7 @@ ID_RULES = RuleHandler(
             IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.pulse.TARGET_ID, condition=pulse_target_channel, default=0, actions=(IDActions.FOLLOW_COLOR), fixed=special_color, remappable=True, id_min=1, id_max=1101),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.pulse.TARGET_ID, condition=pulse_target_group, default=0, remappable=True, id_min=1, id_max=9999)
         ),
-    obj_id.trigger.area.TINT: (
+    obj_id.trigger.AREA_TINT: (
             IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.effect.TINT_CHANNEL, default=get_effect_tint_channel, actions=(IDActions.FOLLOW_COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.COLOR), remappable=True, id_min=1, id_max=9999),
@@ -116,13 +116,13 @@ ID_RULES = RuleHandler(
         ),
     obj_id.LEVEL_START: (
             IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_custom_color_channels, replace=remap_custom_color_channels, actions=(IDActions.ALPHA, IDActions.COLOR), id_min=1, id_max=1101, iterable=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_custom_color_copies, replace=remap_custom_color_copies, actions=(IDActions.FOLLOW_COLOR, IDActions.FOLLOW_ALPHA), id_min=1, id_max=1101, iterable=True, reference=True),
+            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_custom_color_copies, replace=remap_custom_color_copies, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR), id_min=1, id_max=1101, iterable=True, reference=True),
             IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_special_color_channels, replace=remap_special_color_channels, actions=(IDActions.ALPHA, IDActions.COLOR), fixed=True, id_min=1, id_max=1101, iterable=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_special_color_copies, replace=remap_special_base_color_copies, actions=(IDActions.FOLLOW_COLOR, IDActions.FOLLOW_ALPHA), fixed=True, id_min=1, id_max=1101, iterable=True, reference=True),
+            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_special_color_copies, replace=remap_special_base_color_copies, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR), fixed=True, id_min=1, id_max=1101, iterable=True, reference=True),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.level.PLAYER_SPAWN, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999)
         ),
     obj_id.trigger.MOVE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_ID, default=0, actions=(IDActions.MOVE, IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
+            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_POS, default=get_move_default_target, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_CENTER_ID, default=get_move_default_target, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
         ),
@@ -228,7 +228,7 @@ ID_RULES = RuleHandler(
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.checkpoint.RESPAWN_ID, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999)
         ),
     obj_id.trigger.SCALE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.scale.TARGET_ID, default=0, actions=(IDActions.SCALE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
+            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.scale.TARGET_ID, default=0, actions=(IDActions.MOVE, IDActions.SCALE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.scale.CENTER_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
         ),
     obj_id.trigger.ADV_FOLLOW: (
@@ -239,12 +239,12 @@ ID_RULES = RuleHandler(
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_follow.START_DIR_REF, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
         ),
     obj_id.trigger.KEYFRAME: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.keyframe.GROUP_ID, default=get_default_keyframe_group, actions=(IDActions.SCALE, IDActions.MOVE, IDActions.ROTATE), id_min=1, id_max=9999),
+            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.keyframe.GROUP_ID, default=get_default_keyframe_group, actions=(IDActions.MOVE, IDActions.SCALE, IDActions.ROTATE), id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.keyframe.SPAWN_ID, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999),
             IDRule(id_type=IDType.KEYFRAME_ID, obj_prop_id=obj_prop.trigger.keyframe.KEY_ID, default=0, id_min=0, reference=True)
         ),
     obj_id.trigger.ANIMATE_KEYFRAME: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.TARGET_ID, default=0, actions=(IDActions.SCALE, IDActions.MOVE, IDActions.ROTATE), remappable=True, id_min=1, id_max=9999),
+            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.TARGET_ID, default=0, actions=(IDActions.MOVE, IDActions.SCALE, IDActions.ROTATE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.PARENT_ID, default=0, actions=(IDActions.FOLLOW_ROTATE, IDActions.FOLLOW_SCALE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.ANIMATION_ID, default=0, actions=(IDActions.KEYFRAME), remappable=True, id_min=1, id_max=9999)
         ),
@@ -268,7 +268,7 @@ ID_RULES = RuleHandler(
         ),
     obj_id.trigger.UI: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.ui.GROUP_ID, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.ui.UI_TARGET, default=0, actions=(IDActions.UI, IDActions.MOVE), id_min=1, id_max=9999)
+            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.ui.UI_TARGET, default=0, actions=(IDActions.MOVE, IDActions.UI), id_min=1, id_max=9999)
         ),
     obj_id.trigger.TIME: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.time.TARGET_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
@@ -1072,43 +1072,43 @@ ID_RULES = RuleHandler(
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
             IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
         ),
-    obj_id.trigger.area.MOVE: (
+    obj_id.trigger.AREA_MOVE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
         ),
-    obj_id.trigger.area.SCALE: (
+    obj_id.trigger.AREA_SCALE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.SCALE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
+            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.MOVE, IDActions.SCALE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
         ),
-    obj_id.trigger.area.ROTATE: (
+    obj_id.trigger.AREA_ROTATE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.MOVE, IDActions.ROTATE), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
         ),
-    obj_id.trigger.area.FADE: (
+    obj_id.trigger.AREA_FADE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.ALPHA), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
         ),
-    obj_id.trigger.area.EDIT_MOVE: (
+    obj_id.trigger.EDIT_AREA_MOVE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
         ),
-    obj_id.trigger.area.EDIT_SCALE: (
+    obj_id.trigger.EDIT_AREA_SCALE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
         ),
-    obj_id.trigger.area.EDIT_ROTATE: (
+    obj_id.trigger.EDIT_AREA_ROTATE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
         ),
-    obj_id.trigger.area.EDIT_FADE: (
+    obj_id.trigger.EDIT_AREA_FADE: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
         ),
-    obj_id.trigger.area.EDIT_TINT: (
+    obj_id.trigger.EDIT_AREA_TINT: (
             IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
         ),
@@ -1143,7 +1143,7 @@ ID_RULES = RuleHandler(
     obj_id.trigger.START_POSITION: (
             IDRule(id_type=IDType.TRIGGER_CHANNEL, obj_prop_id=obj_prop.start_pos.TARGET_CHANNEL, default=0, actions=(IDActions.SET_ITEM))
         ,),
-    obj_id.trigger.area.STOP: (
+    obj_id.trigger.AREA_STOP: (
             IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.STOP_EFFECT), remappable=True, reference=True)
         ,),
     obj_id.trigger.enter.MOVE: (
