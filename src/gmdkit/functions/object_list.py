@@ -43,9 +43,10 @@ def add_groups(obj_list:ObjectList, groups:Sequence[int]):
         g = obj.setdefault(obj_prop.GROUPS,IDList())
         g_set = set(g)
         
-        new = group_set + g_set
+        new = group_set | g_set
         
         if len(new) > 10:
+            print(new)
             raise ValueError(f"expected at most 10 groups, got {len(new)}")
         
         g[:] = new

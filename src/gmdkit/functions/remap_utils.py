@@ -1,7 +1,9 @@
 # Imports
 import copy
-from typing import Callable, Optional, Sequence
 import re
+from typing import Callable, Optional, Sequence
+from functools import partial
+
 
 # Package Imports
 from gmdkit.casting.id_rules import ID_RULES
@@ -196,7 +198,6 @@ def remap_object_ids(
         else:
             range_min = v.vmin
             range_max = v.vmax
-        print("old",old)
         new = next_free(
             ir,
             vmin=range_min,
@@ -239,7 +240,7 @@ def remap_objects(
         result.append(objl)
         
         id_map = id_func(objl)
-        
+    
         for k,v in id_map.items():
             ic = ic_dict.setdefault(k,set())
             ig = ig_dict.setdefault(k,set())
@@ -267,17 +268,48 @@ def remap_objects(
     return result
 
 
-def remap_objects_copy(*objects:ObjectList|Level):
-    
-    def id_func(obj_list):
-        ids = ID_RULES_COPY.combine_rules(EDITOR_LAYER_RULES).compile_ids(obj_list, by_type=True)
-        return {k:{"ids":v,"values":v.get_ids()} for k,v in ids.items()}
-    
-    return remap_objects(*objects, id_func=id_func)
+def compile_ref_ids(
+        source:ObjectList|Level, 
+        rules:RuleHandler, 
+        groups:Optional[Sequence[Sequence[IDType]]]=None, 
+        ref_groups:Optional[Sequence[Sequence[IDType]]]=None
+        ) -> dict:
+    groups = () if ref_groups is None else groups
+    ref_groups = () if ref_groups is None else ref_groups
+    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    result = {}
+        
+    for k,v in ids.items():
+        k_ = result.setdefault(k,{})
+            
+        k_["ids"] = v
+            
+        if k in ref_groups:
+            id_base = v.filter_values(reference=False).get_ids()
+            id_ref = v.filter_values(reference=True).get_ids()
+            k_["values"] = id_base | id_ref
+            k_["target"] = id_base & id_ref
+                
+        else:
+            k_["values"] = v.get_ids()
 
+    return result
+
+
+def remap_objects_copy(
+        *source:ObjectList,
+        rules:RuleHandler=ID_RULES_COPY
+        ):
+    
+    id_func = partial(compile_ref_ids, source, rules)
+        
+    return remap_objects(
+        *source, 
+        id_func=id_func
+        )
 
 def remap_objects_regroup(
-        *objects:ObjectList|Level, 
+        *source:ObjectList|Level, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
@@ -286,33 +318,10 @@ def remap_objects_regroup(
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
-    ref_groups = () if ref_groups is None else ref_groups
-    
-    def id_func(obj_list):
-        ids = rules.compile_ids(obj_list, by_type=True,type_groups=groups)
-        result = {}
-        
-        for k,v in ids.items():
-            k_ = result.setdefault(k,{})
-            
-            if k in ref_groups:
-                id_base = v.filter_values(reference=False).get_ids()
-                id_ref = v.filter_values(reference=True).get_ids()
-                av = id_base | id_ref
-                tv = id_base & id_ref
-                
-            else:
-                av = v.get_ids()
-                tv = av
-            
-            k_["ids"] = v
-            k_["values"] = av
-            k_["target"] = tv
-            
-        return result
+    id_func = partial(compile_ref_ids, source, rules, groups, ref_groups)
         
     return remap_objects(
-        *objects, 
+        *source, 
         id_func=id_func,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
@@ -321,7 +330,7 @@ def remap_objects_regroup(
 
 
 def remap_objects_build_helper(
-        *objects:ObjectList, 
+        *source:ObjectList, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
@@ -332,50 +341,51 @@ def remap_objects_build_helper(
     
     ref_groups = groups if ref_groups is None else ref_groups
     
-    return remap_objects_regroup(
-        *objects,
+    id_func = partial(compile_ref_ids, source, rules, groups, ref_groups)
+        
+    return remap_objects(
+        *source, 
+        id_func=id_func,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
-        override_fixed=override_fixed,
-        rules=rules,
-        groups=groups,
-        ref_groups=ref_groups        
+        override_fixed=override_fixed
         )
 
 
-def combine_objects(*objects:ObjectList):
-    objects = remap_objects_copy(*objects)
+def combine_objects(
+        *sources:ObjectList|Level,
+        remap_func:Optional[Callable]=None
+        ):
     
-    result = objects[0]
+    if remap_func is not None:
+        sources = remap_func(*sources)
     
-    for objl in objects[1:]:
-        result.extend(objl)
-        
-    result.apply(clean_duplicate_groups)
-    clean_gid_parents(result)
+    result = sources[0]
+    
+    main_level = issubclass(type(result), Level)
+    
+    if main_level:
+        objects = result.objects
+        colors = result.start.get(obj_prop.level.COLORS, ColorList())
+    else:
+        objects = result
+    
+    for i in sources[1:]:
+        if not issubclass(type(i), Level):
+            objects.extend(i)
+        else:
+            objects.extend(i.objects)
+            if main_level:
+                col = i.start.get(obj_prop.level.COLORS)
+                if col is not None:  
+                    colors.add_colors(col)
+            
+    objects.apply(clean_duplicate_groups)
+    clean_gid_parents(objects)
     
     return result
 
 
-def combine_levels(*levels:Level):
-    levels = remap_objects_copy(*levels)
-    
-    result = levels[0]
-    objs = result.objects
-    colors = result.start.get(obj_prop.level.COLORS, ColorList())
-    
-    for lvl in levels[1:]:
-        objs.extend(lvl.objects)
-        col = lvl.start.get(obj_prop.level.COLORS)
-        if col is not None:  
-            colors.add_colors(col)
-    
-    objs.apply(clean_duplicate_groups)
-    clean_gid_parents(objs)
-    
-    return result
-    
-    
 def objs_from_ids(id_list, condition: Optional[Callable] = None):
     
     seen = set()  

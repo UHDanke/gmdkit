@@ -238,8 +238,33 @@ class IdentifierList:
     def remap_objects(self, kv_map:dict, override:bool=False): 
         for v in self.values:
             v.remap_obj(kv_map=kv_map,override=override)
+
+
+def group_id_list(
+        id_list:dict[IDType,Sequence[Identifier]],
+        type_groups:Sequence[Sequence[IDType]]
+        ):
+    
+    seen = set()
+    result = {}
+    
+    if type_groups is None:
+        return {k: IdentifierList(values=v) for k,v in id_list.items()}
+    
+    for k in type_groups:
+        seen.update(k)
+        result[k] = tuple(
+            v
+            for t in k if t in id_list
+            for v in id_list[t]
+        )
+
+    for k in set(id_list.keys()) - seen:
+        result[k] = id_list[k]
         
-        
+    return {k: IdentifierList(values=v) for k,v in result.items()}
+
+
 @dataclass(slots=True,frozen=True)
 class IDRule:
     obj_prop_id: int | str
@@ -318,7 +343,7 @@ class IDRule:
             actions = self.actions,
             replace = self.replace,
         )
-    
+
 
 @dataclass(slots=True)
 class RuleHandler:
@@ -395,27 +420,9 @@ class RuleHandler:
         
         else:
             for obj in source:
-                if issubclass(type(obj), Object):
-                    self.fetch_ids(obj,result)
+                self.fetch_ids(obj,result)
         
         if by_type:
-            if type_groups is not None:
-                seen = set()
-                grouped = {}
-                
-                for g in type_groups:
-                    seen.update(g)
-                    grouped[g] = tuple(
-                        v
-                        for t in g if t in result
-                        for v in result[t]
-                    )
-            
-                for g in seen:
-                    result.pop(g, None)
-                    
-                result.update(grouped)
-                        
-            return {k: IdentifierList(values=v) for k,v in result.items()}
-            
+            return group_id_list(result, type_groups)
+        
         return IdentifierList(values=(i for l in result.values() for i in l))
