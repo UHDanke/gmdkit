@@ -386,7 +386,7 @@ class RuleHandler:
         result = {} if result is None else result
         oid = obj.get(obj_prop.ID, 0)
         rules = self.by_id.get(oid)
-            
+        
         if rules is not None:
             for rule in rules:
                 if (i:= rule.get_id(obj)) is not None:
@@ -424,5 +424,4 @@ class RuleHandler:
         
         if by_type:
             return group_id_list(result, type_groups)
-        
         return IdentifierList(values=(i for l in result.values() for i in l))

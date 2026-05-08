@@ -136,7 +136,7 @@ ID_RULES_REGROUP_COLOR = ID_RULES.compile_rules(id_types=(
 
 
 def offset_object_ids(
-        objects:ObjectList|Level,
+        source:ObjectList|Level,
         id_offset:Optional[dict]=None,
         ignore_ids:Optional[dict]=None,
         rules:RuleHandler=ID_RULES,
@@ -148,7 +148,7 @@ def offset_object_ids(
     ig_all = ignore_ids.get(IDType.ANY,set())
     io_all = id_offset.get(IDType.ANY,set())
     
-    ids = rules.compile_ids(objects, by_type=True, type_groups=groups)
+    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
     for k,v in ids.items():
         ig = ignore_ids.get(k,set()) | ig_all
@@ -158,11 +158,11 @@ def offset_object_ids(
         kv_map = dict(zip(old,new))
         ids.remap_objects(kv_map)
         
-    return objects
+    return source
 
 
 def remap_object_ids(
-        objects:ObjectList|Level,
+        source:ObjectList|Level,
         ignore_ids:Optional[dict]=None,
         id_ranges:Optional[dict]=None,
         reassign_all:bool=False,
@@ -176,7 +176,7 @@ def remap_object_ids(
     ig_all = ignore_ids.get(IDType.ANY,set())
     ir_all = id_ranges.get(IDType.ANY,set())
     
-    ids = rules.compile_ids(objects, by_type=True, type_groups=groups)
+    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
     for k,v in ids.items():
         ig = ignore_ids.get(k,set()) | ig_all
@@ -198,6 +198,7 @@ def remap_object_ids(
         else:
             range_min = v.vmin
             range_max = v.vmax
+            
         new = next_free(
             ir,
             vmin=range_min,
@@ -205,16 +206,15 @@ def remap_object_ids(
             count=len(old),
             in_range=range_search
             )
-        kv_map = dict(zip(old,new))
-        if k == (IDType.COLOR_ID,):
-            print(k,"map",kv_map)
-        v.remap_objects(kv_map,override=override_fixed)
         
-    return objects
+        kv_map = dict(zip(old,new))
+        v.remap_objects(kv_map, override=override_fixed)
+        
+    return source
 
 
 def remap_objects(
-        *objects:ObjectList|Level,
+        *sources:ObjectList|Level,
         id_func:Callable,
         override_fixed:bool=False,
         ignore_ids:Optional[dict]=None, 
@@ -235,11 +235,10 @@ def remap_objects(
         
     last_ids = {}
     
-    for objl in objects:
-        objl = copy.deepcopy(objl)
-        result.append(objl)
-        
-        id_map = id_func(objl)
+    for s in sources:
+        s = copy.deepcopy(s)
+        result.append(s)
+        id_map = id_func(s)
     
         for k,v in id_map.items():
             ic = ic_dict.setdefault(k,set())
@@ -262,6 +261,7 @@ def remap_objects(
                     )
                 if new: last_ids[k] = new[-1]
                 kv_map = dict(zip(coll,new))
+                print(k,kv_map)
                 ids.remap_objects(kv_map,override=override_fixed)
                 ic.update(new)
     
@@ -276,8 +276,9 @@ def compile_ref_ids(
         ) -> dict:
     groups = () if ref_groups is None else groups
     ref_groups = () if ref_groups is None else ref_groups
-    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     result = {}
+    
+    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
         
     for k,v in ids.items():
         k_ = result.setdefault(k,{})
@@ -292,24 +293,24 @@ def compile_ref_ids(
                 
         else:
             k_["values"] = v.get_ids()
-
+    
     return result
 
 
 def remap_objects_copy(
-        *source:ObjectList,
+        *sources:ObjectList,
         rules:RuleHandler=ID_RULES_COPY
         ):
     
-    id_func = partial(compile_ref_ids, source, rules)
-        
+    id_func = partial(compile_ref_ids, rules=rules)
+    
     return remap_objects(
-        *source, 
+        *sources, 
         id_func=id_func
         )
 
 def remap_objects_regroup(
-        *source:ObjectList|Level, 
+        *sources:ObjectList|Level, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
@@ -318,10 +319,10 @@ def remap_objects_regroup(
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
-    id_func = partial(compile_ref_ids, source, rules, groups, ref_groups)
+    id_func = partial(compile_ref_ids, rules=rules, groups=groups, ref_groups=ref_groups)
         
     return remap_objects(
-        *source, 
+        *sources, 
         id_func=id_func,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
@@ -330,7 +331,7 @@ def remap_objects_regroup(
 
 
 def remap_objects_build_helper(
-        *source:ObjectList, 
+        *sources:ObjectList, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
@@ -341,10 +342,10 @@ def remap_objects_build_helper(
     
     ref_groups = groups if ref_groups is None else ref_groups
     
-    id_func = partial(compile_ref_ids, source, rules, groups, ref_groups)
+    id_func = partial(compile_ref_ids, rules=rules, groups=groups, ref_groups=ref_groups)
         
     return remap_objects(
-        *source, 
+        *sources, 
         id_func=id_func,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
@@ -361,7 +362,6 @@ def combine_objects(
         sources = remap_func(*sources)
     
     result = sources[0]
-    
     main_level = issubclass(type(result), Level)
     
     if main_level:
