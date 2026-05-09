@@ -1,5 +1,5 @@
 from gmdkit.serialization.functions import compress_string, decompress_string
-from gmdkit.serialization.type_cast import encode_text, to_numkey
+from gmdkit.serialization.type_cast import encode_text
 from typing import Dict, Set, Tuple, Any
 import pandas as pd
 from gmdkit import Level

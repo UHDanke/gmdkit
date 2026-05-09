@@ -39,7 +39,23 @@ class Color(DataclassDecoderMixin):
         return cls.from_string(string)
     
     def is_default(self):
-        return self == type(self).default(self.channel)
+        channel = self.channel
+        
+        value = (
+            self.red,
+            self.green,
+            self.blue,
+            int(self.player),
+            self.blending,
+            self.opacity,
+            self.copy_id,
+        )
+        
+        if  channel <= 999 or channel >=1015:
+            if value == (255,255,255,-1,False,1.0,0):
+                return True
+        elif channel in {1005,1006,1008}:
+            return True
     
     def set_rgba(
             self, 
@@ -108,6 +124,17 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
             else:
                 seen.add(channel)
                 i += 1
+                
+    def clean(self):
+        self.discard_duplicates()
+        i = 0
+        
+        while i < len(self):
+            col = self[i]
+            if col.is_default():
+                del col
+            i += 1
+        
     
     def add_colors(self, colors:Sequence[Color], override:bool=False):
         index = {c.channel: i for i, c in enumerate(self)}

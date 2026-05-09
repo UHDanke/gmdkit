@@ -51,43 +51,6 @@ def add_groups(obj_list:ObjectList, groups:Sequence[int]):
         
         g[:] = new
 
-def brickify(obj_list:ObjectList, height:Optional[int]=None):
-    """
-    Repositions all objects in the list into a compact brick.
-
-    Parameters
-    ----------
-    obj_list : ObjectList
-        The objects to modify.
-    height : Optional[int], optional
-        The height of the brick. Determined automatically if None.
-
-    Returns
-    -------
-    None.
-
-    """
-    if height is None:
-        height = math.ceil(math.sqrt(len(obj_list)))
-    
-    X = 0
-    Y = 0
-    i = 0
-    for obj in obj_list:
-        obj.update(
-            {
-                obj_prop.X: X,
-                obj_prop.Y: Y,
-                }
-            )
-        i+=1
-        if i >= height:
-            X += 30
-            Y = 0
-            i = 0 
-        else:
-            Y-=30
-
 # TODO REVIEW
 def group_objects(
         obj_list:ObjectList, 
@@ -103,13 +66,6 @@ def group_objects(
         v.append(obj)
         
     return {k:value_func(v) for k, v in new.items()}
-
-def from_ids(object_ids:Sequence):
-    obj_list = ObjectList()
-    for i in object_ids:
-        obj_list.append(Object.default(i))
-    return obj_list
-
 
 def clean_gid_parents(obj_list:ObjectList):
     """
@@ -171,6 +127,7 @@ def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
             groups[None].append(obj)
     
     return groups
+
 
 def compile_parents(
         obj_list:ObjectList

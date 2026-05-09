@@ -12,46 +12,6 @@ from gmdkit.functions.color import create_color_triggers
 from gmdkit.utils.misc import next_free
 
 
-def boundary_offset(
-        level_list:LevelList,
-        vertical_stack:bool=False,
-        block_offset:int=30
-        ):
-    
-    i = None
-    
-    for level in level_list:
-    
-        bounds = boundaries(level.objects)
-        
-        if vertical_stack:
-            
-            if i == None:
-                i = bounds[5]
-            
-            else:
-                level.objects.apply(offset_position, offset_y = i)
-                i += bounds[5]-bounds[1] + block_offset * 30
-            
-        else:
-            if i == None:
-                i = bounds[4]
-            
-            else:
-                level.objects.apply(offset_position, offset_x = i)
-                i += bounds[4]-bounds[0] + block_offset * 30
-    
-        i = i // 30 * 30
-
-
-
-
-
-def create_level_color_triggers(level:Level):
-    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
-    level.objects += create_color_triggers(colors)
-
-
 def level_add_toggles(lvl_list:LevelList):
     init_toggles = ObjectList()
     Y = 0

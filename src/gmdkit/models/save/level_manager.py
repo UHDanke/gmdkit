@@ -34,13 +34,11 @@ class LevelSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixi
     
 
 if __name__ == "__main__":
-    import time
-
-    _start = time.perf_counter()
+    from gmdkit.utils.misc import Timer
+    
+    _t = Timer(start=True)
     level_data = LevelSave.from_default_path()
+    print("Load took", _t.end(), "seconds")
     levels = level_data[lvl_save.LEVELS]
     binary = level_data[lvl_save.BINARY]
     lists = level_data[lvl_save.LISTS]
-    
-    _end = time.perf_counter()
-    print(f"Load took {_end - _start:.6f} seconds")

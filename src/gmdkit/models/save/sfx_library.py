@@ -76,4 +76,9 @@ SFXLibrary.EXTENSION = "dat"
 SFXLibrary.DEFAULT_PATH = SFX_LIBRARY_PATH
 
 if __name__ == "__main__":
+    
+    from gmdkit.utils.misc import Timer
+
+    _t = Timer(start=True)    
     sfx_library = SFXLibrary.from_default_path()
+    print("Load took", _t.end(), "seconds")

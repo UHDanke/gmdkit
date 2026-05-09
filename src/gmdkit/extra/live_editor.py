@@ -30,7 +30,9 @@ class LiveEditor(ObjectString):
     url : str, optional
         WebSocket URL to connect to. Defaults to WEBSOCKET_URL.
     """
-        
+    
+    __slots__ = ("url","ws")
+    
     def __init__(self, url:str=WEBSOCKET_URL):
         self.url = url
         self.ws = None

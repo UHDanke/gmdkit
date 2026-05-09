@@ -152,7 +152,6 @@ class IdentifierList:
     def get_limits(self) -> (int,int):
         self.vmin = max((i.id_min for i in self.values), default=ID_MIN)
         self.vmax = min((i.id_max for i in self.values), default=ID_MAX)
-    
         return self.vmin, self.vmax
 
     def filter_values(
@@ -238,31 +237,60 @@ class IdentifierList:
     def remap_objects(self, kv_map:dict, override:bool=False): 
         for v in self.values:
             v.remap_obj(kv_map=kv_map,override=override)
-
-
-def group_id_list(
-        id_list:dict[IDType,Sequence[Identifier]],
-        type_groups:Sequence[Sequence[IDType]]
-        ):
     
-    seen = set()
-    result = {}
-    
-    if type_groups is None:
-        return {k: IdentifierList(values=v) for k,v in id_list.items()}
-    
-    for k in type_groups:
-        seen.update(k)
-        result[k] = tuple(
-            v
-            for t in k if t in id_list
-            for v in id_list[t]
-        )
-
-    for k in set(id_list.keys()) - seen:
-        result[k] = id_list[k]
+    def get_objects(self, condition: Optional[Callable] = None) -> ObjectList:
         
-    return {k: IdentifierList(values=v) for k,v in result.items()}
+        seen = set()  
+        new = ObjectList()
+        
+        for i in self.values:
+            obj = i.obj
+            
+            if obj is None:
+                continue
+            
+            obj_str = obj.to_string(sort_keys=True)
+            
+            if obj_str in seen: 
+                continue
+            
+            if condition is not None and callable(condition) and not condition(i):
+                continue
+            
+            new.append(obj)
+            seen.add(obj_str)
+        
+        return new
+    
+    @classmethod    
+    def group_by_type(
+            identifiers:Sequence[Identifier],
+            type_groups:Sequence[Sequence[IDType]]
+            ):
+        
+        seen = set()
+        id_dict = {}        
+        
+        for i in identifiers:
+            id_dict.setdefault(i.id_type,[]).append(i)
+        
+        if type_groups is None:
+            return {k: IdentifierList(values=v) for k,v in id_dict.items()}
+        
+        result = {}
+        
+        for k in type_groups:
+            seen.update(k)
+            result[k] = tuple(
+                v
+                for t in k if t in id_dict
+                for v in id_dict[t]
+            )
+
+        for k in set(id_dict.keys()) - seen:
+            result[k] = id_dict[k]
+            
+        return {k: IdentifierList(values=v) for k,v in result.items()}
 
 
 @dataclass(slots=True,frozen=True)
@@ -379,25 +407,24 @@ class RuleHandler:
     
     def fetch_ids(
             self,
-            obj:Object,
-            result:Optional[dict]=None
+            obj:Object
             ):
         
-        result = {} if result is None else result
+        result = []
         oid = obj.get(obj_prop.ID, 0)
         rules = self.by_id.get(oid)
         
         if rules is not None:
             for rule in rules:
                 if (i:= rule.get_id(obj)) is not None:
-                    result.setdefault(i.id_type,[]).append(i)
+                    result.append(i)
     
         if oid != obj_id.LEVEL_START and self.base:
             for rule in self.base:
                 if (i:= rule.get_id(obj)) is not None:
-                    result.setdefault(i.id_type,[]).append(i)
+                    result.append(i)
         
-        return result
+        return tuple(result)
         
     def compile_ids(
             self, 
@@ -406,22 +433,22 @@ class RuleHandler:
             type_groups:Optional[Sequence[set]]=None
             ) -> IdentifierList|dict[Sequence[IDType]|IDType,IdentifierList]:
         
-        result = {}
+        result = []
         cls = type(source)
         
         if issubclass(cls, Level):
-            self.fetch_ids(source.start,result)
+            result.extend(self.fetch_ids(source.start))
             for obj in source.objects:
-                self.fetch_ids(obj,result)
+                result.extend(self.fetch_ids(obj))
                 
         elif issubclass(cls, ObjectList):            
             for obj in source:
-                self.fetch_ids(obj,result)
+                result.extend(self.fetch_ids(obj))
         
         else:
             for obj in source:
-                self.fetch_ids(obj,result)
+                result.extend(self.fetch_ids(obj))
         
         if by_type:
-            return group_id_list(result, type_groups)
-        return IdentifierList(values=(i for l in result.values() for i in l))
+            return IdentifierList.group_by_type(result, type_groups)
+        return IdentifierList(values=result)

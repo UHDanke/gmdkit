@@ -8,7 +8,7 @@ from functools import partial
 # Package Imports
 from gmdkit.casting.id_rules import ID_RULES
 from gmdkit.other.id_classes import IDType, IDRule, RuleHandler
-from gmdkit import Level, Object, ObjectList
+from gmdkit import Level, ObjectList
 from gmdkit.models.prop.color import ColorList
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.utils.misc import next_free
@@ -23,28 +23,8 @@ def create_text_id_rule(
         id_min:Optional[int]=None,
         id_max:Optional[int]=None
         ) -> IDRule:
-    """
-    Compiles an ID rule that retrieves a group ID from a text object field.
-
-    Parameters
-    ----------
-    regex : str
-        DESCRIPTION.
-    id_type : IDType
-        DESCRIPTION.
-    condition : Optional[Callable], optional
-        DESCRIPTION. The default is None.
-    id_min : Optional[int], optional
-        DESCRIPTION. The default is None.
-    id_max : Optional[int], optional
-        DESCRIPTION. The default is None.
-
-    Returns
-    -------
-    IDRule
-        DESCRIPTION.
-
-    """
+    # Compiles an ID rule that retrieves a group ID from a text object field.
+    
     pattern = re.compile(regex)
     
     def function(text: str):
@@ -259,9 +239,9 @@ def remap_objects(
                     vmax=ids.vmax,
                     count=len(coll)
                     )
-                if new: last_ids[k] = new[-1]
+                if new: 
+                    last_ids[k] = new[-1]
                 kv_map = dict(zip(coll,new))
-                print(k,kv_map)
                 ids.remap_objects(kv_map,override=override_fixed)
                 ic.update(new)
     
@@ -309,6 +289,7 @@ def remap_objects_copy(
         id_func=id_func
         )
 
+
 def remap_objects_regroup(
         *sources:ObjectList|Level, 
         ignore_ids:Optional[dict]=None, 
@@ -355,11 +336,12 @@ def remap_objects_build_helper(
 
 def combine_objects(
         *sources:ObjectList|Level,
-        remap_func:Optional[Callable]=None
+        remap_func:Optional[Callable]=None,
+        **func_kwargs
         ):
     
     if remap_func is not None:
-        sources = remap_func(*sources)
+        sources = remap_func(*sources, **func_kwargs)
     
     result = sources[0]
     main_level = issubclass(type(result), Level)
@@ -386,31 +368,43 @@ def combine_objects(
     return result
 
 
-def objs_from_ids(id_list, condition: Optional[Callable] = None):
+def boundary_offset(
+        level_list:LevelList,
+        vertical_stack:bool=False,
+        block_offset:int=30
+        ):
     
-    seen = set()  
-    new = ObjectList()
+    i = None
     
-    for i in id_list:
-        obj = i.obj
-        
-        if obj is None:
-            continue
-        
-        obj_str = obj.to_string()
-        
-        if obj_str in seen: 
-            continue
-        
-        if condition is not None and callable(condition) and not condition(i):
-            continue
-        
-        new.append(obj)
-        seen.add(obj_str)
+    for level in level_list:
     
-    return new
+        bounds = boundaries(level.objects)
+        
+        if vertical_stack:
+            
+            if i == None:
+                i = bounds[5]
+            
+            else:
+                level.objects.apply(offset_position, offset_y = i)
+                i += bounds[5]-bounds[1] + block_offset * 30
+            
+        else:
+            if i == None:
+                i = bounds[4]
+            
+            else:
+                level.objects.apply(offset_position, offset_x = i)
+                i += bounds[4]-bounds[0] + block_offset * 30
+    
+        i = i // 30 * 30
 
 
+def create_level_color_triggers(level:Level):
+    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
+    level.objects += create_color_triggers(colors)
+    
+    
 def compile_keyframe_spawn_ids(obj_list:ObjectList):
     
     def key_func(obj):
@@ -473,19 +467,9 @@ def free_unused_colors(lvl:Level, ignore_ids:dict):
     if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:        
         lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
 
+def get_useless_triggers():
+    pass
 
-def obj_canon_string(obj:Object):
-    d = copy.deepcopy(obj)
-    items = sorted(d.items(), key=lambda x: x[0])
-    d.clear()
-    d.update(items)
-    
-    return d.to_string()
-    
-    
-def strip_intersection(
-        base:ObjectList,
-        objects:ObjectList
-        ):
-    str_set = set(obj_canon_string(obj) for obj in base)
-    return objects.where(lambda obj: obj_canon_string(obj) not in str_set)
+def get_triggers_with_invalid_targets():
+    pass
+        

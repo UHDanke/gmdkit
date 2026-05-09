@@ -40,6 +40,17 @@ class ObjectList(ArrayDecoderMixin,ListClass[Object]):
     DECODER = Object.from_string
     ENCODER = Object.to_string
     
+    def difference(self, *obj_lists:Self):
+        to_string = Object.to_string
+
+        obj_set = {
+            to_string(obj, sort_keys=True)
+            for lst in obj_lists
+            for obj in lst
+        }
+
+        return self.where(lambda obj: obj.to_string(sort_keys=True) not in obj_set)
+
 
 class ObjectGroup(FileStringMixin):
     

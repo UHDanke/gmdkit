@@ -498,7 +498,8 @@ class DictDecoderMixin:
             self, 
             encoder:Optional[StringDictEncoder]=None,
             condition:Optional[KeyValueCondition]=None,
-            container:Optional[str]=None
+            container:Optional[str]=None,
+            sort_keys:bool=False
             ) -> Sequence[str]:
         
         cls = type(self)
@@ -508,19 +509,22 @@ class DictDecoderMixin:
         data = self if container is None else getattr(self, container)
             
         result = []
-    
+        result_extend = result.extend
+        items = data.items()
+        if sort_keys:
+            items = sorted(items)
+
         if encoder:
             try:
-                for key, value in data.items():
+                for key, value in items:
                     if condition is None or condition(key, value):
-                        result.extend(encoder(key, value))
+                        result_extend(encoder(key, value))
             except Exception as e:
                 raise ValueError(f"[{cls.__name__}] failed to encode") from e
         else:
             for key, value in data.items():
                 if condition is None or condition(key, value):
-                    result.append(key)
-                    result.append(value)
+                    result_extend((key, value))
     
         return result
                 

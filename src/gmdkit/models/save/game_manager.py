@@ -33,9 +33,8 @@ class GameSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixin
 
 if __name__ == "__main__":
     
-    import time
+    from gmdkit.utils.misc import Timer
 
-    _start = time.perf_counter()
+    _t = Timer(start=True)
     game_data = GameSave.from_default_path()
-    _end = time.perf_counter()
-    print(f"Load took {_end - _start:.6f} seconds")
+    print("Load took", _t.end(), "seconds")
