@@ -2,21 +2,25 @@
 import copy
 import re
 from typing import Callable, Optional, Sequence
-from functools import partial
-
 
 # Package Imports
 from gmdkit.casting.id_rules import ID_RULES
-from gmdkit.other.id_classes import IDType, IDRule, RuleHandler
-from gmdkit import Level, ObjectList
+from gmdkit.other.id_classes import IDType, IDRule, RuleHandler, AutoID
+from gmdkit import Level, LevelList, ObjectList
 from gmdkit.models.prop.color import ColorList
-from gmdkit.mappings import obj_prop, obj_id
+from gmdkit.mappings import obj_prop, obj_id, color_id
 from gmdkit.utils.misc import next_free
-from gmdkit.functions.object import clean_duplicate_groups
-from gmdkit.functions.object_list import compile_keyframe_groups, clean_gid_parents, add_groups
+from gmdkit.functions.object import clean_duplicate_groups, offset_position
+from gmdkit.functions.object_list import (
+    compile_keyframe_groups, 
+    clean_gid_parents, 
+    add_groups,
+    boundaries
+    )
+from gmdkit.functions.color import create_color_triggers
 
 
-def create_text_id_rule(
+def create_text_rule(
         regex:str,
         id_type:IDType,
         condition:Optional[Callable]=None,
@@ -55,35 +59,51 @@ def create_text_id_rule(
         **optionals
     )
 
-ID_SET_BASE = frozenset((
+ID_SET_COPY = (
+    IDType.LINK_ID,
+    IDType.KEYFRAME_ID
+    )
+
+ID_SET_BASE = (
     IDType.GROUP_ID,
     IDType.ITEM_ID,
     IDType.TIME_ID,
     IDType.COLLISION_ID
-    ))
+    )
 
-ID_SET_REGROUP = frozenset((
+ID_SET_REMAP = (
     *ID_SET_BASE,
     IDType.CONTROL_ID,
     IDType.REMAP_BASE,
     IDType.REMAP_TARGET
-    ))
+    )
 
-ID_RULE_TEXT_NUMBER = create_text_id_rule(
+ID_SET_REGROUP = (
+    *ID_SET_REMAP,
+    IDType.FORCE_ID,
+    IDType.GRADIENT_ID
+    )
+
+ID_SET_REGROUP_COLOR = (
+    *ID_SET_REGROUP,
+    IDType.COLOR_ID
+    )
+
+ID_RULE_TEXT_NUMBER = create_text_rule(
     regex=r"^\d+$",
     id_type=IDType.ANY,
     id_min=1,
     id_max=9999
     )
     
-ID_RULE_TEXT_ID = create_text_id_rule(
+ID_RULE_TEXT_ID = create_text_rule(
     regex=r"\bID\s+(\d+)\b",
     id_type=IDType.GROUP_ID,
     id_min=1,
     id_max=9999
     )
 
-ID_RULE_REMAP_ID = create_text_id_rule(
+ID_RULE_REMAP_ID = create_text_rule(
     regex=r"^(\d+)\s+[A-Za-z]+",
     id_type=IDType.LABEL
     )
@@ -95,24 +115,27 @@ EDITOR_LAYER_RULES = RuleHandler(base=(
     IDRule(obj_prop.EDITOR_L2, IDType.GENERIC, reference=True, default=lambda obj: 0 if obj.get(obj_prop.EDITOR_L1) else None, id_min=-32768, id_max=32767)
     ))
 
-ID_RULES_COPY = ID_RULES.compile_rules(id_types=(
-    IDType.LINK_ID,
-    IDType.KEYFRAME_ID,
-    IDType.GRADIENT_ID
-    ))
+ID_GROUPS_COPY = (
+    (IDType.LINK_ID,),
+    (IDType.KEYFRAME_ID,)
+    )
 
-ID_RULES_REGROUP = ID_RULES.compile_rules(id_types=(
-    *ID_SET_REGROUP,
-    IDType.FORCE_ID,
-    IDType.GRADIENT_ID
-    ))
+ID_GROUPS_REGROUP = (
+    ID_SET_REMAP,
+    (IDType.FORCE_ID,),
+    (IDType.GRADIENT_ID,)
+    )
 
-ID_RULES_REGROUP_COLOR = ID_RULES.compile_rules(id_types=(
-    *ID_SET_REGROUP,
-    IDType.COLOR_ID,
-    IDType.FORCE_ID,
-    IDType.GRADIENT_ID
-    ))
+ID_GROUPS_REGROUP_COLOR = (
+    *ID_GROUPS_REGROUP,
+    (IDType.COLOR_ID,)
+    )
+
+ID_RULES_COPY = ID_RULES.compile_rules(id_types=ID_SET_COPY)
+
+ID_RULES_REGROUP = ID_RULES.compile_rules(id_types=ID_SET_REGROUP)
+
+ID_RULES_REGROUP_COLOR = ID_RULES.compile_rules(id_types=ID_SET_REGROUP_COLOR)
 
 
 def offset_object_ids(
@@ -133,15 +156,15 @@ def offset_object_ids(
     for k,v in ids.items():
         ig = ignore_ids.get(k,set()) | ig_all
         io = id_offset.get(k,io_all)
-        old = v.get_ids() - ig
+        old = v.get_ids(in_range=True) - ig
         new = {i + io for i in old}
         kv_map = dict(zip(old,new))
-        ids.remap_objects(kv_map)
+        v.remap_objects(kv_map)
         
     return source
 
 
-def remap_object_ids(
+def reassign_object_ids(
         source:ObjectList|Level,
         ignore_ids:Optional[dict]=None,
         id_ranges:Optional[dict]=None,
@@ -158,122 +181,128 @@ def remap_object_ids(
     
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
-    for k,v in ids.items():
-        ig = ignore_ids.get(k,set()) | ig_all
-        ir = (id_ranges.get(k,set()) | ir_all) - ig
+    for k, v in ids.items():
+        ig = ignore_ids.get(k, set()) | ig_all
+        ir = (id_ranges.get(k, set()) | ir_all) - ig
+    
+        v = v if override_fixed else v.filter_values(fixed=False)
         used = v.get_ids()
-        old = used - ig
-        old = {x for x in old if v.vmin <= x <= v.vmax}
         
+        auto = {x for x in used if type(x) is AutoID}
+        used_ints = used - auto
+    
         range_search = bool(ir)
         
-        if range_search:
-            range_min = max(v.vmin,min(ir))
-            range_max = min(v.vmax,max(ir))
+    
+        if not reassign_all and not range_search:
+            old = auto
+            sr = used_ints
+            range_min, range_max = v.vmin, v.vmax
+        else:
+            sr = ir - used_ints
             
             if not reassign_all:
-                old -= ir
-                ir -= used
+                old = used_ints - ig - ir
+                
+            else:
+                old = used_ints - ig
             
-        else:
-            range_min = v.vmin
-            range_max = v.vmax
-            
+            old = {x for x in old if v.vmin <= x <= v.vmax} | auto
+            range_min = max(v.vmin, min(ir)) if range_search else v.vmin
+            range_max = min(v.vmax, max(ir)) if range_search else v.vmax
+        
         new = next_free(
-            ir,
+            sr,
             vmin=range_min,
             vmax=range_max,
             count=len(old),
-            in_range=range_search
-            )
-        
+            in_range=range_search,
+        )
+                
         kv_map = dict(zip(old,new))
+        print(k)
+        print("old",old)
+        print("kv_map",kv_map)
         v.remap_objects(kv_map, override=override_fixed)
         
     return source
 
 
 def remap_objects(
-        *sources:ObjectList|Level,
-        id_func:Callable,
-        override_fixed:bool=False,
-        ignore_ids:Optional[dict]=None, 
-        include_ids:Optional[dict]=None,
-        ):
-    result = []   
-    
+        *sources: ObjectList | Level,
+        rules: RuleHandler,
+        groups: Optional[Sequence[Sequence[IDType]]] = None,
+        ref_groups: Optional[Sequence[Sequence[IDType]]] = None,
+        override_fixed: bool = False,
+        ignore_ids: Optional[dict] = None,
+        include_ids: Optional[dict] = None,
+        ) -> list:
+
     ignore_ids = ignore_ids or {}
     include_ids = include_ids or {}
-    ig_all = ignore_ids.get(IDType.ANY,set())
-    ic_all = include_ids.get(IDType.ANY,set())
-    
-    ig_dict = {k: v | ig_all for k,v in ignore_ids.items()}
+    ig_all = ignore_ids.get(IDType.ANY, set())
+    ig_dict = {k: v | ig_all for k, v in ignore_ids.items()}
+
+    ic_all = include_ids.get(IDType.ANY, set())
     ic_dict = {}
-    
+    ia_dict = {}
     for k, v in include_ids.items():
-        ic_dict[k] = v | ic_all | ig_dict.get(k,set())
-        
+        ic_dict[k] = v | ic_all | ig_dict.get(k, set())
+        ia_dict[k] = {x for x in ic_dict[k] if type(x) is AutoID}
+
+    groups = () if groups is None else groups
+    ref_groups = () if ref_groups is None else ref_groups
+    result = []
     last_ids = {}
-    
+
     for s in sources:
         s = copy.deepcopy(s)
         result.append(s)
-        id_map = id_func(s)
-    
-        for k,v in id_map.items():
-            ic = ic_dict.setdefault(k,set())
-            ig = ig_dict.setdefault(k,set())
-            ids = v.get("ids")
-            av = v.get("values", set())
-            tv = v.get("targets", av)
-            coll = ic & tv - ig
-            
-            ic.update(av)
-            ic.update(tv)
-            
+        ids = rules.compile_ids(s, by_type=True, type_groups=groups)
+
+        for k, v in ids.items():
+            ic = ic_dict.setdefault(k, set())
+            ia = ia_dict.setdefault(k, set())
+            ig = ig_dict.setdefault(k, set())
+
+            used = v.get_ids()
+            used_auto = {x for x in used if type(x) is AutoID}
+            v = v if override_fixed else v.filter_values(fixed=False)
+
+            if k in ref_groups:
+                id_base = v.filter_values(reference=False).get_ids()
+                id_ref = v.filter_values(reference=True).get_ids()
+                coll = (ic & id_base & id_ref) - ig
+            else:
+                av = used if override_fixed else v.get_ids()
+                coll = (ic & av) - ig
+
+            ic.update(used)
+            ia.update(used_auto)
+
             if coll:
-                new = next_free(
-                    ic,
+                coll_auto = {x for x in coll if type(x) is AutoID}
+                coll_ints = coll - coll_auto
+
+                new_ints = next_free(
+                    ic - ia,
                     start=last_ids.get(k),
-                    vmin=ids.vmin,
-                    vmax=ids.vmax,
-                    count=len(coll)
-                    )
-                if new: 
-                    last_ids[k] = new[-1]
-                kv_map = dict(zip(coll,new))
-                ids.remap_objects(kv_map,override=override_fixed)
-                ic.update(new)
-    
-    return result
+                    vmin=v.vmin,
+                    vmax=v.vmax,
+                    count=len(coll_ints),
+                ) if coll_ints else []
 
+                if new_ints:
+                    last_ids[k] = new_ints[-1]
 
-def compile_ref_ids(
-        source:ObjectList|Level, 
-        rules:RuleHandler, 
-        groups:Optional[Sequence[Sequence[IDType]]]=None, 
-        ref_groups:Optional[Sequence[Sequence[IDType]]]=None
-        ) -> dict:
-    groups = () if ref_groups is None else groups
-    ref_groups = () if ref_groups is None else ref_groups
-    result = {}
-    
-    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
-        
-    for k,v in ids.items():
-        k_ = result.setdefault(k,{})
-            
-        k_["ids"] = v
-            
-        if k in ref_groups:
-            id_base = v.filter_values(reference=False).get_ids()
-            id_ref = v.filter_values(reference=True).get_ids()
-            k_["values"] = id_base | id_ref
-            k_["target"] = id_base & id_ref
-                
-        else:
-            k_["values"] = v.get_ids()
-    
+                new_auto = [AutoID() for _ in coll_auto]
+
+                kv_map = {**dict(zip(coll_ints, new_ints)), **dict(zip(coll_auto, new_auto))}
+                v.remap_objects(kv_map, override=override_fixed)
+                ic.update(new_ints)
+                ic.update(new_auto)
+                ia.update(new_auto)
+
     return result
 
 
@@ -282,11 +311,9 @@ def remap_objects_copy(
         rules:RuleHandler=ID_RULES_COPY
         ):
     
-    id_func = partial(compile_ref_ids, rules=rules)
-    
     return remap_objects(
-        *sources, 
-        id_func=id_func
+        *sources,
+        rules=rules
         )
 
 
@@ -296,15 +323,15 @@ def remap_objects_regroup(
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=ID_RULES_REGROUP,
-        groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,(IDType.COLOR_ID,)),
+        groups:Optional[Sequence[Sequence[IDType]]]=ID_GROUPS_REGROUP,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
-    
-    id_func = partial(compile_ref_ids, rules=rules, groups=groups, ref_groups=ref_groups)
-        
+            
     return remap_objects(
         *sources, 
-        id_func=id_func,
+        rules=rules, 
+        groups=groups, 
+        ref_groups=ref_groups,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
         override_fixed=override_fixed
@@ -317,17 +344,17 @@ def remap_objects_build_helper(
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=ID_RULES_REGROUP,
-        groups:Optional[Sequence[Sequence[IDType]]]=(ID_SET_REGROUP,(IDType.COLOR_ID,)),
+        groups:Optional[Sequence[Sequence[IDType]]]=ID_GROUPS_REGROUP,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
     ref_groups = groups if ref_groups is None else ref_groups
     
-    id_func = partial(compile_ref_ids, rules=rules, groups=groups, ref_groups=ref_groups)
-        
     return remap_objects(
         *sources, 
-        id_func=id_func,
+        rules=rules, 
+        groups=groups, 
+        ref_groups=ref_groups,
         ignore_ids=ignore_ids,
         include_ids=include_ids,
         override_fixed=override_fixed
@@ -361,7 +388,7 @@ def combine_objects(
                 col = i.start.get(obj_prop.level.COLORS)
                 if col is not None:  
                     colors.add_colors(col)
-            
+    
     objects.apply(clean_duplicate_groups)
     clean_gid_parents(objects)
     

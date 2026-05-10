@@ -17,7 +17,8 @@ from gmdkit.utils.typing import (
     StringDecoder, StringEncoder,
     StringDictDecoder, StringDictEncoder,
     KeyValueCondition,
-    PlistDecoder,PlistEncoder
+    PlistDecoder,PlistEncoder,
+    NumKey
 )
 from gmdkit.serialization.functions import (
     decompress_string, compress_string,
@@ -713,6 +714,7 @@ class DelimiterMixin:
 
         return string
 
+
 class CompressFileMixin:
     
     COMPRESSED: bool = False
@@ -910,4 +912,44 @@ class FolderLoaderMixin:
         for item in data:
             encoder(item, folder_path)
 
-            
+
+class DictDefaultsMixin:
+    
+    TYPES: dict[NumKey, type] = {}
+    DEFAULTS: dict[NumKey, Any] = {}
+
+    def set_defaults(self, *keys: NumKey, override: bool = False) -> None:
+        cls = type(self)
+        types = cls.TYPES
+        defaults = cls.DEFAULTS
+
+        d = self
+
+        if not keys:
+            keys = types
+
+        for k in keys:
+            if not override and k in d:
+                continue
+
+            v = defaults.get(k)
+            d[k] = types[k]() if v is None else v
+
+    def clear_defaults(self) -> None:
+        cls = type(self)
+        types = cls.TYPES
+        defaults = cls.DEFAULTS
+
+        d = self
+
+        for k, factory in types.items():
+            v = d.get(k)
+            if v is None:
+                continue
+
+            default = defaults.get(k)
+            if default is None:
+                default = factory()
+
+            if v == default:
+                d.pop(k, None)

@@ -13,7 +13,7 @@ ObjectListMapping = dict[Optional[int],ObjectList]
 ObjectMapping = dict[int,Object]
 
 
-def add_groups(obj_list:ObjectList, groups:Sequence[int]):
+def add_groups(obj_list:ObjectList, *groups:Sequence[int]):
     """
     Adds groups to every object in the list.
 

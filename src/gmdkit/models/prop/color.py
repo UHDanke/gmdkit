@@ -16,7 +16,7 @@ class Color(DataclassDecoderMixin):
     red: int = 0
     green: int = 0
     blue: int = 0
-    player: TargetPlayer = field_decoder(default=TargetPlayer(-1),decoder=TargetPlayer.from_string,encoder=str)
+    player: TargetPlayer = field_decoder(default=TargetPlayer.NONE,decoder=TargetPlayer.from_string,encoder=str)
     blending: bool = field_decoder(default=False,optional=True)
     channel: int = 0
     opacity: float = 0.0
@@ -45,14 +45,14 @@ class Color(DataclassDecoderMixin):
             self.red,
             self.green,
             self.blue,
-            int(self.player),
+            self.player,
             self.blending,
             self.opacity,
             self.copy_id,
         )
         
         if  channel <= 999 or channel >=1015:
-            if value == (255,255,255,-1,False,1.0,0):
+            if value == (255,255,255,TargetPlayer.NONE,False,1.0,0):
                 return True
         elif channel in {1005,1006,1008}:
             return True
@@ -134,7 +134,13 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
             if col.is_default():
                 del col
             i += 1
+    
+    def set_defaults(self, *color_ids:int, override:bool=True):
+        used = self.get_channels() if override else set()
+        ids = set(color_ids) - used
         
+        for i in ids:
+            self.append(Color.default(i))
     
     def add_colors(self, colors:Sequence[Color], override:bool=False):
         index = {c.channel: i for i, c in enumerate(self)}

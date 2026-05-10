@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Any, Optional, Sequence, Iterable
+from typing import Callable, Any, Optional, Sequence, Iterable, Self
 from dataclasses import dataclass, field
 from enum import IntEnum
 
@@ -39,7 +39,9 @@ class IDType(IntEnum):
     REMAP_BASE = 20
     REMAP_TARGET = 21
     
+IDGroup = Sequence[IDType]
 
+AnyID = IDType.ANY
 
 class IDActions(IntEnum):
     SINGLE = 0
@@ -76,16 +78,26 @@ class IDActions(IntEnum):
     LINKED_OBJECTS = 31
 
 
-def compile_type_groups(*groups):
+class AutoID:
+    __slots__ = ()
     
-    result = []
-    
-    for g in groups:
-        if not isinstance(g, Iterable):
-            g = (g,)
-        result.add(frozenset(g))
-    
-    return frozenset(result)
+    def __setattr__(self, name, value):
+        raise TypeError("immutable")
+
+    def __repr__(self):
+        return f"<AutoID at {hex(id(self))}>"
+
+    def __copy__(self):
+        return type(self)()
+
+    def __deepcopy__(self, memo):
+        oid = id(self)
+        if oid in memo:
+            return memo[oid]
+
+        obj = type(self)()
+        memo[oid] = obj
+        return obj
 
 
 @dataclass(slots=True)
@@ -106,7 +118,6 @@ class Identifier:
     actions: tuple[IDActions] = ()
     replaceable: bool = True
     replace: Optional[Callable] = None
-    remaps: dict = field(default_factory=dict)
     # derived
     is_default: bool = field(init=False, default=False)
 
@@ -199,9 +210,7 @@ class IdentifierList:
             self,
             in_range:bool = False,
             min_value:Optional[int] = None,
-            max_value:Optional[int] = None,
-            remap:bool = False,
-            include_original:bool = True
+            max_value:Optional[int] = None
             ) -> set|dict[set]:
         
         ids = self.values        
@@ -214,23 +223,11 @@ class IdentifierList:
             vals = i.id_val if i.iterable else (i.id_val,)
         
             for v in vals:
-                if in_range and not (low <= v <= high):
+                
+                if in_range and (type(v) is AutoID or not (low <= v <= high)):
                     continue
                 
-                n = v
-                
-                if remap and i.remappable and i.remaps:
-                    if v in i.remaps:
-                        r = i.remaps[v]
-                        r = min(max(r, self.vmin), self.vmax)
-                        result.add(r)
-                        
-                        if include_original:
-                            result.add(n)
-                    else:
-                        result.add(n)
-                else:
-                    result.add(n)
+                result.add(v)
         
         return result
 
@@ -262,7 +259,7 @@ class IdentifierList:
         
         return new
     
-    @classmethod    
+    @staticmethod    
     def group_by_type(
             identifiers:Sequence[Identifier],
             type_groups:Sequence[Sequence[IDType]]

@@ -10,18 +10,20 @@ from gmdkit.serialization.mixins import (
     FilePathMixin,
     DelimiterMixin,
     FileStringMixin,
-    PlistLoaderMixin
+    PlistLoaderMixin,
+    DictDefaultsMixin
     )
 from gmdkit.serialization.type_cast import serialize, to_numkey
 from gmdkit.serialization.functions import dict_cast, write_plist, kv_wrap
-from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS
+from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS, PROPERTY_TYPES
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 
 
-class Object(DelimiterMixin,DictDecoderMixin,DictClass[NumKey,Any]):
+class Object(DelimiterMixin,DictDefaultsMixin,DictDecoderMixin,DictClass[NumKey,Any]):
     
     SEPARATOR = ","
     END_DELIMITER = ";"
+    TYPES = PROPERTY_TYPES
     DECODER = staticmethod(dict_cast(PROPERTY_DECODERS,key_start=to_numkey))
     ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,key_end=str,default=serialize))
     
