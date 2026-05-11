@@ -149,7 +149,7 @@ def offset_object_ids(
     ignore_ids = ignore_ids or {}
     id_offset = id_offset or {}
     ig_all = ignore_ids.get(IDType.ANY,set())
-    io_all = id_offset.get(IDType.ANY,set())
+    io_all = id_offset.get(IDType.ANY,0)
     
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
@@ -158,6 +158,15 @@ def offset_object_ids(
         io = id_offset.get(k,io_all)
         old = v.get_ids(in_range=True) - ig
         new = {i + io for i in old}
+
+        if {
+                i for i in new
+                if i < v.vmin or i > v.vmax
+            }:
+            raise ValueError(
+                "Offset returned out-of-range ID"
+            )
+        
         kv_map = dict(zip(old,new))
         v.remap_objects(kv_map)
         

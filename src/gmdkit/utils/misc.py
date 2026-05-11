@@ -110,7 +110,11 @@ def next_free(
 
     if len(result) < count and start is not None and start >= vmin:
         range_search(start, vmin-1, -1)
-    
+        
+    if len(result) < count:
+        raise ValueError(
+            f"Could only retrieve {len(result)} id(s) out of {count}"
+        )
     return result
 
 
