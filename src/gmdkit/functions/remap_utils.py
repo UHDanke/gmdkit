@@ -228,10 +228,7 @@ def reassign_object_ids(
             in_range=range_search,
         )
                 
-        kv_map = dict(zip(old,new))
-        print(k)
-        print("old",old)
-        print("kv_map",kv_map)
+        kv_map = dict(zip(sorted(old),new))
         v.remap_objects(kv_map, override=override_fixed)
         
     return source
@@ -306,7 +303,7 @@ def remap_objects(
 
                 new_auto = [AutoID() for _ in coll_auto]
 
-                kv_map = {**dict(zip(coll_ints, new_ints)), **dict(zip(coll_auto, new_auto))}
+                kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(coll_auto, new_auto))}
                 v.remap_objects(kv_map, override=override_fixed)
                 ic.update(new_ints)
                 ic.update(new_auto)

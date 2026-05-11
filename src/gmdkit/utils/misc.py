@@ -3,7 +3,7 @@ from typing import Iterable, Callable, ParamSpec, TypeVar, Optional
 import tkinter as tk
 from enum import Enum
 from functools import lru_cache
-
+import bisect
 # Package Imports (only gmdkit.utils is allowed)
 from gmdkit.utils.enums import ArrowDir
 
@@ -83,40 +83,74 @@ def next_free(
     new_ids : list[int]
         A list of ids returned.
     """
-    result = []
+    if isinstance(values, (set, frozenset)):
+        values = sorted(values) if in_range else values
+    else :
+        values = sorted(set(values)) if in_range else set(values)
 
-    def range_search(start: int, stop: int, step: int):
-        nonlocal result
-        i = start
-        while (i < stop if step > 0 else i > stop):
-            if len(result) >= count:
-                break
-            if (i in values) == in_range:
-                result.append(i)
-            i += step
+    if vmin > vmax:
+        return ()
 
-
-    if vmin > vmax: return result
     if start is None:
         start = 0 if vmin <= 0 else vmin
     else:
-        if start < vmin:
-            start = vmin
-        elif start > vmax:
-            start = -1 if vmin < 0 else vmax
-        
-    if start is not None and start <= vmax:
-        range_search(start, vmax+1, 1)
+        start = max(vmin, min(vmax, start))
 
-    if len(result) < count and start is not None and start >= vmin:
-        range_search(start, vmin-1, -1)
-        
+    # ── count=1 fast path ─────────────────────────────────────────────────────
+    if count == 1:
+        if in_range:
+            idx = bisect.bisect_left(values, start)
+            if idx < len(values) and values[idx] <= vmax:
+                return (values[idx],)
+            if start > vmin:
+                idx = bisect.bisect_left(values, vmin)
+                end = bisect.bisect_right(values, start - 1)
+                if idx < end:
+                    return (values[idx],)
+        else:
+            for i in range(start, vmax + 1):
+                if i not in values:
+                    return (i,)
+            for i in range(start - 1, vmin - 1, -1):
+                if i not in values:
+                    return (i,)
+        raise ValueError("Range has no valid ID")
+
+    # ── count>1 general path ──────────────────────────────────────────────────
+    result = []
+
+    def scan_sorted(lo: int, hi: int) -> None:
+        if lo > hi or len(result) >= count:
+            return
+        idx_lo = bisect.bisect_left(values, lo)
+        idx_hi = bisect.bisect_right(values, hi)
+        needed = count - len(result)
+        result.extend(values[idx_lo:idx_lo + min(idx_hi - idx_lo, needed)])
+
+    def scan_set(lo: int, hi: int) -> None:
+        if lo > hi or len(result) >= count:
+            return
+        needed = count - len(result)
+        for i in range(lo, hi + 1):
+            if i not in values:
+                result.append(i)
+                needed -= 1
+                if needed == 0:
+                    return
+
+    scan = scan_sorted if in_range else scan_set
+
+    scan(start, vmax)
     if len(result) < count:
-        raise ValueError(
-            f"Could only retrieve {len(result)} id(s) out of {count}"
-        )
-    return result
+        scan(vmin, start - 1)
+    l = len(result)
+    
+    if not l:
+        raise ValueError("Range has no valid ID")
+    elif l < count:
+        raise ValueError(f"Could only retrieve {len(result)} ids out of {count} from range")
 
+    return tuple(result)
 
 class Clipboard:
     
