@@ -156,17 +156,18 @@ def offset_object_ids(
     for k,v in ids.items():
         ig = ignore_ids.get(k,set()) | ig_all
         io = id_offset.get(k,io_all)
+        
+        if not io: continue
+        
         old = v.get_ids(in_range=True) - ig
+        
+        if not old: continue
+        
         new = {i + io for i in old}
 
-        if {
-                i for i in new
-                if i < v.vmin or i > v.vmax
-            }:
-            raise ValueError(
-                "Offset returned out-of-range ID"
-            )
-        
+        if any(i < v.vmin or i > v.vmax for i in new):
+            raise ValueError("Offset returned out-of-range ID")
+                
         kv_map = dict(zip(old,new))
         v.remap_objects(kv_map)
         
@@ -219,6 +220,8 @@ def reassign_object_ids(
             old = {x for x in old if v.vmin <= x <= v.vmax} | auto
             range_min = max(v.vmin, min(ir)) if range_search else v.vmin
             range_max = min(v.vmax, max(ir)) if range_search else v.vmax
+        
+        if not old: continue
         
         new = next_free(
             sr,
@@ -286,28 +289,29 @@ def remap_objects(
             ic.update(used)
             ia.update(used_auto)
 
-            if coll:
-                coll_auto = {x for x in coll if type(x) is AutoID}
-                coll_ints = coll - coll_auto
+            if not coll: continue
+        
+            coll_auto = {x for x in coll if type(x) is AutoID}
+            coll_ints = coll - coll_auto
 
-                new_ints = next_free(
-                    ic - ia,
-                    start=last_ids.get(k),
-                    vmin=v.vmin,
-                    vmax=v.vmax,
-                    count=len(coll_ints),
-                ) if coll_ints else []
-
-                if new_ints:
-                    last_ids[k] = new_ints[-1]
-
-                new_auto = [AutoID() for _ in coll_auto]
-
-                kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(coll_auto, new_auto))}
-                v.remap_objects(kv_map, override=override_fixed)
-                ic.update(new_ints)
-                ic.update(new_auto)
-                ia.update(new_auto)
+            new_ints = next_free(
+                ic - ia,
+                start=last_ids.get(k),
+                vmin=v.vmin,
+                vmax=v.vmax,
+                count=len(coll_ints),
+            ) if coll_ints else []
+            
+            if new_ints:
+                last_ids[k] = new_ints[-1]
+                
+            new_auto = [AutoID() for _ in coll_auto]
+            
+            kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(coll_auto, new_auto))}
+            v.remap_objects(kv_map, override=override_fixed)
+            ic.update(new_ints)
+            ic.update(new_auto)
+            ia.update(new_auto)
 
     return result
 

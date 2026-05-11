@@ -231,7 +231,11 @@ class IdentifierList:
         
         return result
 
-    def remap_objects(self, kv_map:dict, override:bool=False): 
+    def remap_objects(self, kv_map:dict, override:bool=False):
+        
+        if not kv_map:
+            return
+        
         for v in self.values:
             v.remap_obj(kv_map=kv_map,override=override)
     

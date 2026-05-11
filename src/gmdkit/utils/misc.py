@@ -83,20 +83,19 @@ def next_free(
     new_ids : list[int]
         A list of ids returned.
     """
-    if isinstance(values, (set, frozenset)):
-        values = sorted(values) if in_range else values
-    else :
-        values = sorted(set(values)) if in_range else set(values)
-
-    if vmin > vmax:
+    if vmin > vmax or count == 0:
         return ()
 
     if start is None:
         start = 0 if vmin <= 0 else vmin
     else:
         start = max(vmin, min(vmax, start))
+        
+    if isinstance(values, (set, frozenset)):
+        values = sorted(values) if in_range else values
+    else :
+        values = sorted(set(values)) if in_range else set(values)
 
-    # ── count=1 fast path ─────────────────────────────────────────────────────
     if count == 1:
         if in_range:
             idx = bisect.bisect_left(values, start)
@@ -115,8 +114,7 @@ def next_free(
                 if i not in values:
                     return (i,)
         raise ValueError("Range has no valid ID")
-
-    # ── count>1 general path ──────────────────────────────────────────────────
+        
     result = []
 
     def scan_sorted(lo: int, hi: int) -> None:
