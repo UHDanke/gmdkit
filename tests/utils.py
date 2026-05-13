@@ -4,8 +4,8 @@ import shutil
 import warnings
 from pathlib import Path
 
-from gmdkit.models.object import Object, ObjectList
-from gmdkit.models.prop.list import IDList
+from gmdkit import Object, ObjectList
+from gmdkit.models.prop import IDList
 from gmdkit.mappings import obj_prop
 
 
