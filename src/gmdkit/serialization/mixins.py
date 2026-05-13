@@ -916,8 +916,8 @@ class FolderLoaderMixin:
 
 class DictDefaultsMixin:
 
-    TYPES: dict[NumKey, Callable] | None = None
-    DEFAULTS: dict[NumKey, Any] | None = None
+    TYPES: Optional[dict[NumKey, Callable]] = None
+    DEFAULTS: Optional[dict[NumKey, Any]] = None
 
     def setdefault(self, key, default=MISSING):
         cls = type(self)
@@ -938,7 +938,7 @@ class DictDefaultsMixin:
 
         return self.get(key)
 
-    def setdefaults(self, *keys, override: bool = False):
+    def autodefaults(self, *keys, override:bool=False):
         cls = type(self)
 
         types = cls.TYPES or {}

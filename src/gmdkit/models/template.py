@@ -22,7 +22,7 @@ from gmdkit.serialization.functions import (
 from gmdkit.mappings import smart_prefab, smart_template, obj_prop
 from gmdkit.models.object import Object, ObjectGroup
 from gmdkit.utils.enums import ArrowDir
-from gmdkit.utils.misc import get_enum_values, normalize_orientation, typed_cache
+from gmdkit.utils.functions import get_enum_values, normalize_orientation, typed_cache
 
 class TemplatePosition(IntEnum):
     CENTER = 0
@@ -330,10 +330,6 @@ class SmartPrefabList(PlistLoaderMixin,ListClass[SmartPrefab]):
 class SmartPrefabLayout(PlistLoaderMixin,DictClass[str,SmartPrefabList]):
     DECODER = staticmethod(kv_wrap(value_func=SmartPrefabList.from_node))
     ENCODER = staticmethod(kv_wrap(value_func=SmartPrefabList.to_node))
-    
-    def get_layout(self, key:str) -> SmartLayout:
-        return SmartLayout.from_string(key)
-        
     
     def get_layout(self, key:str) -> SmartLayout:
         return SmartLayout.from_string(key)

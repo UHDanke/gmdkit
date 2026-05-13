@@ -1,6 +1,6 @@
 __all__ = [
     "constants",
-    "extra",
+    "extensions",
     "functions",
     "mappings",
     "remapping",
@@ -20,7 +20,7 @@ __all__ = [
     ]
 
 from . import constants
-from . import extra
+from . import extensions
 from . import functions
 from . import mappings
 from . import remapping

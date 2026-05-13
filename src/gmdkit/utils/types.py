@@ -3,7 +3,7 @@ from typing import Self, Any
 from collections.abc import Iterable, Callable
 
 # Package Imports
-from gmdkit.serialization.functions import filter_kwargs
+from gmdkit.utils.functions import filter_kwargs
 
 
 class ListClass(list[Any]):

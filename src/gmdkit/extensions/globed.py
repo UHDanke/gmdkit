@@ -219,31 +219,31 @@ class GlobedScript:
         with open(path,"w") as file:
             file.write(self.content)
 
-
-def get_globed_scripts(obj_list:ObjectList):
-    
-    result = []
-    
-    for obj in obj_list:
+    @staticmethod
+    def get_scripts(obj_list:ObjectList):
         
-        if obj_id.TEXT != obj.get(obj_prop.ID):
-            continue
+        result = []
         
-        string = obj.get(obj_prop.text.DATA)
-        
-        if string is None:
-            continue
-        
-        if not check_magic(string.to_bytes()):
-            continue
-        
-        try:
-            result.append(GlobedScript(obj))
+        for obj in obj_list:
             
-        except Exception as e:
-            print("Object skipped due to unforseen error while loading GlobedScript:", e)
-        
-    return result
+            if obj_id.TEXT != obj.get(obj_prop.ID):
+                continue
+            
+            string = obj.get(obj_prop.text.DATA)
+            
+            if string is None:
+                continue
+            
+            if not check_magic(string.to_bytes()):
+                continue
+            
+            try:
+                result.append(GlobedScript(obj))
+                
+            except Exception as e:
+                print("Object skipped due to unforseen error while loading GlobedScript:", e)
+            
+        return result
 
 
 if __name__ == "__main__":

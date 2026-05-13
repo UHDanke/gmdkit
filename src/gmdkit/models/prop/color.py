@@ -124,23 +124,16 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
             else:
                 seen.add(channel)
                 i += 1
-                
-    def clean(self):
-        self.discard_duplicates()
-        i = 0
-        
-        while i < len(self):
-            col = self[i]
-            if col.is_default():
-                del col
-            i += 1
     
-    def set_defaults(self, *color_ids:int, override:bool=True):
+    def autodefaults(self, *color_ids:int, override:bool=True):
         used = self.get_channels() if override else set()
         ids = set(color_ids) - used
         
         for i in ids:
             self.append(Color.default(i))
+            
+    def cleardefaults(self):
+        self[:] = [i for i in self if not i.is_default()]
     
     def add_colors(self, colors:Sequence[Color], override:bool=False):
         index = {c.channel: i for i, c in enumerate(self)}

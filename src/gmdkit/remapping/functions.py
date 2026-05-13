@@ -3,7 +3,8 @@ import copy
 from typing import Callable, Optional, Sequence
 
 # Package Imports
-from gmdkit.remapping.classes import IDType, RuleHandler, AutoID
+from gmdkit.remapping.types import IDType, AutoID
+from gmdkit.remapping.classes import RuleHandler
 from gmdkit.remapping.rules import COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER, REGROUP_IDS
 from gmdkit.models.level import Level, LevelList
 from gmdkit.models.object import ObjectList
@@ -99,21 +100,21 @@ def reassign_object_ids(
             else:
                 old = used_ints - ig
             
-            old = {x for x in old if v.vmin <= x <= v.vmax} | auto
+            old = {x for x in old if v.vmin <= x <= v.vmax}
             range_min = max(v.vmin, min(ir)) if range_search else v.vmin
             range_max = min(v.vmax, max(ir)) if range_search else v.vmax
         
-        if not old: continue
+        if not (old or auto): continue
         
         new = next_free(
             sr,
             vmin=range_min,
             vmax=range_max,
-            count=len(old),
+            count=len(old)+len(auto),
             in_range=range_search,
         )
                 
-        kv_map = dict(zip(sorted(old),new))
+        kv_map = dict(zip(sorted(old)+sorted(auto),new))
         v.remap_objects(kv_map, override=override_fixed)
         
     return source
@@ -189,7 +190,7 @@ def remap_objects(
                 
             new_auto = [AutoID() for _ in coll_auto]
             
-            kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(coll_auto, new_auto))}
+            kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(sorted(coll_auto), new_auto))}
             v.remap_objects(kv_map, override=override_fixed)
             ic.update(new_ints)
             ic.update(new_auto)
@@ -367,8 +368,26 @@ def create_common_group(objects:ObjectList, rules) -> tuple[int]:
     add_groups(objects, new)
     
     return tuple(new)
-    
 
+
+def set_used_white_colors(lvl:Level, ignore_ids:dict):
+    ignore_ids = ignore_ids or {}
+    
+    rules = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
+    
+    ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
+    
+    used = ids.get_ids()
+    
+    colors = lvl.start.get(obj_prop.level.COLORS)
+    
+    channels = colors.get_channels()
+    
+    unset = used - channels
+    
+    colors.autodefaults(unset)
+
+    
 def free_unused_colors(lvl:Level, ignore_ids:dict):
     ignore_ids = ignore_ids or {}
     

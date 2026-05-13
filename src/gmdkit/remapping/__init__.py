@@ -8,6 +8,7 @@ __all__ = (
     "RuleHandler",
     "rules",
     "offset_object_ids",
+    "reassign_object_ids",
     "remap_objects",
     "remap_objects_copy",
     "remap_objects_regroup",
@@ -16,15 +17,18 @@ __all__ = (
     )
 
 
-from .classes import (
+from .types import (
     AutoID, 
     IDType, IDActions, 
+    )
+from .classes import (
     Identifier, IdentifierList, 
     IDRule, RuleHandler,
     )
 from . import rules
 from .functions import (
     offset_object_ids,
+    reassign_object_ids,
     remap_objects,
     remap_objects_copy,
     remap_objects_regroup,

@@ -1,7 +1,5 @@
 # Imports
 from typing import Callable, Literal, Optional, Any, get_type_hints, TypeVar, overload
-from functools import partial
-from inspect import signature
 import numpy as np
 from dataclasses import field, fields, dataclass, MISSING
 import sys
@@ -21,7 +19,7 @@ from gmdkit.utils.typing import (
     PathString,
     Element
     )
-from gmdkit.utils.misc import typed_cache
+from gmdkit.utils.functions import typed_cache
 
 
 @typed_cache(maxsize=256)
@@ -563,40 +561,3 @@ def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=N
             d[k] = to_node_wrap(f)
             
     return d
-    
-
-def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
-    """
-    Filters keyword arguments to only those present on the given functions.
-    
-    Parameters
-    ----------
-    *functions : Callable
-        One or more functions to retrieve the parameters from.
-        
-    **kwargs : dict[str,Any]
-        The keyword arguments to filter.
-        
-    Returns
-    -------
-    funcs : list[Callable]
-        A list containing functions with embedded kwargs.
-        
-    """
-    if not kwargs: 
-        return functions
-    kw_keys = set(kwargs)
-    result = []
-    
-    for fn in functions:
-        params = signature(fn).parameters
-        if params:
-            kw = {k: kwargs[k] for k in kw_keys & set(params)}
-            if kw:
-                result.append(partial(fn, **kw))
-            else:
-                result.append(fn)
-        else:
-            result.append(fn)
-    
-    return result

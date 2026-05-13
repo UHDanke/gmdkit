@@ -1,101 +1,16 @@
 # Imports
 from typing import Callable, Any, Optional, Sequence
 from dataclasses import dataclass, field
-from enum import IntEnum
 
 # Package Imports
 from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.remapping.base_func import obj_can_be_spawned
-
+from gmdkit.remapping.types import IDType, IDActions
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
-
-
-class AutoID:
-    __slots__ = ()
-    
-    def __setattr__(self, name, value):
-        raise TypeError("immutable")
-
-    def __repr__(self):
-        return f"<AutoID at {hex(id(self))}>"
-
-    def __copy__(self):
-        return type(self)()
-
-    def __deepcopy__(self, memo):
-        oid = id(self)
-        if oid in memo:
-            return memo[oid]
-
-        obj = type(self)()
-        memo[oid] = obj
-        return obj
-    
-
-class IDType(IntEnum):
-    LABEL = -2
-    GENERIC = -1
-    ANY = 0
-    GROUP_ID = 1  
-    ITEM_ID = 2
-    TIME_ID = 3
-    COLLISION_ID = 4
-    COLOR_ID = 5
-    CONTROL_ID = 6
-    LINK_ID = 7
-    TRIGGER_CHANNEL = 8
-    ENTER_CHANNEL = 9
-    MATERIAL_ID = 10
-    EFFECT_ID = 11
-    GRADIENT_ID = 12
-    FORCE_ID = 13
-    KEYFRAME_ID = 14
-    SFX_ID = 15
-    SONG_ID = 16
-    UNIQUE_SFX_ID = 17
-    SFX_GROUP = 18
-    SONG_CHANNEL = 19
-    REMAP_BASE = 20
-    REMAP_TARGET = 21
-
-
-class IDActions(IntEnum):
-    SINGLE = 0
-    ACTIVE = 1
-    SPAWN = 2
-    TOGGLE = 3
-    FOLLOW_POSITION = 4 
-    COLOR = 5
-    FOLLOW_COLOR = 6
-    ALPHA = 7
-    FOLLOW_ALPHA = 8
-    MOVE = 9
-    FOLLOW_MOVE = 10
-    ROTATE = 11
-    FOLLOW_ROTATE = 12
-    SCALE = 13
-    FOLLOW_SCALE = 14
-    ANIMATE = 15
-    KEYFRAME = 16
-    PARTICLES = 17
-    UI = 18
-    RESET = 19
-    STOP = 20
-    PAUSE = 21
-    RESUME = 22
-    EDIT_EFFECT = 23
-    STOP_EFFECT = 24
-    SET_ITEM = 25
-    GET_ITEM = 26
-    TRACK_ITEM = 27
-    PERSIST_ITEM = 28
-    TRACK_COLLISION = 29
-    CHECK_COLLISION = 30
-    LINKED_OBJECTS = 31
 
 
 @dataclass(slots=True)
