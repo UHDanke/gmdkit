@@ -5,7 +5,7 @@ from typing import Any
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.models.prop.gzip import ObjectString
-from gmdkit.serialization.mixins import FilePathMixin, PlistLoaderMixin, FolderLoaderMixin
+from gmdkit.serialization.mixins import FilePathMixin, PlistLoaderMixin, FolderLoaderMixin, DictDefaultsMixin
 from gmdkit.serialization.functions import (
     dict_cast, from_node_dict, to_node_dict, read_plist, write_plist, get_load_keys, kv_wrap, args_wrap
     )
@@ -14,10 +14,11 @@ from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.mappings import lvl_prop
 
 
-class Level(FilePathMixin,PlistLoaderMixin,DictClass[str,Any]):
+class Level(FilePathMixin,DictDefaultsMixin,PlistLoaderMixin,DictClass[str,Any]):
     
     DECODER = staticmethod(dict_cast(from_node_dict(LEVEL_DECODERS),default=read_plist))
     ENCODER = staticmethod(dict_cast(to_node_dict(LEVEL_ENCODERS),default=write_plist))
+    TYPES = LEVEL_TYPES
     ENCODER_KEY = 4
     EXTENSION = "gmd"
     SELECTORS = get_load_keys(LEVEL_TYPES)

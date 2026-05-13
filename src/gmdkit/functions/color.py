@@ -2,7 +2,7 @@
 from gmdkit.mappings import obj_prop, color_id, obj_id
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.color import Color, ColorList
-from gmdkit import enums
+from gmdkit.utils import enums
 from gmdkit.models.prop.hsv import HSV
 
 

@@ -1,17 +1,40 @@
 # Imports
-from typing import Callable, Any, Optional, Sequence, Iterable, Self
+from typing import Callable, Any, Optional, Sequence
 from dataclasses import dataclass, field
 from enum import IntEnum
 
 # Package Imports
-from gmdkit import Level, Object, ObjectList
+from gmdkit.models.level import Level
+from gmdkit.models.object import Object, ObjectList
 from gmdkit.mappings import obj_prop, obj_id
-from gmdkit.other.id_functions import obj_can_be_spawned
+from gmdkit.remapping.base_func import obj_can_be_spawned
 
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
 
+
+class AutoID:
+    __slots__ = ()
+    
+    def __setattr__(self, name, value):
+        raise TypeError("immutable")
+
+    def __repr__(self):
+        return f"<AutoID at {hex(id(self))}>"
+
+    def __copy__(self):
+        return type(self)()
+
+    def __deepcopy__(self, memo):
+        oid = id(self)
+        if oid in memo:
+            return memo[oid]
+
+        obj = type(self)()
+        memo[oid] = obj
+        return obj
+    
 
 class IDType(IntEnum):
     LABEL = -2
@@ -38,10 +61,7 @@ class IDType(IntEnum):
     SONG_CHANNEL = 19
     REMAP_BASE = 20
     REMAP_TARGET = 21
-    
-IDGroup = Sequence[IDType]
 
-AnyID = IDType.ANY
 
 class IDActions(IntEnum):
     SINGLE = 0
@@ -76,28 +96,6 @@ class IDActions(IntEnum):
     TRACK_COLLISION = 29
     CHECK_COLLISION = 30
     LINKED_OBJECTS = 31
-
-
-class AutoID:
-    __slots__ = ()
-    
-    def __setattr__(self, name, value):
-        raise TypeError("immutable")
-
-    def __repr__(self):
-        return f"<AutoID at {hex(id(self))}>"
-
-    def __copy__(self):
-        return type(self)()
-
-    def __deepcopy__(self, memo):
-        oid = id(self)
-        if oid in memo:
-            return memo[oid]
-
-        obj = type(self)()
-        memo[oid] = obj
-        return obj
 
 
 @dataclass(slots=True)
@@ -263,35 +261,35 @@ class IdentifierList:
         
         return new
     
-    @staticmethod    
+    @staticmethod
     def group_by_type(
-            identifiers:Sequence[Identifier],
-            type_groups:Sequence[Sequence[IDType]]
+            identifiers: Sequence[Identifier],
+            type_groups: Sequence[IDType | Sequence[IDType]] | None = None,
             ):
-        
-        seen = set()
-        id_dict = {}        
-        
+    
+        id_dict: dict[IDType, list[Identifier]] = {}
         for i in identifiers:
-            id_dict.setdefault(i.id_type,[]).append(i)
-        
+            id_dict.setdefault(i.id_type, []).append(i)
+    
         if type_groups is None:
-            return {k: IdentifierList(values=v) for k,v in id_dict.items()}
-        
-        result = {}
-        
+            return {k: IdentifierList(values=v) for k, v in id_dict.items()}
+    
+        seen: set[IDType] = set()
+        result: dict[IDType | tuple[IDType, ...], list[Identifier]] = {}
+    
         for k in type_groups:
-            seen.update(k)
-            result[k] = tuple(
-                v
-                for t in k if t in id_dict
-                for v in id_dict[t]
-            )
-
-        for k in set(id_dict.keys()) - seen:
+            if isinstance(k, IDType):  # single type, not a group
+                seen.add(k)
+                result[k] = id_dict.get(k, [])
+            else:
+                key = tuple(k)
+                seen.update(key)
+                result[key] = [v for t in key for v in id_dict.get(t, [])]
+    
+        for k in id_dict.keys() - seen:
             result[k] = id_dict[k]
-            
-        return {k: IdentifierList(values=v) for k,v in result.items()}
+    
+        return {k: IdentifierList(values=v) for k, v in result.items()}
 
 
 @dataclass(slots=True,frozen=True)

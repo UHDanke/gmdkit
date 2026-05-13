@@ -3,6 +3,7 @@ __all__ = [
     "extra",
     "functions",
     "mappings",
+    "remapping",
     "typing",
     "enums",
     "Level", 
@@ -24,6 +25,7 @@ from . import constants
 from . import extra
 from . import functions
 from . import mappings
+from . import remapping
 from .utils import typing, enums
 from .models.level import Level, LevelList
 from .models.level_pack import LevelPack, LevelPackList

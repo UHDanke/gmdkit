@@ -3,7 +3,8 @@ from typing import Any, Protocol, Callable, Iterable, Literal
 from xml.etree.ElementTree import Element
 from os import PathLike
 
-    
+MISSING = object()
+
 PathString = str|PathLike
 PlistStruct = dict|list|tuple
 NumKey = int|str

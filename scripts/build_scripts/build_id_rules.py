@@ -3,7 +3,7 @@ from collections import defaultdict
 
 CSV_PATH = "data/csv/remap_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_id_rules.txt"
-FILEPATH = "src/gmdkit/casting/id_rules.py"
+FILEPATH = "src/gmdkit/remapping/rules/base.py"
 
 def try_convert_int(val):
     try:
@@ -129,7 +129,7 @@ def main():
     )
     
     if unique_functions:
-        id_funcs = "from gmdkit.other.id_functions import (\n    " + (
+        id_funcs = "from gmdkit.remapping.base_func import (\n    " + (
             ",\n    ".join(unique_functions)
             ) + "\n)"
     else:

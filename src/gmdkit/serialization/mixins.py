@@ -18,7 +18,8 @@ from gmdkit.utils.typing import (
     StringDictDecoder, StringDictEncoder,
     KeyValueCondition,
     PlistDecoder,PlistEncoder,
-    NumKey
+    NumKey,
+    MISSING
 )
 from gmdkit.serialization.functions import (
     decompress_string, compress_string,
@@ -914,42 +915,57 @@ class FolderLoaderMixin:
 
 
 class DictDefaultsMixin:
-    
-    TYPES: dict[NumKey, type] = {}
-    DEFAULTS: dict[NumKey, Any] = {}
 
-    def set_defaults(self, *keys: NumKey, override: bool = False) -> None:
+    TYPES: dict[NumKey, Callable] | None = None
+    DEFAULTS: dict[NumKey, Any] | None = None
+
+    def setdefault(self, key, default=MISSING):
         cls = type(self)
-        types = cls.TYPES
-        defaults = cls.DEFAULTS
 
-        d = self
+        types = cls.TYPES or {}
+        defaults = cls.DEFAULTS or {}
+
+        if key not in self:
+
+            if default is not MISSING:
+                self[key] = default
+
+            elif key in defaults:
+                self[key] = defaults[key]
+
+            elif key in types:
+                self[key] = types[key]()
+
+        return self.get(key)
+
+    def setdefaults(self, *keys, override: bool = False):
+        cls = type(self)
+
+        types = cls.TYPES or {}
+        defaults = cls.DEFAULTS or {}
 
         if not keys:
-            keys = types
+            keys = tuple(set(types) | set(defaults))
 
-        for k in keys:
-            if not override and k in d:
+        for key in keys:
+
+            if not override and key in self:
                 continue
 
-            v = defaults.get(k)
-            d[k] = types[k]() if v is None else v
+            if key in defaults:
+                self[key] = defaults[key]
 
-    def clear_defaults(self) -> None:
+            elif key in types:
+                self[key] = types[key]()
+
+    def cleardefaults(self, *keys):
         cls = type(self)
-        types = cls.TYPES
-        defaults = cls.DEFAULTS
 
-        d = self
+        types = cls.TYPES or {}
+        defaults = cls.DEFAULTS or {}
 
-        for k, factory in types.items():
-            v = d.get(k)
-            if v is None:
-                continue
+        if not keys:
+            keys = tuple(set(types) | set(defaults))
 
-            default = defaults.get(k)
-            if default is None:
-                default = factory()
-
-            if v == default:
-                d.pop(k, None)
+        for key in keys:
+            self.pop(key, None)

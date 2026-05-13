@@ -1,15 +1,15 @@
 # Imports
 import copy
-import re
 from typing import Callable, Optional, Sequence
 
 # Package Imports
-from gmdkit.casting.id_rules import ID_RULES
-from gmdkit.other.id_classes import IDType, IDRule, RuleHandler, AutoID
-from gmdkit import Level, LevelList, ObjectList
+from gmdkit.remapping.classes import IDType, RuleHandler, AutoID
+from gmdkit.remapping.rules import COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER, REGROUP_IDS
+from gmdkit.models.level import Level, LevelList
+from gmdkit.models.object import ObjectList
 from gmdkit.models.prop.color import ColorList
-from gmdkit.mappings import obj_prop, obj_id, color_id
-from gmdkit.utils.misc import next_free
+from gmdkit.mappings import obj_prop, color_id
+from gmdkit.remapping.utils import next_free
 from gmdkit.functions.object import clean_duplicate_groups, offset_position
 from gmdkit.functions.object_list import (
     compile_keyframe_groups, 
@@ -20,129 +20,11 @@ from gmdkit.functions.object_list import (
 from gmdkit.functions.color import create_color_triggers
 
 
-def create_text_rule(
-        regex:str,
-        id_type:IDType,
-        condition:Optional[Callable]=None,
-        id_min:Optional[int]=None,
-        id_max:Optional[int]=None
-        ) -> IDRule:
-    # Compiles an ID rule that retrieves a group ID from a text object field.
-    
-    pattern = re.compile(regex)
-    
-    def function(text: str):
-        match = pattern.search(text)
-        if not match:
-            return None
-        return int(match.group(1) if match.lastindex else match.group(0))
-    
-    def replace(text: str, new_id: int):
-        match = pattern.search(text)
-        if not match:
-            return text
-        return text[:match.start(1)] + str(new_id) + text[match.end(1):] if match.lastindex else str(new_id)
-    
-    optionals = {}
-    if condition is not None:
-        optionals["condition"] = condition
-    if id_min is not None:
-        optionals["id_min"] = id_min
-    if id_max is not None:
-        optionals["id_max"] = id_max
-         
-    return IDRule(
-        obj_prop_id=obj_prop.text.DATA,
-        id_type=id_type,
-        function=function,
-        replace=replace,
-        **optionals
-    )
-
-ID_SET_COPY = (
-    IDType.LINK_ID,
-    IDType.KEYFRAME_ID
-    )
-
-ID_SET_BASE = (
-    IDType.GROUP_ID,
-    IDType.ITEM_ID,
-    IDType.TIME_ID,
-    IDType.COLLISION_ID
-    )
-
-ID_SET_REMAP = (
-    *ID_SET_BASE,
-    IDType.CONTROL_ID,
-    IDType.REMAP_BASE,
-    IDType.REMAP_TARGET
-    )
-
-ID_SET_REGROUP = (
-    *ID_SET_REMAP,
-    IDType.FORCE_ID,
-    IDType.GRADIENT_ID
-    )
-
-ID_SET_REGROUP_COLOR = (
-    *ID_SET_REGROUP,
-    IDType.COLOR_ID
-    )
-
-ID_RULE_TEXT_NUMBER = create_text_rule(
-    regex=r"^\d+$",
-    id_type=IDType.ANY,
-    id_min=1,
-    id_max=9999
-    )
-    
-ID_RULE_TEXT_ID = create_text_rule(
-    regex=r"\bID\s+(\d+)\b",
-    id_type=IDType.GROUP_ID,
-    id_min=1,
-    id_max=9999
-    )
-
-ID_RULE_REMAP_ID = create_text_rule(
-    regex=r"^(\d+)\s+[A-Za-z]+",
-    id_type=IDType.LABEL
-    )
-
-TEXT_RULES = RuleHandler(by_id={obj_id.TEXT:(ID_RULE_TEXT_NUMBER,ID_RULE_TEXT_ID,ID_RULE_REMAP_ID)})
-
-EDITOR_LAYER_RULES = RuleHandler(base=(
-    IDRule(obj_prop.EDITOR_L1, IDType.GENERIC, reference=True, default=0, id_min=-32768, id_max=32767),
-    IDRule(obj_prop.EDITOR_L2, IDType.GENERIC, reference=True, default=lambda obj: 0 if obj.get(obj_prop.EDITOR_L1) else None, id_min=-32768, id_max=32767)
-    ))
-
-ID_GROUPS_COPY = (
-    (IDType.LINK_ID,),
-    (IDType.KEYFRAME_ID,)
-    )
-
-ID_GROUPS_REGROUP = (
-    ID_SET_REMAP,
-    (IDType.FORCE_ID,),
-    (IDType.GRADIENT_ID,)
-    )
-
-ID_GROUPS_REGROUP_COLOR = (
-    *ID_GROUPS_REGROUP,
-    (IDType.COLOR_ID,)
-    )
-
-ID_RULES_COPY = ID_RULES.compile_rules(id_types=ID_SET_COPY)
-
-ID_RULES_REGROUP = ID_RULES.compile_rules(id_types=ID_SET_REGROUP)
-
-ID_RULES_REGROUP_COLOR = ID_RULES.compile_rules(id_types=ID_SET_REGROUP_COLOR)
-
-
 def offset_object_ids(
         source:ObjectList|Level,
         id_offset:Optional[dict]=None,
         ignore_ids:Optional[dict]=None,
-        rules:RuleHandler=ID_RULES,
+        rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
@@ -180,7 +62,7 @@ def reassign_object_ids(
         id_ranges:Optional[dict]=None,
         reassign_all:bool=False,
         override_fixed:bool=False,
-        rules:RuleHandler=ID_RULES,
+        rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
@@ -318,7 +200,7 @@ def remap_objects(
 
 def remap_objects_copy(
         *sources:ObjectList,
-        rules:RuleHandler=ID_RULES_COPY
+        rules:RuleHandler=COPY_ID_HANDLER
         ):
     
     return remap_objects(
@@ -332,8 +214,8 @@ def remap_objects_regroup(
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
-        rules:RuleHandler=ID_RULES_REGROUP,
-        groups:Optional[Sequence[Sequence[IDType]]]=ID_GROUPS_REGROUP,
+        rules:RuleHandler=REGROUP_ID_HANDLER,
+        groups:Optional[Sequence[Sequence[IDType]]]=REGROUP_IDS,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
             
@@ -353,8 +235,8 @@ def remap_objects_build_helper(
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
-        rules:RuleHandler=ID_RULES_REGROUP,
-        groups:Optional[Sequence[Sequence[IDType]]]=ID_GROUPS_REGROUP,
+        rules:RuleHandler=REGROUP_ID_HANDLER,
+        groups:Optional[Sequence[Sequence[IDType]]]=REGROUP_IDS,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ):
     
@@ -481,20 +363,16 @@ def create_common_group(objects:ObjectList, rules) -> tuple[int]:
     if common:
         return tuple(common)
     
-    rules = rules.compile_rules(id_types=(
-        *ID_SET_BASE,
-        ))
-    ids = rules.compile_ids(objects, by_type=False)
-    vals = ids.get_ids()
-    new = next_free(vals,vmin=ids.vmin,vmax=ids.vmax,count=1)
+    new = AutoID()
     add_groups(objects, new)
+    
     return tuple(new)
     
 
 def free_unused_colors(lvl:Level, ignore_ids:dict):
     ignore_ids = ignore_ids or {}
     
-    rules = ID_RULES.compile_rules(id_types=(IDType.COLOR_ID,))
+    rules = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
     
     ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
     id_base = ids.filter_values(reference=False).get_ids()
