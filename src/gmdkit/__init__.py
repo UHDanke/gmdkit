@@ -6,6 +6,7 @@ __all__ = [
     "remapping",
     "typing",
     "enums",
+    "template",
     "Level", 
     "LevelList",
     "LevelPack", 
@@ -15,10 +16,7 @@ __all__ = [
     "Object", 
     "ObjectList",
     "GameSave", 
-    "LevelSave",
-    "SmartTemplate", 
-    "SmartPrefab", 
-    "SmartLayout"
+    "LevelSave"
     ]
 
 from . import constants
@@ -27,10 +25,10 @@ from . import functions
 from . import mappings
 from . import remapping
 from .utils import typing, enums
+from .models import template
 from .models.level import Level, LevelList
 from .models.level_pack import LevelPack, LevelPackList
 from .models.object import Object, ObjectList
-from .models.template import SmartTemplate, SmartPrefab, SmartLayout
 from .models.prop.gzip import ObjectString, ReplayString
 from .models.save.game_manager import GameSave
 from .models.save.level_manager import LevelSave
