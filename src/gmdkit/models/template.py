@@ -24,6 +24,7 @@ from gmdkit.models.object import Object, ObjectGroup
 from gmdkit.utils.enums import ArrowDir
 from gmdkit.utils.functions import get_enum_values, normalize_orientation, typed_cache
 
+
 class TemplatePosition(IntEnum):
     CENTER = 0
     TOP = 1
@@ -34,6 +35,7 @@ class TemplatePosition(IntEnum):
     TOP_RIGHT = 6
     BOTTOM_LEFT = 7
     BOTTOM_RIGHT = 8
+
     
 class TemplateType(Enum):
     NONE = "0"

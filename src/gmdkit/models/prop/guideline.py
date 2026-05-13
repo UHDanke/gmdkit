@@ -11,7 +11,7 @@ from gmdkit.serialization.type_cast import decode_text, encode_text
 # Some mods use guideline data as a datafield
 # this exists in order to allow gmdkit to load the level
 @dataclass_decoder(slots=True, separator="~", from_array=True)
-class GuideData(DataclassDecoderMixin):
+class Guidedata(DataclassDecoderMixin):
 
     data: dict = field_decoder(
         decoder=lambda string: dict_from_string(decode_text(string.removeprefix("|"))), 
@@ -27,14 +27,14 @@ class Guideline(DataclassDecoderMixin):
     color: float = 0
 
 
-class GuidelineList(FileStringMixin,DelimiterMixin,ArrayDecoderMixin,ListClass[Guideline|GuideData]):
+class GuidelineList(FileStringMixin,DelimiterMixin,ArrayDecoderMixin,ListClass[Guideline|Guidedata]):
     
     __slots__ = ()
     
     SEPARATOR = "~"
     END_DELIMITER = "~"
     GROUP_SIZE = 2
-    DECODER = lambda t: GuideData.from_tokens(t) if t[0].startswith("|") else Guideline.from_tokens(t)
+    DECODER = lambda t: Guidedata.from_tokens(t) if t[0].startswith("|") else Guideline.from_tokens(t)
     ENCODER = lambda obj: obj.to_tokens()
     
     def clean(self):

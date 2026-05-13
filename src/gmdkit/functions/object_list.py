@@ -6,7 +6,7 @@ import math
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
-from gmdkit.models.prop.list import IDList
+from gmdkit.models.prop.groups import IDList
 from gmdkit.functions.object import get_keyframe_id
 
 ObjectListMapping = dict[Optional[int],ObjectList]

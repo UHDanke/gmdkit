@@ -5,7 +5,11 @@ from gmdkit.serialization.type_cast import (
     from_float,
     decode_text, encode_text
     )
-from gmdkit.models.prop.list import IDList, EventList, IntPairList, RemapList
+from gmdkit.models.prop.groups import IDList
+from gmdkit.models.prop.events import EventList
+from gmdkit.models.prop.sequence import SequenceList
+from gmdkit.models.prop.random import RandomWeightsList
+from gmdkit.models.prop.remaps import RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.particle import Particle

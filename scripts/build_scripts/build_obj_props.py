@@ -158,8 +158,11 @@ def get_obj_types(gd_type, gd_format, key):
                 case  'events':
                     return "EventList"
                 
-                case  'weights' | 'sequence' | 'group weights' | 'group counts':
-                    return 'IntPairList'
+                case  'sequence' | 'group counts':
+                    return 'SequenceList'
+                
+                case  'weights' | 'group weights':
+                    return 'RandomWeightsList'
                 
                 case 'remaps' |'group remaps':
                     return 'RemapList'
@@ -213,8 +216,11 @@ def decode_obj_props(gd_type, gd_format):
                 case 'events':
                     return "EventList.from_string"
                 
-                case 'weights' | 'sequence' | 'group weights' | 'group counts':
-                    return 'IntPairList.from_string'
+                case  'sequence' | 'group counts':
+                    return 'SequenceList.from_string'
+                
+                case  'weights' | 'group weights':
+                    return 'RandomWeightsList.from_string'
                 
                 case 'remaps' |'group remaps':
                     return 'RemapList.from_string'
@@ -262,8 +268,11 @@ def encode_obj_props(gd_type, gd_format):
                 case 'events':
                     return "EventList.to_string"
                 
-                case  'weights' | 'sequence' | 'group weights' | 'group counts':
-                    return 'IntPairList.to_string'
+                case  'sequence' | 'group counts':
+                    return 'SequenceList.to_string'
+                
+                case  'weights' | 'group weights':
+                    return 'RandomWeightsList.to_string'
                 
                 case 'remaps' |'group remaps':
                     return 'RemapList.to_string'

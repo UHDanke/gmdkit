@@ -5,7 +5,11 @@ from gmdkit.serialization.type_cast import (
     from_float,
     decode_text, encode_text
     )
-from gmdkit.models.prop.list import IDList, EventList, IntPairList, RemapList
+from gmdkit.models.prop.groups import IDList
+from gmdkit.models.prop.events import EventList
+from gmdkit.models.prop.sequence import SequenceList
+from gmdkit.models.prop.random import RandomWeightsList
+from gmdkit.models.prop.remaps import RemapList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.particle import Particle
@@ -146,7 +150,7 @@ PROPERTY_DECODERS = {
     149: float,
     150: float,
     151: float,
-    152: IntPairList.from_string,
+    152: RandomWeightsList.from_string,
     153: to_bool,
     154: to_bool,
     155: int,
@@ -388,7 +392,7 @@ PROPERTY_DECODERS = {
     432: int,
     433: to_bool,
     434: float,
-    435: IntPairList.from_string,
+    435: SequenceList.from_string,
     436: enums.SequenceMode,
     437: float,
     438: float,
@@ -736,7 +740,7 @@ PROPERTY_ENCODERS = {
     149: from_float,
     150: from_float,
     151: from_float,
-    152: IntPairList.to_string,
+    152: RandomWeightsList.to_string,
     153: from_bool,
     154: from_bool,
     157: from_bool,
@@ -902,7 +906,7 @@ PROPERTY_ENCODERS = {
     431: from_bool,
     433: from_bool,
     434: from_float,
-    435: IntPairList.to_string,
+    435: SequenceList.to_string,
     437: from_float,
     438: from_float,
     441: from_bool,
@@ -1197,7 +1201,7 @@ PROPERTY_TYPES = {
     149: float,
     150: float,
     151: float,
-    152: IntPairList,
+    152: RandomWeightsList,
     153: bool,
     154: bool,
     155: int,
@@ -1439,7 +1443,7 @@ PROPERTY_TYPES = {
     432: int,
     433: bool,
     434: float,
-    435: IntPairList,
+    435: SequenceList,
     436: enums.SequenceMode,
     437: float,
     438: float,
