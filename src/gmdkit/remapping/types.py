@@ -4,19 +4,19 @@ from enum import IntEnum
 
 class AutoID:
     __slots__ = ("index",)
-    _counter = 0
+    counter = 1
 
     def __new__(cls):
         obj = object.__new__(cls)
-        object.__setattr__(obj, "index", cls._counter)
-        cls._counter += 1
+        object.__setattr__(obj, "index", cls.counter)
+        cls.counter += 1
         return obj
 
     def __setattr__(self, name, value):
-        raise TypeError("immutable")
+        raise TypeError("AutoID is immutable")
 
     def __repr__(self):
-        return f"<AutoID #{self.index} at {hex(id(self))}>"
+        return f"<AutoID #{self.index}>"
 
     def __copy__(self):
         return type(self)()
@@ -93,3 +93,18 @@ class IDActions(IntEnum):
     TRACK_COLLISION = 29
     CHECK_COLLISION = 30
     LINKED_OBJECTS = 31
+    
+
+class IDGroup:
+    def __init__(self, name: str, *members: IDType):
+        self.name = name
+        self.members = members
+    
+    def __repr__(self):
+        return f"<IDGroup: '{self.name}'>"
+    
+    def __iter__(self):
+        return iter(self.members)
+
+    def __contains__(self, item):
+        return item in self.members

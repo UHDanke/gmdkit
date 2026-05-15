@@ -37,22 +37,27 @@ def offset_object_ids(
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
     for k,v in ids.items():
-        ig = ignore_ids.get(k,set()) | ig_all
-        io = id_offset.get(k,io_all)
-        
-        if not io: continue
-        
-        old = v.get_ids(in_range=True) - ig
-        
-        if not old: continue
-        
-        new = {i + io for i in old}
-
-        if any(i < v.vmin or i > v.vmax for i in new):
-            raise ValueError("Offset returned out-of-range ID")
-                
-        kv_map = dict(zip(old,new))
-        v.remap_objects(kv_map)
+        try:
+            ig = ignore_ids.get(k,set()) | ig_all
+            io = id_offset.get(k,io_all)
+            
+            if not io: continue
+            
+            old = v.get_ids(in_range=True) - ig
+            
+            if not old: continue
+            
+            new = {i + io for i in old}
+    
+            if any(i < v.vmin or i > v.vmax for i in new):
+                raise ValueError("Offset returned out-of-range ID")
+                    
+            kv_map = dict(zip(old,new))
+            v.remap_objects(kv_map)
+        except Exception as e:
+            raise RuntimeError(
+                f"Offset ID function encountered the following error while processing key {k}:"
+                ) from e
         
     return source
 
@@ -75,48 +80,53 @@ def reassign_object_ids(
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
     for k, v in ids.items():
-        ig = ignore_ids.get(k, set()) | ig_all
-        ir = (id_ranges.get(k, set()) | ir_all) - ig
-    
-        v = v if override_fixed else v.filter_values(fixed=False)
-        used = v.get_ids()
+        try:
+            ig = ignore_ids.get(k, set()) | ig_all
+            ir = (id_ranges.get(k, set()) | ir_all) - ig
         
-        auto = {x for x in used if type(x) is AutoID}
-        used_ints = used - auto
-    
-        range_search = bool(ir)
-        
-    
-        if not reassign_all and not range_search:
-            old = auto
-            sr = used_ints
-            range_min, range_max = v.vmin, v.vmax
-        else:
-            sr = ir - used_ints
+            v = v if override_fixed else v.filter_values(fixed=False)
+            used = v.get_ids()
             
-            if not reassign_all:
-                old = used_ints - ig - ir
-                
+            auto = {x for x in used if type(x) is AutoID}
+            used_ints = used - auto
+        
+            range_search = bool(ir)
+            
+        
+            if not reassign_all and not range_search:
+                old = auto
+                sr = used_ints
+                range_min, range_max = v.vmin, v.vmax
             else:
-                old = used_ints - ig
-            
-            old = {x for x in old if v.vmin <= x <= v.vmax}
-            range_min = max(v.vmin, min(ir)) if range_search else v.vmin
-            range_max = min(v.vmax, max(ir)) if range_search else v.vmax
-        
-        if not (old or auto): continue
-        
-        new = next_free(
-            sr,
-            vmin=range_min,
-            vmax=range_max,
-            count=len(old)+len(auto),
-            in_range=range_search,
-        )
+                sr = ir - used_ints
                 
-        kv_map = dict(zip(sorted(old)+sorted(auto),new))
-        v.remap_objects(kv_map, override=override_fixed)
+                if not reassign_all:
+                    old = used_ints - ig - ir
+                    
+                else:
+                    old = used_ints - ig
+                
+                old = {x for x in old if v.vmin <= x <= v.vmax}
+                range_min = max(v.vmin, min(ir)) if range_search else v.vmin
+                range_max = min(v.vmax, max(ir)) if range_search else v.vmax
+            
+            if not (old or auto): continue
         
+            new = next_free(
+                sr,
+                vmin=range_min,
+                vmax=range_max,
+                count=len(old)+len(auto),
+                in_range=range_search,
+            )
+                    
+            kv_map = dict(zip(sorted(old)+sorted(auto),new))
+            
+            v.remap_objects(kv_map, override=override_fixed)
+        except Exception as e:
+            raise RuntimeError(
+                f"Reassign ID function encountered the following error while processing key {k}:"
+                ) from e
     return source
 
 
