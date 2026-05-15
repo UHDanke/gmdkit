@@ -3,7 +3,7 @@ from collections import defaultdict
 
 CSV_PATH = "data/csv/remap_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_id_rules.txt"
-FILEPATH = "src/gmdkit/remapping/rules/base.py"
+FILEPATH = "src/gmdkit/remapping/base.py"
 
 def try_convert_int(val):
     try:
