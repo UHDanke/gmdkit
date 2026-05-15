@@ -2,8 +2,7 @@
 import pytest
 from pathlib import Path
 
-from gmdkit.models.level import Level
-from gmdkit.models.object import Object
+from gmdkit import Level, Object
 from gmdkit.mappings import obj_prop
 
 from tests.utils import ONLINE_LEVELS, OFFLINE_LEVELS

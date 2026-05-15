@@ -5,9 +5,8 @@ import tempfile
 import shutil
 from pathlib import Path
 
-from gmdkit.models.object import Object, ObjectList
-from gmdkit.models.level import Level
-from gmdkit.models.prop.list import IDList
+from gmdkit import Object, ObjectList, Level
+from gmdkit.models.prop import IDList
 from gmdkit.mappings import obj_prop
 
 ExceptionInfo = pytest.ExceptionInfo
