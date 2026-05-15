@@ -5,7 +5,8 @@ CSV_PATH = "data/csv/prop_table.csv"
 TEMPLATE_PATH = "scripts/build_scripts/templates/casting_obj_props.txt"
 FILEPATH = "src/gmdkit/casting/object_props.py"
 FOLDERPATH = "src/gmdkit/mappings/obj_prop/"
-
+CLASSES_FILEPATH = "src/gmdkit/extensions/fielded/object_classes.py"
+CLASSES_TEMPLATE_PATH = "scripts/build_scripts/templates/obj_classes.txt"
 
 def match_enum(enum_format):
     match enum_format:
@@ -291,6 +292,131 @@ def encode_obj_props(gd_type, gd_format):
         case _:
             return
 
+def get_gmdkit_format(gd_type, gd_format):
+    
+    t = get_obj_types(gd_type, gd_format, None)
+    return t if t is not None else 'str'
+
+def _segments_to_classname(segments: list[str]) -> str:
+    
+    return "".join(s.strip().title().replace(" ", "").replace("_", "") for s in segments)
+
+def _hoist_common_props(node: dict):
+    
+    child_keys = [k for k in node if k is not None]
+
+    for ck in child_keys:
+        _hoist_common_props(node[ck])
+
+    if len(child_keys) < 2:
+        return
+
+    # Build a set of (attr, fmt) present in every child
+    def prop_signatures(n):
+        return {(attr, fmt) for attr, fmt, _ in n.get(None, [])}
+
+    common_sigs = prop_signatures(node[child_keys[0]])
+    for ck in child_keys[1:]:
+        common_sigs &= prop_signatures(node[ck])
+
+    if not common_sigs:
+        return
+
+    # For each common (attr, fmt), take the prop from the first child
+    hoisted: dict[tuple, tuple] = {}
+    for ck in child_keys:
+        child_props = node[ck].get(None, [])
+        remaining = []
+        for prop in child_props:
+            sig = (prop[0], prop[1])
+            if sig in common_sigs:
+                hoisted.setdefault(sig, prop)   # keep first occurrence
+            else:
+                remaining.append(prop)
+        node[ck][None] = remaining
+
+    parent_props = node.get(None, [])
+    node[None] = parent_props + list(hoisted.values())
+
+def _collect_classes(
+    node: dict,
+    segments: list[str],
+    classes: list[tuple[str, str, list[tuple[str, str, int | str]]]],
+):
+    
+    class_name  = _segments_to_classname(segments)
+    parent_name = _segments_to_classname(segments[:-1]) if len(segments) > 1 else "FieldedObject"
+
+    props: list[tuple[str, str, int | str]] = node.get(None, [])
+    classes.append((class_name, parent_name, props))
+
+    for child_key in sorted(k for k in node if k is not None):
+        _collect_classes(node[child_key], segments + [child_key], classes)
+
+def _insert_prop(root: dict, alias: str, fmt: str, prop_id: int | str):
+    
+    parts = alias.strip().split('.')
+    node = root
+    for part in parts[:-1]:
+        node = node[part]          # defaultdict auto-creates missing nodes
+
+    leaf_attr = parts[-1].lower()
+    if None not in node:
+        node[None] = []
+    node[None].append((leaf_attr, fmt, prop_id))
+
+def generate_prop_classes(prop_table: pd.DataFrame, filepath: str):
+    
+    root = tree()   # utils tree() — recursive defaultdict
+
+    for _, row in prop_table.iterrows():
+        raw_id    = row['id']
+        prop_id   = int(raw_id) if str(raw_id).isdigit() else str(raw_id)
+        gd_type   = str(row.get('type',   '')).strip()
+        gd_format = str(row.get('format', '')).strip()
+        alias     = row.get('alias')
+
+        fmt = get_gmdkit_format(gd_type, gd_format)
+
+        if pd.notna(alias) and str(alias).strip():
+            alias_str = str(alias).strip()
+            if not any(seg.startswith("M_") for seg in alias_str.split(".")):
+                _insert_prop(root, alias_str, fmt, prop_id)
+
+    fielded_object_lines: list[str] = []
+
+    root_props = sorted(root.get(None, []), key=lambda x: sort_number(x[2]))
+    for attr, fmt, prop_id in root_props:
+        fielded_object_lines.append(f"    {attr}: {fmt} = DictField[{fmt}]({prop_id!r})")
+    if not root_props:
+        fielded_object_lines.append("    pass")
+
+    _hoist_common_props(root)
+    all_classes: list[tuple[str, str, list]] = []
+    for child_key in sorted(k for k in root if k is not None):
+        _collect_classes(root[child_key], [child_key], all_classes)
+
+    # Emit each subclass at module level
+    for class_name, parent_name, props in all_classes:
+        fielded_object_lines.append("")
+        fielded_object_lines.append("")
+        fielded_object_lines.append(f"class {class_name}({parent_name}):")
+        body = sorted(props, key=lambda x: sort_number(x[2]))
+        for attr, fmt, prop_id in body:
+            fielded_object_lines.append(f"    {attr}: {fmt} = DictField[{fmt}]({prop_id!r})")
+        if not body:
+            fielded_object_lines.append("    pass")
+
+    with open(CLASSES_TEMPLATE_PATH, "r") as f:
+        template = f.read()
+
+    with open(filepath, "w") as f:
+        f.write(template.format(
+            fielded_object="\n".join(fielded_object_lines),
+        ))
+
+    print(f"[generate_prop_classes] Written → {filepath}")
+
 def main():
     prop_table = pd.read_csv("data/csv/prop_table.csv")
     prop_table['id'] = prop_table['id'].apply(lambda x: int(x) if str(x).isdigit() else str(x))
@@ -350,6 +476,8 @@ def main():
     # Write mappings/object_properties.py
     clear_folder(FOLDERPATH)
     render_tree(root, FOLDERPATH)
+
+    generate_prop_classes(prop_table, CLASSES_FILEPATH)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,36 @@
+# Package Imports
+from gmdkit.utils.classes import DictField
+from gmdkit.utils import enums
+from gmdkit.models.object import Object
+from gmdkit.models.prop.groups import IDList
+from gmdkit.models.prop.events import EventList
+from gmdkit.models.prop.sequence import SequenceList
+from gmdkit.models.prop.random import RandomWeightsList
+from gmdkit.models.prop.remaps import RemapList
+from gmdkit.models.prop.guideline import GuidelineList
+from gmdkit.models.prop.hsv import HSV
+from gmdkit.models.prop.particle import Particle
+from gmdkit.models.prop.color import Color, ColorList
+
+
+class FieldedObject(Object):
+    READONLY_KEYS = frozenset({{1}})
+
+    def __setitem__(self, key, value):
+        if key in self.READONLY_KEYS and key in self:
+            raise TypeError(
+                f"Key {{key!r}} is read-only and cannot be modified after initialisation."
+            )
+        super().__setitem__(key, value)
+
+    def __setattr__(self, name, value):
+        cls = type(self)
+        for c in cls.__mro__:
+            if name in c.__dict__:
+                object.__setattr__(self, name, value)
+                return
+        raise AttributeError(
+            f"{{cls.__name__!r}} has no field {{name!r}}."
+        )
+
+{fielded_object}

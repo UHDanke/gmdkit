@@ -18,12 +18,12 @@ class DictField(Generic[T]):
         if instance is None:
             return self
         try:
-            return instance.obj[self.key]  # type: ignore[attr-defined]
+            return instance[self.key]  # type: ignore[attr-defined]
         except KeyError:
             raise AttributeError(self.key) from None
 
     def __set__(self, instance: Any, value: T) -> None:
-        instance.obj[self.key] = value
+        instance[self.key] = value
     
         
 class Clipboard:

@@ -2,11 +2,10 @@
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.remapping.base import ID_RULES as BASE_ID_HANDLER
 from gmdkit.remapping.classes import IDRule, RuleHandler
-from gmdkit.remapping.types import IDType, IDGroup
-from gmdkit.remapping.utils import create_text_rule
+from gmdkit.remapping.types import IDType
+from gmdkit.remapping.utils import create_text_rule, create_label_rule
 
-ALL_IDS = IDGroup(
-    "ALL_IDS",
+ALL_IDS = (
     IDType.GROUP_ID,  
     IDType.ITEM_ID,
     IDType.TIME_ID,
@@ -30,43 +29,37 @@ ALL_IDS = IDGroup(
     IDType.REMAP_TARGET
     )
 
-COPY_IDS = IDGroup(
-    "COPY_IDS",
+COPY_IDS = (
     IDType.LINK_ID,
     IDType.KEYFRAME_ID
     )
 
-GROUP_IDS = IDGroup(
-    "GROUP_IDS",
+GROUP_IDS = (
     IDType.GROUP_ID,
     IDType.ITEM_ID,
     IDType.TIME_ID,
     IDType.COLLISION_ID
     )
 
-REMAP_IDS = IDGroup(
-    "REMAP_IDS",
+REMAP_IDS = (
     *GROUP_IDS,
     IDType.CONTROL_ID,
     IDType.REMAP_BASE,
     IDType.REMAP_TARGET
     )
 
-REMAP_COLOR_IDS = IDGroup(
-    "REMAP_COLOR_IDS",
+REMAP_COLOR_IDS = (
     *REMAP_IDS,
     IDType.COLOR_ID
     )
 
-REGROUP_IDS = IDGroup(
-    "REGROUP_IDS",
+REGROUP_IDS = (
     *REMAP_IDS,
     IDType.FORCE_ID,
     IDType.GRADIENT_ID
     )
 
-REGROUP_COLOR_IDS = IDGroup(
-    "REGROUP_COLOR_IDS",
+REGROUP_COLOR_IDS = (
     *REGROUP_IDS,
     IDType.COLOR_ID
     )
@@ -87,6 +80,11 @@ TEXT_ID_RULE = create_text_rule(
 
 TEXT_REMAP_RULE = create_text_rule(
     regex=r"^(\d+)\s+[A-Za-z]+",
+    id_type=IDType.LABEL
+    )
+
+TEXT_ID_LABEL_RULE = create_label_rule(
+    template="ID {}",
     id_type=IDType.LABEL
     )
 

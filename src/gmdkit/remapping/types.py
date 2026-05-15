@@ -1,5 +1,6 @@
 # Imports
 from enum import IntEnum
+from dataclasses import dataclass
 
 
 class AutoID:
@@ -31,7 +32,16 @@ class AutoID:
 
     def __lt__(self, other):
         return self.index < other.index
-    
+
+
+@dataclass(frozen=True, slots=True)
+class LabelID:
+    value: int
+    template: str = ""
+
+    def __str__(self) -> str:
+        return self.template.format(self.value)
+        
 
 class IDType(IntEnum):
     LABEL = -2
