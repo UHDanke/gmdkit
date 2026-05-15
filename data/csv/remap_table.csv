@@ -584,16 +584,16 @@ item id,4534,obj_prop.trigger.collectible.ITEM_ID,,,,,get_collectible_default_it
 item id,4535,obj_prop.trigger.collectible.ITEM_ID,,,,,get_collectible_default_item_id,set item,FALSE,FALSE,0,9999,FALSE,FALSE
 item id,4536,obj_prop.trigger.collectible.ITEM_ID,,,,,get_collectible_default_item_id,set item,FALSE,FALSE,0,9999,FALSE,FALSE
 item id,4539,obj_prop.trigger.collectible.ITEM_ID,,,,,get_collectible_default_item_id,set item,FALSE,FALSE,0,9999,FALSE,FALSE
-collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_A,,,,,get_default_collision_block_a,track collision,FALSE,TRUE,1,9999,FALSE,FALSE
-collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_B,,,,,get_default_collision_block_b,track collision,FALSE,TRUE,1,9999,FALSE,FALSE
-collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_A,,,,,get_default_instant_coll_block_a,check collision,FALSE,TRUE,1,9999,FALSE,FALSE
-collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_B,,,,,get_default_instant_coll_block_b,check collision,FALSE,TRUE,1,9999,FALSE,FALSE
-collision id,obj_id.trigger.COLLISION_BLOCK,obj_prop.trigger.collision_block.BLOCK_ID,,,,,0,,FALSE,FALSE,1,9999,FALSE,TRUE
+collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_A,,,,,get_default_collision_block_a,track collision,FALSE,TRUE,0,9999,FALSE,FALSE
+collision id,obj_id.trigger.COLLISION,obj_prop.trigger.collision.BLOCK_B,,,,,get_default_collision_block_b,track collision,FALSE,TRUE,0,9999,FALSE,FALSE
+collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_A,,,,,get_default_instant_coll_block_a,check collision,FALSE,TRUE,0,9999,FALSE,FALSE
+collision id,obj_id.trigger.INSTANT_COLLISION,obj_prop.trigger.instant_collision.BLOCK_B,,,,,get_default_instant_coll_block_b,check collision,FALSE,TRUE,0,9999,FALSE,FALSE
+collision id,obj_id.trigger.COLLISION_BLOCK,obj_prop.trigger.collision_block.BLOCK_ID,,,,,0,,FALSE,FALSE,0,9999,FALSE,TRUE
 link id,,obj_prop.LINKED_GROUP,,,,,,,FALSE,FALSE,1,,FALSE,TRUE
 trigger channel,obj_id.trigger.ARROW,obj_prop.trigger.arrow.TARGET_CHANNEL,,,,,0,set item,FALSE,FALSE,,,FALSE,TRUE
 trigger channel,obj_id.trigger.START_POSITION,obj_prop.start_pos.TARGET_CHANNEL,,,,,0,set item,FALSE,FALSE,,,FALSE,FALSE
 trigger channel,,obj_prop.trigger.CHANNEL,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
-gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,,0,,FALSE,FALSE,0,1000,FALSE,TRUE
+gradient id,obj_id.trigger.GRADIENT,obj_prop.trigger.gradient.GRADIENT_ID,,,,,get_default_gradient,,FALSE,FALSE,0,1000,FALSE,TRUE
 effect id,obj_id.trigger.AREA_MOVE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.AREA_SCALE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE
 effect id,obj_id.trigger.AREA_ROTATE,obj_prop.trigger.effect.EFFECT_ID,,,,,0,,FALSE,FALSE,,,FALSE,TRUE

@@ -1,0 +1,756 @@
+category,class,gmdkit alias,member,getter,setter,type,save type,save key,deprecated,info,note,Filter
+Object,GameObject,,m_objectID,,,int,int,1,FALSE,,,FALSE
+Object,GameObject,,m_startPosition.x,,,float,float,2,FALSE,,,FALSE
+Object,GameObject,,m_startPosition.y,,,float,float,3,FALSE,,,FALSE
+Object,GameObject,,m_isFlipX,isFlipX,,bool,bool,4,FALSE,,,FALSE
+Object,GameObject,,m_isFlipY,isFlipY,,bool,bool,5,FALSE,,,FALSE
+Object,GameObject,,-,getRotation,setRotation,float,float,6,FALSE,,,FALSE
+Object,EffectGameObject,,m_triggerTargetColor.r,,,GLUByte,int,7,FALSE,,,FALSE
+Object,EffectGameObject,,m_triggerTargetColor.g,,,GLUByte,int,8,FALSE,,,FALSE
+Object,EffectGameObject,,m_triggerTargetColor.b,,,GLUByte,int,9,FALSE,,,FALSE
+Object,EffectGameObject,,m_duration,,,float,float,10,FALSE,,,FALSE
+Object,EffectGameObject,,m_isTouchTriggered,,,bool,bool,11,FALSE,,,FALSE
+Object,EffectGameObject,,m_secretCoinID,,,int,int,12,FALSE,,,FALSE
+Object,EffectGameObject,,m_shouldPreview,,,bool,bool,13,FALSE,,,FALSE
+Object,EffectGameObject,,m_tintGround,,,bool,bool,14,FALSE,,,FALSE
+Object,EffectGameObject,,m_usesPlayerColor1,,,bool,bool,15,FALSE,,,FALSE
+Object,EffectGameObject,,m_usesPlayerColor2,,,bool,bool,16,FALSE,,,FALSE
+Object,EffectGameObject,,m_usesBlending,,,bool,bool,17,FALSE,,,FALSE
+,,,,,,,int,19,TRUE,,,FALSE
+Object,GameObject,,m_editorLayer,,,short,int,20,FALSE,,,FALSE
+Object,GameObject,,m_baseColor.m_colorID,,,int,int,21,FALSE,,,FALSE
+Object,GameObject,,m_detailColor.m_colorID,,,int,int,22,FALSE,,,FALSE
+Object,GameObject,,m_targetColor,,,int,int,23,FALSE,,,FALSE
+Object,GameObject,,m_zLayer,,,ZLayer,int,24,FALSE,,,FALSE
+Object,GameObject,,m_zOrder,,,int,int,25,FALSE,,,FALSE
+Object,EffectGameObject,,m_moveOffset.x,,,float,float,28,FALSE,,,FALSE
+Object,EffectGameObject,,m_moveOffset.y,,,float,float,29,FALSE,,,FALSE
+Object,EffectGameObject,,m_easingType,,,EasingType,int,30,FALSE,,,FALSE
+Object,TextGameObject,,m_text,,,gd::string,string,31,FALSE,,,FALSE
+,,,,,,,float,32,TRUE,,,FALSE
+Object,GameObject,,m_hasGroupParent,,,bool,bool,34,FALSE,,,FALSE
+Object,EffectGameObject,,m_opacity,,,float,float,35,FALSE,,,FALSE
+Object,EffectGameObject,,,,,,bool,36,FALSE,HARDCODED,,FALSE
+Object,GameObject,,m_baseUsesHSV,,,bool,bool,41,FALSE,,,FALSE
+Object,GameObject,,m_detailUsesHSV,,,bool,bool,42,FALSE,,,FALSE
+Object,GameObject,,m_baseColor.m_hsv,,,cocos2d::ccHSVValue,string,43,FALSE,,,FALSE
+Object,GameObject,,m_detailColor.m_hsv,,,cocos2d::ccHSVValue,string,44,FALSE,,,FALSE
+Object,EffectGameObject,,m_fadeInDuration,,,float,float,45,FALSE,,,FALSE
+Object,EffectGameObject,,m_holdDuration,,,float,float,46,FALSE,,,FALSE
+Object,EffectGameObject,,m_fadeOutDuration,,,float,float,47,FALSE,,,FALSE
+Object,EffectGameObject,,m_pulseMode,,,int,int,48,FALSE,SHOULD BE ENUM,,TRUE
+Object,EffectGameObject,,m_hsvValue,,,cocos2d::ccHSVValue,string,49,FALSE,,,FALSE
+Object,EffectGameObject,,m_copyColorID,,,int,int,50,FALSE,,,FALSE
+Object,EffectGameObject,,m_targetGroupID,,,int,int,51,FALSE,,,FALSE
+Object,EffectGameObject,,m_pulseTargetType,,,int,int,52,FALSE,SHOULD BE ENUM,,TRUE
+Object,TeleportPortalObject,,m_teleportYOffset,,,float,float,54,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_teleportEase,,,bool,bool,55,FALSE,,,FALSE
+Object,EffectGameObject,,m_activateGroup,,,bool,bool,56,FALSE,,,FALSE
+Object,GameObject,,m_groups,,,"std::array<short, 10>",string,57,FALSE,,,FALSE
+Object,EffectGameObject,,m_lockToPlayerX,,,bool,bool,58,FALSE,,,FALSE
+Object,EffectGameObject,,m_lockToPlayerY,,,bool,bool,59,FALSE,,,FALSE
+Object,EffectGameObject,,m_copyOpacity,,,bool,bool,60,FALSE,,,FALSE
+Object,GameObject,,m_editorLayer2,,,short,int,61,FALSE,,,FALSE
+Object,EffectGameObject,,m_isSpawnTriggered,,,bool,bool,62,FALSE,,,FALSE
+Object,SpawnTriggerGameObject,,m_spawnDelay,,,float,float,63,FALSE,,,FALSE
+Object,GameObject,,m_isDontFade,,,bool,bool,64,FALSE,,,FALSE
+Object,EffectGameObject,,m_pulseMainOnly,,,bool,bool,65,FALSE,,,FALSE
+Object,EffectGameObject,,m_pulseDetailOnly,,,bool,bool,66,FALSE,,,FALSE
+Object,GameObject,,m_isDontEnter,,,bool,bool,67,FALSE,,,FALSE
+Object,EffectGameObject,,m_rotationDegrees,,,float,float,68,FALSE,,,FALSE
+Object,EffectGameObject,,m_times360,,,int,int,69,FALSE,,,FALSE
+Object,EffectGameObject,,m_lockObjectRotation,,,bool,bool,70,FALSE,,,FALSE
+Object,EffectGameObject,,m_centerGroupID,,,int,int,71,FALSE,,,FALSE
+Object,EffectGameObject,,m_followXMod,,,float,float,72,FALSE,,,FALSE
+Object,EffectGameObject,,m_followYMod,,,float,float,73,FALSE,,,FALSE
+Object,EffectGameObject,,m_shakeStrength,,,float,float,75,FALSE,,,FALSE
+Object,EffectGameObject,,m_animationID,,,int,int,76,FALSE,,,FALSE
+Object,CountTriggerGameObject,,m_pickupCount,,,int,int,77,FALSE,,,FALSE
+Object,EffectGameObject,,m_subtractCount,,,bool,bool,78,FALSE,,,FALSE
+Object,EffectGameObject,,m_itemID,,,int,int,80,FALSE,,,FALSE
+Object,EffectGameObject,,m_touchHoldMode,,,bool,bool,81,FALSE,,,FALSE
+Object,EffectGameObject,,m_touchToggleMode,,,TouchTriggerType,int,82,FALSE,,,FALSE
+Object,EffectGameObject,,m_shakeInterval,,,float,float,84,FALSE,,,FALSE
+Object,EffectGameObject,,m_easingRate,,,float,float,85,FALSE,,,FALSE
+Object,EffectGameObject,,m_pulseExclusive,,,bool,bool,86,FALSE,,,FALSE
+Object,EffectGameObject,,m_IsMultiTriggered,,,bool,bool,87,FALSE,,,FALSE
+Object,CountTriggerGameObject,,m_pickupTriggerMode,,,int,int,88,FALSE,SHOULD BE ENUM,,TRUE
+Object,EffectGameObject,,m_isDualMode,,,bool,bool,89,FALSE,,,FALSE
+Object,EffectGameObject,,m_followYSpeed,,,float,float,90,FALSE,,,FALSE
+Object,EffectGameObject,,m_followYDelay,,,float,float,91,FALSE,,,FALSE
+Object,EffectGameObject,,m_followYOffset,,,int,int,92,FALSE,,,FALSE
+Object,EffectGameObject,,m_triggerOnExit,,,bool,bool,93,FALSE,,,FALSE
+Object,EffectGameObject,,m_isDynamicBlock,,,bool,bool,94,FALSE,,,FALSE
+Object,EffectGameObject,,m_itemID2,,,int,int,95,FALSE,,,FALSE
+Object,GameObject,,m_hasNoGlow,,,bool,bool,96,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_rotationSpeed,,,float,float,97,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_disableRotation,,,bool,bool,98,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_isMultiActivate,,,bool,bool,99,FALSE,,,FALSE
+Object,EffectGameObject,,m_useMoveTarget,,,bool,bool,100,FALSE,,,FALSE
+Object,EffectGameObject,,m_moveTargetMode,,,MoveTargetType,int,101,FALSE,,,FALSE
+Object,EffectGameObject,,m_previewDisable,,,bool,bool,102,FALSE,,,FALSE
+Object,GameObject,,m_isHighDetail,,,bool,bool,103,FALSE,,,FALSE
+Object,CountTriggerGameObject,,m_multiActivate,,,bool,bool,104,FALSE,,,FALSE
+Object,EffectGameObject,,m_followYMaxSpeed,,,float,float,105,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_animationRandomizedStart,,,bool,bool,106,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_animationSpeed,,,float,float,107,FALSE,,,FALSE
+Object,GameObject,,m_linkedGroup,,,int,int,108,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_exitStatic,,,bool,bool,110,FALSE,,,FALSE
+Object,EffectGameObject,,m_cameraIsFreeMode,,,bool,bool,111,FALSE,,,FALSE
+Object,EffectGameObject,,m_cameraEditCameraSettings,,,bool,bool,112,FALSE,,,FALSE
+Object,EffectGameObject,,m_cameraEasingValue,,,float,float,113,FALSE,,,FALSE
+Object,EffectGameObject,,m_cameraPaddingValue,,,float,float,114,FALSE,,,FALSE
+Object,EffectGameObject,,m_ordValue,,,int,int,115,FALSE,,,FALSE
+Object,GameObject,,m_hasNoEffects,,,bool,bool,116,FALSE,,,FALSE
+Object,EffectGameObject,,m_isReverse,,,bool,bool,117,FALSE,,,FALSE
+Object,EffectGameObject,,m_endReversed,,,bool,bool,118,FALSE,,,FALSE
+Object,EffectGameObject,,m_timeWarpTimeMod,,,float,float,120,FALSE,,,FALSE
+Object,GameObject,,m_isNoTouch,,,bool,bool,121,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_animationShouldUseSpeed,,,bool,bool,122,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_animateOnTriger,,,bool,bool,123,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_disableDelayedLoop,,,bool,bool,126,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_disableAnimShine,,,bool,bool,127,FALSE,,,FALSE
+Object,GameObject,,m_scaleX,,,float,float,128,FALSE,,,FALSE
+Object,GameObject,,m_scaleY,,,float,float,129,FALSE,,,FALSE
+Object,GameObject,,-,setRotationX,setRotationX,float,float,131,FALSE,,,FALSE
+Object,GameObject,,-,setRotationY,setRotationY,float,float,132,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_onlyMove,,,bool,bool,133,FALSE,,,FALSE
+Object,GameObject,,m_isPassable,,,bool,bool,134,FALSE,,,FALSE
+Object,GameObject,,m_isHide,,,bool,bool,135,FALSE,,,FALSE
+Object,GameObject,,m_isNonStickX,,,bool,bool,136,FALSE,,,FALSE
+Object,GameObject,,m_isIceBlock,,,bool,bool,137,FALSE,,,FALSE
+Object,EffectGameObject,,m_targetPlayer1,,,bool,bool,138,FALSE,,,FALSE
+Object,CountTriggerGameObject,,m_isOverride,,,bool,bool,139,FALSE,,,FALSE
+Object,EffectGameObject,,m_lockToCameraX,,,bool,bool,141,FALSE,,,FALSE
+Object,EffectGameObject,,m_lockToCameraY,,,bool,bool,142,FALSE,,,FALSE
+Object,EffectGameObject,,m_moveModX,,,float,float,143,FALSE,,,FALSE
+Object,EffectGameObject,,m_moveModY,,,float,float,144,FALSE,,,FALSE
+Object,ParticleGameObject,,m_particleStruct,,,cocos2d::ParticleStruct,string,145,FALSE,,,FALSE
+Object,GameObject,,m_particleUseObjectColor,,,bool,bool,146,FALSE,,,FALSE
+Object,ParticleGameObject,,m_hasUniformObjectColor,,,bool,bool,147,FALSE,,,FALSE
+Object,EffectGameObject,,m_gravityValue,,,float,float,148,FALSE,,,FALSE
+Object,ForceBlockGameObject,,m_force,,,float,float,149,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_objectScaleX,,,float,float,150,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_objectScaleY,,,float,float,151,FALSE,,,FALSE
+Object,ChanceTriggerGameObject,,m_chanceObjects,,,std::vector<ChanceObject>,string,152,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_divideX,,,bool,bool,153,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_divideY,,,bool,bool,154,FALSE,,,FALSE
+Object,GameObject,,m_mainColorKeyIndex,,,int,int,155,FALSE,,,FALSE
+Object,GameObject,,m_detailColorKeyIndex,,,int,int,156,FALSE,,,FALSE
+Object,SmartGameObject,,m_referenceOnly,,,bool,bool,157,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_streakAdditive,,,GameOptionsSetting,int,159,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_unlinkDualGravity,,,GameOptionsSetting,int,160,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_hideGround,,,GameOptionsSetting,int,161,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_hideP1,,,GameOptionsSetting,int,162,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_hideP2,,,GameOptionsSetting,int,163,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_edgeDirection,,,int,int,164,FALSE,SHOULD BE ENUM,,TRUE
+Object,GameOptionsTrigger,,m_disableP1Controls,,,GameOptionsSetting,int,165,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_groundDirection,,,int,int,166,FALSE,,,
+Object,RotateGameplayGameObject,,m_moveDirection,,,int,int,167,FALSE,,,
+Object,RotateGameplayGameObject,,m_editVelocity,,,bool,bool,169,FALSE,,,FALSE
+Object,EffectGameObject,,m_channelValue,,,int,int,170,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_changeChannel,,,bool,bool,171,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_channelOnly,,,bool,bool,172,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_targetChannelID,,,int,int,173,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_blendingMode,,,int,int,174,FALSE,SHOULD BE ENUM,,TRUE
+Object,ShaderGameObject,,m_speed,,,float,float,175,FALSE,,,FALSE
+Object,ShaderGameObject,,m_strength,,,float,float,176,FALSE,,,FALSE
+Object,ShaderGameObject,,m_timeOff,,,float,float,177,FALSE,,,FALSE
+Object,ShaderGameObject,,m_waveWidth,,,float,float,179,FALSE,,,FALSE
+Object,ShaderGameObject,,m_targetX,,,float,float,180,FALSE,,,FALSE
+Object,ShaderGameObject,,m_fadeIn,,,float,float,181,FALSE,,,FALSE
+Object,ShaderGameObject,,m_fadeOut,,,float,float,182,FALSE,,,FALSE
+Object,ShaderGameObject,,m_inner,,,float,float,183,FALSE,,,FALSE
+Object,ShaderGameObject,,m_invert,,,bool,bool,184,FALSE,,,FALSE
+Object,ShaderGameObject,,m_flip,,,bool,bool,185,FALSE,,,FALSE
+Object,ShaderGameObject,,m_rotate,,,bool,bool,186,FALSE,,,FALSE
+Object,ShaderGameObject,,m_dual,,,bool,bool,187,FALSE,,,FALSE
+Object,ShaderGameObject,,m_useX,,,bool,bool,188,FALSE,,,FALSE
+Object,ShaderGameObject,,m_targetY,,,float,float,189,FALSE,,,FALSE
+Object,ShaderGameObject,,m_useY,,,bool,bool,190,FALSE,,,FALSE
+Object,ShaderGameObject,,m_outer,,,float,float,191,FALSE,,,FALSE
+Object,ShaderGameObject,,m_disableAll,,,bool,bool,192,FALSE,,,FALSE
+Object,GameObject,,m_isGripSlope,,,bool,bool,193,FALSE,,,FALSE
+Object,ShaderGameObject,,m_snapGrid,,,bool,bool,194,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_hideMG,,,GameOptionsSetting,int,195,FALSE,,,FALSE
+Object,ShaderGameObject,,m_zLayerMin,,,int,int,196,FALSE,SHOULD BE ENUM,,TRUE
+Object,ShaderGameObject,,m_zLayerMax,,,int,int,197,FALSE,SHOULD BE ENUM,,TRUE
+Object,EffectGameObject,,m_touchPlayerMode,,,TouchTriggerControl,int,198,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_disableP2Controls,,,GameOptionsSetting,int,199,FALSE,,,FALSE
+Object,EffectGameObject,,m_targetPlayer2,,,bool,bool,200,FALSE,,,FALSE
+Object,EffectGameObject,,m_followCPP,,,bool,bool,201,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_blendingLayer,,,int,int,202,FALSE,SHOULD BE ENUM,,TRUE
+Object,GradientTriggerObject,,m_upBottomLeftID,,,int,int,203,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_downBottomRightID,,,int,int,204,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_leftTopLeftID,,,int,int,205,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_rightTopRightID,,,int,int,206,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_vertexMode,,,bool,bool,207,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_disable,,,bool,bool,208,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_gradientID,,,int,int,209,FALSE,,,FALSE
+Object,EffectGameObject,,m_legacyHSV,,,bool,bool,210,FALSE,,,FALSE
+Object,ParticleGameObject,,m_shouldQuickStart,,,bool,bool,211,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_followObject,,,bool,bool,212,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_followEasing,,,float,float,213,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_animateOnlyWhenActive,,,bool,bool,214,FALSE,,,FALSE
+Object,EnterEffectObject,,m_enterType,,,int,int,217,FALSE,SHOULD BE ENUM,,TRUE
+Object,EnterEffectObject,,m_moveDistance,,,int,int,218,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveDistanceVariance,,,int,int,219,FALSE,,,FALSE
+Object,EnterEffectObject,,m_offset,,,int,int,220,FALSE,,,FALSE
+Object,EnterEffectObject,,m_offsetVariance,,,int,int,221,FALSE,,,FALSE
+Object,EnterEffectObject,,m_length,,,int,int,222,FALSE,,,FALSE
+Object,EnterEffectObject,,m_lengthVariance,,,int,int,223,FALSE,,,FALSE
+Object,EnterEffectObject,,m_property224,,,int,int,224,FALSE,,,FALSE
+Object,EnterEffectObject,,m_effectID,,,int,int,225,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveAngle,,,int,int,231,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveAngleVariance,,,int,int,232,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaScaleX,,,float,float,233,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaScaleXVariance,,,float,float,234,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaScaleY,,,float,float,235,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaScaleYVariance,,,float,float,236,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveX,,,int,int,237,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveXVariance,,,int,int,238,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveY,,,int,int,239,FALSE,,,FALSE
+Object,EnterEffectObject,,m_moveYVariance,,,int,int,240,FALSE,,,FALSE
+Object,EnterEffectObject,,m_xyMode,,,bool,bool,241,FALSE,,,FALSE
+Object,EnterEffectObject,,m_easingInType,,,EasingType,int,242,FALSE,,,FALSE
+Object,EnterEffectObject,,m_easingInRate,,,float,float,243,FALSE,,,FALSE
+Object,EnterEffectObject,,m_easingOutType,,,EasingType,int,248,FALSE,,,FALSE
+Object,EnterEffectObject,,m_easingOutRate,,,float,float,249,FALSE,,,FALSE
+Object,EnterEffectObject,,m_offsetY,,,int,int,252,FALSE,,,FALSE
+Object,EnterEffectObject,,m_offsetYVariance,,,int,int,253,FALSE,,,FALSE
+Object,EnterEffectObject,,m_tintChannelID,,,int,int,260,FALSE,,,FALSE
+Object,EnterEffectObject,,m_easeOutEnabled,,,bool,bool,261,FALSE,,,FALSE
+Object,EnterEffectObject,,m_directionType,,,int,int,262,FALSE,,,FALSE
+Object,EnterEffectObject,,m_modFront,,,float,float,263,FALSE,,,FALSE
+Object,EnterEffectObject,,m_modBack,,,float,float,264,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaTint,,,float,float,265,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaRotation,,,float,float,270,FALSE,,,FALSE
+Object,EnterEffectObject,,m_areaRotationVariance,,,float,float,271,FALSE,,,FALSE
+Object,,,,,,,string,274,FALSE,,,
+Object,EnterEffectObject,,m_toOpacity,,,float,float,275,FALSE,,,FALSE
+Object,EnterEffectObject,,m_inbound,,,bool,bool,276,FALSE,,,FALSE
+Object,EnterEffectObject,,m_hsvEnabled,,,bool,bool,278,FALSE,,,FALSE
+Object,GameObject,,m_hasAreaParent,,,bool,bool,279,FALSE,,,FALSE
+Object,EffectGameObject,,m_ignoreGroupParent,,,bool,bool,280,FALSE,,,FALSE
+Object,EffectGameObject,,m_ignoreLinkedObjects,,,bool,bool,281,FALSE,,,FALSE
+Object,EnterEffectObject,,m_deadzone,,,float,float,282,FALSE,,,FALSE
+Object,EnterEffectObject,,m_twoDirections,,,bool,bool,283,FALSE,,,FALSE
+Object,EffectGameObject,,m_isSinglePTouch,,,bool,bool,284,FALSE,,,FALSE
+Object,EnterEffectObject,,m_property285,,,float,float,285,FALSE,,,FALSE
+Object,EnterEffectObject,,m_fromOpacity,,,float,float,286,FALSE,,,FALSE
+Object,EnterEffectObject,,m_relative,,,bool,bool,287,FALSE,,,FALSE
+Object,EnterEffectObject,,m_relativeFade,,,float,float,288,FALSE,,,FALSE
+Object,GameObject,,m_isNonStickY,,,bool,bool,289,FALSE,,,FALSE
+Object,ShaderGameObject,,m_screenOffsetX,,,float,float,290,FALSE,,,FALSE
+Object,ShaderGameObject,,m_screenOffsetY,,,float,float,291,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_delay,,,float,float,292,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_delayVariance,,,float,float,293,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_maxSpeed,,,float,float,298,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_maxSpeedVariance,,,float,float,299,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startSpeed,,,float,float,300,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startSpeedVariance,,,float,float,301,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_targetDirection,,,bool,bool,305,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_xOnly,,,bool,bool,306,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_yOnly,,,bool,bool,307,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_maxRange,,,float,float,308,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_maxRangeVariance,,,float,float,309,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_property310,,,float,float,310,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_property310,,,float,float,311,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_property312,,,float,float,312,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_property313,,,float,float,313,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_property314,,,float,float,314,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_property315,,,float,float,315,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForce,,,float,float,316,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForceVariance,,,float,float,317,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForceLow,,,float,float,318,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForceLowVariance,,,float,float,319,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForceHigh,,,float,float,320,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerFroceHighVariance,,,float,float,321,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_speedRangeLow,,,float,float,322,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_speedRangeLowVariance,,,float,float,323,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_speedRangeHigh,,,float,float,324,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_speedRangeHighVariance,,,float,float,325,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakForce,,,float,float,326,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakForceVariance,,,float,float,327,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakAngle,,,float,float,328,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakAngleVariance,,,float,float,329,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakSteerForce,,,float,float,330,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakSteerForceVariance,,,float,float,331,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakSteerSpeedLimit,,,float,float,332,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_breakSteerSpeedLimitVariance,,,float,float,333,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_acceleration,,,float,float,334,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_accelerationVariance,,,float,float,335,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_ignoreDisabled,,,bool,bool,336,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForceLowEnabled,,,bool,bool,337,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_steerForceHighEnabled,,,bool,bool,338,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_rotateDirection,,,bool,bool,339,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_rotationOffset,,,float,float,340,FALSE,,,FALSE
+Object,EnterEffectObject,,m_priority,,,int,int,341,FALSE,,,FALSE
+Object,GameObject,,m_enterChannel,,,short,int,343,FALSE,,,FALSE
+Object,EnterEffectObject,,m_enterChannel,,,int,int,344,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_staticForceEnabled,,,bool,bool,345,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_staticForce,,,float,float,346,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_redirectForceEnabled,,,bool,bool,347,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_redirectForceMin,,,float,float,348,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_redirectForceMax,,,float,float,349,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_redirectForceMod,,,float,float,350,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_saveOffset,,,bool,bool,351,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_ignoreX,,,bool,bool,352,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_ignoreY,,,bool,bool,353,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_gravityMode,,,int,int,354,FALSE,SHOULD BE ENUM,,TRUE
+Object,EnterEffectObject,,m_useEffectID,,,bool,bool,355,FALSE,,,FALSE
+Object,GameObject,,m_isScaleStick,,,bool,bool,356,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_nearAcceleration,,,float,float,357,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_nearAccelerationVariance,,,float,float,358,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_nearDistance,,,float,float,359,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_nearDistanceVariance,,,float,float,360,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_easing,,,float,float,361,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_easingVariance,,,float,float,362,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_rotateEasing,,,float,float,363,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_rotateDeadZ,,,float,float,364,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_priority,,,int,int,365,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_maxRangeReference,,,int,int,366,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_followMode,,,int,int,367,FALSE,SHOULD BE ENUM,,TRUE
+Object,RotateGameplayGameObject,,m_instantOffset,,,bool,bool,368,FALSE,,,FALSE
+Object,EffectGameObject,,m_hasCenterEffect,,,bool,bool,369,FALSE,,,FALSE
+Object,EffectGameObject,,m_cameraDisableGridSnap,,,bool,bool,370,FALSE,,,FALSE
+Object,EffectGameObject,,m_zoomValue,,,float,float,371,FALSE,,,FALSE
+Object,GameObject,,m_hasNoAudioScale,,,bool,bool,372,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_keyframeGroup,,,int,int,373,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_keyframeIndex,,,int,int,374,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_referenceOnly,,,bool,bool,375,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_closeLoop,,,bool,bool,376,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_proximity,,,bool,bool,377,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_curve,,,bool,bool,378,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_timeMode,,,int,int,379,FALSE,SHOULD BE ENUM,,TRUE
+Object,KeyframeGameObject,,m_previewArt,,,bool,bool,380,FALSE,,,FALSE
+Object,EffectGameObject,,m_collectibleIsPickupItem,,,bool,bool,381,FALSE,,,FALSE
+Object,EffectGameObject,,m_collectibleIsToggleTrigger,,,bool,bool,382,FALSE,,,FALSE
+Object,EffectGameObject,,m_collectiblePoints,,,int,int,383,FALSE,,,FALSE
+Object,UISettingsGameObject,,m_xRef,,,int,int,385,FALSE,SHOULD BE ENUM,,TRUE
+Object,UISettingsGameObject,,m_yRef,,,int,int,386,FALSE,SHOULD BE ENUM,,TRUE
+Object,UISettingsGameObject,,m_xRelative,,,bool,bool,387,FALSE,,,FALSE
+Object,UISettingsGameObject,,m_yRelative,,,bool,bool,388,FALSE,,,FALSE
+Object,LabelGameObject,,m_showSecondsOnly,,,bool,bool,389,FALSE,,,FALSE
+Object,LabelGameObject,,m_shownSpecial,,,int,int,390,FALSE,SHOULD BE ENUM,,TRUE
+Object,LabelGameObject,,m_alignment,,,int,int,391,FALSE,SHOULD BE ENUM,,TRUE
+Object,SFXTriggerGameObject,,m_soundID,,,int,int,392,FALSE,,,FALSE
+Object,EffectGameObject,,m_smallStep,,,bool,bool,393,FALSE,,,FALSE
+Object,EffectGameObject,,m_isDirectionFollowSnap360,,,bool,bool,394,FALSE,,,FALSE
+Object,EffectGameObject,,m_targetModCenterID,,,int,int,395,FALSE,,,FALSE
+Object,EffectGameObject,,m_directionModeDistance,,,float,float,396,FALSE,,,FALSE
+Object,EffectGameObject,,m_isDynamicMode,,,bool,bool,397,FALSE,,,FALSE
+Object,SongTriggerGameObject,,m_prep,,,bool,bool,399,FALSE,,,FALSE
+Object,SongTriggerGameObject,,m_loadPrep,,,bool,bool,400,FALSE,,,FALSE
+Object,EffectGameObject,,m_rotationTargetID,,,int,int,401,FALSE,,,FALSE
+Object,EffectGameObject,,m_rotationOffset,,,float,float,402,FALSE,,,FALSE
+Object,EffectGameObject,,m_dynamicModeEasing,,,int,int,403,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_speed,,,int,int,404,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_pitchIndex,,,int,int,405,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_volume,,,float,float,406,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_reverb,,,bool,bool,407,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_start,,,int,int,408,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_fadeIn,,,int,int,409,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_end,,,int,int,410,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_fadeOut,,,int,int,411,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_fastFourierTransform,,,bool,bool,412,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_loop,,,bool,bool,413,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_stopLoop,,,bool,bool,414,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_unique,,,bool,bool,415,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_sfxUniqueID,,,int,int,416,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_stop,,,bool,bool,417,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_changeVolume,,,bool,bool,418,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_changeSpeed,,,bool,bool,419,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_override,,,bool,bool,420,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_volumeNear,,,float,float,421,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_volumeMedium,,,float,float,422,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_volumeFar,,,float,float,423,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_minDistNear,,,int,int,424,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_minDistMedium,,,int,int,425,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_minDistFar,,,int,int,426,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_cameraDistance,,,bool,bool,428,FALSE,,,FALSE
+Object,EventLinkTrigger,,m_eventIDs,,,std::set<int>,string,430,FALSE,SHOULD MAP TO ENUMS,,TRUE
+Object,EventLinkTrigger,,m_resetRemap,,,bool,bool,431,FALSE,CANNOT CONFIRM BEHAVIOR,EVENT 431,TRUE
+Object,SongTriggerGameObject,,m_songChannel,,,int,int,432,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_preload,,,bool,bool,433,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_minInterval,,,float,float,434,FALSE,,,FALSE
+Object,ChanceTriggerGameObject,,m_chanceObjects,,,gd::vector<ChanceObject>,string,435,FALSE,,,FALSE
+Object,SequenceTriggerGameObject,,m_sequenceMode,,,int,int,436,FALSE,SHOULD BE ENUM,,TRUE
+Object,SequenceTriggerGameObject,,m_minInt,,,float,float,437,FALSE,,,FALSE
+Object,SequenceTriggerGameObject,,m_reset,,,float,float,438,FALSE,,,FALSE
+Object,SequenceTriggerGameObject,,m_resetMode,,,int,int,439,FALSE,SHOULD BE ENUM,,TRUE
+Object,EffectGameObject,,m_collectibleParticleID,,,int,int,440,FALSE,,,FALSE
+Object,EffectGameObject,,m_spawnOrdered,,,bool,bool,441,FALSE,,,FALSE
+Object,SpawnTriggerGameObject,,m_remapObjects,,,std::vector<ChanceObject>,string,442,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_staticForceAdditive,,,bool,bool,443,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_isNoMultiActivate,,,bool,bool,444,FALSE,,,FALSE
+Object,RingObject,,m_claimTouch,,,bool,bool,445,FALSE,,,FALSE
+Object,GameObject,,m_objectMaterial,,,short,int,446,FALSE,,,FALSE
+Object,EventLinkTrigger,,m_extraID,,,int,int,447,FALSE,,,FALSE
+Object,CheckpointGameObject,,m_respawnID,,,int,int,448,FALSE,,,FALSE
+Object,CountTriggerGameObject,,m_pickupTriggerMultiplier,,,float,float,449,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_relativeRotation,,,bool,bool,452,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_smoothVelocity,,,bool,bool,453,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_velocityModifier,,,float,float,454,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_sfxGroup,,,int,int,455,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_previewOpacity,,,float,float,456,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_groupID,,,int,int,457,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_proximityMode,,,int,int,458,FALSE,SHOULD BE ENUM,,TRUE
+Object,KeyframeGameObject,,m_autoLayer,,,bool,bool,459,FALSE,,,FALSE
+Object,EndTriggerGameObject,,m_noEffects,,,bool,bool,460,FALSE,,,FALSE
+Object,EndTriggerGameObject,,m_noSFX,,,bool,bool,461,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_singleFrame,,,int,int,462,FALSE,,,FALSE
+Object,EffectGameObject,,m_hasNoAnimation,,,bool,bool,463,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_instantCamera,,,bool,bool,464,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_exitInstant,,,bool,bool,465,FALSE,,,FALSE
+Object,LabelGameObject,,m_isTimeCounter,,,bool,bool,466,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_startTime,,,float,float,467,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_dontOverride,,,bool,bool,468,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_ignoreTimeWarp,,,bool,bool,469,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_timeMod,,,float,float,470,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_startPaused,,,bool,bool,471,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_controlType,,,int,int,472,FALSE,SHOULD BE ENUM,,TRUE
+Object,TimerTriggerGameObject,,m_targetTime,,,float,float,473,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_stopTimeEnabled,,,bool,bool,474,FALSE,,,FALSE
+Object,TimerTriggerGameObject,,m_multiActivate,,,bool,bool,475,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_item1Mode,,,int,int,476,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_item2Mode,,,int,int,477,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_targetItemMode,,,int,int,478,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_mod1,,,float,float,479,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_resultType1,,,int,int,480,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_resultType2,,,int,int,481,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_resultType3,,,int,int,482,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_mod2,,,float,float,483,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_tolerance,,,float,float,484,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_roundType1,,,int,int,485,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_roundType2,,,int,int,486,FALSE,SHOULD BE ENUM,,TRUE
+Object,EndTriggerGameObject,,m_instant,,,bool,bool,487,FALSE,,,FALSE
+Object,TextGameObject,,m_kerning,,,int,int,488,FALSE,,,FALSE
+Object,LabelGameObject,,m_kerning,,,int,int,488,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_ignoreVolumeTest,,,bool,bool,489,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_soundDuration,,,float,float,490,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_persistent,,,bool,bool,491,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_targetAll,,,bool,bool,492,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_reset,,,bool,bool,493,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_timer,,,bool,bool,494,FALSE,,,FALSE
+Object,GameObject,,m_isExtraSticky,,,bool,bool,495,FALSE,,,FALSE
+Object,GameObject,,m_isDontBoostY,,,bool,bool,496,FALSE,,,FALSE
+Object,GameObject,,m_customColorType,,,short,int,497,FALSE,SHOULD BE ENUM,,TRUE
+Object,AudioLineGuideGameObject,,m_beatsPerMinute,,,int,int,498,FALSE,,,FALSE
+Object,AudioLineGuideGameObject,,m_speed,,,Speed,int,499,FALSE,,,FALSE
+Object,AudioLineGuideGameObject,,m_disabled,,,bool,bool,500,FALSE,,,FALSE
+Object,AudioLineGuideGameObject,,m_beatsPerBar,,,int,int,501,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_reverbPreset,,,int,int,502,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_reverbEnabled,,,bool,bool,503,FALSE,,,FALSE
+Object,RingObject,,m_isSpawnOnly,,,bool,bool,504,FALSE,,,FALSE
+Object,SequenceTriggerGameObject,,m_uniqueRemap,,,bool,bool,505,FALSE,,,FALSE
+Object,CameraTriggerGameObject,,m_previewOpacity,,,float,float,506,FALSE,,,FALSE
+Object,GameObject,,m_hasNoParticles,,,bool,bool,507,FALSE,,,FALSE
+Object,GradientTriggerObject,,m_disableAll,,,bool,bool,508,FALSE,,,FALSE
+Object,GameObject,,m_isDontBoostX,,,bool,bool,509,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_snapGround,,,bool,bool,510,FALSE,,,FALSE
+Object,GameObject,,m_hasExtendedCollision,,,bool,bool,511,FALSE,,,FALSE
+Object,ShaderGameObject,,m_maxSize,,,float,float,512,FALSE,,,FALSE
+Object,ShaderGameObject,,m_animate,,,bool,bool,513,FALSE,,,FALSE
+Object,ShaderGameObject,,m_relative,,,bool,bool,514,FALSE,,,FALSE
+Object,ShaderGameObject,,m_hardEdges,,,bool,bool,515,FALSE,,,FALSE
+Object,EnhancedTriggerObject,,m_minXID,,,int,int,516,FALSE,,,FALSE
+Object,EnhancedTriggerObject,,m_minYID,,,int,int,517,FALSE,,,FALSE
+Object,EnhancedTriggerObject,,m_maxXID,,,int,int,518,FALSE,,,FALSE
+Object,EnhancedTriggerObject,,m_maxYID,,,int,int,519,FALSE,,,FALSE
+Object,KeyframeAnimTriggerObject,,m_timeMod,,,float,float,520,FALSE,,,FALSE
+Object,KeyframeAnimTriggerObject,,m_positionXMod,,,float,float,521,FALSE,,,FALSE
+Object,KeyframeAnimTriggerObject,,m_rotationMod,,,float,float,522,FALSE,,,FALSE
+Object,KeyframeAnimTriggerObject,,m_scaleXMod,,,float,float,523,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_lineOpacity,,,float,float,524,FALSE,,,FALSE
+Object,EventLinkTrigger,,m_extraID2,,,int,int,525,FALSE,SHOULD BE ENUM,,TRUE
+Object,ForceBlockGameObject,,m_minForce,,,float,float,526,FALSE,,,FALSE
+Object,ForceBlockGameObject,,m_maxForce,,,float,float,527,FALSE,,,FALSE
+Object,ForceBlockGameObject,,m_relativeForce,,,bool,bool,528,FALSE,,,FALSE
+Object,ForceBlockGameObject,,m_forceRange,,,bool,bool,529,FALSE,,,FALSE
+Object,ForceBlockGameObject,,m_forceID,,,int,int,530,FALSE,,,FALSE
+Object,ShaderGameObject,,m_editorDisabled,,,bool,bool,531,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_hideAttempts,,,GameOptionsSetting,int,532,FALSE,,,FALSE
+Object,ArtTriggerGameObject,,m_artIndex,,,int,int,533,FALSE,,,FALSE
+Object,EffectGameObject,,m_controlID,,,int,int,534,FALSE,,,FALSE
+Object,EffectGameObject,,m_targetControlID,,,bool,bool,535,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_direction,,,int,int,536,FALSE,SHOULD BE ENUM,,TRUE
+Object,KeyframeGameObject,,m_revolutions,,,int,int,537,FALSE,,,FALSE
+Object,EnterEffectObject,,m_specialTarget,,,int,int,538,FALSE,SHOULD BE ENUM,,TRUE
+Object,EnterEffectObject,,m_dontEditAreaParent,,,bool,bool,539,FALSE,,,FALSE
+Object,PlayerControlGameObject,,m_stopJump,,,bool,bool,540,FALSE,,,FALSE
+Object,PlayerControlGameObject,,m_stopMove,,,bool,bool,541,FALSE,,,FALSE
+Object,PlayerControlGameObject,,m_stopRotation,,,bool,bool,542,FALSE,,,FALSE
+Object,PlayerControlGameObject,,m_stopSlide,,,bool,bool,543,FALSE,,,FALSE
+Object,EffectGameObject,,m_isSilent,,,bool,bool,544,FALSE,,,FALSE
+Object,KeyframeAnimTriggerObject,,m_positionYMod,,,float,float,545,FALSE,,,FALSE
+Object,KeyframeAnimTriggerObject,,m_scaleYMod,,,float,float,546,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_offset.x,,,float,float,547,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_offset.y,,,float,float,548,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_offsetVariance.x,,,float,float,549,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_offsetVariance.y,,,float,float,550,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_matchRotation,,,bool,bool,551,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_rotation,,,float,float,552,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_rotationVariance,,,float,float,553,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_scale,,,float,float,554,FALSE,,,FALSE
+Object,SpawnParticleGameObject,,m_scaleVariance,,,float,float,555,FALSE,,,FALSE
+Object,SpawnTriggerGameObject,,m_delayRange,,,float,float,556,FALSE,,,FALSE
+Object,KeyframeGameObject,,m_spawnDelay,,,float,float,557,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_friction,,,float,float,558,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_frictionVariance,,,float,float,559,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startSpeedReference,,,int,int,560,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_nearFriction,,,float,float,561,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_nearFrictionVariance,,,float,float,562,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startDirection,,,float,float,563,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startDirectionVariance,,,float,float,564,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startDirectionReference,,,int,int,565,FALSE,,,FALSE
+Object,AdvancedFollowEditObject,,m_modX,,,float,float,566,FALSE,,,FALSE
+Object,AdvancedFollowEditObject,,m_modXVariance,,,float,float,567,FALSE,,,FALSE
+Object,AdvancedFollowEditObject,,m_modY,,,float,float,568,FALSE,,,FALSE
+Object,AdvancedFollowEditObject,,m_modYVariance,,,float,float,569,FALSE,,,FALSE
+Object,AdvancedFollowEditObject,,m_redirectDirection,,,bool,bool,570,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_exclusive,,,bool,bool,571,FALSE,,,FALSE
+Object,AdvancedFollowTriggerObject,,m_startMode,,,int,int,572,FALSE,SHOULD BE ENUM,,TRUE
+Object,GameOptionsTrigger,,m_editRespawnTime,,,GameOptionsSetting,int,573,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_respawnTime,,,float,float,574,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_audioOnDeath,,,GameOptionsSetting,int,575,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_noDeathSFX,,,GameOptionsSetting,int,576,FALSE,,,FALSE
+Object,TransformTriggerGameObject,,m_relativeScale,,,bool,bool,577,FALSE,,,FALSE
+Object,ItemTriggerGameObject,,m_signType1,,,int,int,578,FALSE,SHOULD BE ENUM,,TRUE
+Object,ItemTriggerGameObject,,m_signType2,,,int,int,579,FALSE,SHOULD BE ENUM,,TRUE
+Object,TriggerControlGameObject,,m_customTriggerValue,,,GJActionCommand,int,580,FALSE,,,FALSE
+Object,SpawnTriggerGameObject,,m_resetRemap,,,bool,bool,581,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_velocityModX,,,float,float,582,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_velocityModY,,,float,float,583,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_overrideVelocity,,,bool,bool,584,FALSE,,,FALSE
+Object,RotateGameplayGameObject,,m_dontSlide,,,bool,bool,585,FALSE,,,FALSE
+Object,DashRingObject,,m_dashSpeed,,,float,float,586,FALSE,,,FALSE
+Object,DashRingObject,,m_allowCollide,,,bool,bool,587,FALSE,,,FALSE
+Object,DashRingObject,,m_endBoost,,,float,float,588,FALSE,,,FALSE
+Object,DashRingObject,,m_stopSlide,,,bool,bool,589,FALSE,,,FALSE
+Object,DashRingObject,,m_maxDuration,,,float,float,590,FALSE,,,FALSE
+Object,TeleportPortalObject,,m_redirectDash,,,bool,bool,591,FALSE,,,FALSE
+Object,EnhancedGameObject,,m_animationOffset,,,bool,bool,592,FALSE,,,FALSE
+Object,GameOptionsTrigger,,m_boostSlide,,,GameOptionsSetting,int,593,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_dontReset,,,bool,bool,595,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_speedVariance,,,int,int,596,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_pitchVariance,,,int,int,597,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_volumeVariance,,,float,float,598,FALSE,,,FALSE
+Object,SFXTriggerGameObject,,m_pitchSteps,,,bool,bool,599,FALSE,,,FALSE
+Object,EffectGameObject,,,,,,bool,600,FALSE,NOT DOCUMENTED,INSTANT COLLISION DONT RESET REMAP,TRUE
+Object,LevelSettingsLayer,,,,,,int,kA1,FALSE,CANNOT FIND MEMBER,DEFAULT SONG ID,TRUE
+Object,LevelSettingsObject,,m_startMode,,,int,int,kA2,FALSE,SHOULD BE ENUM,,TRUE
+Object,LevelSettingsObject,,m_startMini,,,bool,bool,kA3,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_startSpeed,,,int,int,kA4,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_backgroundIndex,,,int,int,kA6,FALSE,,,FALSE
+,,,,,,,bool,kA5,TRUE,,,FALSE
+Object,LevelSettingsObject,,m_groundIndex,,,int,int,kA7,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_startDual,,,bool,bool,kA8,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_startsWithStartPos,,,bool,bool,kA9,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_twoPlayerMode,,,bool,bool,kA10,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_isFlipped,,,bool,bool,kA11,FALSE,,,FALSE
+,,,,,,,bool,kA12,TRUE,,,FALSE
+Object,LevelSettingsObject,,m_songOffset,,,float,float,kA13,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_guidelineString,,,gd::string,string,kA14,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fadeIn,,,bool,bool,kA15,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fadeOut,,,bool,bool,kA16,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_groundLineIndex,,,int,int,kA17,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fontIndex,,,int,int,kA18,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_targetOrder,,,int,int,kA19,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_reverseGameplay,,,bool,bool,kA20,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_disableStartPos,,,bool,bool,kA21,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_platformerMode,,,bool,bool,kA22,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_propertykA23,,,bool,bool,kA23,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_propertykA24,,,bool,bool,kA24,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_middleGroundIndex,,,int,int,kA25,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_targetChannel,,,int,int,kA26,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_allowMultiRotation,,,bool,bool,kA27,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_mirrorMode,,,bool,bool,kA28,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_rotateGameplay,,,bool,bool,kA29,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_enablePlayerSqueeze,,,bool,bool,kA31,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fixGravityBug,,,bool,bool,kA32,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fixNegativeScale,,,bool,bool,kA33,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fixRobotJump,,,bool,bool,kA34,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_resetCamera,,,bool,bool,kA35,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_spawnGroup,,,int,int,kA36,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_dynamicLevelHeight,,,bool,bool,kA37,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_sortGroups,,,bool,bool,kA38,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_fixRadiusCollision,,,bool,bool,kA39,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_enable22Changes,,,bool,bool,kA40,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_allowStaticRotate,,,bool,bool,kA41,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_ReverseSync,,,bool,bool,kA42,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_noTimePenalty,,,bool,bool,kA43,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_propertykA44,,,int,int,kA44,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_decreaseBoostSlide,,,bool,bool,kA45,FALSE,,,FALSE
+Object,LevelSettingsObject,,m_dontReset,,,bool,bool,kA46,FALSE,,,FALSE
+Object,LevelSettingsLayer,,m_nextFreeID,,,int,int,kA47,FALSE,,,FALSE
+Object,LevelSettingsLayer,,,,,,bool,kA48,FALSE,NOT DOCUMENTED,ENABLE IMPULSE FIX,TRUE
+,,,,,,,int,kS1,TRUE,,,FALSE
+,,,,,,,int,kS2,TRUE,,,FALSE
+,,,,,,,int,kS3,TRUE,,,FALSE
+,,,,,,,int,kS4,TRUE,,,FALSE
+,,,,,,,int,kS5,TRUE,,,FALSE
+,,,,,,,int,kS6,TRUE,,,FALSE
+,,,,,,,int,kS7,TRUE,,,FALSE
+,,,,,,,int,kS8,TRUE,,,FALSE
+,,,,,,,int,kS9,TRUE,,,FALSE
+,,,,,,,int,kS10,TRUE,,,FALSE
+,,,,,,,int,kS11,TRUE,,,FALSE
+,,,,,,,int,kS12,TRUE,,,FALSE
+,,,,,,,int,kS13,TRUE,,,FALSE
+,,,,,,,int,kS14,TRUE,,,FALSE
+,,,,,,,int,kS15,TRUE,,,FALSE
+,,,,,,,int,kS16,TRUE,,,FALSE
+,,,,,,,int,kS17,TRUE,,,FALSE
+,,,,,,,int,kS18,TRUE,,,FALSE
+,,,,,,,int,kS19,TRUE,,,FALSE
+,,,,,,,int,kS20,TRUE,,,FALSE
+,,,,,,,string,kS29,TRUE,,,FALSE
+,,,,,,,string,kS30,TRUE,,,FALSE
+,,,,,,,string,kS31,TRUE,,,FALSE
+,,,,,,,string,kS32,TRUE,,,FALSE
+,,,,,,,string,kS33,TRUE,,,FALSE
+,,,,,,,string,kS34,TRUE,,,FALSE
+,,,,,,,string,kS35,TRUE,,,FALSE
+,,,,,,,string,kS36,TRUE,,,FALSE
+,,,,,,,string,kS37,TRUE,,,FALSE
+Object,GJEffectManager,,,,,,string,kS38,FALSE,UNSURE IF DICT MEMBER OR VECTOR,LEVEL COLORS,TRUE
+Object,LevelSettingsObject,,m_colorPage,,,int,int,kS39,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastBuildSave,,,cocos2d::CCDictionary*,dict,kI6,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelID,,,geode::SeedValueRSV,int,k1,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelName,,,gd::string,string,k2,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelDesc,,,gd::string,string,k3,FALSE,,base64,FALSE
+Level,GJGameLevel,,m_levelString,,,gd::string,string,k4,FALSE,,object string,FALSE
+Level,GJGameLevel,,m_creatorName,,,gd::string,string,k5,FALSE,,,FALSE
+Level,GJGameLevel,,m_recordString,,,gd::string,string,k34,FALSE,,replay string,FALSE
+Level,GJGameLevel,,m_lockedEditorLayers,,,gd::string,string,k91,FALSE,,int list,FALSE
+Level,GJGameLevel,,m_savedCameraPositions,,,gd::string,string,k101,FALSE,,position list,FALSE
+Level,GJGameLevel,,m_previewLock.x,,,float,int,k102,FALSE,,,FALSE
+Level,GJGameLevel,,m_previewLock.y,,,float,int,k103,FALSE,,,FALSE
+Level,GJGameLevel,,m_userID,,,geode::SeedValueRSV,int,k6,FALSE,,,FALSE
+Level,GJGameLevel,,m_accountID,,,geode::SeedValueRSV,int,k60,FALSE,,,FALSE
+Level,GJGameLevel,,m_difficulty,,,GJDifficulty,int,k7,FALSE,,,FALSE
+Level,GJGameLevel,,m_audioTrack,,,int,int,k8,FALSE,SHOULD BE ENUM,official songs,TRUE
+Level,GJGameLevel,,m_songID,,,int,int,k45,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelRev,,,int,int,k46,FALSE,,,FALSE
+Level,GJGameLevel,,m_unlisted,,,bool,bool,k79,FALSE,,,FALSE
+Level,GJGameLevel,,m_friendsOnly,,,bool,bool,k94,FALSE,,,FALSE
+Level,GJGameLevel,,m_objectCount,,,geode::SeedValueRSV,int,k48,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelIndex,,,int,int,k83,FALSE,,,FALSE
+Level,GJGameLevel,,m_ratings,,,int,int,k9,FALSE,,,FALSE
+Level,GJGameLevel,,m_ratingsSum,,,int,int,k10,FALSE,,,FALSE
+Level,GJGameLevel,,m_downloads,,,int,int,k11,FALSE,,,FALSE
+Level,GJGameLevel,,m_isEditable,,,bool,bool,k13,FALSE,,,FALSE
+Level,GJGameLevel,,m_gauntletLevel,,,bool,bool,k77,FALSE,,,FALSE
+Level,GJGameLevel,,m_gauntletLevel2,,,bool,bool,k78,FALSE,,,FALSE
+Level,GJGameLevel,,m_workingTime,,,int,int,k80,FALSE,,,FALSE
+Level,GJGameLevel,,m_workingTime2,,,int,int,k81,FALSE,,,FALSE
+Level,GJGameLevel,,m_lowDetailMode,,,bool,bool,k72,FALSE,,,FALSE
+Level,GJGameLevel,,m_lowDetailModeToggled,,,bool,bool,k73,FALSE,,,FALSE
+Level,GJGameLevel,,m_disableShakeToggled,,,bool,bool,k112,FALSE,,,FALSE
+Level,GJGameLevel,,m_isVerified,,,geode::SeedValueRS,bool,k14,FALSE,,,FALSE
+Level,GJGameLevel,,m_isUploaded,,,bool,bool,k15,FALSE,,,FALSE
+Level,GJGameLevel,,m_hasBeenModified,,,bool,bool,k47,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelVersion,,,int,int,k16,FALSE,,,FALSE
+Level,GJGameLevel,,m_gameVersion,,,int,int,k17,FALSE,,,FALSE
+Level,GJGameLevel,,m_attempts,,,geode::SeedValueRSV,int,k18,FALSE,,,FALSE
+Level,GJGameLevel,,m_jumps,,,geode::SeedValueRSV,int,k36,FALSE,,,FALSE
+Level,GJGameLevel,,m_clicks,,,geode::SeedValueRSV,int,k85,FALSE,,,FALSE
+Level,GJGameLevel,,m_attemptTime,,,geode::SeedValueRSV,int,k86,FALSE,,,FALSE
+Level,GJGameLevel,,m_chk,,,int,int,k87,FALSE,,,FALSE
+Level,GJGameLevel,,m_isChkValid,,,bool,bool,k89,FALSE,,,FALSE
+Level,GJGameLevel,,m_normalPercent,,,geode::SeedValueVSR,int,k19,FALSE,,,FALSE
+Level,GJGameLevel,,m_orbCompletion,,,geode::SeedValueRSV,int,k71,FALSE,,,FALSE
+Level,GJGameLevel,,m_practicePercent,,,int,int,k20,FALSE,,,FALSE
+Level,GJGameLevel,,m_likes,,,int,int,k22,FALSE,,,FALSE
+Level,GJGameLevel,,m_dislikes,,,int,int,k24,FALSE,NEED INFO,UNUSED?,TRUE
+Level,GJGameLevel,,m_levelLength,,,int,int,k23,FALSE,SHOULD BE ENUM,level length,TRUE
+Level,GJGameLevel,,m_featured,,,int,int,k27,FALSE,,feature,FALSE
+Level,GJGameLevel,,m_isEpic,,,int,int,k75,FALSE,SHOULD BE ENUM,epic rating,TRUE
+Level,GJGameLevel,,m_levelFavorited,,,bool,bool,k82,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelFolder,,,int,int,k84,FALSE,,,FALSE
+Level,GJGameLevel,,m_dailyID,,,geode::SeedValueRSV,int,k74,FALSE,,,FALSE
+Level,GJGameLevel,,m_demon,,,geode::SeedValueRSV,bool,k25,FALSE,,,FALSE
+Level,GJGameLevel,,m_demonDifficulty,,,int,int,k76,FALSE,SHOULD BE ENUM,demon rating,TRUE
+Level,GJGameLevel,,m_stars,,,geode::SeedValueRSV,int,k26,FALSE,,,FALSE
+Level,GJGameLevel,,m_autoLevel,,,bool,bool,k33,FALSE,,,FALSE
+Level,GJGameLevel,,m_coins,,,int,int,k64,FALSE,,,FALSE
+Level,GJGameLevel,,m_coinsVerified,,,geode::SeedValueRSV,bool,k65,FALSE,,,FALSE
+Level,GJGameLevel,,m_password,,,geode::SeedValueRS,int,k41,FALSE,,,FALSE
+Level,GJGameLevel,,m_originalLevel,,,geode::SeedValueRSV,int,k42,FALSE,,,FALSE
+Level,GJGameLevel,,m_twoPlayerMode,,,bool,bool,k43,FALSE,,,FALSE
+Level,GJGameLevel,,m_firstCoinVerified,,,geode::SeedValueRSV,bool,k61,FALSE,,,FALSE
+Level,GJGameLevel,,m_secondCoinVerified,,,geode::SeedValueRSV,bool,k62,FALSE,,,FALSE
+Level,GJGameLevel,,m_thirdCoinVerified,,,geode::SeedValueRSV,bool,k63,FALSE,,,FALSE
+Level,GJGameLevel,,m_starsRequested,,,int,int,k66,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelNotDownloaded,,,bool,bool,k35,FALSE,,,FALSE
+Level,GJGameLevel,,m_requiredCoins,,,int,int,k37,FALSE,,,FALSE
+Level,GJGameLevel,,m_isUnlocked,,,bool,bool,k38,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastCameraPos.x,,,float,float,kI1,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastCameraPos.y,,,float,float,kI2,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastEditorZoom,,,float,float,kI3,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastBuildTab,,,int,int,kI5,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastBuildPage,,,int,int,kI4,FALSE,,,FALSE
+Level,GJGameLevel,,m_lastBuildGroupID,,,int,int,kI7,FALSE,,,FALSE
+Level,GJGameLevel,,m_levelType,,,GJLevelType,int,k21,FALSE,,,FALSE
+Level,GJGameLevel,,m_capacityString,,,gd::string,string,k67,FALSE,,,FALSE
+Level,GJGameLevel,,m_highObjectsEnabled,,,bool,bool,k69,FALSE,,,FALSE
+Level,GJGameLevel,,m_unlimitedObjectsEnabled,,,bool,bool,k93,FALSE,,,FALSE
+Level,GJGameLevel,,m_personalBests,,,gd::string,string,k88,FALSE,,int list,FALSE
+Level,GJGameLevel,,m_timestamp,,,int,int,k95,FALSE,,,FALSE
+Level,GJGameLevel,,m_songIDs,,,gd::string,string,k104,FALSE,,int list,FALSE
+Level,GJGameLevel,,m_sfxIDs,,,gd::string,string,k105,FALSE,,int list,FALSE
+Level,GJGameLevel,,m_songSize,,,int,int,k106,FALSE,,,FALSE
+Level,GJGameLevel,,m_bestTime,,,int,int,k107,FALSE,,,FALSE
+Level,GJGameLevel,,m_ticksTime,,,int,int,k115,FALSE,,,FALSE
+Level,GJGameLevel,,m_clicksTime,,,int,int,k117,FALSE,,,FALSE
+Level,GJGameLevel,,m_coinsTime,,,int,int,k121,FALSE,,,FALSE
+Level,GJGameLevel,,m_inputsTime,,,gd::string,string,k119,FALSE,,replay string,FALSE
+Level,GJGameLevel,,m_bestPoints,,,int,int,k108,FALSE,,,FALSE
+Level,GJGameLevel,,m_ticksPoints,,,int,int,k116,FALSE,,,FALSE
+Level,GJGameLevel,,m_clicksPoints,,,int,int,k118,FALSE,,,FALSE
+Level,GJGameLevel,,m_coinsPoints,,,int,int,k122,FALSE,,,FALSE
+Level,GJGameLevel,,m_inputsPoints,,,gd::string,string,k120,FALSE,,replay string,FALSE
+Level,GJGameLevel,,m_platformerSeed,,,int,int,k111,FALSE,,,FALSE
+Level,GJGameLevel,,m_localBestTimes,,,gd::string,string,k109,FALSE,,int list,FALSE
+Level,GJGameLevel,,m_localBestPoints,,,gd::string,string,k110,FALSE,,int list,FALSE
+Level,GJGameLevel,,m_savedTime,,,bool,bool,k123,FALSE,,,FALSE
+Level,GJGameLevel,,m_savedPoints,,,bool,bool,k124,FALSE,,,FALSE
+Level,GJGameLevel,,,,,,int,k125,FALSE,NOT DOCUMENTED,TOGGLE_CBS,TRUE
+Level,,,,,,,,k12,TRUE,,,FALSE
+Level,,,,,,,,k39,TRUE,,,FALSE
+Level,,,,,,,,k40,TRUE,,,FALSE
+Level,,,,,,,,k51,TRUE,,,FALSE
+Level,,,,,,,,k52,TRUE,,,FALSE
+Level,,,,,,,,k53,TRUE,,,FALSE
+Level,,,,,,,,k54,TRUE,,,FALSE
+Level,,,,,,,int,k50,FALSE,BINARY_VERSION,"NO MEMBER, SET EXPLICITLY",FALSE
+Level,GJGameLevel,,,,,,bool,k68,FALSE,TODO,m_isCompletionLegitimate != false,TRUE
+Level,GJGameLevel,,,,,,int,k90,FALSE,TODO,m_newNormalPercent2.random - m_newNormalPercent2.seed,TRUE
+Level List,GJLevelList,,m_listID,,,int,int,k1,FALSE,,,FALSE
+Level List,GJLevelList,,m_listVersion,,,int,int,k16,FALSE,,,FALSE
+Level List,GJLevelList,,m_downloads,,,int,int,k11,FALSE,,,FALSE
+Level List,GJLevelList,,m_likes,,,int,int,k22,FALSE,,,FALSE
+Level List,GJLevelList,,m_difficulty,,,int,int,k7,FALSE,SHOULD BE ENUM,list level difficulty,TRUE
+Level List,GJLevelList,,m_accountID,,,int,int,k60,FALSE,,,FALSE
+Level List,GJLevelList,,m_listRevision,,,int,int,k46,FALSE,,,FALSE
+Level List,GJLevelList,,m_listOrder,,,int,int,k83,FALSE,,,FALSE
+Level List,GJLevelList,,m_original,,,int,int,k42,FALSE,,,FALSE
+Level List,GJLevelList,,m_diamonds,,,int,int,k113,FALSE,,,FALSE
+Level List,GJLevelList,,m_levelsToClaim,,,int,int,k114,FALSE,,,FALSE
+Level List,GJLevelList,,m_unlisted,,,bool,bool,k79,FALSE,,,FALSE
+Level List,GJLevelList,,m_friendsOnly,,,bool,bool,k94,FALSE,,,FALSE
+Level List,GJLevelList,,m_uploaded,,,bool,int,k15,FALSE,bool,,FALSE
+Level List,GJLevelList,,m_favorite,,,bool,bool,k82,FALSE,,,FALSE
+Level List,GJLevelList,,m_featured,,,bool,bool,k27,FALSE,,,FALSE
+Level List,GJLevelList,,m_onlineLevelsLoaded,,,bool,bool,k100,FALSE,,,FALSE
+Level List,GJLevelList,,m_modified,,,bool,int,k47,FALSE,,,FALSE
+Level List,GJLevelList,,m_creatorName,,,gd::string,string,k5,FALSE,,,FALSE
+Level List,GJLevelList,,m_listName,,,gd::string,string,k2,FALSE,,,FALSE
+Level List,GJLevelList,,m_levelsString,,,gd::string,string,k96,FALSE,int list,,FALSE
+Level List,GJLevelList,,m_listDesc,,,gd::string,string,k3,FALSE,base64,,FALSE
+Level List,GJLevelList,,m_uploadDate,,,int,int,k98,FALSE,,,FALSE
+Level List,GJLevelList,,m_updateDate,,,int,int,k99,FALSE,,,FALSE
+Level List,GJLevelList,,m_levelsDict,,,cocos2d::CCDictionary*,dict,k97,FALSE,level map,,FALSE
+Level List,GJLevelList,,m_listType,,,GJLevelType,int,k21,FALSE,list type,,FALSE
+Level,GJLevelList,,,,,,int,k84,FALSE,UNKNOWN,DATA LOADED FOLDER RELATED KEY,TRUE
