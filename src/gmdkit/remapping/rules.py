@@ -84,7 +84,6 @@ TEXT_REMAP_RULE = create_text_rule(
     )
 
 TEXT_ID_LABEL_RULE = create_label_rule(
-    template="ID {}",
     id_type=IDType.LABEL
     )
 
@@ -98,6 +97,8 @@ EDITOR_LAYERS_HANDLER = RuleHandler(base=(
 Z_LAYER_HANDLER = RuleHandler(base=(
     IDRule(obj_prop.Z_LAYER, IDType.GENERIC, reference=True, id_min=-5, id_max=11),
     ))
+
+COLOR_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
 
 COPY_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=COPY_IDS)
 

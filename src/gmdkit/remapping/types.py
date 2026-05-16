@@ -34,13 +34,14 @@ class AutoID:
         return self.index < other.index
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class LabelID:
-    value: int
-    template: str = ""
-
+    template: str
+    name: str = ""
+    value: int = 0
+    
     def __str__(self) -> str:
-        return self.template.format(self.value)
+        return self.template.format(value=self.value, name=self.name)
         
 
 class IDType(IntEnum):

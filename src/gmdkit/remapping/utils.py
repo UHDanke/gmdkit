@@ -50,7 +50,6 @@ def create_text_rule(
 
 
 def create_label_rule(
-        template: str,
         id_type: IDType,
         condition: Optional[Callable] = None,
         id_min: Optional[int] = None,
@@ -58,23 +57,13 @@ def create_label_rule(
         ) -> IDRule:
     # Compiles an ID rule for LabelID objects with a specific template.
 
-    def function(text: str | LabelID):
-        if (
-            isinstance(text, LabelID)
-            and text.template == template
-        ):
+    def function(text: LabelID):
+        if isinstance(text, LabelID):
             return text.value
 
-        return None
-
-    def replace(text: str | LabelID, new_id: int):
-        if (
-            isinstance(text, LabelID)
-            and text.template == template
-        ):
-            return LabelID(new_id, template)
-
-        return text
+    def replace(text: LabelID, new_id: int):
+        if isinstance(text, LabelID):
+            text.value = new_id
 
     optionals = {}
     if condition is not None:

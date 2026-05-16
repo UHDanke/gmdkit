@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, Any, Optional, Sequence
+from typing import Callable, Any, Optional, Sequence, Self
 from dataclasses import dataclass, field
 
 # Package Imports
@@ -87,7 +87,7 @@ class IdentifierList:
             condition:Optional[Callable]=None,
             has_tags:Optional[Sequence[IDActions]]=None,
             has_types:Optional[Sequence[IDType]]=None
-            ) -> set[int]:
+            ) -> Self:
 
         result = []
         has_cond = callable(condition)
