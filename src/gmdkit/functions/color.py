@@ -1,10 +1,11 @@
 # Package Imports
 from gmdkit.mappings import obj_prop, color_id, obj_id
+from gmdkit.models.level import Level
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.utils import enums
 from gmdkit.models.prop.hsv import HSV
-
+from gmdkit import remapping
 
 RGBA = tuple[int,int,int,float]
 
@@ -100,16 +101,16 @@ def color_to_trigger(color:Color) -> Object:
 def trigger_to_color(obj:Object) -> Color:
     """
     Converts a color trigger to a Color.
-
+    
     Parameters
     ----------
     obj : Object
         The color object to convert.
-
+        
     Returns
     -------
     Color
-
+    
     """
     
     if obj[obj_prop.ID] != obj_id.trigger.COLOR: return
@@ -149,7 +150,7 @@ def create_color_triggers(
         ) -> ObjectList:
     """
     Converts a list of colors into color triggers.
-
+    
     Parameters
     ----------
     color_list : 
@@ -158,7 +159,7 @@ def create_color_triggers(
         Horizontal offset between triggers. The default is 0.
     offset_y : float, optional
         Vertical offset between triggers. The default is -30.
-
+        
     Returns
     -------
     ObjectListx
@@ -183,3 +184,29 @@ def create_color_triggers(
         obj_list.append(obj)
     
     return obj_list
+
+
+def create_lvl_color_triggers(level:Level):
+    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
+    level.objects += create_color_triggers(colors)
+
+    
+def set_used_colors(lvl:Level):
+    used = remapping.rules.COLOR_ID_HANDLER.compile_ids(lvl).filter_values(reference=True).get_ids()
+    colors = lvl.start.get(obj_prop.level.COLORS)
+    colors.autodefaults(*used)
+
+    
+def free_unused_colors(lvl:Level, ignore_ids:dict):
+    ignore_ids = ignore_ids or {}
+    
+    rules = remapping.rules.BASE_ID_HANDLER.compile_rules(id_types=(remapping.IDType.COLOR_ID,))
+    
+    ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
+    id_base = ids.filter_values(reference=False).get_ids()
+    id_ref = ids.filter_values(reference=True).get_ids()
+    unused = id_base - id_ref - ignore_ids
+    
+    if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:        
+        lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
+

@@ -8,6 +8,7 @@ from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
 from gmdkit.models.prop.groups import IDList
 from gmdkit.functions.object import get_keyframe_id
+from gmdkit import remapping
 
 ObjectListMapping = dict[Optional[int],ObjectList]
 ObjectMapping = dict[int,Object]
@@ -729,3 +730,16 @@ def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_l
         gx.append(obj)
         
     return {k: function(v) for k,v in groups.items()}
+
+
+def set_common_group(objects:ObjectList, rules) -> tuple[int]:
+    
+    common = objects.shared_values(lambda obj: obj.get(obj_prop.GROUPS))
+    
+    if common:
+        return tuple(common)
+    
+    new = remapping.AutoID()
+    add_groups(objects, new)
+    
+    return tuple(new)

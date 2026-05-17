@@ -5,20 +5,20 @@ from typing import Callable, Optional, Sequence
 # Package Imports
 from gmdkit.remapping.types import IDType, AutoID
 from gmdkit.remapping.classes import RuleHandler
-from gmdkit.remapping.rules import COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER, REGROUP_IDS
+from gmdkit.remapping.rules import (
+    COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER,
+    REGROUP_IDS
+    )
 from gmdkit.models.level import Level, LevelList
 from gmdkit.models.object import ObjectList
 from gmdkit.models.prop.color import ColorList
-from gmdkit.mappings import obj_prop, color_id
+from gmdkit.mappings import obj_prop
 from gmdkit.remapping.utils import next_free
 from gmdkit.functions.object import clean_duplicate_groups, offset_position
-from gmdkit.functions.object_list import (
-    compile_keyframe_groups, 
+from gmdkit.functions.object_list import ( 
     clean_gid_parents, 
-    add_groups,
     boundaries
     )
-from gmdkit.functions.color import create_color_triggers
 
 
 def offset_object_ids(
@@ -86,7 +86,7 @@ def reassign_object_ids(
         
             v = v if override_fixed else v.filter_values(fixed=False)
             used = v.get_ids()
-            
+            old = set()
             auto = {x for x in used if type(x) is AutoID}
             used_ints = used - auto
         
@@ -94,7 +94,6 @@ def reassign_object_ids(
             
         
             if not reassign_all and not range_search:
-                old = auto
                 sr = used_ints
                 range_min, range_max = v.vmin, v.vmax
             else:
@@ -328,88 +327,11 @@ def boundary_offset(
                 i += bounds[4]-bounds[0] + block_offset * 30
     
         i = i // 30 * 30
+   
 
 
-def create_level_color_triggers(level:Level):
-    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
-    level.objects += create_color_triggers(colors)
-    
-    
-def compile_keyframe_spawn_ids(obj_list:ObjectList):
-    
-    def key_func(obj):
-        spawn_id = obj.get(obj_prop.trigger.keyframe.SPAWN_ID)
-        return None if spawn_id == 0 else spawn_id
-    
-    return compile_keyframe_groups(obj_list,key_func)
 
 
-def compile_spawn_groups(obj_list:ObjectList):
-    
-    spawn_groups = { 0: ObjectList() }
-    
-    for obj in obj_list:
-        
-        if not obj.get(obj_prop.trigger.SPAWN_TRIGGER):
-            continue
-        
-        if (groups:=obj.get(obj_prop.GROUPS)) is not None:
-            
-            for i in set(groups):
-                spawn_groups.setdefault(i,ObjectList())
-                spawn_groups[i].append(obj)
-        else:
-            spawn_groups[0].append(obj)
-    
-    for v in spawn_groups.values():
-        v.sort(key=lambda obj: obj.get(obj_prop.X))
-        
-    return spawn_groups
-
-
-def create_common_group(objects:ObjectList, rules) -> tuple[int]:
-    
-    common = objects.shared_values(lambda obj: obj.get(obj_prop.GROUPS))
-    
-    if common:
-        return tuple(common)
-    
-    new = AutoID()
-    add_groups(objects, new)
-    
-    return tuple(new)
-
-
-def set_used_white_colors(lvl:Level, ignore_ids:dict):
-    ignore_ids = ignore_ids or {}
-    
-    rules = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
-    
-    ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
-    
-    used = ids.get_ids()
-    
-    colors = lvl.start.get(obj_prop.level.COLORS)
-    
-    channels = colors.get_channels()
-    
-    unset = used - channels
-    
-    colors.autodefaults(unset)
-
-    
-def free_unused_colors(lvl:Level, ignore_ids:dict):
-    ignore_ids = ignore_ids or {}
-    
-    rules = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
-    
-    ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
-    id_base = ids.filter_values(reference=False).get_ids()
-    id_ref = ids.filter_values(reference=True).get_ids()
-    unused = id_base - id_ref - ignore_ids
-    
-    if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:        
-        lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
 
 def get_useless_triggers():
     pass

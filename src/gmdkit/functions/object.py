@@ -83,12 +83,21 @@ def reset_colors(obj:Object) -> None:
     None.
 
     """
-    obj.pop(
+    obj.discard(
         obj_prop.COLOR_1,
         obj_prop.COLOR_1_INDEX,
         obj_prop.COLOR_2,
         obj_prop.COLOR_2_INDEX
         )
+
+
+def reset_spawn_touch(obj:Object):
+    obj.discard(
+        obj_prop.trigger.TOUCH_TRIGGER,
+        obj_prop.trigger.SPAWN_TRIGGER,
+        obj_prop.trigger.MULTI_TRIGGER
+        )
+    
 
 def clean_duplicate_groups(obj:Object) -> None:
     """
