@@ -3,8 +3,9 @@ from typing import Optional
 
 # Package Imports
 from gmdkit.mappings import obj_prop, obj_id
+from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.functions.object import reset_transforms, reset_spawn_touch
+from gmdkit.functions.object import reset_transforms, reset_spawn_touch, offset_position
 from gmdkit.functions.object_list import boundaries, add_groups, group_objects_x
 from gmdkit import remapping
 from gmdkit.mappings.obj_id_set import AREA_TRIGGERS
@@ -192,4 +193,47 @@ def area_start_pos_fix(
     
     return areas, events
     
+
+
+def boundary_offset(
+        *levels:Level,
+        vertical_stack:bool=False,
+        block_offset:int=30
+        ):
     
+    i = None
+    
+    for level in levels:
+    
+        bounds = boundaries(level.objects)
+        
+        if vertical_stack:
+            
+            if i == None:
+                i = bounds[5]
+            
+            else:
+                level.objects.apply(offset_position, offset_y = i)
+                i += bounds[5]-bounds[1] + block_offset * 30
+            
+        else:
+            if i == None:
+                i = bounds[4]
+            
+            else:
+                level.objects.apply(offset_position, offset_x = i)
+                i += bounds[4]-bounds[0] + block_offset * 30
+    
+        i = i // 30 * 30
+   
+
+
+
+
+
+def get_useless_triggers():
+    pass
+
+def get_triggers_with_invalid_targets():
+    pass
+        

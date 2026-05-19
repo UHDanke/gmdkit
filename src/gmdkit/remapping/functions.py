@@ -9,16 +9,13 @@ from gmdkit.remapping.rules import (
     COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER,
     REGROUP_IDS
     )
-from gmdkit.models.level import Level, LevelList
+from gmdkit.models.level import Level
 from gmdkit.models.object import ObjectList
 from gmdkit.models.prop.color import ColorList
 from gmdkit.mappings import obj_prop
 from gmdkit.remapping.utils import next_free
-from gmdkit.functions.object import clean_duplicate_groups, offset_position
-from gmdkit.functions.object_list import ( 
-    clean_gid_parents, 
-    boundaries
-    )
+from gmdkit.functions.object import clean_duplicate_groups
+from gmdkit.functions.object_list import clean_gid_parents
 
 
 def offset_object_ids(
@@ -120,6 +117,57 @@ def reassign_object_ids(
             )
                     
             kv_map = dict(zip(sorted(old)+sorted(auto),new))
+            
+            v.remap_objects(kv_map, override=override_fixed)
+        except Exception as e:
+            raise RuntimeError(
+                f"Reassign ID function encountered the following error while processing key {k}:"
+                ) from e
+    return source
+
+
+def resolve_auto_ids(
+        source:ObjectList|Level,
+        rules:RuleHandler=BASE_ID_HANDLER,
+        groups:Optional[Sequence[Sequence[IDType]]]=None
+        ):
+    
+    return reassign_object_ids(
+            source=source,
+            rules=rules,
+            groups=groups
+            )
+    
+
+def assign_auto_ids(
+        source:ObjectList|Level,
+        ignore_ids:Optional[dict]=None,
+        reassign_all:bool=False,
+        override_fixed:bool=False,
+        rules:RuleHandler=BASE_ID_HANDLER,
+        groups:Optional[Sequence[Sequence[IDType]]]=None
+        ):
+    
+    ignore_ids = ignore_ids or {}
+    ig_all = ignore_ids.get(IDType.ANY,set())
+    
+    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    
+    for k, v in ids.items():
+        try:
+            ig = ignore_ids.get(k, set()) | ig_all
+        
+            v = v if override_fixed else v.filter_values(fixed=False)
+            used = v.get_ids()
+            old = set()
+            auto = {x for x in used if type(x) is AutoID}
+            old = used - auto - ig
+
+            if not old: continue
+        
+            new = [AutoID() for _ in old]
+                    
+            kv_map = dict(zip(sorted(old),new))
             
             v.remap_objects(kv_map, override=override_fixed)
         except Exception as e:
@@ -297,45 +345,3 @@ def combine_objects(
     return result
 
 
-def boundary_offset(
-        level_list:LevelList,
-        vertical_stack:bool=False,
-        block_offset:int=30
-        ):
-    
-    i = None
-    
-    for level in level_list:
-    
-        bounds = boundaries(level.objects)
-        
-        if vertical_stack:
-            
-            if i == None:
-                i = bounds[5]
-            
-            else:
-                level.objects.apply(offset_position, offset_y = i)
-                i += bounds[5]-bounds[1] + block_offset * 30
-            
-        else:
-            if i == None:
-                i = bounds[4]
-            
-            else:
-                level.objects.apply(offset_position, offset_x = i)
-                i += bounds[4]-bounds[0] + block_offset * 30
-    
-        i = i // 30 * 30
-   
-
-
-
-
-
-def get_useless_triggers():
-    pass
-
-def get_triggers_with_invalid_targets():
-    pass
-        
