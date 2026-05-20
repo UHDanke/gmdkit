@@ -1,6 +1,11 @@
 # Imports
+import re
 from enum import IntEnum
 from dataclasses import dataclass
+from typing import ClassVar, get_type_hints, Optional, Self
+
+# Package Imports
+from gmdkit.utils.functions import typed_cache
 
 
 class AutoID:
@@ -34,15 +39,47 @@ class AutoID:
         return self.index < other.index
 
 
-@dataclass(slots=True)
+@dataclass
 class LabelID:
     template: str
-    name: str = ""
     value: int = 0
-    
+    text: str = ""
+
+    _TYPE_TO_PATTERN: ClassVar[dict] = {
+        int: r"\d+",
+        float: r"\d+\.\d+",
+        str: r"\w+",
+    }
+
+    @classmethod
+    @typed_cache()
+    def _hints(cls) -> dict:
+        return {k: v for k, v in get_type_hints(cls).items()
+                if not k.startswith("_") and k != "template"}
+
+    @classmethod
+    @typed_cache()
+    def _build_pattern(cls, template: str) -> str:
+        pattern = re.escape(template)
+        for field_name, field_type in cls._hints().items():
+            field_pattern = cls._TYPE_TO_PATTERN.get(field_type, r"\w+")
+            pattern = pattern.replace(
+                re.escape(f"{{{field_name}}}"),
+                f"(?P<{field_name}>{field_pattern})"
+            )
+        return pattern
+
     def __str__(self) -> str:
-        return self.template.format(value=self.value, name=self.name)
-        
+        return self.template.format(**{f: getattr(self, f) for f in self._hints()})
+
+    @classmethod
+    def from_string(cls, formatted: str, template: str) -> Optional[Self]:
+        match = re.fullmatch(cls._build_pattern(template), formatted)
+        if not match:
+            return None
+        kwargs = {k: cls._hints()[k](v) for k, v in match.groupdict().items()}
+        return cls(template=template, **kwargs)
+
 
 class IDType(IntEnum):
     LABEL = -2

@@ -88,7 +88,7 @@ def next_free(
         vmax: int = 2**31 - 1,
         count: int = 1,
         in_range: bool = False,
-) -> list[int]:
+        ) -> list[int]:
     """
     Returns the next unused integer from a list, within the given limits.
     Negative numbers are returned counting down from -1.
@@ -114,7 +114,7 @@ def next_free(
         A list of ids returned.
     """
     if vmin > vmax or count == 0:
-        return []  # BUG 1: was returning () (tuple) instead of [] (list)
+        return []
 
     if start is None:
         start = 0 if vmin <= 0 else vmin
@@ -122,34 +122,26 @@ def next_free(
         start = max(vmin, min(vmax, start))
 
     if in_range:
-        # Need sorted list for bisect
         values = sorted(set(values) if not isinstance(values, (set, frozenset)) else values)
     else:
-        # Need a set for O(1) lookup
         values = set(values) if not isinstance(values, (set, frozenset)) else values
 
     if count == 1:
         if in_range:
-            # Search [start, vmax] first
             idx = bisect.bisect_left(values, start)
             if idx < len(values) and values[idx] <= vmax:
-                return [values[idx]]  # BUG 1: was returning tuple
-            # Wrap: search [vmin, start-1]
-            # BUG 2: was guarded by `if start > vmin`, missing the case start == vmin
-            # with elements below — but since we already checked [start, vmax] above,
-            # just always check the wrap range.
+                return [values[idx]]
             idx_lo = bisect.bisect_left(values, vmin)
-            idx_hi = bisect.bisect_left(values, start)  # exclusive upper bound
+            idx_hi = bisect.bisect_left(values, start)
             if idx_lo < idx_hi:
-                return [values[idx_lo]]  # BUG 1: was returning tuple
+                return [values[idx_lo]]
         else:
             for i in range(start, vmax + 1):
                 if i not in values:
-                    return [i]  # BUG 1: was returning tuple
+                    return [i]
             for i in range(start - 1, vmin - 1, -1):
                 if i not in values:
-                    return [i]  # BUG 1: was returning tuple
-        # BUG 3: in_range=False path fell through to multi-count block instead of raising
+                    return [i]
         raise ValueError("Range has no valid ID")
 
     result = []
