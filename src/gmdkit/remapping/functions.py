@@ -1,6 +1,6 @@
 # Imports
 import copy
-from typing import Callable, Optional, Sequence
+from typing import Optional, Sequence
 
 # Package Imports
 from gmdkit.remapping.types import IDType, AutoID
@@ -9,13 +9,15 @@ from gmdkit.remapping.rules import (
     COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER,
     REGROUP_IDS
     )
+from gmdkit.remapping.utils import next_free
 from gmdkit.models.level import Level
 from gmdkit.models.object import ObjectList
 from gmdkit.models.prop.color import ColorList
 from gmdkit.mappings import obj_prop
-from gmdkit.remapping.utils import next_free
-from gmdkit.functions.object import clean_duplicate_groups
-from gmdkit.functions.object_list import clean_gid_parents
+
+
+IDGroup = IDType|Sequence[IDType]
+IDRemaps = dict[IDGroup,dict[int,int]]
 
 
 def offset_object_ids(
@@ -23,13 +25,15 @@ def offset_object_ids(
         id_offset:Optional[dict]=None,
         ignore_ids:Optional[dict]=None,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[Sequence[IDType]]]=None
-        ):
+        groups:Optional[Sequence[IDGroup]]=None
+        ) -> IDRemaps:
     
     ignore_ids = ignore_ids or {}
     id_offset = id_offset or {}
     ig_all = ignore_ids.get(IDType.ANY,set())
     io_all = id_offset.get(IDType.ANY,0)
+    
+    remapped = {}
     
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
@@ -51,12 +55,15 @@ def offset_object_ids(
                     
             kv_map = dict(zip(old,new))
             v.remap_objects(kv_map)
+            
+            remapped[k] = kv_map
+        
         except Exception as e:
             raise RuntimeError(
                 f"Offset ID function encountered the following error while processing key {k}:"
                 ) from e
         
-    return source
+    return remapped
 
 
 def reassign_object_ids(
@@ -66,13 +73,15 @@ def reassign_object_ids(
         reassign_all:bool=False,
         override_fixed:bool=False,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[Sequence[IDType]]]=None
-        ):
+        groups:Optional[Sequence[IDGroup]]=None
+        ) -> IDRemaps:
     
     ignore_ids = ignore_ids or {}
     id_ranges = id_ranges or {}
     ig_all = ignore_ids.get(IDType.ANY,set())
     ir_all = id_ranges.get(IDType.ANY,set())
+    
+    remapped = {}
     
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
@@ -83,10 +92,9 @@ def reassign_object_ids(
         
             v = v if override_fixed else v.filter_values(fixed=False)
             used = v.get_ids()
-            old = set()
             auto = {x for x in used if type(x) is AutoID}
             used_ints = used - auto
-        
+            
             range_search = bool(ir)
             
         
@@ -106,7 +114,8 @@ def reassign_object_ids(
                 range_min = max(v.vmin, min(ir)) if range_search else v.vmin
                 range_max = min(v.vmax, max(ir)) if range_search else v.vmax
             
-            if not (old or auto): continue
+            if not (old or auto): 
+                continue
         
             new = next_free(
                 sr,
@@ -117,27 +126,73 @@ def reassign_object_ids(
             )
                     
             kv_map = dict(zip(sorted(old)+sorted(auto),new))
-            
             v.remap_objects(kv_map, override=override_fixed)
+            
+            remapped[k] = kv_map
+            
         except Exception as e:
             raise RuntimeError(
                 f"Reassign ID function encountered the following error while processing key {k}:"
                 ) from e
-    return source
+    
+    return remapped
 
 
 def resolve_auto_ids(
         source:ObjectList|Level,
+        id_ranges:Optional[dict]=None,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[Sequence[IDType]]]=None
-        ):
+        groups:Optional[Sequence[IDGroup]]=None
+        ) -> IDRemaps:
     
-    return reassign_object_ids(
-            source=source,
-            rules=rules,
-            groups=groups
+    id_ranges = id_ranges or {}
+    ir_all = id_ranges.get(IDType.ANY,set())
+    
+    remapped = {}
+    
+    ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    
+    for k, v in ids.items():
+        try:
+            ir = (id_ranges.get(k, set()) | ir_all)
+            
+            used = v.get_ids()
+            auto = {x for x in used if type(x) is AutoID}
+            used_ints = used - auto
+        
+            range_search = bool(ir)
+            
+        
+            if not range_search:
+                sr = used_ints
+                range_min, range_max = v.vmin, v.vmax
+            else:
+                sr = ir - used_ints
+                range_min = max(v.vmin, min(ir)) if range_search else v.vmin
+                range_max = min(v.vmax, max(ir)) if range_search else v.vmax
+            
+            if not auto: continue
+        
+            new = next_free(
+                sr,
+                vmin=range_min,
+                vmax=range_max,
+                count=len(auto),
+                in_range=range_search,
             )
+                    
+            kv_map = dict(zip(sorted(auto),new))
+            v.remap_objects(kv_map)
+            
+            remapped[k] = kv_map
+            
+        except Exception as e:
+            raise RuntimeError(
+                f"Resolve Auto ID function encountered the following error while processing key {k}:"
+                ) from e
     
+    return remapped
+
 
 def assign_auto_ids(
         source:ObjectList|Level,
@@ -145,11 +200,13 @@ def assign_auto_ids(
         reassign_all:bool=False,
         override_fixed:bool=False,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[Sequence[IDType]]]=None
-        ):
+        groups:Optional[Sequence[IDGroup]]=None
+        ) -> IDRemaps:
     
     ignore_ids = ignore_ids or {}
     ig_all = ignore_ids.get(IDType.ANY,set())
+    
+    remapped = {}
     
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
     
@@ -170,22 +227,26 @@ def assign_auto_ids(
             kv_map = dict(zip(sorted(old),new))
             
             v.remap_objects(kv_map, override=override_fixed)
+        
+            remapped[k] = kv_map
+            
         except Exception as e:
             raise RuntimeError(
                 f"Reassign ID function encountered the following error while processing key {k}:"
                 ) from e
-    return source
+    
+    return remapped
 
 
 def remap_objects(
-        *sources: ObjectList | Level,
-        rules: RuleHandler,
-        groups: Optional[Sequence[Sequence[IDType]]] = None,
-        ref_groups: Optional[Sequence[Sequence[IDType]]] = None,
-        override_fixed: bool = False,
-        ignore_ids: Optional[dict] = None,
-        include_ids: Optional[dict] = None,
-        ) -> list:
+        *sources:ObjectList|Level,
+        rules:RuleHandler,
+        groups:Optional[Sequence[Sequence[IDType]]]=None,
+        ref_groups:Optional[Sequence[Sequence[IDType]]]=None,
+        override_fixed:bool=False,
+        ignore_ids:Optional[dict]=None,
+        include_ids:Optional[dict]=None,
+        ) -> list[ObjectList|Level]:
 
     ignore_ids = ignore_ids or {}
     include_ids = include_ids or {}
@@ -257,9 +318,9 @@ def remap_objects(
 
 
 def remap_objects_copy(
-        *sources:ObjectList,
+        *sources:ObjectList|Level,
         rules:RuleHandler=COPY_ID_HANDLER
-        ):
+        ) -> list[ObjectList|Level]:
     
     return remap_objects(
         *sources,
@@ -275,7 +336,7 @@ def remap_objects_regroup(
         rules:RuleHandler=REGROUP_ID_HANDLER,
         groups:Optional[Sequence[Sequence[IDType]]]=REGROUP_IDS,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
-        ):
+        ) -> list[ObjectList|Level]:
             
     return remap_objects(
         *sources, 
@@ -289,14 +350,14 @@ def remap_objects_regroup(
 
 
 def remap_objects_build_helper(
-        *sources:ObjectList, 
+        *sources:ObjectList|Level, 
         ignore_ids:Optional[dict]=None, 
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=REGROUP_ID_HANDLER,
         groups:Optional[Sequence[Sequence[IDType]]]=REGROUP_IDS,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
-        ):
+        ) -> list[ObjectList|Level]:
     
     ref_groups = groups if ref_groups is None else ref_groups
     
@@ -312,13 +373,8 @@ def remap_objects_build_helper(
 
 
 def combine_objects(
-        *sources:ObjectList|Level,
-        remap_func:Optional[Callable]=None,
-        **func_kwargs
-        ):
-    
-    if remap_func is not None:
-        sources = remap_func(*sources, **func_kwargs)
+        *sources:ObjectList|Level
+        ) -> ObjectList|Level:
     
     result = sources[0]
     main_level = issubclass(type(result), Level)
@@ -338,9 +394,6 @@ def combine_objects(
                 col = i.start.get(obj_prop.level.COLORS)
                 if col is not None:  
                     colors.add_colors(col)
-    
-    objects.apply(clean_duplicate_groups)
-    clean_gid_parents(objects)
     
     return result
 

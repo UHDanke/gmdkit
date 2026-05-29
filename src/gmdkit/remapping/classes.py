@@ -7,7 +7,7 @@ from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.remapping.base_func import obj_can_be_spawned
-from gmdkit.remapping.types import IDType, IDActions
+from gmdkit.remapping.types import IDType, IDActions, AutoID
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
@@ -124,7 +124,7 @@ class IdentifierList:
             in_range:bool = False,
             min_value:Optional[int] = None,
             max_value:Optional[int] = None
-            ) -> set|dict[set]:
+            ) -> set:
         
         ids = self.values        
         low = min_value if min_value is not None else self.vmin
@@ -143,7 +143,7 @@ class IdentifierList:
                 result.add(v)
         
         return result
-
+    
     def remap_objects(self, kv_map:dict, override:bool=False):
         
         if not kv_map:

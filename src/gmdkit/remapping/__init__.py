@@ -14,6 +14,8 @@ __all__ = (
     "remap_objects_regroup",
     "remap_objects_build_helper",
     "combine_objects",
+    "resolve_auto_ids",
+    "assign_auto_ids"
     )
 
 
@@ -34,4 +36,6 @@ from .functions import (
     remap_objects_regroup,
     remap_objects_build_helper,
     combine_objects,
+    resolve_auto_ids,
+    assign_auto_ids
     )

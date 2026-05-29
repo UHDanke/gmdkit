@@ -17,6 +17,12 @@ class AutoID:
         object.__setattr__(obj, "index", cls.counter)
         cls.counter += 1
         return obj
+    
+    def __getstate__(self):
+        return (self.index,)
+
+    def __setstate__(self, state):
+        object.__setattr__(self, "index", state[0])
 
     def __setattr__(self, name, value):
         raise TypeError("AutoID is immutable")
@@ -37,7 +43,6 @@ class AutoID:
 
     def __lt__(self, other):
         return self.index < other.index
-
 
 @dataclass
 class LabelID:

@@ -34,7 +34,7 @@ class LevelSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixi
     
 
 if __name__ == "__main__":
-    from gmdkit.utils.misc import Timer
+    from gmdkit.utils.classes import Timer
     
     _t = Timer(start=True)
     level_data = LevelSave.from_default_path()

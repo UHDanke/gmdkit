@@ -124,7 +124,7 @@ MusicLibrary.DEFAULT_PATH = MUSIC_LIBRARY_PATH
 
 if __name__ == "__main__":
     
-    from gmdkit.utils.misc import Timer
+    from gmdkit.utils.classes import Timer
 
     _t = Timer(start=True)   
     music_library = MusicLibrary.from_default_path()

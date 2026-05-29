@@ -177,10 +177,12 @@ class KeyframeRefMode(EnumClass):
     DIST = 2
 
 class ItemOperation(EnumClass):
-    ADD = 1
-    SUBTRACT = 2
-    MULTIPLY = 3
-    DIVIDE = 4
+    EQUAL = 0
+    ADD_GT = 1
+    SUBTRACT_GE = 2
+    MULTIPLY_LT = 3
+    DIVIDE_LE = 4
+    NOT_EQUAL = 5
 
 class ItemType(EnumClass):
     DEFAULT = 0

@@ -33,7 +33,7 @@ class GameSave(DefaultPathMixin,FilePathMixin,CompressFileMixin,PlistLoaderMixin
 
 if __name__ == "__main__":
     
-    from gmdkit.utils.misc import Timer
+    from gmdkit.utils.classes import Timer
 
     _t = Timer(start=True)
     game_data = GameSave.from_default_path()
