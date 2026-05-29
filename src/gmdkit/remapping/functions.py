@@ -72,6 +72,7 @@ def reassign_object_ids(
         id_ranges:Optional[dict]=None,
         reassign_all:bool=False,
         override_fixed:bool=False,
+        reassign_auto:bool=False,
         rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[IDGroup]]=None
         ) -> IDRemaps:
@@ -114,18 +115,18 @@ def reassign_object_ids(
                 range_min = max(v.vmin, min(ir)) if range_search else v.vmin
                 range_max = min(v.vmax, max(ir)) if range_search else v.vmax
             
-            if not (old or auto): 
+            if not (old or reassign_auto and auto): 
                 continue
-        
+            
             new = next_free(
                 sr,
                 vmin=range_min,
                 vmax=range_max,
-                count=len(old)+len(auto),
+                count=len(old)+(len(auto) if reassign_auto else 0),
                 in_range=range_search,
             )
                     
-            kv_map = dict(zip(sorted(old)+sorted(auto),new))
+            kv_map = dict(zip(sorted(old)+(sorted(auto) if reassign_auto else []),new))
             v.remap_objects(kv_map, override=override_fixed)
             
             remapped[k] = kv_map
@@ -396,5 +397,3 @@ def combine_objects(
                     colors.add_colors(col)
     
     return result
-
-
