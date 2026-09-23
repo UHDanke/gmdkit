@@ -12,7 +12,7 @@ from gmdkit.models.prop.hsv import HSV
 
 @dataclass_decoder(slots=True, from_array=False, separator="_", auto_key=str)
 class Color(DataclassDecoderMixin):
-    
+
     red: int = 0
     green: int = 0
     blue: int = 0
@@ -32,15 +32,15 @@ class Color(DataclassDecoderMixin):
     copy_opacity: bool = field_decoder(default=False,optional=True)
     disable_legacy_hsv: bool = False
 
-    
+
     @classmethod
     def default(cls, color_id:int):
         string = default_color(color_id)
         return cls.from_string(string)
-    
+
     def is_default(self):
         channel = self.channel
-        
+
         value = (
             self.red,
             self.green,
@@ -50,49 +50,49 @@ class Color(DataclassDecoderMixin):
             self.opacity,
             self.copy_id,
         )
-        
+
         if  channel <= 999 or channel >=1015:
             if value == (255,255,255,TargetPlayer.NONE,False,1.0,0):
                 return True
         elif channel in {1005,1006,1008}:
             return True
-    
+
     def set_rgba(
-            self, 
+            self,
             red:Optional[int]=None,
             green:Optional[int]=None,
             blue:Optional[int]=None,
             alpha:Optional[float]=None
             ):
-        if red is not None: 
+        if red is not None:
             self.red = red
-            
-        if green is not None: 
+
+        if green is not None:
             self.green = green
-        
-        if blue is not None: 
+
+        if blue is not None:
             self.blue = blue
-        
-        if alpha is not None: 
+
+        if alpha is not None:
             self.opacity = alpha
-    
+
     def get_rgba(self):
         r = self.red
         g = self.green
         b = self.blue
         a = self.opacity
         return (r,g,b,a)
-    
+
     def set_hex(self, hex_string):
         hex_string = hex_string.lstrip("#")
         if len(hex_string) != 6:
             raise ValueError("Invalid hex string.")
-        
+
         r = int(hex_string[0:2], 16)
         g = int(hex_string[2:4], 16)
         b = int(hex_string[4:6], 16)
         self.set_rgba(r, g, b)
-    
+
     def get_hex(self):
         r, g, b, _ = self.get_rgba()
         return "#{:02X}{:02X}{:02X}".format(r, g, b)
@@ -101,18 +101,18 @@ class Color(DataclassDecoderMixin):
 class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
 
     __slots__ = ()
-    
+
     SEPARATOR = '|'
     END_DELIMITER = "|"
     DECODER = Color.from_string
     ENCODER = Color.to_string
-    
+
     def get_channels(self):
         return self.unique_values(lambda color: (color.channel,))
-    
+
     def get_copies(self):
         return self.unique_values(lambda color: (color.copy_id,))
-    
+
     def discard_duplicates(self):
         seen = set()
         i = 0
@@ -124,17 +124,21 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
             else:
                 seen.add(channel)
                 i += 1
-    
-    def autodefaults(self, *color_ids:int, override:bool=True):
-        used = self.get_channels() if override else set()
-        ids = set(color_ids) - used
-        
+
+    def set_defaults(self, *color_ids:int, override:bool=False):
+        existing = self.get_channels()
+        ids = set(color_ids)
+        if override:
+            self[:] = [c for c in self if c.id not in ids]
+        else:
+            ids -= existing
         for i in ids:
             self.append(Color.default(i))
-            
-    def cleardefaults(self):
+        print(self.get_channels())
+
+    def clear_defaults(self):
         self[:] = [i for i in self if not i.is_default()]
-    
+
     def add_colors(self, colors:Sequence[Color], override:bool=False):
         index = {c.channel: i for i, c in enumerate(self)}
 
@@ -145,4 +149,3 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
             else:
                 index[color.channel] = len(self)
                 self.append(color)
-            

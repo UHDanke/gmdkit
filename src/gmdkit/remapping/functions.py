@@ -6,8 +6,7 @@ from typing import Optional, Sequence
 from gmdkit.remapping.types import IDType, AutoID
 from gmdkit.remapping.classes import RuleHandler
 from gmdkit.remapping.rules import (
-    COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER,
-    REGROUP_IDS
+    COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER
     )
 from gmdkit.remapping.utils import next_free
 from gmdkit.models.level import Level
@@ -19,56 +18,57 @@ from gmdkit.mappings import obj_prop
 IDGroup = IDType|Sequence[IDType]
 IDRemaps = dict[IDGroup,dict[int,int]]
 
+DEFAULT_EXCLUDE = {IDType.ANY:{0}}
 
 def offset_object_ids(
         source:ObjectList|Level,
         id_offset:Optional[dict]=None,
-        ignore_ids:Optional[dict]=None,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[IDGroup]]=None
         ) -> IDRemaps:
-    
-    ignore_ids = ignore_ids or {}
+
+    exclude_ids = exclude_ids or {}
     id_offset = id_offset or {}
-    ig_all = ignore_ids.get(IDType.ANY,set())
+    ig_all = exclude_ids.get(IDType.ANY,set())
     io_all = id_offset.get(IDType.ANY,0)
-    
+
     remapped = {}
-    
+
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
-    
+
     for k,v in ids.items():
         try:
-            ig = ignore_ids.get(k,set()) | ig_all
+            ig = exclude_ids.get(k,set()) | ig_all
             io = id_offset.get(k,io_all)
-            
+
             if not io: continue
-            
+
             old = v.get_ids(in_range=True) - ig
-            
+
             if not old: continue
-            
+
             new = {i + io for i in old}
-    
+
             if any(i < v.vmin or i > v.vmax for i in new):
                 raise ValueError("Offset returned out-of-range ID")
-                    
+
             kv_map = dict(zip(old,new))
             v.remap_objects(kv_map)
-            
+
             remapped[k] = kv_map
-        
+
         except Exception as e:
             raise RuntimeError(
                 f"Offset ID function encountered the following error while processing key {k}:"
                 ) from e
-        
+
     return remapped
 
 
 def reassign_object_ids(
         source:ObjectList|Level,
-        ignore_ids:Optional[dict]=None,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         id_ranges:Optional[dict]=None,
         reassign_all:bool=False,
         override_fixed:bool=False,
@@ -76,48 +76,48 @@ def reassign_object_ids(
         rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[IDGroup]]=None
         ) -> IDRemaps:
-    
-    ignore_ids = ignore_ids or {}
+
+    exclude_ids = exclude_ids or {}
     id_ranges = id_ranges or {}
-    ig_all = ignore_ids.get(IDType.ANY,set())
+    ig_all = exclude_ids.get(IDType.ANY,set())
     ir_all = id_ranges.get(IDType.ANY,set())
-    
+
     remapped = {}
-    
+
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
-    
+
     for k, v in ids.items():
         try:
-            ig = ignore_ids.get(k, set()) | ig_all
+            ig = exclude_ids.get(k, set()) | ig_all
             ir = (id_ranges.get(k, set()) | ir_all) - ig
-        
+
             v = v if override_fixed else v.filter_values(fixed=False)
             used = v.get_ids()
             auto = {x for x in used if type(x) is AutoID}
             used_ints = used - auto
-            
+
             range_search = bool(ir)
-            
-        
+
+
             if not reassign_all and not range_search:
                 sr = used_ints
                 range_min, range_max = v.vmin, v.vmax
             else:
                 sr = ir - used_ints
-                
+
                 if not reassign_all:
                     old = used_ints - ig - ir
-                    
+
                 else:
                     old = used_ints - ig
-                
+
                 old = {x for x in old if v.vmin <= x <= v.vmax}
                 range_min = max(v.vmin, min(ir)) if range_search else v.vmin
                 range_max = min(v.vmax, max(ir)) if range_search else v.vmax
-            
-            if not (old or reassign_auto and auto): 
+
+            if not (old or reassign_auto and auto):
                 continue
-            
+
             new = next_free(
                 sr,
                 vmin=range_min,
@@ -125,55 +125,61 @@ def reassign_object_ids(
                 count=len(old)+(len(auto) if reassign_auto else 0),
                 in_range=range_search,
             )
-                    
+
             kv_map = dict(zip(sorted(old)+(sorted(auto) if reassign_auto else []),new))
             v.remap_objects(kv_map, override=override_fixed)
-            
+
             remapped[k] = kv_map
-            
+
         except Exception as e:
             raise RuntimeError(
                 f"Reassign ID function encountered the following error while processing key {k}:"
                 ) from e
-    
+
     return remapped
 
 
 def resolve_auto_ids(
         source:ObjectList|Level,
         id_ranges:Optional[dict]=None,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[IDGroup]]=None
         ) -> IDRemaps:
     
+    exclude_ids = exclude_ids or {}
     id_ranges = id_ranges or {}
+    ig_all = exclude_ids.get(IDType.ANY,set())
     ir_all = id_ranges.get(IDType.ANY,set())
-    
+
     remapped = {}
-    
+
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
-    
+
     for k, v in ids.items():
         try:
-            ir = (id_ranges.get(k, set()) | ir_all)
-            
+
             used = v.get_ids()
             auto = {x for x in used if type(x) is AutoID}
-            used_ints = used - auto
-        
-            range_search = bool(ir)
-            
-        
-            if not range_search:
-                sr = used_ints
-                range_min, range_max = v.vmin, v.vmax
-            else:
-                sr = ir - used_ints
-                range_min = max(v.vmin, min(ir)) if range_search else v.vmin
-                range_max = min(v.vmax, max(ir)) if range_search else v.vmax
             
             if not auto: continue
         
+            used_ints = used - auto
+
+            ig = exclude_ids.get(k, set()) | ig_all
+            ir = (id_ranges.get(k, set()) | ir_all)
+            
+            range_search = bool(ir)
+
+            if not range_search:
+                sr = used_ints | ig
+                range_min, range_max = v.vmin, v.vmax
+            else:
+                sr = ir - used_ints - ig
+                range_min = max(v.vmin, min(ir)) if range_search else v.vmin
+                range_max = min(v.vmax, max(ir)) if range_search else v.vmax
+
+            
             new = next_free(
                 sr,
                 vmin=range_min,
@@ -181,40 +187,39 @@ def resolve_auto_ids(
                 count=len(auto),
                 in_range=range_search,
             )
-                    
+
             kv_map = dict(zip(sorted(auto),new))
             v.remap_objects(kv_map)
-            
+
             remapped[k] = kv_map
-            
+
         except Exception as e:
             raise RuntimeError(
                 f"Resolve Auto ID function encountered the following error while processing key {k}:"
                 ) from e
-    
+
     return remapped
 
 
 def assign_auto_ids(
         source:ObjectList|Level,
-        ignore_ids:Optional[dict]=None,
-        reassign_all:bool=False,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         override_fixed:bool=False,
         rules:RuleHandler=BASE_ID_HANDLER,
         groups:Optional[Sequence[IDGroup]]=None
         ) -> IDRemaps:
-    
-    ignore_ids = ignore_ids or {}
-    ig_all = ignore_ids.get(IDType.ANY,set())
-    
+
+    exclude_ids = exclude_ids or {}
+    ig_all = exclude_ids.get(IDType.ANY,set())
+
     remapped = {}
-    
+
     ids = rules.compile_ids(source, by_type=True, type_groups=groups)
-    
+
     for k, v in ids.items():
         try:
-            ig = ignore_ids.get(k, set()) | ig_all
-        
+            ig = exclude_ids.get(k, set()) | ig_all
+
             v = v if override_fixed else v.filter_values(fixed=False)
             used = v.get_ids()
             old = set()
@@ -222,20 +227,20 @@ def assign_auto_ids(
             old = used - auto - ig
 
             if not old: continue
-        
+
             new = [AutoID() for _ in old]
-                    
+
             kv_map = dict(zip(sorted(old),new))
-            
+
             v.remap_objects(kv_map, override=override_fixed)
-        
+
             remapped[k] = kv_map
-            
+
         except Exception as e:
             raise RuntimeError(
                 f"Reassign ID function encountered the following error while processing key {k}:"
                 ) from e
-    
+
     return remapped
 
 
@@ -245,14 +250,14 @@ def remap_objects(
         groups:Optional[Sequence[Sequence[IDType]]]=None,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None,
         override_fixed:bool=False,
-        ignore_ids:Optional[dict]=None,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         include_ids:Optional[dict]=None,
         ) -> list[ObjectList|Level]:
 
-    ignore_ids = ignore_ids or {}
+    exclude_ids = exclude_ids or {}
     include_ids = include_ids or {}
-    ig_all = ignore_ids.get(IDType.ANY, set())
-    ig_dict = {k: v | ig_all for k, v in ignore_ids.items()}
+    ig_all = exclude_ids.get(IDType.ANY, set())
+    ig_dict = {k: v | ig_all for k, v in exclude_ids.items()}
 
     ic_all = include_ids.get(IDType.ANY, set())
     ic_dict = {}
@@ -292,7 +297,7 @@ def remap_objects(
             ia.update(used_auto)
 
             if not coll: continue
-        
+
             coll_auto = {x for x in coll if type(x) is AutoID}
             coll_ints = coll - coll_auto
 
@@ -303,13 +308,14 @@ def remap_objects(
                 vmax=v.vmax,
                 count=len(coll_ints),
             ) if coll_ints else []
-            
+
             if new_ints:
                 last_ids[k] = new_ints[-1]
-                
+
             new_auto = [AutoID() for _ in coll_auto]
-            
+
             kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(sorted(coll_auto), new_auto))}
+            print(k, kv_map)
             v.remap_objects(kv_map, override=override_fixed)
             ic.update(new_ints)
             ic.update(new_auto)
@@ -322,7 +328,7 @@ def remap_objects_copy(
         *sources:ObjectList|Level,
         rules:RuleHandler=COPY_ID_HANDLER
         ) -> list[ObjectList|Level]:
-    
+
     return remap_objects(
         *sources,
         rules=rules
@@ -330,44 +336,44 @@ def remap_objects_copy(
 
 
 def remap_objects_regroup(
-        *sources:ObjectList|Level, 
-        ignore_ids:Optional[dict]=None, 
+        *sources:ObjectList|Level,
+        exclude_ids:Optional[dict]=None,
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=REGROUP_ID_HANDLER,
-        groups:Optional[Sequence[Sequence[IDType]]]=REGROUP_IDS,
+        groups:Optional[Sequence[Sequence[IDType]]]=None,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ) -> list[ObjectList|Level]:
-            
+
     return remap_objects(
-        *sources, 
-        rules=rules, 
-        groups=groups, 
+        *sources,
+        rules=rules,
+        groups=groups,
         ref_groups=ref_groups,
-        ignore_ids=ignore_ids,
+        exclude_ids=exclude_ids,
         include_ids=include_ids,
         override_fixed=override_fixed
         )
 
 
 def remap_objects_build_helper(
-        *sources:ObjectList|Level, 
-        ignore_ids:Optional[dict]=None, 
+        *sources:ObjectList|Level,
+        exclude_ids:Optional[dict]=None,
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=REGROUP_ID_HANDLER,
-        groups:Optional[Sequence[Sequence[IDType]]]=REGROUP_IDS,
+        groups:Optional[Sequence[Sequence[IDType]]]=None,
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ) -> list[ObjectList|Level]:
-    
+
     ref_groups = groups if ref_groups is None else ref_groups
-    
+
     return remap_objects(
-        *sources, 
-        rules=rules, 
-        groups=groups, 
+        *sources,
+        rules=rules,
+        groups=groups,
         ref_groups=ref_groups,
-        ignore_ids=ignore_ids,
+        exclude_ids=exclude_ids,
         include_ids=include_ids,
         override_fixed=override_fixed
         )
@@ -376,16 +382,16 @@ def remap_objects_build_helper(
 def combine_objects(
         *sources:ObjectList|Level
         ) -> ObjectList|Level:
-    
+
     result = sources[0]
     main_level = issubclass(type(result), Level)
-    
+
     if main_level:
         objects = result.objects
         colors = result.start.get(obj_prop.level.COLORS, ColorList())
     else:
         objects = result
-    
+
     for i in sources[1:]:
         if not issubclass(type(i), Level):
             objects.extend(i)
@@ -393,7 +399,7 @@ def combine_objects(
             objects.extend(i.objects)
             if main_level:
                 col = i.start.get(obj_prop.level.COLORS)
-                if col is not None:  
+                if col is not None:
                     colors.add_colors(col)
-    
+
     return result

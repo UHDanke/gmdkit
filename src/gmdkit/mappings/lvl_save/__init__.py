@@ -1,3 +1,0 @@
-LEVELS = 'LLM_01'
-LISTS = 'LLM_03'
-BINARY = 'LLM_02'

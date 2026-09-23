@@ -19,11 +19,7 @@ class LiveEditor(ObjectString):
     
     Requires iAndyHD3's WSLiveEditor geode mod in order to work.
     
-    Can be used as a context manager to ensure the connection is properly closed:
-    
-        with LiveEditor() as editor:
-            editor.get_level()
-            editor.add_objects(objects)
+    Can be used as a context manager to ensure the connection is properly closed.
     
     Parameters
     ----------
@@ -36,8 +32,33 @@ class LiveEditor(ObjectString):
     def __init__(self, url:str=WEBSOCKET_URL):
         self.url = url
         self.ws = None
+        
+    def __getstate__(self):
+        dict_state, slots_state = super().__getstate__()
+        if slots_state and "ws" in slots_state:
+            slots_state = dict(slots_state)
+            slots_state["ws"] = None
+        return dict_state, slots_state
+    
+    def __setstate__(self, state):
+        dict_state, slots_state = state
+        if dict_state:
+            self.__dict__.update(dict_state)
+        if slots_state:
+            for key, value in slots_state.items():
+                setattr(self, key, value)
+    
+    def is_connected(self):
+        """
+        Whether the WebSocket connection is currently open.
 
-    def connect(self):
+        Returns
+        -------
+        bool
+        """
+        return self.ws is not None and self.ws.connected
+        
+    def connect(self, timeout:float=5.0):
         """
         Open the WebSocket connection.
         
@@ -52,7 +73,7 @@ class LiveEditor(ObjectString):
             If the connection cannot be established.
         """
         try:
-            self.ws = create_connection(self.url)
+            self.ws = create_connection(self.url, timeout=timeout)
             return self
         except Exception as e:
             self.ws = None
@@ -61,25 +82,16 @@ class LiveEditor(ObjectString):
     def close(self):
         """
         Close the WebSocket connection.
-        
-        Raises
-        ------
-        RuntimeError
-            If the WebSocket is not connected.
         """
-        if not self.ws:
-            raise RuntimeError("WebSocket is not connected")
-        self.ws.close()
-        self.ws = None
+        if self.ws is not None:
+            self.ws.close()
+            self.ws = None
         
     def __enter__(self):
         return self.connect()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        if exc_type:
-            print(f"Error: {exc_type.__name__}: {exc_val}")
-    
+        self.close()    
         return False
     
     def request(self, action:str, **kwargs:Any) -> str:
@@ -121,8 +133,9 @@ class LiveEditor(ObjectString):
         status = response.get("status")
         
         if status == "error":
-            message = response.get("message","no error message provided")
-            raise RuntimeError(f"response error: {message}")
+            message = response.get("error","no error message provided")
+            
+            raise RuntimeError(f"{message}")
         
         if not self.ws.connected: self.ws = None
         
@@ -198,3 +211,7 @@ class LiveEditor(ObjectString):
         None.
         """
         self.request("REMOVE_OBJECTS", group=group_id)
+        
+    def get_info(self):
+        
+        return self.request("EDITOR_LEVEL_INFO")

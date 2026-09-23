@@ -59,7 +59,7 @@ def color_fade(color_1:Color, color_2:Color, percent:float) -> RGBA:
 
 def color_to_trigger(color:Color) -> Object:
     """
-    Converts a Color to a Color 
+    Converts a Color to a Color
 
     Parameters
     ----------
@@ -75,54 +75,54 @@ def color_to_trigger(color:Color) -> Object:
     obj[obj_prop.trigger.color.RED] = color.red
     obj[obj_prop.trigger.color.GREEN] = color.green
     obj[obj_prop.trigger.color.BLUE] = color.blue
-        
+
     match color.player:
         case 1: obj[obj_prop.trigger.color.PLAYER_1] = True
         case 2: obj[obj_prop.trigger.color.PLAYER_2] = True
         case _: pass
-    
+
     if (v:=color.blending): obj[obj_prop.trigger.color.BLENDING] = v
     if (v:=color.channel):
         obj[obj_prop.trigger.color.CHANNEL] = v
-    
+
     obj[obj_prop.trigger.color.OPACITY] = color.opacity
-    
+
     if (v:=color.copy_id): obj[obj_prop.trigger.color.COPY_ID] = v
-    
+
     if not Color.CONDITION("hsv",v:=color.hsv): obj[obj_prop.trigger.color.HSV] = v
-    
+
     obj[obj_prop.trigger.color.DURATION] = 0
-    
+
     if (v:=color.copy_opacity): obj[obj_prop.trigger.color.COPY_OPACITY] = v
-    
+
     return obj
 
 
 def trigger_to_color(obj:Object) -> Color:
     """
     Converts a color trigger to a Color.
-    
+
     Parameters
     ----------
     obj : Object
         The color object to convert.
-        
+
     Returns
     -------
     Color
-    
+
     """
-    
+
     if obj[obj_prop.ID] != obj_id.trigger.COLOR: return
-    
+
     color = Color.default(obj.get(obj_prop.trigger.color.CHANNEL, 0))
     color.red = obj.get(obj_prop.trigger.color.RED,0)
     color.green = obj.get(obj_prop.trigger.color.GREEN,0)
     color.blue = obj.get(obj_prop.trigger.color.BLUE,0)
-    
+
     p_1 = obj[obj_prop.trigger.color.PLAYER_1]
     p_2 = obj[obj_prop.trigger.color.PLAYER_1]
-    
+
     if p_1 and p_2:
         color.player = enums.TargetPlayer.ALL
     elif not p_1 and not p_2:
@@ -131,50 +131,54 @@ def trigger_to_color(obj:Object) -> Color:
         color.player = enums.TargetPlayer.P1
     elif p_2:
         color.player = enums.TargetPlayer.P2
-        
+
     color.blending = obj.get(obj_prop.trigger.color.BLENDING,False)
     color.channel = obj.get(obj_prop.trigger.color.CHANNEL,0)
     color.opacity = obj.get(obj_prop.trigger.color.OPACITY,0)
     color.copy_id = obj.get(obj_prop.trigger.color.COPY_ID,0)
     color.hsv = obj.get(obj_prop.trigger.color.HSV,HSV())
     color.copy_opacity = obj.get(obj_prop.trigger.color.COPY_OPACITY,False)
-    
+
     return color
 
 
 def create_color_triggers(
-        color_list:ColorList, 
-        ignore_default:bool=True, 
-        pos_x:float=0, 
+        color_list:ColorList,
+        ignore_default:bool=True,
+        ignore_ids:None=None,
+        pos_x:float=0,
         pos_y:float=0
         ) -> ObjectList:
     """
     Converts a list of colors into color triggers.
-    
+
     Parameters
     ----------
-    color_list : 
+    color_list :
         A list to retrieve colors from.
     offset_x : float, optional
         Horizontal offset between triggers. The default is 0.
     offset_y : float, optional
         Vertical offset between triggers. The default is -30.
-        
+
     Returns
     -------
     ObjectListx
         An ObjectList containing the generated color triggers.
     """
     obj_list = ObjectList()
-    
+
     y = pos_y
     x = pos_x
-        
+
     for color in color_list:
-        
+
+        if ignore_ids is not None and color.channel in ignore_ids:
+            continue
+
         if ignore_default and color.is_default():
             continue
-            
+
         obj = color_to_trigger(color)
         obj.update({
             obj_prop.X: x,
@@ -182,31 +186,36 @@ def create_color_triggers(
             })
         y += -30
         obj_list.append(obj)
-    
+
     return obj_list
 
 
-def create_lvl_color_triggers(level:Level):
-    colors = level.start.get(obj_prop.level.COLORS).where(lambda x: x.channel in color_id.LEVEL)
-    level.objects += create_color_triggers(colors)
+def create_lvl_color_triggers(
+        level:Level,
+        ignore_default:bool=True,
+        pos_x:float=0,
+        pos_y:float=0
+        ) -> ObjectList:
+    colors: ColorList = level.start.get(obj_prop.level.COLORS)#.where(lambda x: x.channel in color_id.LEVEL)
+    level.objects += create_color_triggers(colors,ignore_default,pos_x,pos_y)
 
-    
+
 def set_used_colors(lvl:Level):
     used = remapping.rules.COLOR_ID_HANDLER.compile_ids(lvl).filter_values(reference=True).get_ids()
-    colors = lvl.start.get(obj_prop.level.COLORS)
-    colors.autodefaults(*used)
+    colors: ColorList = lvl.start.get(obj_prop.level.COLORS)
+    print(lvl.name,used)
+    colors.set_defaults(*used)
 
-    
+
 def free_unused_colors(lvl:Level, ignore_ids:dict):
     ignore_ids = ignore_ids or {}
-    
+
     rules = remapping.rules.BASE_ID_HANDLER.compile_rules(id_types=(remapping.IDType.COLOR_ID,))
-    
+
     ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
     id_base = ids.filter_values(reference=False).get_ids()
     id_ref = ids.filter_values(reference=True).get_ids()
     unused = id_base - id_ref - ignore_ids
-    
-    if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:        
-        lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
 
+    if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:
+        lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)

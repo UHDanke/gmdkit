@@ -43,11 +43,9 @@ class RemapList(IntPairList):
         
         result = cls()
         
-        for key, value in data.items():
-            result.append(IntPair(key,value))
+        result.update_from_dict(data)
         
         return result
-    
     
     def to_dict(self) -> dict[int,int]:
         
@@ -58,6 +56,15 @@ class RemapList(IntPairList):
         
         return result
     
+    def update_from_dict(self, data:dict[int,int], clear=False):
+        
+        if clear:
+            self.clear()
+        
+        for key, value in data.items():
+            self.append(IntPair(key,value))
+            
+        return self
     
     def clean(self):
         

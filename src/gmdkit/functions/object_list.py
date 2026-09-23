@@ -14,7 +14,7 @@ ObjectListMapping = dict[Optional[int],ObjectList]
 ObjectMapping = dict[int,Object]
 
 
-def add_groups(obj_list:ObjectList, *groups:Sequence[int]):
+def add_groups(obj_list:ObjectList, *groups:Sequence[int],ignore_extra:bool=False):
     """
     Adds groups to every object in the list.
 
@@ -36,36 +36,38 @@ def add_groups(obj_list:ObjectList, *groups:Sequence[int]):
 
     """
     group_set = set(groups)
-    
+
+    if ignore_extra:
+       group_set = set(sorted(groups)[:10])
+
     if len(group_set) > 10:
         raise ValueError("cannot add more than 10 groups")
-    
+
     for obj in obj_list:
         g = obj.setdefault(obj_prop.GROUPS,IDList())
         g_set = set(g)
-        
+
         new = group_set | g_set
-        
+
         if len(new) > 10:
-            print(new)
             raise ValueError(f"expected at most 10 groups, got {len(new)}")
-        
+
         g[:] = new
 
 # TODO REVIEW
 def group_objects(
-        obj_list:ObjectList, 
+        obj_list:ObjectList,
         key_func:Callable=lambda obj: obj.get(obj_prop.ID),
         value_func:Callable=ObjectList
         ):
-    
+
     new = {}
-    
+
     for obj in obj_list:
         k = key_func(obj)
         v = new.setdefault(k,ObjectList())
         v.append(obj)
-        
+
     return {k:value_func(v) for k, v in new.items()}
 
 def clean_gid_parents(obj_list:ObjectList):
@@ -83,19 +85,19 @@ def clean_gid_parents(obj_list:ObjectList):
 
     """
     seen = set()
-    
+
     for obj in obj_list:
-        
+
         if (parents:=obj.get(obj_prop.PARENT_GROUPS)) is not None:
-            
+
             new = set(parents).intersection(obj.get(obj_prop.GROUPS,[]))
-            
+
             new.difference_update(seen)
-            
+
             seen.update(new)
-    
+
             obj[obj_prop.PARENT_GROUPS][:] = new
-                
+
 def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
     """
     Compiles objects by their group IDs.
@@ -108,25 +110,25 @@ def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
     Returns
     -------
     groups : dict[Optional[int], ObjectList]
-        A dictionary mapping all objects contained in a group to a group ID. 
+        A dictionary mapping all objects contained in a group to a group ID.
         Objects without a group ID are keyed by None.
     """
     groups = {}
-    
+
     groups.setdefault(None, ObjectList())
-    
+
     for obj in obj_list:
-        
+
         gids = obj.get(obj_prop.GROUPS,[])
-        
+
         if gids:
             for gid in gids:
                 groups.setdefault(gid,ObjectList())
                 groups[gid].append(obj)
-        
-        else:              
+
+        else:
             groups[None].append(obj)
-    
+
     return groups
 
 
@@ -163,58 +165,58 @@ def compile_parents(
     gid_parents = {}
     group_parents = {}
     area_parents = {}
-    
+
     for obj in obj_list:
-        
+
         if (parents:=obj.get(obj_prop.PARENT_GROUPS)):
-        
+
             for parent in parents:
-            
+
                 gid_parents.setdefault(parent, obj)
-                
-        
+
+
     for gid, parent in gid_parents.items():
-        
+
         if parent.get(obj_prop.GROUP_PARENT):
             group_parents[gid] = parent
-        
+
         if parent.get(obj_prop.AREA_PARENT):
             area_parents[gid] = parent
-    
-    
+
+
     priority = lambda obj: (obj.get(obj_prop.X,0),obj.get(obj_prop.Y,0))
-    
+
     for gid, group in groups.items():
-        
+
         if not gid_parents.get(gid):
             continue
-        
+
         gp = group_parents.get(gid)
         ap = area_parents.get(gid)
-        
+
         if gp is None:
             gp = group.where(lambda obj: obj.get(obj_prop.GROUP_PARENT) is not None)
-            
+
             if gp: group_parents[gid] = min(gp, key=priority)
-        
+
         if ap is None:
             ap = group.where(lambda obj: obj.get(obj_prop.AREA_PARENT) is not None)
-            
+
             if ap: area_parents[gid] = min(ap, key=priority)
-        
+
         if gp is None and ap is not None:
             group_parents[gid] = ap
-        
+
         elif ap is None and gp is not None:
             area_parents[gid] = gp
-            
-    
+
+
     return groups, gid_parents, group_parents, area_parents
-               
+
 def compile_chunks(
-        obj_list:ObjectList, 
-        chunk_size:float=100, 
-        origin:tuple[float,float]=(0,0), 
+        obj_list:ObjectList,
+        chunk_size:float=100,
+        origin:tuple[float,float]=(0,0),
         function:Callable=ObjectList
         ) -> dict[tuple[int,int],Any]:
     """
@@ -240,16 +242,16 @@ def compile_chunks(
     """
     ox = origin[0]
     oy = origin[1]
-    
+
     result = dict()
-    
+
     for obj in obj_list:
         x = int(((obj.get(obj_prop.X,ox))-ox)/chunk_size)
         y = int((obj.get(obj_prop.Y,oy)-oy)/chunk_size)
-        
+
         chunk = result.setdefault((x,y),[])
         chunk.append(obj)
-            
+
     return {k:function(v) for k, v in result.items()}
 
 def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
@@ -265,29 +267,29 @@ def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
     -------
     keyframe_ids : ObjectListMapping
         A dictionary mapping keyframe IDs to keyframe objects.
-        
+
     """
     result = dict()
-    
+
     for obj in obj_list:
-        
+
         if obj_id.trigger.KEYFRAME != obj.get(obj_prop.ID):
             continue
-        
+
         if (key_id:=obj.get(obj_prop.trigger.keyframe.KEY_ID, 0)) is not None:
-            
+
             pool = result.setdefault(key_id,ObjectList())
-            
+
             pool.append(obj)
-            
+
     for value in result.values():
-        
+
         value.sort(key=lambda obj: obj.get(obj_prop.trigger.keyframe.INDEX,0))
-        
+
     return result
 
 def compile_keyframe_groups(
-        obj_list:ObjectList, 
+        obj_list:ObjectList,
         function:Callable=get_keyframe_id
         ) -> dict[int|None,list[Any]]:
     """
@@ -297,7 +299,7 @@ def compile_keyframe_groups(
     ----------
     obj_list : ObjectList
         The object list to compile.
-        
+
     function: Callable
         A function that takes in an object and returns a value.
 
@@ -308,35 +310,35 @@ def compile_keyframe_groups(
 
     """
     result = dict()
-    
+
     no_group = set()
-    
+
     for obj in obj_list:
-        
+
         if obj_id.trigger.KEYFRAME != obj.get(obj_prop.ID):
             continue
-        
+
         if function is not None and callable(function) and (value:=function(obj)) is not None:
             groups = obj.get(obj_prop.GROUPS)
-            
+
             if groups:
                 no_group.discard(value)
-                
+
                 for group in groups:
                     key_list = result.setdefault(group,set())
                     key_list.add(value)
             else:
                 no_group.add(value)
-    
+
     if no_group:
         result[0] = no_group
-    
+
     for key, value in result.items():
-        
+
         result[key] = tuple(sorted(result[key]))
-        
+
     return result
-    
+
 def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,ObjectMapping]:
     """
     Compiles objects by their linked group ID and their group and area parents.
@@ -355,7 +357,7 @@ def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,
         A dictionary mapping the linked group parent object to a link ID.
         If multiple exist, the one with smallest x then y position is returned, respecting game mechanics.
         If no group parent exists, the area parent is also the group parent.
-        
+
     area_parents: ObjectMapping
         A dictionary mapping the linked area parent object to a link ID.
         If multiple exist, the one with smallest x then y position is returned, respecting game mechanics.
@@ -364,29 +366,29 @@ def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,
     links = {}
     group_parents = {}
     area_parents = {}
-    
+
     for obj in obj_list:
-        
+
         if (link_id:=obj.get(obj_prop.LINKED_GROUP)):
-        
+
             link = links.setdefault(link_id,ObjectList())
             link.append(obj)
-    
-    
+
+
     priority = lambda obj: (obj.get(obj_prop.X,0),obj.get(obj_prop.Y,0))
-    
+
     for link_id, link in links.items():
-        
+
         if link_id is None: continue
-        
+
         gp = link.where(lambda obj: obj.get(obj_prop.GROUP_PARENT) is not None)
-            
+
         if gp: group_parents[link_id] = min(gp, key=priority)
-        
+
         ap = link.where(lambda obj: obj.get(obj_prop.AREA_PARENT) is not None)
-            
+
         if ap: area_parents[link_id] = min(ap, key=priority)
-            
+
     return links, group_parents, area_parents
 
 def compile_spawn_groups(obj_list:ObjectList) -> ObjectListMapping:
@@ -405,17 +407,17 @@ def compile_spawn_groups(obj_list:ObjectList) -> ObjectListMapping:
 
     """
     spawn_triggers = obj_list.where(lambda obj: obj.get(obj_prop.trigger.SPAWN_TRIGGER,False))
-    
+
     spawn_groups = compile_groups(obj_list=spawn_triggers)
-    
+
     for gid, group in spawn_groups.items():
 
         group.sort(key=lambda obj: obj.get(obj_prop.X,0))
-    
+
     return spawn_groups
-         
+
 def boundaries(
-        obj_list:ObjectList, 
+        obj_list:ObjectList,
         center_type:Literal["midpoint","mean","median"]="mean"
         ) -> dict[str,float]:
     """
@@ -426,13 +428,13 @@ def boundaries(
     ----------
     obj_list : ObjectList
         The objects to compile the coordinates of.
-        
+
     center_type : Literal["midpoint","mean","median"], optional
         The method by which to calculate the center of the object group:
         - "midpoint": geometric midpoint between the min and max coordinates.
         - "mean": arithmetic average of all object coordinates.
         - "median": median of all object coordinates.
-        
+
         Defaults to "mean".
 
     Returns
@@ -442,17 +444,17 @@ def boundaries(
     """
     x = []
     y = []
-    
+
     for obj in obj_list:
         if (pos_x:=obj.get(obj_prop.X)) is not None:
             x.append(pos_x)
         if (pos_y:=obj.get(obj_prop.Y)) is not None:
             y.append(pos_y)
-    
+
     if x:
         min_x = min(x)
         max_x = max(x)
-        
+
         match center_type:
             case "midpoint":
                 center_x = (max_x + min_x) / 2
@@ -460,13 +462,13 @@ def boundaries(
                 center_x = mean(x)
             case "median":
                 center_x = median(x)
-    else:   
+    else:
         min_x = center_x = max_x = 0.0
-    
+
     if y:
         min_y = min(y)
         max_y = max(y)
-        
+
         match center_type:
             case "midpoint":
                 center_y = (max_y + min_y) / 2
@@ -476,7 +478,7 @@ def boundaries(
                 center_y = median(y)
     else:
         min_y = center_y = max_y = 0.0
-        
+
     return {"min_x": min_x, "min_y":min_y, "center_x":center_x, "center_y":center_y, "max_x":max_x, "max_y": max_y}
 
 def grid_align(
@@ -489,7 +491,7 @@ def grid_align(
         ):
     """
     Alings a list of objects to a grid of a given size.
-    
+
     Parameters
     ----------
     obj_list : ObjectList
@@ -504,19 +506,19 @@ def grid_align(
         The grid's Y offset. The default is 0.
     snap_func : Callable, optional
         The function used to snap the position of the objects. Uses round() by default.
-        
+
     Returns
     -------
     None.
-        
+
     """
-    
+
     if not (unit_x or unit_y) or not callable(snap_func): return
-    
+
     for obj in obj_list:
         if unit_x is not None:
             obj[obj_prop.X] = snap_func((obj.get(obj_prop.X) - offset_x) / unit_x) * unit_x + offset_x
-            
+
         if unit_y is not None:
             obj[obj_prop.Y] = snap_func((obj.get(obj_prop.Y) - offset_y) / unit_y) * unit_y + offset_y
 
@@ -532,86 +534,86 @@ def warp_objects(
         center_y:float|None=None,
         center_rotation:float|None=None
         ) -> None:
-    
+
     if center_rotation is not None:
         rotation = (rotation or 0) - center_rotation
-    
+
     center_x = center_x or 0.0
     center_y = center_y or 0.0
-        
+
     r = math.radians(rotation or 0)
     cos_r = math.cos(r)
     sin_r = math.sin(r)
     tx = math.tan(math.radians(rotation or 0))
     ty = math.tan(math.radians(skew or 0))
-    
+
     m00 = cos_r
     m01 = -sin_r + tx
     m10 = sin_r + ty
     m11 = cos_r
-    
+
     for obj in obj_list:
-        
+
         if not only_move:
-            
+
             obj_scale_x = obj.get(obj_prop.SCALE_X, 1.00)
             obj_scale_y = obj.get(obj_prop.SCALE_Y, 1.00)
             obj_skew_x = obj.get(obj_prop.SKEW_X, 0)
             obj_skew_y = obj.get(obj_prop.SKEW_Y, 0)
-            
+
             if (obj_rot:=obj.get(obj_prop.ROTATION)) is not None:
                 obj_skew_x += obj_rot
                 obj_skew_y += obj_rot
-            
+
             obj_tx = math.radians(obj_skew_x)
             obj_ty = math.radians(obj_skew_y)
-            
+
             vx = obj_scale_x * math.cos(obj_tx)
             vy = obj_scale_x * math.sin(obj_tx)
             wx = obj_scale_y * math.cos(obj_ty)
             wy = obj_scale_y * math.sin(obj_ty)
-            
+
             vx, vy = vx * cos_r - vy * sin_r,  vx * sin_r + vy * cos_r
             wx, wy = wx * cos_r - wy * sin_r, wx * sin_r + wy * cos_r
-            
+
             wx += tx * vx
             wy += tx * vy
             vx += ty * wx
             vy += ty * wy
-        
+
             obj_scale_x = math.hypot(vx, vy)
             obj_scale_y = math.hypot(wx, wy)
             obj_skew_x = math.degrees(math.atan2(vy, vx))
             obj_skew_y = math.degrees(math.atan2(wy, wx))
-        
+
             if obj_scale_x == 1:
                 obj.pop(obj_prop.SCALE_X,None)
             else:
                 obj[obj_prop.SCALE_X] = obj_scale_x
-            
+
             if obj_scale_y == 1:
                 obj.pop(obj_prop.SCALE_Y,None)
             else:
                 obj[obj_prop.SCALE_Y] = obj_scale_y
-        
+
             if obj_skew_x == obj_skew_y:
                 obj.pop(obj_prop.SKEW_X, None)
                 obj.pop(obj_prop.SKEW_Y, None)
                 obj[obj_prop.ROTATION] = obj_skew_x
-            
+
             else:
                 obj[obj_prop.SKEW_X] = obj_skew_x
                 obj[obj_prop.SKEW_Y] = obj_skew_y
-        
+
         x = obj.get(obj_prop.X, 0)
         y = obj.get(obj_prop.Y, 0)
         dx = x - center_x
         dy = y - center_y
-        
+
         if x is not None:
             obj[obj_prop.X] = m00 * dx + m01 * dy + center_x
         if y is not None:
-            obj[obj_prop.Y] = m10 * dx + m11 * dy + center_y 
+            obj[obj_prop.Y] = m10 * dx + m11 * dy + center_y
 
 # TODO TEST
 def align_objects(
@@ -625,11 +627,11 @@ def align_objects(
     """
     Aligns objects within a group at equal intervals, similar to the Align X / Align Y editor functions.
     Linked objects are aligned as one group, centered on their mean center.
-    
+
     Parameters
     ----------
     obj_list : ObjectList
-        The objects to align. 
+        The objects to align.
     keep_alignment : bool, optional
         Makes objects that share the same position aligned together instead of individually. Defaults to False.
     ignore_links: bool, optional
@@ -638,89 +640,89 @@ def align_objects(
         Use the linked group's group parent instead of its mean center. Defaults to False.
     x_axis : bool, optional
         Whether objects are aligned on the x axis. Defaults to True.
-    
+
     y_axis : bool, optional
         Whether objects are aligned on the y axis. Defaults to True.
-    
+
     Returns
     -------
     None
-    
+
     """
     if not x_axis and not y_axis:
         return
-        
+
     item_list = []
-    
+
     if ignore_links:
-        
+
         for obj in obj_list:
             data = ObjectList([obj])
             x = obj.get(obj_prop.X,0)
             y = obj.get(obj_prop.Y,0)
             item_list.append({'data':data,'x':x,'y':y})
-            
+
     else:
-        
+
         links, group_parents, _ = compile_links(obj_list)
-        
+
         for link_id, link in links.items():
-            
+
             if link_id is None:
                 for obj in link:
                     data = ObjectList([obj])
                     x = obj.get(obj_prop.X,0)
                     y = obj.get(obj_prop.Y,0)
                     item_list.append({'data':data,'x':x,'y':y})
-            
+
             else:
                 data = link
-                
+
                 if center_gparent == True and link_id in group_parents:
                     obj = group_parents[link_id]
                     x = obj.get(obj_prop.X,0)
                     y = obj.get(obj_prop.Y,0)
-                
+
                 else:
                     x = mean([obj.get(obj_prop.X,0) for obj in link])
                     y = mean([obj.get(obj_prop.Y,0) for obj in link])
-                
+
                 item_list.append({'data':data,'x':x,'y':y})
-            
+
     def per_axis(ax, pid):
         if keep_alignment:
             d = {}
-            
+
             for item in item_list:
                 data = d.setdefault(item[ax],[])
                 data.extend(item['data'])
-                
+
             l = [{'data':v,ax:k} for k, v in d.items()]
-        
+
         else:
             l = item_list
-            
+
         first = min(l, key=lambda i: i.get(ax,0))
         last = max(l, key=lambda i: i.get(ax,0))
         interval = (last-first) / len(l)
-        
+
         for i, item in enumerate(l):
             offset = first + i*interval - l.get(ax,0)
-            
+
             for obj in item['data']:
                 if (val := obj.get(pid)): obj[pid] = val + offset
-                
+
     if x_axis: per_axis('x', obj_prop.X)
-    
+
     if y_axis: per_axis('y', obj_prop.Y)
 
 # TODO
 def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_limit:float=0):
-    
+
     objs = sorted(obj_list, key=lambda obj: obj.get(obj_prop.X,0))
-    
+
     groups = {}
-    
+
     x = None
     for obj in objs:
         ox = obj.get(obj_prop.X)
@@ -728,18 +730,18 @@ def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_l
             x = ox
         gx = groups.setdefault(x, [])
         gx.append(obj)
-        
+
     return {k: function(v) for k,v in groups.items()}
 
 
 def set_common_group(objects:ObjectList, rules) -> tuple[int]:
-    
+
     common = objects.shared_values(lambda obj: obj.get(obj_prop.GROUPS))
-    
+
     if common:
         return tuple(common)
-    
+
     new = remapping.AutoID()
     add_groups(objects, new)
-    
+
     return tuple(new)

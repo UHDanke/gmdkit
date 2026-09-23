@@ -35,10 +35,10 @@ class Identifier:
     is_default: bool = field(init=False, default=False)
 
     def __post_init__(self):
-        
+
         if type(self.id_val) is tuple and not self.iterable:
             self.iterable = True
-            
+
         if not self.iterable and self.id_val == self.default:
             self.is_default = True
             #self.fixed = True
@@ -49,30 +49,30 @@ class Identifier:
             return
         obj = self.obj
         pid = self.obj_prop_id
-        
+
         if self.replace is not None and callable(self.replace):
             val = obj.get(pid)
-            
+
             if val is not None:
                 obj[pid] = self.replace(val, kv_map)
-                
+
         elif (new := kv_map.get(self.id_val)) is not None:
             obj[pid] = new
 
 
-@dataclass(slots=True)           
+@dataclass(slots=True)
 class IdentifierList:
-    
+
     values: tuple[Identifier] = field(default_factory=tuple)
     ignored: set[int] = field(default_factory=set)
     vmin: int = ID_MIN
-    vmax: int = ID_MAX        
-    
+    vmax: int = ID_MAX
+
     def __post_init__(self):
         if type(self.values) is not tuple:
             self.values = tuple(self.values)
         self.get_limits()
-        
+
     def get_limits(self) -> (int,int):
         self.vmin = max((i.id_min for i in self.values), default=ID_MIN)
         self.vmax = min((i.id_max for i in self.values), default=ID_MAX)
@@ -91,107 +91,107 @@ class IdentifierList:
 
         result = []
         has_cond = callable(condition)
-        
+
         for i in self.values:
-            
+
             if has_types and i.id_type not in has_types:
                 continue
-            
+
             if default is not None and i.is_default != default:
                 continue
-            
+
             if fixed is not None and i.fixed != fixed:
                 continue
-            
+
             if remappable is not None and i.remappable != remappable:
                 continue
 
             if reference is not None and i.reference != reference:
                 continue
-            
+
             if has_cond and not condition(i):
                 continue
-            
+
             if has_tags and i.actions not in i.has_tags:
                 continue
-            
+
             result.append(i)
-        
+
         return self.__class__(values=result)
-    
+
     def get_ids(
             self,
             in_range:bool = False,
             min_value:Optional[int] = None,
             max_value:Optional[int] = None
             ) -> set:
-        
-        ids = self.values        
+
+        ids = self.values
         low = min_value if min_value is not None else self.vmin
         high = max_value if max_value is not None else self.vmax
-        
+
         result = set()
-        
+
         for i in ids:
             vals = i.id_val if i.iterable else (i.id_val,)
-        
+
             for v in vals:
-                
+
                 if in_range and (type(v) is AutoID or not (low <= v <= high)):
                     continue
-                
+
                 result.add(v)
-        
+
         return result
-    
+
     def remap_objects(self, kv_map:dict, override:bool=False):
-        
+
         if not kv_map:
             return
-        
+
         for v in self.values:
             v.remap_obj(kv_map=kv_map,override=override)
-    
+
     def get_objects(self, condition: Optional[Callable] = None) -> ObjectList:
-        
-        seen = set()  
+
+        seen = set()
         new = ObjectList()
-        
+
         for i in self.values:
             obj = i.obj
-            
+
             if obj is None:
                 continue
-            
+
             obj_str = obj.to_string(sort_keys=True)
-            
-            if obj_str in seen: 
+
+            if obj_str in seen:
                 continue
-            
+
             if condition is not None and callable(condition) and not condition(i):
                 continue
-            
+
             new.append(obj)
             seen.add(obj_str)
-        
+
         return new
-    
+
     @staticmethod
     def group_by_type(
             identifiers: Sequence[Identifier],
             type_groups: Sequence[IDType | Sequence[IDType]] | None = None,
             ):
-    
+
         id_dict: dict[IDType, list[Identifier]] = {}
         for i in identifiers:
             id_dict.setdefault(i.id_type, []).append(i)
-    
+
         if type_groups is None:
             return {k: IdentifierList(values=v) for k, v in id_dict.items()}
-    
+
         seen: set[IDType] = set()
         result: dict[IDType | tuple[IDType, ...], list[Identifier]] = {}
-    
+
         for k in type_groups:
             if isinstance(k, IDType):  # single type, not a group
                 seen.add(k)
@@ -200,10 +200,10 @@ class IdentifierList:
                 key = tuple(k)
                 seen.update(key)
                 result[key] = [v for t in key for v in id_dict.get(t, [])]
-    
+
         for k in id_dict.keys() - seen:
             result[k] = id_dict[k]
-    
+
         return {k: IdentifierList(values=v) for k, v in result.items()}
 
 
@@ -223,7 +223,7 @@ class IDRule:
     id_min: int = ID_MIN
     id_max: int = ID_MAX
     actions: Optional[tuple] = None
-    
+
     def is_matched(
             self,
             id_types:Optional[Sequence[IDType]]=None,
@@ -237,10 +237,10 @@ class IDRule:
         if actions and self.id_type not in id_types:
             return False
         return True
-        
+
     def get_id(self, obj: Object):
         val = obj.get(self.obj_prop_id)
-        
+
         default = self.default(obj) if callable(self.default) else self.default
 
         if val is None:
@@ -250,13 +250,13 @@ class IDRule:
                 if default is None:
                     return
                 val = default
-    
+
         if callable(self.condition) and not self.condition(obj):
             return
-    
+
         if callable(self.function):
             val = self.function(val)
-    
+
         if self.iterable:
             val = tuple(val)
             if not val:
@@ -264,12 +264,12 @@ class IDRule:
             fixed = self.fixed
         elif val is None:
             return
-        
-        else:            
+
+        else:
             fixed = self.fixed(val) if callable(self.fixed) else self.fixed
-        
+
         remappable = self.remappable(obj) if callable(self.remappable) else self.remappable
-    
+
         return Identifier(
             obj=obj,
             obj_prop_id =self.obj_prop_id,
@@ -289,80 +289,97 @@ class IDRule:
 
 @dataclass(slots=True)
 class RuleHandler:
-    
+
     base: tuple[IDRule] = field(default_factory=tuple)
     by_id: dict[int|str, tuple[IDRule]] = field(default_factory=dict)
-    
+    groups: Optional[list[Sequence]] = None
+
     def compile_rules(self, **kwargs):
-        
+
         base = tuple(i for i in self.base if i.is_matched(**kwargs))
         by_id = {}
-        
+        groups = self.groups
+
         for k, v in self.by_id.items():
             r = tuple(i for i in v if i.is_matched(**kwargs))
             if r:
                 by_id[k] = r
-            
-        return self.__class__(base=base,by_id=by_id)
-    
-    def combine_rules(self, *rules):
-        
+
+        return self.__class__(base=base,by_id=by_id,groups=groups)
+
+    def add_groups(self, *groups):
+        current = list(self.groups) if self.groups else []
+
+        for spec in groups:
+            if spec:
+                current.extend(spec)
+
+        self.groups = current
+
+
+    def add_rules(self, *rules):
+
         base = set()
         by_id = {}
         rule_list = [self, *rules]
-        
+
+        new = self.__class__()
+
         for r in rule_list:
             base.update(r.base)
-            
+            new.add_groups(r.groups)
+
             for k,v in r.by_id.items():
                 by_id.setdefault(k,set()).update(v)
-        
-        return self.__class__(base=tuple(base),by_id={k:tuple(v) for k,v in by_id.items()})
-    
+
+
+        new.base = tuple(base)
+        new.by_id={k:tuple(v) for k,v in by_id.items()}
+
+
     def fetch_ids(
             self,
             obj:Object
             ):
-        
+
         result = []
         oid = obj.get(obj_prop.ID, 0)
         rules = self.by_id.get(oid)
-        
+
         if rules is not None:
             for rule in rules:
                 if (i:= rule.get_id(obj)) is not None:
                     result.append(i)
-    
+
         if oid != obj_id.LEVEL_START and self.base:
             for rule in self.base:
                 if (i:= rule.get_id(obj)) is not None:
                     result.append(i)
-        
+
         return tuple(result)
-        
+
     def compile_ids(
-            self, 
+            self,
             source: ObjectList|Level,
             by_type:bool=False,
             type_groups:Optional[Sequence[set]]=None
             ) -> IdentifierList|dict[Sequence[IDType]|IDType,IdentifierList]:
-        
+
         result = []
-        cls = type(source)
-        
-        if issubclass(cls, Level):
+        type_groups = self.groups if type_groups is None else type_groups
+
+        if hasattr(source, "start"):
             result.extend(self.fetch_ids(source.start))
+
+        if hasattr(source, "objects"):
             for obj in source.objects:
                 result.extend(self.fetch_ids(obj))
-                
-        elif issubclass(cls, ObjectList):            
-            for obj in source:
-                result.extend(self.fetch_ids(obj))
-        
+
         else:
             for obj in source:
                 result.extend(self.fetch_ids(obj))
-        
+
         if by_type:
             return IdentifierList.group_by_type(result, type_groups)
+
         return IdentifierList(values=result)

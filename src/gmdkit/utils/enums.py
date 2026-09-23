@@ -2,7 +2,7 @@
 from enum import IntEnum
 
 class EnumClass(IntEnum):
-    
+
     @classmethod
     def from_string(cls, string: str):
         return cls(int(string))
@@ -44,8 +44,8 @@ class ZLayer(EnumClass):
     T1 = 5
     T2 = 7
     T3 = 9
-    T4 = 11    
-    
+    T4 = 11
+
 class Easing(EnumClass):
     NONE = 0
     EASE_IN_OUT = 1
@@ -76,7 +76,7 @@ class ItemLabelSpecialID(EnumClass):
     MAINTIME = -1
     POINTS = -2
     ATTEMPTS = -3
-    
+
 class UIRef(EnumClass):
     DEFAULT = 0
     AUTO_X = 1
@@ -92,7 +92,7 @@ class TouchMode(EnumClass):
     FLIP = 0
     ON = 1
     OFF = 2
-    
+
 class TargetPlayer(EnumClass):
     NONE = -1
     ALL = 0
@@ -104,7 +104,7 @@ class GravityMode(EnumClass):
     NORMAL = 1
     FLIPPED = 2
     TOGGLE = 3
-    
+
 class StopMode(EnumClass):
     STOP = 0
     PAUSE = 1
@@ -114,7 +114,7 @@ class TargetAxis(EnumClass):
     NONE = 0
     X = 1
     Y = 2
-    
+
 class VolumeDirection(EnumClass):
     CIRCULAR = 0
     HORIZONTAL = 1
@@ -123,7 +123,7 @@ class VolumeDirection(EnumClass):
     VERTICAL = 4
     DOWN = 5
     UP = 6
-    
+
 class ReverbPreset(EnumClass):
     GENERIC = 0
     PADDED_CELL = 1
@@ -155,7 +155,7 @@ class SequenceMode(EnumClass):
 class PulseTarget(EnumClass):
     CHANNEL = 0
     GROUP = 1
-    
+
 class PickupMode(EnumClass):
     ADD = 0
     MULTIPLY = 1
@@ -170,7 +170,7 @@ class KeyframeSpin(EnumClass):
     NONE = 0
     CW = 1
     CCW = 2
-    
+
 class KeyframeRefMode(EnumClass):
     TIME = 0
     EVEN = 1
@@ -197,7 +197,7 @@ class ItemRoundOp(EnumClass):
     ROUND = 1
     FLOOR = 2
     CEILING = 3
-    
+
 class ItemSignOp(EnumClass):
     NONE = 0
     ABSOLUTE = 1
@@ -207,13 +207,13 @@ class InstantCountMode(EnumClass):
     EQUAL = 0
     LARGER = 1
     SMALLER = 2
-    
+
 class GradientBlending(EnumClass):
     NORMAL = 0
     ADDITIVE = 1
     MULTIPLY = 2
     INVERT = 3
-    
+
 class GradientLayer(EnumClass):
     BG = 1
     MG = 2
@@ -230,12 +230,12 @@ class GradientLayer(EnumClass):
     G = 13
     UI = 14
     MAX = 15
-    
+
 class EnterMode(EnumClass):
     NONE = 0
     ENTER = 1
     EXIT = 2
-    
+
 class EffectSpecialCenter(EnumClass):
     P1 = -1
     P2 = -2
@@ -248,21 +248,21 @@ class EffectSpecialCenter(EnumClass):
     BR = -9
     CR = -10
     TR = -11
-    
+
 class CameraEdge(EnumClass):
     NONE = 0
     LEFT = 1
     RIGHT = 2
     UP = 3
     DOWN = 4
-    
+
 class ArrowDir(EnumClass):
     NONE = 0
     UP = 1
     DOWN = 2
     LEFT = 3
     RIGHT = 4
-    
+
     def flip(self):
         cls = type(self)
         opposites = {
@@ -273,17 +273,17 @@ class ArrowDir(EnumClass):
         }
         return opposites.get(self, cls.NONE)
 
-    
+
 class AdvFollowInit(EnumClass):
     INIT = 0
     SET = 1
     ADD = 2
-    
+
 class AdvFollowMode(EnumClass):
     MODE_1 = 0
     MODE_2 = 1
     MODE_3 = 2
-    
+
 class GameEvents(EnumClass):
     TINY_LANDING = 1
     FEATHER_LANDING = 2
@@ -363,7 +363,7 @@ class GameEvents(EnumClass):
     FALL_SPEED_LOW = 76
     FALL_SPEED_MED = 77
     FALL_SPEED_HIGH = 78
-    
+
 class BigBeastAnim(EnumClass):
     BITE = 0
     ATTACK01 = 1
@@ -392,7 +392,7 @@ class SpikeBallAnim(EnumClass):
     ATTACK03 = 6
     IDLE03 = 7
     FROMATTACK03 = 8
-    
+
 class Gamemode(EnumClass):
     CUBE = 0
     SHIP = 1
@@ -409,7 +409,7 @@ class Speed(EnumClass):
     FAST = 2
     VERY_FAST = 3
     SUPER_FAST = 4
-    
+
 class ColorID(EnumClass):
     DEFAULT = 0
     BACKGROUND = 1000
@@ -426,8 +426,8 @@ class ColorID(EnumClass):
     LIGHTER = 1012
     MIDDLEGROUND = 1013
     MIDDLEGROUND_2 = 1014
-    
-class LevelDifficulty(EnumClass):    
+
+class LevelDifficulty(EnumClass):
     NA = -1
     AUTO = 0
     EASY = 1
@@ -441,7 +441,7 @@ class LevelDifficulty(EnumClass):
     INSANE_DEMON = 9
     EXTREME_DEMON = 10
 
-class ListDifficulty(EnumClass):    
+class ListDifficulty(EnumClass):
     NA = -1
     AUTO = 0
     EASY = 1
@@ -463,7 +463,7 @@ class LevelLength(EnumClass):
     LONG = 3
     XL = 4
     PLAT = 5
-    
+
 class OfficialSongs(EnumClass):
     STAY_INSIDE_ME = -1
     STEREO_MADNESS = 0
@@ -506,7 +506,7 @@ class OfficialSongs(EnumClass):
     PRESS_START = 37
     NOCK_EM = 38
     POWER_TRIP = 39
-    
+
 class EpicRating(EnumClass):
     NONE = 0
     EPIC = 1
@@ -520,7 +520,7 @@ class FeatureRating(EnumClass):
     EPIC = 3
     LEGENDARY = 4
     MYTHIC = 5
-    
+
 class DemonRating(EnumClass):
     HARD = 0
     UNKNOWN = 1
@@ -528,7 +528,7 @@ class DemonRating(EnumClass):
     MEDIUM = 4
     INSANE = 5
     EXTREME = 6
-    
+
 class LevelType(EnumClass):
     OFFICIAL = 1
     LOCAL = 2
@@ -548,7 +548,7 @@ class LevelRating(EnumClass):
     HARD = 30
     HARDER = 40
     INSANE = 50
-    
+
 class ReplayEventID(EnumClass):
     JUMP_P1 = 0
     LEFT_P1 = 2
@@ -557,16 +557,16 @@ class ReplayEventID(EnumClass):
     LEFT_P2 = 7
     RIGHT_P2 = 8
     CHECKPOINT = 99
-    
+
 class ToggleCBS(EnumClass):
     DEFAULT = 0
     ON = 1
     OFF = 2
-    
+
 class SequenceResetType(EnumClass):
     RESET_FULL = 0
     RESET_STEP = 1
-    
+
 class TimeControlType(EnumClass):
     START = 0
     STOP = 1
@@ -574,4 +574,55 @@ class TimeControlType(EnumClass):
 class PulseColorType(EnumClass):
     COLOR = 0
     HSV = 1
-    
+
+class TextureQuality(EnumClass):
+    AUTO = 0
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
+
+class Resolution(EnumClass):
+    AUTO = 0
+    R640X480 = 1
+    R720X480 = 2
+    R720X576 = 3
+    R800X600 = 4
+    R1024X768 = 5
+    R1152X864 = 6
+    R1176X664 = 7
+    R1280X720 = 8
+    R1280X768 = 9
+    R1280X800 = 10
+    R1280X960 = 11
+    R1280X1024 = 12
+    R1360X768 = 13
+    R1366X768 = 14
+    R1440X900 = 15
+    R1600X900 = 16
+    R1600X1024 = 17
+    R1600X1200 = 18
+    R1680X1050 = 19
+    R1768X992 = 20
+    R1920X1080 = 21
+    R1920X1200 = 22
+    R1920X1440 = 23
+    R2048X1536 = 24
+    R2560X1440 = 25
+    R2560X1600 = 26
+    R3840X2160 = 27
+
+class ModStatus(EnumClass):
+    NONE = 0
+    MODERATOR = 1
+    ELDER_MODERATOR = 2
+
+class DisplayIcon(EnumClass):
+    CUBE = 0
+    SHIP = 1
+    BALL = 2
+    UFO = 3
+    WAVE = 4
+    ROBOT = 5
+    SPIDER = 6
+    SWING = 7
+    JETPACK = 8

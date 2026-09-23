@@ -1,6 +1,7 @@
 # Imports
 from typing import Optional, Self
 
+
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.mixins import FileStringMixin
@@ -28,8 +29,8 @@ class GzipString(FileStringMixin):
         The decompressed string, populated after calling load().
     """
 
-    def __init__(self, string: Optional[str] = None):
-        self.string = string or ""
+    def __init__(self, string: str = ""):
+        self.string = string
         self.decompressed: Optional[str] = None
 
     def load(self) -> str:
@@ -41,7 +42,9 @@ class GzipString(FileStringMixin):
         str
             The decompressed string.
         """
-        self.decompressed = decompress_string(self.string)
+        if self.string:
+            self.decompressed = decompress_string(self.string)
+            
         return self.decompressed
 
     def save(self, string: Optional[str] = None) -> None:

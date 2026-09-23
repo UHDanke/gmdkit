@@ -6,7 +6,7 @@ from gmdkit.remapping.types import IDType
 from gmdkit.remapping.utils import create_text_rule, create_label_rule
 
 ALL_IDS = (
-    IDType.GROUP_ID,  
+    IDType.GROUP_ID,
     IDType.ITEM_ID,
     IDType.TIME_ID,
     IDType.COLLISION_ID,
@@ -70,7 +70,7 @@ TEXT_NUM_RULE = create_text_rule(
     id_min=1,
     id_max=9999
     )
-    
+
 TEXT_ID_RULE = create_text_rule(
     regex=r"\bID\s+(\d+)\b",
     id_type=IDType.GROUP_ID,
@@ -103,9 +103,11 @@ COLOR_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
 COPY_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=COPY_IDS)
 
 REMAP_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=REMAP_IDS)
+REMAP_ID_HANDLER.groups = (REMAP_IDS,)
 
 REMAP_COLOR_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=REMAP_COLOR_IDS)
 
 REGROUP_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=REGROUP_IDS)
+REGROUP_ID_HANDLER.groups = (REMAP_IDS,)
 
 REGROUP_COLOR_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=REGROUP_COLOR_IDS)

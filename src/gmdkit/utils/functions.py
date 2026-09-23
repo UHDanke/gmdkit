@@ -1,5 +1,5 @@
 # Imports
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable, ParamSpec, TypeVar, get_type_hints
 from enum import Enum
 from functools import lru_cache, partial
 from inspect import signature
@@ -20,7 +20,11 @@ def get_enum_values(cls):
     if not isinstance(cls, Enum):
         raise ValueError(f"expected enum, got {cls.__name__}")
     
-    return {e.value for e in cls}       
+    return {e.value for e in cls}
+
+@typed_cache(maxsize=256)
+def cached_type_hints(cls):
+    return get_type_hints(cls)
 
 @typed_cache(maxsize=256)
 def normalize_orientation(rotation:float, flip_x:bool=False, flip_y:bool=False):

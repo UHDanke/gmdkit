@@ -1,0 +1,17 @@
+# Package Imports
+from gmdkit.models.fields.classes import DictField, FieldClass
+from gmdkit.utils import enums
+from gmdkit.models.prop.groups import IDList
+from gmdkit.models.prop.events import EventList
+from gmdkit.models.prop.sequence import SequenceList
+from gmdkit.models.prop.random import RandomWeightsList
+from gmdkit.models.prop.remaps import RemapList
+from gmdkit.models.prop.guideline import GuidelineList
+from gmdkit.models.prop.hsv import HSV
+from gmdkit.models.prop.particle import Particle
+from gmdkit.models.prop.color import Color, ColorList
+
+
+class FieldedObject(FieldClass):
+
+{fielded_object}

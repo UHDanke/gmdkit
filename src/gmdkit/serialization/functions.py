@@ -1,7 +1,7 @@
 # Imports
 from typing import Callable, Literal, Optional, Any, get_type_hints, TypeVar, overload
 import numpy as np
-from dataclasses import field, fields, dataclass, MISSING
+from dataclasses import field, fields, dataclass, MISSING, Field
 import sys
 import xml.etree.ElementTree as ET
 import base64
@@ -14,39 +14,38 @@ from gmdkit.serialization.type_cast import (
     from_float, from_bool, to_bool, dict_cast
     )
 from gmdkit.utils.typing import (
-    StringDictDecoder, 
+    StringDictDecoder,
     StringDictEncoder,
     PathString,
     Element
     )
 from gmdkit.utils.functions import typed_cache
 
-
 @typed_cache(maxsize=256)
-def get_fields(cls):
-    return fields(cls)
+def get_fields(cls) -> tuple[Field, ...]:
+    return tuple(f for f in fields(cls) if not f.name.startswith("_"))
 
 @typed_cache(maxsize=256)
 def get_field_names(cls) -> set[str]:
-    return {f.name for f in fields(cls)}
+    return {f.name for f in get_fields(cls)}
 
 @typed_cache(maxsize=256)
 def get_field_names_ordered(cls) -> tuple[str, ...]:
-    return tuple(f.name for f in fields(cls))
+    return tuple(f.name for f in get_fields(cls))
 
 @typed_cache(maxsize=256)
-def has_field(cls, key:str):
+def has_field(cls, key: str) -> bool:
     return key in get_field_names(cls)
-          
-def set_field(obj, key:str, value):
-    if not has_field(type(obj),key):
+
+def set_field(obj, key: str, value) -> None:
+    if not has_field(type(obj), key):
         raise KeyError(key)
     setattr(obj, key, value)
 
-def get_field(obj, key:str):
-    if not has_field(type(obj),key):
+def get_field(obj, key: str):
+    if not has_field(type(obj), key):
         raise KeyError(key)
-    return getattr(obj, key)   
+    return getattr(obj, key)
 
 def xor(data: bytes, key: bytes) -> bytes:
     d = np.frombuffer(data, dtype=np.uint8)
@@ -59,25 +58,25 @@ def decompress_string(
         xor_key:Optional[bytes]=None,
         compression:Optional[Literal["zlib","gzip","deflate","auto"]]="auto",
         ) -> str:
-    
+        
     byte_stream = string.encode()
-    
+
     if xor_key is not None:
         byte_stream = xor(byte_stream, key=xor_key)
-    
+
     byte_stream = base64.urlsafe_b64decode(byte_stream)
-    
+
     match compression:
         case 'zlib':
             byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS)
         case 'gzip':
-            byte_stream = gzip.decompress(byte_stream) 
+            byte_stream = gzip.decompress(byte_stream)
         case 'deflate':
             byte_stream = zlib.decompress(byte_stream, wbits=-zlib.MAX_WBITS)
         case 'auto':
             byte_stream = zlib.decompress(byte_stream, wbits=zlib.MAX_WBITS|32)
         case None:
-            pass            
+            pass
         case _:
             raise ValueError(f"unsupported decompression method: {compression}")
 
@@ -90,9 +89,9 @@ def compress_string(
         compression:Optional[Literal["zlib","gzip","deflate"]]="gzip",
         level:int=6
         ) -> str:
-    
+
     byte_stream = string.encode()
-    
+
     match compression:
         case 'zlib':
             byte_stream = zlib.compress(byte_stream, wbits=zlib.MAX_WBITS, level=level)
@@ -104,17 +103,17 @@ def compress_string(
             pass
         case _:
             raise ValueError(f"unsupported compression method: {compression}")
-            
+
     byte_stream = base64.urlsafe_b64encode(byte_stream)
-    
+
     if xor_key is not None:
         byte_stream = xor(byte_stream, key=xor_key)
-    
+
     return byte_stream.decode()
 
 
 def read_plist(node:Element) -> int|bool|float|str|dict|list:
-    
+
     match node.tag:
         case 'i':
             return int(node.text)
@@ -126,10 +125,10 @@ def read_plist(node:Element) -> int|bool|float|str|dict|list:
             return True
         case 'd'|'dict':
             num = len(node)
-            
+
             if num == 0:
                 return {}
-            
+
             if (
                     num >= 2 and
                     node[0].tag == "k" and
@@ -137,77 +136,77 @@ def read_plist(node:Element) -> int|bool|float|str|dict|list:
                     node[1].tag == "t"
                     ):
                 return [read_plist(node[i]) for i in range(3, len(node), 2)]
-            
+
             return {
                 node[i].text: read_plist(node[i + 1])
                 for i in range(0, len(node) - 1, 2)
             }
         case _:
             raise ValueError(f"unknown node tag: {node.tag} for node {node}")
-            
+
 
 def write_plist(value:Any) -> Element:
-    
+
     if isinstance(value, bool):
-        if value: 
+        if value:
             return Element("t")
         return None
-    
+
     elif isinstance(value, int):
         node = Element("i")
         node.text = str(value)
         return node
-    
+
     elif isinstance(value, float):
         node = Element("r")
         node.text = from_float(value)
         return node
-    
+
     elif isinstance(value, str):
         node = Element("s")
         node.text = value
         return node
-    
+
     elif isinstance(value, dict):
         root = Element("d")
-        
+
         for k, v in value.items():
             node = write_plist(v)
             if node is None:
                 continue
             ET.SubElement(root, "k").text = str(k)
             root.append(node)
-        
+
         return root
-    
+
     elif isinstance(value, (list, tuple)):
         root = Element("d")
         ET.SubElement(root, "k").text = "_isArr"
         root.append(Element("t"))
-        
+
         for k, v in enumerate(value, start=1):
             node = write_plist(v)
             if node is None:
                 continue
             ET.SubElement(root, "k").text = f"k_{k}"
             root.append(node)
-        
+
         return root
-    
+
     else:
         raise ValueError(f"class {type(value)} is not serializable")
-    
+
 
 def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optional[int]=None):
-    
+
     if node.tag not in ['d', 'dict']:
         raise ValueError("element is not a plist dict element")
-    
+
     length = len(node)
-    
+
     if length % 2 != 0:
         raise ValueError(f"expected an even number of key-value dict elements, got {length}")
-    
+
     if length < 2:
         if is_array:
             raise ValueError(f"expected at least 2 header elements for array, found {length}")
@@ -215,13 +214,13 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
             raise ValueError(f"expected at least 2 header elements for encoded dict, found {length}")
         else:
             return
-        
+
     key_el = node[0]
     val_el = node[1]
-    
+
     array_header = key_el.tag == 'k' and key_el.text in ['_isArr','_IsArr'] and val_el.tag == 't' and val_el.text is None
     encoder_header = key_el.tag == 'k' and key_el.text == 'kCEK' and val_el.tag == 'i' and val_el.text is not None
-    
+
     if is_array:
         if not array_header:
             raise ValueError(
@@ -238,7 +237,7 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
         raise ValueError("expected plain dict, found array header")
     elif encoder_header:
         raise ValueError("expected plain dict, found encoded dict header")
-        
+
     for i in range(0, length, 2):
         if node[i].tag != 'k':
             raise ValueError(f"expected key tag 'k' at index {i}, got '{node[i].tag}'")
@@ -247,12 +246,12 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
 def get_plist_root(node:ET.Element) -> ET.Element:
     if node.tag != "plist":
         raise ValueError(f"expected root node to be <plist>, got <{node.tag}> instead")
-        
+
     root = node.find("dict")
-        
+
     if root is None:
         raise ValueError("plist does not contain a <dict> sub-element")
-    
+
     return root
 
 
@@ -285,30 +284,30 @@ def to_plist_file(data: Any, path: PathString):
 
 
 def decoder_from_type(type_hint:Any):
-    
+
     if type_hint is bool:
         return to_bool
-    
+
     if callable(type_hint):
         return type_hint
- 
+
     raise ValueError(f"unsupported type hint: {type_hint}")
-        
+
 
 def encoder_from_type(type_hint:Any):
-    
+
     if type_hint is bool:
         return from_bool
-    
+
     if type_hint is float:
         return from_float
-    
+
     if isinstance(type_hint, type) and issubclass(type_hint, (int, str)):
         return str
-    
+
     if isinstance(type_hint, type) and issubclass(type_hint, Enum):
         return lambda x: str(x.value)
-    
+
     raise ValueError(f"unsupported type hint: {type_hint}")
 
 
@@ -348,7 +347,7 @@ def dataclass_decoder(
 
 def dataclass_decoder(
         cls=None,
-        decoder:Optional[StringDictDecoder]=None, 
+        decoder:Optional[StringDictDecoder]=None,
         encoder:Optional[StringDictEncoder]=None,
         condition:Optional[Callable]=None,
         separator:Optional[str]=None,
@@ -359,53 +358,53 @@ def dataclass_decoder(
         *args,
         **kwargs
         ):
-    
-    def wrap(cls):        
+
+    def wrap(cls):
         cls = dataclass(cls, *args, **kwargs)
         hints = get_type_hints(cls, globalns=vars(sys.modules[cls.__module__]))
-        
+
         if separator is not None:
             cls.SEPARATOR = separator
-        
+
         if from_array is not None:
             cls.FROM_ARRAY = from_array
-        
+
         dkey_dict = {}
         ekey_dict = {}
         cond_dict = {}
         decoders = {}
         encoders = {}
         has_kwargs = set()
-        
+
         fields = get_fields(cls)
         for i, f in enumerate(fields,start=1):
             meta = f.metadata
             name = f.name
-            key = meta.get("key") 
+            key = meta.get("key")
             if key is None and auto_key is not None:
                 key = auto_key(i)
-                
+
             ft = hints[f.name]
-                        
+
             if key is not None and name != key:
                 if key in dkey_dict:
                     raise ValueError(f"duplicate serialization key: {key!r}")
                 dkey_dict[key] = name
                 ekey_dict[name] = key
-        
+
             decoders[name] = meta.get("decoder") or decoder_from_type(ft)
             encoders[name] = meta.get("encoder") or encoder_from_type(ft)
-        
-            
+
+
             allow_kwargs = meta.get("allow_kwargs")
             allow_kwargs = default_kwargs if allow_kwargs is None else allow_kwargs
-            
+
             if allow_kwargs:
                 has_kwargs.add(name)
-            
+
             optional = meta.get("optional")
             optional = default_optional if optional is None else optional
-            
+
             if optional:
                 if f.default_factory is not MISSING:
                     default = f.default_factory()
@@ -414,7 +413,7 @@ def dataclass_decoder(
                 else:
                     default = None
                 cond_dict[name] = default
-                
+
         cls.DECODER = staticmethod(
             decoder or dict_cast(
                 decoders,
@@ -422,7 +421,7 @@ def dataclass_decoder(
                 allow_kwargs=has_kwargs
                 )
             )
-            
+
         cls.ENCODER = staticmethod(
             encoder or dict_cast(
                 encoders,
@@ -430,17 +429,17 @@ def dataclass_decoder(
                 allow_kwargs=has_kwargs
         		)
             )
-        
+
         if cond_dict:
             def is_default(key, value):
                 return key in cond_dict and cond_dict[key] == value
         else:
-            is_default = None                
-        
+            is_default = None
+
         cls.CONDITION = staticmethod(condition or is_default)
-        
+
         return cls
-    
+
     return wrap if cls is None else wrap(cls)
 
 
@@ -453,35 +452,35 @@ def field_decoder(
         allow_kwargs:Optional[bool]=None,
         **kwargs
         ):
-    
+
     d = dict(kwargs)
-    
+
     original_md = d.get("metadata")
     if original_md is not None and not isinstance(original_md, dict):
         raise TypeError(f"'metadata' must be a dict if provided, got {type(original_md).__name__}")
-    
+
     md = dict(original_md) if original_md else {}
-            
+
     if "decoder" not in md and decoder is not None:
         md["decoder"] = decoder
-    
+
     if "encoder" not in md and encoder is not None:
         md["encoder"] = encoder
-        
+
     if "key" not in md and key is not None:
         md["key"] = key
-    
+
     if "optional" not in md and optional is not None:
             md["optional"] = optional
-        
+
     if "allow_kwargs" not in md and allow_kwargs is not None:
         md["allow_kwargs"] = allow_kwargs
-                 
+
     if md:
         d["metadata"] = md
     elif "metadata" in d:
         d.pop("metadata")
-        
+
     return field(*args, **d)
 
 def pass_kwargs(**kwargs):
@@ -492,14 +491,14 @@ def kv_wrap(
         value_func: Optional[Callable[..., Any]] = None,
         kwarg_handler: Optional[Callable[..., dict[str, Any]]] = pass_kwargs,
         ) -> Callable:
-    
+
     def wrap(key, value, **kwargs) -> tuple:
         processed_kwargs = kwarg_handler(**kwargs) if kwarg_handler is not None else {}
         return (
             key_func(key) if key_func is not None else key,
             value_func(value, **processed_kwargs) if value_func is not None else value,
         )
-    
+
     return wrap
 
 
@@ -508,13 +507,13 @@ def args_wrap(
         max_args: Optional[int] = None,
         kwarg_handler: Optional[Callable[[dict[str, Any]], dict[str, Any]]] = pass_kwargs,
         ) -> Callable:
-    
+
     def wrap(*args, **kwargs) -> Any:
         return func(
             *(args[:max_args] if max_args is not None else args),
            **(kwarg_handler(**kwargs) if kwarg_handler is not None else {}),
         )
-    
+
     return wrap
 
 
@@ -525,7 +524,7 @@ def get_load_keys(func_dict:dict[Callable]) -> set:
 def from_node_wrap(function:Callable):
     def get_node_text(node, **kwargs):
         return function(node.text, **kwargs)
-    
+
     return get_node_text
 
 
@@ -533,31 +532,31 @@ def to_node_wrap(function:Callable):
     def return_node(value, **kwargs):
         string = function(value, **kwargs)
         return write_plist(string)
-    
+
     return return_node
 
 
 def from_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):
-    
+
     d = {}
-    
+
     for k, f in functions.items():
         if exclude and k in exclude:
             d[k] = f
         else:
             d[k] = from_node_wrap(f)
-            
+
     return d
 
 
 def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=None):
-    
+
     d = {}
-    
+
     for k, f in functions.items():
         if exclude and k in exclude:
             d[k] = f
         else:
             d[k] = to_node_wrap(f)
-            
+
     return d

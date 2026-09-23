@@ -4,10 +4,8 @@ __all__ = (
     "obj_prop",
     "lvl_prop",
     "list_prop",
-    "lvl_save",
     )
 
-from . import lvl_save
 from . import color_id
 from . import obj_id
 from . import obj_prop
