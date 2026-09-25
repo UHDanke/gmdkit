@@ -4,28 +4,22 @@ from typing import Self, Optional, Any
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.utils.typing import NumKey
-from gmdkit.serialization.mixins import (
-    DictDecoderMixin, 
+from gmdkit.serialization.mixins import ( 
     ArrayDecoderMixin,
     FilePathMixin,
     DelimiterMixin,
     FileStringMixin,
-    PlistLoaderMixin,
-    DictDefaultsMixin
+    PlistLoaderMixin
     )
-from gmdkit.serialization.type_cast import serialize, to_numkey
-from gmdkit.serialization.functions import dict_cast, write_plist, kv_wrap
-from gmdkit.casting.object_props import PROPERTY_DECODERS, PROPERTY_ENCODERS, PROPERTY_TYPES
+from gmdkit.serialization.functions import write_plist, kv_wrap
 from gmdkit.defaults.objects import OBJECT_DEFAULT
+from gmdkit.casting.object_loader import FieldLoaderMixin
 
 
-class Object(DelimiterMixin,DictDefaultsMixin,DictDecoderMixin,DictClass[NumKey,Any]):
+class Object(DelimiterMixin,FieldLoaderMixin,DictClass[NumKey,Any]):
     
     SEPARATOR = ","
     END_DELIMITER = ";"
-    TYPES = PROPERTY_TYPES
-    DECODER = staticmethod(dict_cast(PROPERTY_DECODERS,key_start=to_numkey))
-    ENCODER = staticmethod(dict_cast(PROPERTY_ENCODERS,key_end=str,default=serialize))
     
     @classmethod
     def default(cls, object_id:int) -> Self:
