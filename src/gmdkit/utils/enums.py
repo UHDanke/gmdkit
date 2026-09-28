@@ -73,6 +73,7 @@ class ItemLabelAlignment(EnumClass):
     RIGHT = 2
 
 class ItemLabelSpecialID(EnumClass):
+    NONE = 0
     MAINTIME = -1
     POINTS = -2
     ATTEMPTS = -3
@@ -89,7 +90,7 @@ class UIRef(EnumClass):
     TOP = 8
 
 class TouchMode(EnumClass):
-    FLIP = 0
+    TOGGLE = 0
     ON = 1
     OFF = 2
 
@@ -237,6 +238,7 @@ class EnterMode(EnumClass):
     EXIT = 2
 
 class EffectSpecialCenter(EnumClass):
+    NONE = 0
     P1 = -1
     P2 = -2
     C = -3
