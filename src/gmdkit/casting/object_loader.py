@@ -640,29 +640,24 @@ FieldLoaderMixin.add_field(key="kS38", decoder=ColorList.from_string, encoder=Co
 FieldLoaderMixin.add_field(key="kS39", decoder=int, default=0)
 
 
-"""
---- Object interface logic ---
-Don't use these as object class reference for Geometry Dash, they don't match.
-GD's object classes are a disaster and should have been split into subclasses.
-GD class references are kept purely for mapping objects to gmdkit classes.
-
-"""
+# --- Object interface logic ---
+# Don't use these as object class reference for Geometry Dash, they don't match.
+# GD's object classes are a disaster and should have been split into subclasses.
+# Game class references are kept purely for mapping objects to gmdkit classes.
 
 # Class GameObject, EnhancedObject
-class BaseObject(FieldLoaderMixin):
+class BaseObject(FieldLoaderMixin): # TODO EVALUATE
     obj_id: int = AliasField(1)
     x: float = AliasField(2)
     y: float = AliasField(3)
     flip_x: bool = AliasField(4)
     flip_y: bool = AliasField(5)
     rotation: float = AliasField(6)
-    old_color_id: enums.OldColor = AliasField(19)
     editor_l1: int = AliasField(20)
     color_1: int = AliasField(21)
     color_2: int = AliasField(22)
     z_layer: int = AliasField(24)
     z_order: int = AliasField(25)
-    old_scale: float = AliasField(32)
     group_parent: bool = AliasField(34)
     hsv_enabled_1: bool = AliasField(41)
     hsv_enabled_2: bool = AliasField(42)
@@ -688,13 +683,11 @@ class BaseObject(FieldLoaderMixin):
     color_1_index: int = AliasField(155)
     color_2_index: int = AliasField(156)
     grip_slope: bool = AliasField(193)
-    target_player_2: bool = AliasField(200)
     parent_groups: IDList = AliasField(274)
     area_parent: bool = AliasField(279)
     nonstick_y: bool = AliasField(289)
     enter_channel: int = AliasField(343)
     scale_stick: bool = AliasField(356)
-    disable_grid_snap: bool = AliasField(370)
     no_audio_scale: bool = AliasField(372)
     material: int = AliasField(446)
     extra_sticky: bool = AliasField(495)
@@ -703,9 +696,24 @@ class BaseObject(FieldLoaderMixin):
     no_particle: bool = AliasField(507)
     dont_boost_x: bool = AliasField(509)
     extended_collision: bool = AliasField(511)
+    
+    @property
+    def scale(self) -> float:
+        return min(self.scale_x, self.scale_y)
 
+    @scale.setter
+    def scale(self, value:float):
+        current = self.scale
+        if current == 0:
+            self.scale_x = self.scale_y = value
+            return
+        factor = value / current
+        self.scale_x *= factor
+        self.scale_y *= factor
+        
+        
 # Class AnimatedGameObject
-class AnimatedObject(BaseObject):
+class AnimatedObject(BaseObject): # TODO EVALUATE
     randomize_start: bool = AliasField(106)
     animation_speed: float = AliasField(107)
     use_speed: bool = AliasField(122)
@@ -724,13 +732,12 @@ class ParticleObject(BaseObject):
     quick_start: bool = AliasField(211)
 
 
-class Saw(BaseObject):
-    """(new, no C++ equivalent)"""
+class Saw(BaseObject): # TODO EVALUATE
     rotation_speed: float = AliasField(97)
     disable_rotation: bool = AliasField(98)
 
 
-class SpecialAnimated(BaseObject):
+class SpecialAnimated(BaseObject): # TODO EVALUATE
     """SpecialAnimGameObject"""
     pass
 
@@ -749,7 +756,7 @@ class TriggerObject(BaseObject):
     ignore_linked: bool = AliasField(281)
     single_ptouch: bool = AliasField(284)
     center_effect: bool = AliasField(369)
-    disable_multi_activate: bool = AliasField(444)
+    disable_multi_activate: bool = AliasField(444) # TODO EVALUATE
     control_id: int = AliasField(534)
 
 # Object 1935
@@ -822,15 +829,9 @@ class AdvancedFollowTrigger(TriggerObject):
     exclusive: bool = AliasField(571)
     init: enums.AdvFollowInit = AliasField(572)
 
-# BREAK THIS UP IN TWO
-# Class AdvancedFollowEditObject
-class EditAdvFollowTrigger(TriggerObject):
-    """AdvancedFollowEditObject"""
+# Object 3660
+class EditAdvancedFollowTrigger(TriggerObject):
     target_id: int = AliasField(51)
-    follow_id: int = AliasField(71)
-    player_1: bool = AliasField(138)
-    player_2: bool = AliasField(200)
-    corner: bool = AliasField(201)
     speed: float = AliasField(300)
     speed_rand: float = AliasField(301)
     x_only: bool = AliasField(306)
@@ -845,6 +846,15 @@ class EditAdvFollowTrigger(TriggerObject):
     mod_y: float = AliasField(568)
     mod_y_rand: float = AliasField(569)
 
+# Object 3661
+class RetargetAdvancedFollowTrigger(TriggerObject):
+    target_id: int = AliasField(51)
+    follow_id: int = AliasField(71)
+    player_1: bool = AliasField(138)
+    player_2: bool = AliasField(200)
+    corner: bool = AliasField(201)
+    use_control_id: bool = AliasField(535)
+
 # Object 1007
 class AlphaTrigger(TriggerObject):
     duration: float = AliasField(10)
@@ -856,54 +866,90 @@ class AnimateTrigger(TriggerObject):
     target_id: int = AliasField(51)
     animation_id: int = AliasField(76)
 
-
-class ArtTrigger(TriggerObject):
-    """ArtTriggerGameObject"""
+# Object 3029
+class BackgroundTrigger(TriggerObject):
     bg_id: int = AliasField(533)
+
+# Object 3030
+class GroundTrigger(TriggerObject):
+    # This trigger displays line options but they don't do anything
     gr_id: int = AliasField(533)
+
+# Object 3031
+class MiddlegroundTrigger(TriggerObject):
     mg_id: int = AliasField(533)
 
-
+# Object 3642
+# Class AudioLineGuideGameObject
 class BPMTrigger(TriggerObject):
-    """AudioLineGuideGameObject"""
     duration: float = AliasField(10)
     bpm: int = AliasField(498)
     speed: enums.Speed = AliasField(499)
     disable: bool = AliasField(500)
     bpb: int = AliasField(501)
 
-
+# Object 3029
 class BgSpeedTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     x_mod: float = AliasField(143)
     y_mod: float = AliasField(144)
+    
+# Object 1913
+class ZoomCameraTrigger(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
+    zoom: float = AliasField(371)
 
-
-class CameraTrigger(TriggerObject):
-    """CameraTriggerGameObject"""
+# Object 1914
+class StaticCameraTrigger(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
+    target_id: int = AliasField(71)
+    target_axis: enums.TargetAxis = AliasField(101)
+    exit_static: bool = AliasField(110)
+    follow_group: bool = AliasField(212)
+    follow_easing: float = AliasField(213)
+    smooth_velocity: bool = AliasField(453)
+    velocity_mod: float = AliasField(454)
+    exit_instant: bool = AliasField(465)
+    
+# Object 1916
+class OffsetCameraTrigger(TriggerObject):
     duration: float = AliasField(10)
     offset_x: float = AliasField(28)
     offset_y: float = AliasField(29)
     easing: enums.Easing = AliasField(30)
-    edge_target_id: int = AliasField(51)
+    ease_rate: float = AliasField(85)
+    target_axis: enums.TargetAxis = AliasField(101)
+
+# Object 2015
+class RotateCameraTrigger(TriggerObject):
+    duration: float = AliasField(10)
     degrees: float = AliasField(68)
     add: bool = AliasField(70)
-    target_id: int = AliasField(71)
+    easing: enums.Easing = AliasField(30)
     ease_rate: float = AliasField(85)
-    axis: enums.TargetAxis = AliasField(101)
-    exit: bool = AliasField(110)
+    snap_360: bool = AliasField(394)
+
+# Object 2062
+class CameraEdgeTrigger(TriggerObject):
+    target_id: int = AliasField(51)
+    edge: enums.CameraEdge = AliasField(164)
+
+# Object 2925
+class CameraModeTrigger(TriggerObject):
     free_mode: bool = AliasField(111)
     edit_settings: bool = AliasField(112)
-    mode_easing: float = AliasField(113)
-    padding: float = AliasField(114)
-    direction: enums.CameraEdge = AliasField(164)
-    follow_group: bool = AliasField(212)
-    follow_easing: float = AliasField(213)
+    camera_easing: float = AliasField(113)
+    camera_padding: float = AliasField(114)
+    disable_grid_snap: float = AliasField(370)
+
+# Object 2016
+class CameraGuide(TriggerObject):
+    offset_x: float = AliasField(28)
+    offset_y: float = AliasField(29)
     zoom: float = AliasField(371)
-    snap_360: bool = AliasField(394)
-    smooth_velocity: bool = AliasField(453)
-    velocity_mod: float = AliasField(454)
-    exit_instant: bool = AliasField(465)
     preview_opacity: float = AliasField(506)
 
 # Object 2068
@@ -931,7 +977,6 @@ class CheckpointTrigger(TriggerObject):
 
 
 class CollectibleObject(TriggerObject):
-    coin_id: int = AliasField(12) # TODO SUBCLASS
     group_id: int = AliasField(51)
     sub_count: bool = AliasField(78)
     item_id: int = AliasField(80)
@@ -939,8 +984,12 @@ class CollectibleObject(TriggerObject):
     toggle_trigger: bool = AliasField(382)
     points: int = AliasField(383)
     particle: int = AliasField(440)
-    no_anim: bool = AliasField(463)
+    no_anim: bool = AliasField(463)  
 
+# Object 142
+class SecretCoin(CollectibleObject):
+    coin_id: int = AliasField(12) 
+    
 # Object 1816
 class CollisionBlock(TriggerObject):
     block_id: int = AliasField(80)
@@ -975,41 +1024,47 @@ class ColorTrigger(TriggerObject):
     copy_opacity: bool = AliasField(60)
     disable_legacy_hsv: bool = AliasField(210)
 
-
+# Object 1611
 class CountTrigger(TriggerObject):
-    """CountTriggerGameObject"""
     target_id: int = AliasField(51)
     activate_group: bool = AliasField(56)
+    target_count: int = AliasField(77)
+    item_id: int = AliasField(80)
+    multi_activate: bool = AliasField(104)
+
+# Object 1817
+class PickupTrigger(TriggerObject):
     count: int = AliasField(77)
     item_id: int = AliasField(80)
     mode: enums.InstantCountMode = AliasField(88)
-    multi_activate: bool = AliasField(104)
     override: bool = AliasField(139)
     mod: float = AliasField(449)
 
+# Object 1811
+class InstantCountTrigger():
+    target_id: int = AliasField(51)
+    activate_group: bool = AliasField(56)
+    target_count: int = AliasField(77)
+    item_id: int = AliasField(80)
+    mode: enums.InstantCountMode = AliasField(88)
 
+# Object 3600
+# Class EndTriggerGameObject
 class EndTrigger(TriggerObject):
-    """EndTriggerGameObject"""
     spawn_id: int = AliasField(51)
     target_pos: int = AliasField(71)
     no_effects: bool = AliasField(460)
     no_sfx: bool = AliasField(461)
     instant: bool = AliasField(487)
 
-
+# Object 1931
 class EndWallTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     group_id: int = AliasField(51)
     lock_y: bool = AliasField(59)
     reverse: bool = AliasField(118)
 
 
-class EnhancedTrigger(TriggerObject):
-    """EnhancedTriggerObject"""
-    pass
-
-
-class EnterEffect(TriggerObject):
+class EnterEffect(TriggerObject): # TODO BREAKUP INTO AREA AND ENTER
     """EnterEffectObject"""
     duration: float = AliasField(10)
     hsv: HSV = AliasField(49)
@@ -1077,11 +1132,8 @@ class EventTrigger(TriggerObject):
     extra_id_1: int = AliasField(447)
     extra_id_2: enums.TargetPlayer = AliasField(525)
 
-
-# Object
-# Class
+# Object 1814
 class FollowPlayerYTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     duration: float = AliasField(10)
     target_id: int = AliasField(51)
     speed: float = AliasField(90)
@@ -1089,20 +1141,16 @@ class FollowPlayerYTrigger(TriggerObject):
     offset: int = AliasField(92)
     max_speed: float = AliasField(105)
 
-# Object
-# Class
+# Object 1347
 class FollowTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     duration: float = AliasField(10)
     target_id: int = AliasField(51)
-    follow_target: int = AliasField(71)
+    follow_id: int = AliasField(71)
     mod_x: float = AliasField(72)
     mod_y: float = AliasField(73)
 
-# Object
-# Class
+# Class ForceBlockGameObject
 class ForceBlock(TriggerObject):
-    """ForceBlockGameObject"""
     value: float = AliasField(149)
     value_min: float = AliasField(526)
     value_max: float = AliasField(527)
@@ -1111,17 +1159,12 @@ class ForceBlock(TriggerObject):
     force_id: int = AliasField(530)
 
 
-class GamemodePortalTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
-    free_mode: bool = AliasField(111)
-    edit_settings: bool = AliasField(112)
-    easing: float = AliasField(113)
-    padding: float = AliasField(114)
+class GamemodePortalTrigger(CameraModeTrigger):
+    pass
 
-# Object
-# Class
+# Object 2900
+# Class RotateGameplayGameObject
 class GameplayArrow(TriggerObject):
-    """RotateGameplayGameObject"""
     dir_y_neg: enums.ArrowDir = AliasField(166)
     dir_x_pos: enums.ArrowDir = AliasField(167)
     edit_velocity: bool = AliasField(169)
@@ -1134,15 +1177,13 @@ class GameplayArrow(TriggerObject):
     override_velocity: bool = AliasField(584)
     dont_slide: bool = AliasField(585)
 
-# Object
-# Class
+# Object 2901
 class GameplayOffsetTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     offset_x: float = AliasField(28)
     offset_y: float = AliasField(29)
     dont_zoom_x: bool = AliasField(58)
     dont_zoom_y: bool = AliasField(59)
-    axis: enums.TargetAxis = AliasField(101)
+    target_axis: enums.TargetAxis = AliasField(101)
 
 # Object 2903
 # Class GradientTriggerObject
@@ -1191,34 +1232,49 @@ class ItemLabel(TriggerObject):
     time_counter: bool = AliasField(466)
     kerning: int = AliasField(488)
 
-# Object
-# Class
-class ItemTrigger(TriggerObject):
-    """ItemTriggerGameObject"""
+# Object 3619
+class ItemEditTrigger(TriggerObject):
     target_item_id: int = AliasField(51)
-    true_id: int = AliasField(51)
-    false_id: int = AliasField(71)
     item_id_1: int = AliasField(80)
-    item_id: int = AliasField(80)
     item_id_2: int = AliasField(95)
     item_type_1: enums.ItemType = AliasField(476)
     item_type_2: enums.ItemType = AliasField(477)
-    item_type_3: enums.ItemType = AliasField(478)
+    target_item_type: enums.ItemType = AliasField(478)
     mod: float = AliasField(479)
+    assign_op: enums.ItemOperation = AliasField(480)
+    item_op: enums.ItemOperation = AliasField(481)
+    mod_op: enums.ItemOperation = AliasField(482)
+    round_op_1: enums.ItemRoundOp = AliasField(485)
+    round_op_2: enums.ItemRoundOp = AliasField(486)
+    sign_op_1: enums.ItemSignOp = AliasField(578)
+    sign_op_2: enums.ItemSignOp = AliasField(579)
+
+# Object 3620
+class ItemCompareTrigger(TriggerObject):
+    true_id: int = AliasField(51)
+    false_id: int = AliasField(71)
+    item_id_1: int = AliasField(80)
+    item_id_2: int = AliasField(95)
+    item_type_1: enums.ItemType = AliasField(476)
+    item_type_2: enums.ItemType = AliasField(477)
     mod_1: float = AliasField(479)
     item_op_1: enums.ItemOperation = AliasField(480)
     item_op_2: enums.ItemOperation = AliasField(481)
-    item_op_3: enums.ItemOperation = AliasField(482)
+    comp_op: enums.ItemOperation = AliasField(482)
     mod_2: float = AliasField(483)
     tolerance: float = AliasField(484)
     round_op_1: enums.ItemRoundOp = AliasField(485)
     round_op_2: enums.ItemRoundOp = AliasField(486)
+    sign_op_1: enums.ItemSignOp = AliasField(578)
+    sign_op_2: enums.ItemSignOp = AliasField(579)
+
+# Object 3641
+class ItemPersistTrigger(TriggerObject):
+    item_id: int = AliasField(80)
     set_persistent: bool = AliasField(491)
     target_all: bool = AliasField(492)
     reset: bool = AliasField(493)
     timer: bool = AliasField(494)
-    sign_op_1: enums.ItemSignOp = AliasField(578)
-    sign_op_2: enums.ItemSignOp = AliasField(579)
 
 # Object 3032
 # Class KeyframeGameObject
@@ -1297,23 +1353,19 @@ class MoveTrigger(TriggerObject):
     dynamic_mode: bool = AliasField(397)
     silent: bool = AliasField(544)
 
-# Object
-# Class
+# Object 3655
+# Class ObjectControlGameObject
 class ObjectControlTrigger(TriggerObject):
-    """ObjectControlGameObject"""
     target_id: int = AliasField(51)
 
-# Object
-# Class
+# Object 1812
 class OnDeathTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     group_id: int = AliasField(51)
     activate_group: bool = AliasField(56)
 
-# Object
-# Class
+# Object 2899
+# Class GameOptionsTrigger
 class OptionsTrigger(TriggerObject):
-    """GameOptionsTrigger"""
     streak_additive: enums.Option = AliasField(159)
     unlink_dual_gravity: enums.Option = AliasField(160)
     hide_ground: enums.Option = AliasField(161)
@@ -1329,15 +1381,13 @@ class OptionsTrigger(TriggerObject):
     disable_death_sfx: enums.Option = AliasField(576)
     boost_slide: enums.Option = AliasField(593)
 
-
-class Orb(TriggerObject):
-    """RingObject"""
+# Class RingObject
+class Orb(TriggerObject): # TODO EVALUATE
     rotation_speed: float = AliasField(97)
     disable_rotation: bool = AliasField(98)
 
-
+# Class DashRingObject
 class DashOrb(Orb):
-    """DashRingObject"""
     speed: float = AliasField(586)
     collide: bool = AliasField(587)
     end_boost: float = AliasField(588)
@@ -1345,7 +1395,7 @@ class DashOrb(Orb):
     max_duration: float = AliasField(590)
 
 
-class Teleportal(Orb):
+class Teleportal(Orb): # TODO BREAKUP
     """TeleportPortalObject"""
     target_id: int = AliasField(51)
     portal_distance: float = AliasField(54)
@@ -1365,24 +1415,18 @@ class Teleportal(Orb):
     snap_ground: bool = AliasField(510)
     redirect_dash: bool = AliasField(591)
 
-# Object
-# Class
+# Object 1932
+# Class PlayerControlGameObject
 class PlayerControlTrigger(TriggerObject):
-    """PlayerControlGameObject"""
-    m_58: bool = AliasField(58)
-    m_59: bool = AliasField(59)
     player_1: bool = AliasField(138)
-    m_141: bool = AliasField(141)
     player_2: bool = AliasField(200)
     stop_jump: bool = AliasField(540)
     stop_move: bool = AliasField(541)
     stop_rotation: bool = AliasField(542)
     stop_slide: bool = AliasField(543)
 
-# Object
-# Class
+# Object 1006
 class PulseTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     red: int = AliasField(7)
     green: int = AliasField(8)
     blue: int = AliasField(9)
@@ -1399,29 +1443,24 @@ class PulseTrigger(TriggerObject):
     exclusive: bool = AliasField(86)
     disable_static_hsv: bool = AliasField(210)
 
-# Object
-# Class
+# Object 1912
 class RandomTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     chance: float = AliasField(10)
     true_id: int = AliasField(51)
     false_id: int = AliasField(71)
 
-# Object
-# Class
+# Object 3618
 class ResetTrigger(TriggerObject):
-    """(new, no C++ equivalent)"""
     group_id: int = AliasField(51)
 
-# Object
-# Class
+# Object 1346
 class RotateTrigger(TriggerObject):
     """(new, no C++ equivalent)"""
     duration: float = AliasField(10)
     easing: enums.Easing = AliasField(30)
     target_id: int = AliasField(51)
     degrees: float = AliasField(68)
-    full: int = AliasField(69)
+    full_rotations: int = AliasField(69)
     lock_rotation: bool = AliasField(70)
     center_id: int = AliasField(71)
     ease_rate: float = AliasField(85)
@@ -1438,9 +1477,9 @@ class RotateTrigger(TriggerObject):
     max_x_id: int = AliasField(518)
     max_y_id: int = AliasField(519)
 
-
-class SFXTrigger(TriggerObject):
-    """SFXTriggerGameObject"""
+# Object
+# Class SFXTriggerGameObject
+class SFXTrigger(TriggerObject): # TODO BREAKUP
     duration: float = AliasField(10)
     group_id_1: int = AliasField(51)
     group_id_2: int = AliasField(71)
@@ -1480,16 +1519,14 @@ class SFXTrigger(TriggerObject):
     sfx_duration: float = AliasField(490)
     reverb: enums.ReverbPreset = AliasField(502)
     override_reverb: bool = AliasField(503)
-    m_595: bool = AliasField(595)
     speed_rand: int = AliasField(596)
     pitch_rand: int = AliasField(597)
     volume_rand: float = AliasField(598)
     pitch_steps: bool = AliasField(599)
 
-
-class SongTrigger(SFXTrigger):
-    """SongTriggerGameObject"""
-    duration: float = AliasField(10)
+# Object 1934
+# Class SongTriggerGameObject 
+class SongTrigger(TriggerObject): # TODO BREAKUP
     group_id_1: int = AliasField(51)
     group_id_2: int = AliasField(71)
     player_1: bool = AliasField(138)
@@ -1498,22 +1535,16 @@ class SongTrigger(SFXTrigger):
     prep: bool = AliasField(399)
     load_prep: bool = AliasField(400)
     speed: int = AliasField(404)
-    m_405: int = AliasField(405)
     volume: float = AliasField(406)
-    m_407: bool = AliasField(407)
     start: int = AliasField(408)
     fade_in: int = AliasField(409)
     end: int = AliasField(410)
     fade_out: int = AliasField(411)
-    m_412: bool = AliasField(412)
     loop: bool = AliasField(413)
     stop_loop: bool = AliasField(414)
-    m_415: bool = AliasField(415)
-    m_416: int = AliasField(416)
     stop: bool = AliasField(417)
     change_volume: bool = AliasField(418)
     change_speed: bool = AliasField(419)
-    m_420: bool = AliasField(420)
     vol_near: float = AliasField(421)
     vol_med: float = AliasField(422)
     fol_var: float = AliasField(423)
@@ -1522,25 +1553,13 @@ class SongTrigger(SFXTrigger):
     dist_3: int = AliasField(426)
     camera: bool = AliasField(428)
     channel: int = AliasField(432)
-    m_433: bool = AliasField(433)
-    m_434: float = AliasField(434)
-    m_455: int = AliasField(455)
-    m_457: int = AliasField(457)
     direction: enums.VolumeDirection = AliasField(458)
-    m_489: bool = AliasField(489)
-    m_490: float = AliasField(490)
-    m_502: enums.ReverbPreset = AliasField(502)
-    m_503: bool = AliasField(503)
     dont_reset: bool = AliasField(595)
-    m_596: int = AliasField(596)
-    m_597: int = AliasField(597)
-    m_598: float = AliasField(598)
-    m_599: bool = AliasField(599)
 
-# Object
-# Class
+
+# Object 2067
+# Class TransformTriggerGameObject
 class ScaleTrigger(TriggerObject):
-    """TransformTriggerGameObject"""
     duration: float = AliasField(10)
     easing: enums.Easing = AliasField(30)
     target_id: int = AliasField(51)
@@ -1554,23 +1573,19 @@ class ScaleTrigger(TriggerObject):
     relative_rotation: bool = AliasField(452)
     relative_scale: bool = AliasField(577)
 
+# Object 2904
+class ShaderOptions(TriggerObject):
+    ignore_player_particles: bool = AliasField(188)
+    disable_all: bool = AliasField(192)
+    layer_min: enums.GradientLayer = AliasField(196)
+    layer_max: enums.GradientLayer = AliasField(197)
 
-class ShaderTrigger(TriggerObject):
-    """ShaderGameObject"""
-    fade_time: float = AliasField(10)
+# Object 2916
+class BulgeShader(TriggerObject):
+    duration: float = AliasField(10)
     easing: enums.Easing = AliasField(30)
-    ease_rate: float = AliasField(85)
-    shader_opt_ignore_player_particles: bool = AliasField(188)
-    shader_opt_disable_all: bool = AliasField(192)
-    shader_opt_layer_min: enums.GradientLayer = AliasField(196)
-    shader_opt_layer_max: enums.GradientLayer = AliasField(197)
-    relative: bool = AliasField(514)
-    disable_preview: bool = AliasField(531)
-
-
-class Bulge(ShaderTrigger):
-    """(new, no C++ equivalent)"""
     center_id: int = AliasField(51)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     bulge: float = AliasField(176)
     radius: float = AliasField(180)
@@ -1579,42 +1594,51 @@ class Bulge(ShaderTrigger):
     screen_offset_x: float = AliasField(290)
     screen_offset_y: float = AliasField(291)
     relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class Chromatic(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2910
+class ChromaticShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     target_x: float = AliasField(180)
     use_x: bool = AliasField(188)
     target_y: float = AliasField(189)
     use_y: bool = AliasField(190)
     relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class ChromaticGlitch(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2911
+class ChromaticGlitchShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     speed: float = AliasField(175)
     strength: float = AliasField(176)
     line_thickness: float = AliasField(179)
     rgb_offset: float = AliasField(180)
-    segment_h: float = AliasField(189)
+    segment_height: float = AliasField(189)
     line_strength: float = AliasField(191)
     disable: bool = AliasField(192)
     relative_pos: bool = AliasField(194)
     relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class EditColor(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2923
+class EditColorShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     cb: float = AliasField(175)
     cr: float = AliasField(176)
     br: float = AliasField(179)
     bg: float = AliasField(180)
     bb: float = AliasField(189)
     cg: float = AliasField(191)
+    disable_preview: bool = AliasField(531)
 
-
-class Glitch(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2909
+class GlitchShader(TriggerObject):
+    duration: float = AliasField(10)
     speed: float = AliasField(175)
     strength: float = AliasField(176)
     slice_height: float = AliasField(179)
@@ -1622,36 +1646,48 @@ class Glitch(ShaderTrigger):
     max_col_y_offset: float = AliasField(182)
     max_slice_x_offset: float = AliasField(191)
     relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class GrayScale(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2919
+class GrayScaleShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     tint_channel: int = AliasField(51)
+    ease_rate: float = AliasField(85)
     target: float = AliasField(176)
     use_lum: bool = AliasField(188)
     use_tint: bool = AliasField(190)
+    disable_preview: bool = AliasField(531)
 
-
-class Hue(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2922
+class HueShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     degrees: float = AliasField(176)
+    disable_preview: bool = AliasField(531)
 
-
-class InvertColor(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2921
+class InvertColorShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     target: float = AliasField(176)
-    r: float = AliasField(179)
-    g: float = AliasField(180)
+    red: float = AliasField(179)
+    green: float = AliasField(180)
     edit_rgb: bool = AliasField(188)
-    b: float = AliasField(189)
+    blue: float = AliasField(189)
     tween_rgb: bool = AliasField(190)
     clamp_rgb: bool = AliasField(194)
+    disable_preview: bool = AliasField(531)
 
-
-class LensCircle(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2913
+class LensCircleShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     center_id: int = AliasField(51)
     tint_channel: int = AliasField(71)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     strength: float = AliasField(176)
     size: float = AliasField(179)
@@ -1660,12 +1696,15 @@ class LensCircle(ShaderTrigger):
     screen_offset_x: float = AliasField(290)
     screen_offset_y: float = AliasField(291)
     relative: bool = AliasField(514)
-
-
-class MotionBlur(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+    disable_preview: bool = AliasField(531)
+    
+# Object 2915
+class MotionBlurShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     center_id: int = AliasField(51)
     ref_channel: int = AliasField(71)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     intensity: float = AliasField(176)
     target_x: float = AliasField(180)
@@ -1679,11 +1718,14 @@ class MotionBlur(ShaderTrigger):
     center: bool = AliasField(201)
     relative: bool = AliasField(514)
     empty_only: bool = AliasField(515)
+    disable_preview: bool = AliasField(531)
 
-
-class Pinch(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2917
+class PinchShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     center_id: int = AliasField(51)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     modifier: float = AliasField(179)
     target_x: float = AliasField(180)
@@ -1694,10 +1736,14 @@ class Pinch(ShaderTrigger):
     screen_offset_x: float = AliasField(290)
     screen_offset_y: float = AliasField(291)
     radius: float = AliasField(512)
+    relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class Pixelate(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2912
+class PixelateShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     target_x: float = AliasField(180)
     use_x: bool = AliasField(188)
     target_y: float = AliasField(189)
@@ -1705,12 +1751,15 @@ class Pixelate(ShaderTrigger):
     snap_grid: bool = AliasField(194)
     relative: bool = AliasField(514)
     hard_edges: bool = AliasField(515)
+    disable_preview: bool = AliasField(531)
 
-
-class RadialBlur(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2914
+class RadialBlurShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     center_id: int = AliasField(51)
     ref_channel: int = AliasField(71)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     intensity: float = AliasField(176)
     size: float = AliasField(179)
@@ -1720,16 +1769,22 @@ class RadialBlur(ShaderTrigger):
     screen_offset_x: float = AliasField(290)
     screen_offset_y: float = AliasField(291)
     empty_only: bool = AliasField(515)
+    disable_preview: bool = AliasField(531)
 
-
-class Sepia(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2920
+class SepiaShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     target: float = AliasField(176)
+    disable_preview: bool = AliasField(531)
 
-
-class ShockLine(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2907
+class ShockLineShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     center_id: int = AliasField(51)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     speed: float = AliasField(175)
     strength: float = AliasField(176)
@@ -1749,11 +1804,14 @@ class ShockLine(ShaderTrigger):
     max_size: float = AliasField(512)
     animate: bool = AliasField(513)
     relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class Shockwave(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2905
+class ShockwaveShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
     center_id: int = AliasField(51)
+    ease_rate: float = AliasField(85)
     player_1: bool = AliasField(138)
     speed: float = AliasField(175)
     strength: float = AliasField(176)
@@ -1773,14 +1831,18 @@ class Shockwave(ShaderTrigger):
     max_size: float = AliasField(512)
     animate: bool = AliasField(513)
     relative: bool = AliasField(514)
+    disable_preview: bool = AliasField(531)
 
-
-class SplitScreen(ShaderTrigger):
-    """(new, no C++ equivalent)"""
+# Object 2924
+class SplitScreenShader(TriggerObject):
+    duration: float = AliasField(10)
+    easing: enums.Easing = AliasField(30)
+    ease_rate: float = AliasField(85)
     target_x: float = AliasField(180)
     use_x: bool = AliasField(188)
     target_y: float = AliasField(189)
     use_y: bool = AliasField(190)
+    disable_preview: bool = AliasField(531)
 
 # Object 1520
 class ShakeTrigger(TriggerObject):
@@ -1817,6 +1879,11 @@ class SpawnTrigger(TriggerObject):
 # Object 31
 # Class StartPosObject
 class StartPosition(TriggerObject):
+    gamemode: enums.Gamemode = AliasField('kA2')
+    mini_mode: bool = AliasField('kA3')
+    speed: enums.Speed = AliasField('kA4')
+    dual_mode: bool = AliasField('kA8')
+    flip_gravity: bool = AliasField('kA11')
     target_order: int = AliasField('kA19')
     reverse_mode: bool = AliasField('kA20')
     disable: bool = AliasField('kA21')
@@ -1824,12 +1891,6 @@ class StartPosition(TriggerObject):
     mirror_mode: bool = AliasField('kA28')
     rotate_mode: bool = AliasField('kA29')
     reset_camera: bool = AliasField('kA35')
-    mini_mode = None
-    dual_mode = None
-    flip_gravity = None
-    speed = None
-    gamemode = None
-
 
 # Object 3640
 class StateBlock(TriggerObject):
@@ -1844,20 +1905,28 @@ class StopTrigger(TriggerObject):
     mode: enums.StopMode = AliasField(580)
 
 # Object 3614
-# Class TimerTriggerGameObject
 class TimerTrigger(TriggerObject):
     target_id: int = AliasField(51)
     item_id: int = AliasField(80)
     start_time: float = AliasField(467)
     dont_override: bool = AliasField(468)
     ignore_timewarp: bool = AliasField(469)
-    mod: float = AliasField(470)
+    time_mod: float = AliasField(470)
     start_paused: bool = AliasField(471)
-    control_stop: enums.TimeControlType = AliasField(472)
     stop_time: float = AliasField(473)
-    target_time: float = AliasField(473)
     stop: bool = AliasField(474)
+
+# Object 3615
+class TimerEventTrigger(TriggerObject):
+    target_id: int = AliasField(51)
+    item_id: int = AliasField(80)
+    target_time: float = AliasField(473)
     multi_activate: bool = AliasField(475)
+
+# Object 3617
+class TimerControlTrigger(TriggerObject):
+    item_id: int = AliasField(80)
+    control_mode: enums.TimeControlType = AliasField(472)
 
 # Object 3643
 class ToggleBlock(TriggerObject):
