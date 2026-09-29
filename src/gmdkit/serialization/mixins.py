@@ -6,7 +6,7 @@ from typing import (
     Any, Self, Literal,
     Optional,
     Callable, Sequence,
-    ClassVar
+    ClassVar, 
     )
 
 # Package Imports
@@ -214,7 +214,7 @@ class PlistDecoderMixin(FileStringMixin):
 
 
     @classmethod
-    def from_node(cls, node:ET.Element, **kwargs):
+    def from_node(cls, node:ET.Element, **kwargs) -> Self:
 
         new = cls()
 
@@ -225,7 +225,7 @@ class PlistDecoderMixin(FileStringMixin):
         return new
 
 
-    def to_node(self, node:Optional[ET.Element]=None, **kwargs):
+    def to_node(self, node:Optional[ET.Element]=None, **kwargs) -> ET.Element:
 
         try:
             result = self.save_data(**kwargs)
@@ -240,7 +240,7 @@ class PlistDecoderMixin(FileStringMixin):
 
 
     @classmethod
-    def from_string(cls, string:str, **kwargs):
+    def from_string(cls, string:str, **kwargs) -> Self:
         try:
             node = ET.fromstring(string)
 
@@ -691,8 +691,11 @@ class DelimiterMixin:
 
             if end_delimiter:
                 string = string.removesuffix(end_delimiter)
-
-        return super().from_string(string, **kwargs)
+        
+        # autocompletion explodes on super, i tried everything, only assert works
+        result = super().from_string(string, **kwargs)
+        assert isinstance(result, cls)
+        return result
 
 
     def to_string(
@@ -741,7 +744,10 @@ class CompressFileMixin:
         if compressed:
             string = decompress_string(string, compression=compression, xor_key=cypher)
 
-        return super().from_string(string, **kwargs)
+        # autocompletion explodes on super, i tried everything, only assert works
+        result = super().from_string(string, **kwargs)
+        assert isinstance(result, cls)
+        return result
 
 
     def to_string(
@@ -796,8 +802,10 @@ class FilePathMixin(FileStringMixin):
             raise ValueError(
                 "file has invalid extension, expected '{extension}', got '{path_ext}' instead"
                 )
-
-        return super().from_file(path=path,**kwargs)
+        
+        result = super().from_file(path=path,**kwargs)
+        assert isinstance(result, cls)
+        return result
 
 
     def to_file(self,
@@ -838,9 +846,9 @@ class PlistLoaderMixin(PlistDecoderMixin):
     @classmethod
     def from_string(cls, string:str, load_content:Optional[bool]=None, content_selectors:Optional[set]=None, **kwargs):
         new = super().from_string(string, **kwargs)
+        assert isinstance(new, cls)
         if load_content if load_content is not None else cls.LOAD_CONTENT:
             new.load(selectors=content_selectors)
-
         return new
 
 
@@ -877,7 +885,7 @@ class FolderLoaderMixin:
             decoder:Optional[Callable]=None,
             container:Optional[str]=None,
             **kwargs
-            ):
+            ) -> Self:
 
         extension = cls.FOLDER_EXTENSION if extension is None else extension
         decoder = cls.FOLDER_DECODER if decoder is None else decoder

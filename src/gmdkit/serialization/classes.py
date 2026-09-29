@@ -1,15 +1,67 @@
-# Imports
-from typing import Callable, Any, Optional, TypeVar, overload
+from typing import Callable, Any, Optional, TypeVar, overload, Type
 from collections import ChainMap
 
-# Package Imports
 from gmdkit.utils.typing import MISSING
+from gmdkit.utils.types import DictClass
 from gmdkit.serialization.functions import (
     read_plist, write_plist,
     )
 
 
 V = TypeVar("V", bound="BaseInterface")
+
+
+class BaseInterface:
+    CONTAINER = "obj"
+
+    def __init__(self, obj: "FieldInterface"):
+        self.obj = obj
+
+    def __getattr__(self, name: str) -> Any:
+        d = object.__getattribute__(self, "__dict__")
+
+        if "obj" not in d:
+            raise AttributeError(name)
+
+        return getattr(d["obj"], name)
+
+    def __getitem__(self, key):
+        return self.obj[key]
+
+    def __setitem__(self, key, value):
+        self.obj[key] = value
+
+    def __delitem__(self, key):
+        del self.obj[key]
+
+    def __contains__(self, key):
+        return key in self.obj
+
+    def __len__(self):
+        return len(self.obj)
+
+    def __iter__(self):
+        return iter(self.obj)
+
+    def __repr__(self):
+        return f"{type(self).__name__}({self.obj!r})"
+
+
+class Default:
+    __slots__ = ("value", "factory")
+
+    def __init__(self, value=MISSING, factory=None):
+        if factory is not None and value is not MISSING:
+            raise ValueError("pass either default or default_factory, not both")
+        self.value = value
+        self.factory = factory
+
+    @property
+    def stored(self):
+        return self.factory is not None
+
+    def __call__(self):
+        return self.factory() if self.factory is not None else self.value
 
 
 class Codec:
@@ -118,39 +170,9 @@ class DictField(AliasField):
             decoder=self.decoder,
             is_node=self.is_node,
             pass_kwargs=self.pass_kwargs,
+            default=self.default,
+            default_factory=self.default_factory,
         )
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        try:
-            return self._target(instance)[self.canonical]
-        except KeyError:
-            if self.default_factory is not None:
-                value = self.default_factory()
-                self._target(instance)[self.canonical] = value
-                return value
-            if self.default is not MISSING:
-                return self.default
-            return None
-
-
-class BaseInterface:
-    CONTAINER = "obj"
-
-    def __init__(self, obj: "FieldInterface"):
-        self.obj = obj
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.obj, name)
-
-    def __getitem__(self, key): return self.obj[key]
-    def __setitem__(self, key, value): self.obj[key] = value
-    def __delitem__(self, key): del self.obj[key]
-    def __contains__(self, key): return key in self.obj
-    def __len__(self): return len(self.obj)
-    def __iter__(self): return iter(self.obj)
-    def __repr__(self): return f"{type(self).__name__}({self.obj!r})"
 
 
 class FieldMetaclass(type):
@@ -159,24 +181,21 @@ class FieldMetaclass(type):
 
     DEFAULT_DECODER: Callable = staticmethod(read_plist)
     DEFAULT_ENCODER: Callable = staticmethod(write_plist)
-
     DECODER: Callable
     ENCODER: Callable
-
-    ID_KEY: Optional[str] = None
+    HAS_NODES: bool = False
 
     _ENCODER_MAP: dict
     _DECODER_MAP: dict
+    _DEFAULT_MAP: dict
     _KEYS: set
-    _VIEW_REGISTRY: dict
-    _ID_REGISTRY: dict
     _ENCODER_CHAIN: ChainMap
     _DECODER_CHAIN: ChainMap
+    _DEFAULT_CHAIN: ChainMap
     _KEY_CHAIN: ChainMap
-    _VIEW_CHAIN: ChainMap
-    _ID_CHAIN: ChainMap
 
-    def add_field(cls, key, *, encoder=None, decoder=None, is_node=False, pass_kwargs=False):
+    def add_field(cls, key, *, encoder=None, decoder=None, is_node=False,
+                  pass_kwargs=False, default=MISSING, default_factory=None):
         if "_KEYS" not in cls.__dict__:
             cls._KEYS = set()
         if key in cls._KEYS:
@@ -185,17 +204,101 @@ class FieldMetaclass(type):
         if encoder is not None:
             if "_ENCODER_MAP" not in cls.__dict__:
                 cls._ENCODER_MAP = {}
-            codec_cls = Codec if is_node else EncoderCodec
+            codec_cls = EncoderCodec if (cls.HAS_NODES and not is_node) else Codec
             cls._ENCODER_MAP[key] = codec_cls(encoder, allow_kwargs=pass_kwargs)
         if decoder is not None:
             if "_DECODER_MAP" not in cls.__dict__:
                 cls._DECODER_MAP = {}
-            codec_cls = Codec if is_node else DecoderCodec
+            codec_cls = DecoderCodec if (cls.HAS_NODES and not is_node) else Codec
             cls._DECODER_MAP[key] = codec_cls(decoder, allow_kwargs=pass_kwargs)
+        if default_factory is not None or default is not MISSING:
+            if "_DEFAULT_MAP" not in cls.__dict__:
+                cls._DEFAULT_MAP = {}
+            cls._DEFAULT_MAP[key] = Default(default, default_factory)
 
-    def register_id(cls, id_value, schema: type):
-        if not issubclass(schema, BaseInterface):
-            raise TypeError(f"{schema.__name__} must subclass BaseInterface")
+    def __new__(mcls, name, bases, namespace, **kwargs):
+        cls = super().__new__(mcls, name, bases, namespace, **kwargs)
+        cls.__missing__ = mcls._missing
+        cls._DECODER_MAP = cls.__dict__.get("_DECODER_MAP", {})
+        cls._ENCODER_MAP = cls.__dict__.get("_ENCODER_MAP", {})
+        cls._DEFAULT_MAP = cls.__dict__.get("_DEFAULT_MAP", {})
+        cls._KEYS = cls.__dict__.get("_KEYS", set())
+
+        cls._DECODER_CHAIN = ChainMap(*(
+            klass.__dict__["_DECODER_MAP"]
+            for klass in cls.__mro__
+            if "_DECODER_MAP" in klass.__dict__
+        ))
+        cls._ENCODER_CHAIN = ChainMap(*(
+            klass.__dict__["_ENCODER_MAP"]
+            for klass in cls.__mro__
+            if "_ENCODER_MAP" in klass.__dict__
+        ))
+        cls._DEFAULT_CHAIN = ChainMap(*(
+            klass.__dict__["_DEFAULT_MAP"]
+            for klass in cls.__mro__
+            if "_DEFAULT_MAP" in klass.__dict__
+        ))
+        cls._KEY_CHAIN = ChainMap(*(
+            klass.__dict__["_KEYS"]
+            for klass in cls.__mro__
+            if "_KEYS" in klass.__dict__
+        ))
+
+        cls.DECODER = staticmethod(codec_cast(
+            cls._DECODER_CHAIN,
+            default=cls.DEFAULT_DECODER,
+            key_start=cls.KEY_DECODER,
+        ))
+        cls.ENCODER = staticmethod(codec_cast(
+            cls._ENCODER_CHAIN,
+            default=cls.DEFAULT_ENCODER,
+            key_end=cls.KEY_ENCODER,
+        ))
+
+        return cls
+    
+    def _missing(self, key):
+        cls = type(self)
+        default = cls._DEFAULT_CHAIN.get(key)
+        
+        if default is None:
+            raise KeyError(f"{key!r} is missing and has no default or default_factory")
+            
+        value = default()
+        if default.stored:
+            dict.__setitem__(self, key, value)
+        return value
+
+    def get_decoders(cls):
+        return {k: v.function for k, v in cls._DECODER_CHAIN.items()}
+
+    def get_encoders(cls):
+        return {k: v.function for k, v in cls._ENCODER_CHAIN.items()}
+
+    def get_keys(cls):
+        return set().union(*(
+            klass.__dict__["_KEYS"]
+            for klass in cls.__mro__
+            if "_KEYS" in klass.__dict__
+        ))
+
+    def get_defaults(cls):
+        return {key: default() for key, default in cls._DEFAULT_CHAIN.items()}
+
+
+class InterfaceMetaclass(FieldMetaclass):
+    DEFAULT_SCHEMA: Type[BaseInterface] = BaseInterface
+    ID_KEY: Optional[str] = None
+
+    _VIEW_REGISTRY: dict
+    _ID_REGISTRY: dict
+    _VIEW_CHAIN: ChainMap
+    _ID_CHAIN: ChainMap
+
+    def register_id(cls, id_value, schema: Type[BaseInterface]):
+        if not (isinstance(schema, type) and issubclass(schema, BaseInterface)):
+            raise TypeError(f"{schema!r} must be a subclass of BaseInterface")
         if "_VIEW_REGISTRY" not in cls.__dict__:
             cls._VIEW_REGISTRY = {}
         if "_ID_REGISTRY" not in cls.__dict__:
@@ -214,27 +317,9 @@ class FieldMetaclass(type):
     def __new__(mcls, name, bases, namespace, **kwargs):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
 
-        cls._DECODER_MAP = cls.__dict__.get("_DECODER_MAP", {})
-        cls._ENCODER_MAP = cls.__dict__.get("_ENCODER_MAP", {})
-        cls._KEYS = cls.__dict__.get("_KEYS", set())
         cls._VIEW_REGISTRY = cls.__dict__.get("_VIEW_REGISTRY", {})
         cls._ID_REGISTRY = cls.__dict__.get("_ID_REGISTRY", {})
 
-        cls._DECODER_CHAIN = ChainMap(*(
-            klass.__dict__["_DECODER_MAP"]
-            for klass in cls.__mro__
-            if "_DECODER_MAP" in klass.__dict__
-        ))
-        cls._ENCODER_CHAIN = ChainMap(*(
-            klass.__dict__["_ENCODER_MAP"]
-            for klass in cls.__mro__
-            if "_ENCODER_MAP" in klass.__dict__
-        ))
-        cls._KEY_CHAIN = ChainMap(*(
-            klass.__dict__["_KEYS"]
-            for klass in cls.__mro__
-            if "_KEYS" in klass.__dict__
-        ))
         cls._VIEW_CHAIN = ChainMap(*(
             klass.__dict__["_VIEW_REGISTRY"]
             for klass in cls.__mro__
@@ -246,54 +331,36 @@ class FieldMetaclass(type):
             if "_ID_REGISTRY" in klass.__dict__
         ))
 
-        cls.DECODER = staticmethod(codec_cast(
-            cls._DECODER_CHAIN,
-            default=cls.DEFAULT_DECODER,
-            key_start=cls.KEY_DECODER,
-        ))
-        cls.ENCODER = staticmethod(codec_cast(
-            cls._ENCODER_CHAIN,
-            default=cls.DEFAULT_ENCODER,
-            key_end=cls.KEY_ENCODER,
-        ))
-
         return cls
 
-    def get_decoders(cls):
-        return {k: v.function for k, v in cls._DECODER_CHAIN.items()}
-
-    def get_encoders(cls):
-        return {k: v.function for k, v in cls._ENCODER_CHAIN.items()}
-
-    def get_keys(cls):
-        return set(cls._KEY_CHAIN)
+    def get_schema(cls, id_value=None):
+        return cls._VIEW_CHAIN.get(id_value, cls.DEFAULT_SCHEMA)
 
 
-class FieldInterface(dict, metaclass=FieldMetaclass):
-    ID_KEY: Optional[str] = None
+class FieldInterface(DictClass, metaclass=InterfaceMetaclass):
 
     @property
     def current_id(self):
         return dict.get(self, type(self).ID_KEY) if type(self).ID_KEY else None
 
     @overload
-    def interface(self, key: None = None) -> Optional[BaseInterface]: ...
+    def interface(self, key: None = None) -> BaseInterface: ...
     @overload
     def interface(self, key: type[V]) -> Optional[V]: ...
+    @overload
+    def interface(self, key: int | str) -> Optional[BaseInterface]: ...
 
-    def interface(self, key=None) -> Optional[BaseInterface]:
-        view_chain = type(self)._VIEW_CHAIN
-        id_chain = type(self)._ID_CHAIN
+    def interface(self, key: type[BaseInterface] | int | str | None = None):
+        cls = type(self)
         current_id = self.current_id
 
         if key is None:
-            view_cls = view_chain.get(current_id)
-        elif key in view_chain:
-            view_cls = view_chain[key] if current_id == key else None
-        elif key in id_chain:
-            view_cls = key if current_id in id_chain[key] else None
+            view_cls = cls.get_schema(current_id)
+        elif isinstance(key, type) and issubclass(key, BaseInterface):
+            resolved = cls.get_schema(current_id)
+            view_cls = resolved if issubclass(resolved, key) else None
         else:
-            view_cls = None
+            view_cls = cls._VIEW_CHAIN.get(key) if key == current_id else None
 
         return view_cls(self) if view_cls is not None else None
 
@@ -301,8 +368,10 @@ class FieldInterface(dict, metaclass=FieldMetaclass):
     def require_interface(self, key: None = None) -> BaseInterface: ...
     @overload
     def require_interface(self, key: type[V]) -> V: ...
+    @overload
+    def require_interface(self, key: int | str) -> BaseInterface: ...
 
-    def require_interface(self, key=None) -> BaseInterface:
+    def require_interface(self, key=None):
         result = self.interface(key)
         if result is None:
             raise TypeError(

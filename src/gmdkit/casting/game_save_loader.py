@@ -20,7 +20,8 @@ from gmdkit.utils import enums
 
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
-
+    HAS_NODES = True
+    
     official_levels: LevelMapping = DictField(
         key="GLM_01",
         default_factory=LevelMapping,

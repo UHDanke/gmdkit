@@ -6,7 +6,9 @@ from gmdkit.serialization.mixins import PlistLoaderMixin
 
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
-
+    
+    HAS_NODES = True
+    
     levels: LevelList = DictField(
         key="LLM_01",
         default_factory=LevelList,

@@ -9,7 +9,9 @@ from gmdkit.serialization.mixins import PlistLoaderMixin
 
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
-
+    
+    HAS_NODES = True
+    
     level_id: int = DictField(key="k1")
 
     name: str = DictField(key="k2", default="Unnamed")

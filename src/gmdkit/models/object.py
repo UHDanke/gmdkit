@@ -27,7 +27,7 @@ class Object(DelimiterMixin,FieldLoaderMixin,DictClass[NumKey,Any]):
         string = OBJECT_DEFAULT.get(object_id, f"1,{object_id},2,0,3,0;")
         
         return cls.from_string(string)
-    
+
     
 class ObjectList(ArrayDecoderMixin,ListClass[Object]):
     
@@ -36,7 +36,7 @@ class ObjectList(ArrayDecoderMixin,ListClass[Object]):
     DECODER = Object.from_string
     ENCODER = Object.to_string
     
-    def difference(self, *obj_lists:Self):
+    def difference(self, *obj_lists:Self): # TODO EVALUATE
         to_string = Object.to_string
 
         obj_set = {

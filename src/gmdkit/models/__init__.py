@@ -1,6 +1,6 @@
-
 __all__ = (
     "prop",
+    "interfaces",
     "GameSave",
     "LevelSave",
     "MusicLibrary",
@@ -23,7 +23,7 @@ __all__ = (
     "SmartTemplateList",
 )
 
-from . import prop
+from . import prop, interfaces
 from .save.game_manager import GameSave
 from .save.level_manager import LevelSave
 from .save.music_library import MusicLibrary
