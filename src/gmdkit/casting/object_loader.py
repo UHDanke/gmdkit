@@ -3,7 +3,7 @@ from gmdkit.serialization.type_cast import (
     to_bool, from_bool,
     from_float,
     decode_text, encode_text,
-    to_numkey
+    to_numkey, serialize
     )
 from gmdkit.serialization.classes import FieldInterface
 from gmdkit.serialization.mixins import DictDecoderMixin
@@ -19,6 +19,8 @@ from gmdkit.models.prop.color import Color, ColorList
 
 
 class FieldLoaderMixin(DictDecoderMixin, FieldInterface):
+    DEFAULT_DECODER = None
+    DEFAULT_ENCODER = serialize
     KEY_DECODER = to_numkey
     KEY_ENCODER = str
     ID_KEY = 1
