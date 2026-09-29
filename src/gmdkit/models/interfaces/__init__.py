@@ -3,26 +3,316 @@
 # GD's object classes are a disaster and should have been split into subclasses.
 # Game class references are kept purely for mapping objects to gmdkit classes.
 
+__all__ = [
+    "AnimatedMonsterObject",
+    "AnimatedObject",
+    "BaseAnimatedObject",
+    "DelayedAnimatedObject",
+    "ExpandingAnimatedObject",
+    "ParticleObject",
+    "RandomAnimatedObject",
+    "SpecialAnimatedObject",
+    "SpinningObject",
+    "AreaFadeTrigger",
+    "AreaMoveTrigger",
+    "AreaRotateTrigger",
+    "AreaScaleTrigger",
+    "AreaTintTrigger",
+    "EditAreaFadeTrigger",
+    "EditAreaMoveTrigger",
+    "EditAreaRotateTrigger",
+    "EditAreaScaleTrigger",
+    "EditAreaTintTrigger",
+    "StopAreaTrigger",
+    "BPMTrigger",
+    "EditSFXTrigger",
+    "EditSongTrigger",
+    "SFXTrigger",
+    "SongTrigger",
+    "BaseObject",
+    "EffectObject",
+    "TriggerObject",
+    "CameraEdgeTrigger",
+    "CameraGuide",
+    "CameraModeTrigger",
+    "GameplayOffsetTrigger",
+    "OffsetCameraTrigger",
+    "RotateCameraTrigger",
+    "ShakeTrigger",
+    "StaticCameraTrigger",
+    "ZoomCameraTrigger",
+    "CollectibleObject",
+    "SecretCoin",
+    "SmallCoin",
+    "UserCoin",
+    "CollisionBlock",
+    "CollisionTrigger",
+    "InstantCollisionTrigger",
+    "StateBlock",
+    "EnterFadeTrigger",
+    "EnterMoveTrigger",
+    "EnterPreset",
+    "EnterRotateTrigger",
+    "EnterScaleTrigger",
+    "EnterTintTrigger",
+    "StopEnterTrigger",
+    "AdvancedFollowTrigger",
+    "EditAdvancedFollowTrigger",
+    "FollowPlayerYTrigger",
+    "FollowTrigger",
+    "RetargetAdvancedFollowTrigger",
+    "DashOrbObject",
+    "ForceBlock",
+    "GamemodePortalObject",
+    "OrbObject",
+    "PadObject",
+    "PortalObject",
+    "SpinningOrbObject",
+    "StartPosition",
+    "ToggleBlock",
+    "CountTrigger",
+    "InstantCountTrigger",
+    "ItemCompareTrigger",
+    "ItemEditTrigger",
+    "ItemLabel",
+    "ItemPersistTrigger",
+    "PickupTrigger",
+    "TimerControlTrigger",
+    "TimerEventTrigger",
+    "TimerTrigger",
+    "AdvancedRandomTrigger",
+    "EventTrigger",
+    "LinkVisibleTrigger",
+    "ObjectControlTrigger",
+    "OnDeathTrigger",
+    "RandomTrigger",
+    "ResetTrigger",
+    "SequenceTrigger",
+    "SpawnTrigger",
+    "StopTrigger",
+    "Template",
+    "Text",
+    "TimewarpTrigger",
+    "ToggleTrigger",
+    "TouchTrigger",
+    "UITrigger",
+    "CheckpointTrigger",
+    "EndTrigger",
+    "EndWallTrigger",
+    "GameplayArrow",
+    "GravityTrigger",
+    "OptionsTrigger",
+    "PlayerControlTrigger",
+    "BulgeShader",
+    "ChromaticGlitchShader",
+    "ChromaticShader",
+    "EditColorShader",
+    "GlitchShader",
+    "GrayScaleShader",
+    "HueShader",
+    "InvertColorShader",
+    "LensCircleShader",
+    "MotionBlurShader",
+    "PinchShader",
+    "PixelateShader",
+    "RadialBlurShader",
+    "SepiaShader",
+    "ShaderOptions",
+    "ShockLineShader",
+    "ShockwaveShader",
+    "SplitScreenShader",
+    "LinkedTeleportPortal",
+    "TeleportOrb",
+    "TeleportTrigger",
+    "UnlinkedTeleportPortal",
+    "AnimateKeyframeTrigger",
+    "KeyframeObject",
+    "MoveTrigger",
+    "RotateTrigger",
+    "ScaleTrigger",
+    "AlphaTrigger",
+    "AnimateTrigger",
+    "BackgroundTrigger",
+    "BgSpeedTrigger",
+    "ColorTrigger",
+    "GradientTrigger",
+    "GroundTrigger",
+    "MgEditTrigger",
+    "MgSpeedTrigger",
+    "MiddlegroundTrigger",
+    "PulseTrigger",
+    "SpawnParticleTrigger",
+]
 
-from .objects import *
-from .triggers import *
-from .gameplay import *
-from .visual import *
-from .misc import *
-
-from .base import LevelSettings, BaseObject, TriggerObject
-from .triggers.audio import (
-    BPMTrigger, SFXTrigger, SongTrigger, EditSFXTrigger, EditSongTrigger
-    )
-from .triggers.camera import (
-    ZoomCameraTrigger, StaticCameraTrigger, OffsetCameraTrigger,
-    RotateCameraTrigger, CameraEdgeTrigger, CameraModeTrigger,
-    CameraGuide, ShakeTrigger
-    )
-from .triggers.shaders import (
-    ShaderOptions, BulgeShader, ChromaticShader, ChromaticGlitchShader,
-    EditColorShader, GlitchShader, GrayScaleShader, HueShader,
-    InvertColorShader, LensCircleShader, MotionBlurShader, PinchShader,
-    PixelateShader, RadialBlurShader, SepiaShader, ShockLineShader,
-    ShockwaveShader, SplitScreenShader
-    )
+from .animated import (
+    AnimatedMonsterObject,
+    AnimatedObject,
+    BaseAnimatedObject,
+    DelayedAnimatedObject,
+    ExpandingAnimatedObject,
+    ParticleObject,
+    RandomAnimatedObject,
+    SpecialAnimatedObject,
+    SpinningObject
+)
+from .area import (
+    AreaFadeTrigger,
+    AreaMoveTrigger,
+    AreaRotateTrigger,
+    AreaScaleTrigger,
+    AreaTintTrigger,
+    EditAreaFadeTrigger,
+    EditAreaMoveTrigger,
+    EditAreaRotateTrigger,
+    EditAreaScaleTrigger,
+    EditAreaTintTrigger,
+    StopAreaTrigger
+)
+from .audio import (
+    BPMTrigger,
+    EditSFXTrigger,
+    EditSongTrigger,
+    SFXTrigger,
+    SongTrigger
+)
+from .base import (
+    BaseObject,
+    EffectObject,
+    TriggerObject
+)
+from .camera import (
+    CameraEdgeTrigger,
+    CameraGuide,
+    CameraModeTrigger,
+    GameplayOffsetTrigger,
+    OffsetCameraTrigger,
+    RotateCameraTrigger,
+    ShakeTrigger,
+    StaticCameraTrigger,
+    ZoomCameraTrigger
+)
+from .collectibles import (
+    CollectibleObject,
+    SecretCoin,
+    SmallCoin,
+    UserCoin
+)
+from .collisions import (
+    CollisionBlock,
+    CollisionTrigger,
+    InstantCollisionTrigger,
+    StateBlock
+)
+from .enter import (
+    EnterFadeTrigger,
+    EnterMoveTrigger,
+    EnterPreset,
+    EnterRotateTrigger,
+    EnterScaleTrigger,
+    EnterTintTrigger,
+    StopEnterTrigger
+)
+from .follows import (
+    AdvancedFollowTrigger,
+    EditAdvancedFollowTrigger,
+    FollowPlayerYTrigger,
+    FollowTrigger,
+    RetargetAdvancedFollowTrigger
+)
+from .gameplay import (
+    DashOrbObject,
+    ForceBlock,
+    GamemodePortalObject,
+    OrbObject,
+    PadObject,
+    PortalObject,
+    SpinningOrbObject,
+    StartPosition,
+    ToggleBlock
+)
+from .items import (
+    CountTrigger,
+    InstantCountTrigger,
+    ItemCompareTrigger,
+    ItemEditTrigger,
+    ItemLabel,
+    ItemPersistTrigger,
+    PickupTrigger,
+    TimerControlTrigger,
+    TimerEventTrigger,
+    TimerTrigger
+)
+from .misc import (
+    AdvancedRandomTrigger,
+    EventTrigger,
+    LinkVisibleTrigger,
+    ObjectControlTrigger,
+    OnDeathTrigger,
+    RandomTrigger,
+    ResetTrigger,
+    SequenceTrigger,
+    SpawnTrigger,
+    StopTrigger,
+    Template,
+    Text,
+    TimewarpTrigger,
+    ToggleTrigger,
+    TouchTrigger,
+    UITrigger
+)
+from .player import (
+    CheckpointTrigger,
+    EndTrigger,
+    EndWallTrigger,
+    GameplayArrow,
+    GravityTrigger,
+    OptionsTrigger,
+    PlayerControlTrigger
+)
+from .shaders import (
+    BulgeShader,
+    ChromaticGlitchShader,
+    ChromaticShader,
+    EditColorShader,
+    GlitchShader,
+    GrayScaleShader,
+    HueShader,
+    InvertColorShader,
+    LensCircleShader,
+    MotionBlurShader,
+    PinchShader,
+    PixelateShader,
+    RadialBlurShader,
+    SepiaShader,
+    ShaderOptions,
+    ShockLineShader,
+    ShockwaveShader,
+    SplitScreenShader
+)
+from .teleport import (
+    LinkedTeleportPortal,
+    TeleportOrb,
+    TeleportTrigger,
+    UnlinkedTeleportPortal
+)
+from .transforms import (
+    AnimateKeyframeTrigger,
+    KeyframeObject,
+    MoveTrigger,
+    RotateTrigger,
+    ScaleTrigger
+)
+from .visual import (
+    AlphaTrigger,
+    AnimateTrigger,
+    BackgroundTrigger,
+    BgSpeedTrigger,
+    ColorTrigger,
+    GradientTrigger,
+    GroundTrigger,
+    MgEditTrigger,
+    MgSpeedTrigger,
+    MiddlegroundTrigger,
+    PulseTrigger,
+    SpawnParticleTrigger
+)
