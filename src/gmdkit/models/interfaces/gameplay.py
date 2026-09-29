@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit import enums
+from gmdkit.utils import enums
 from gmdkit.models.interfaces.base import EffectObject, Field, register_id
 from gmdkit.models.interfaces.animated import SpinningObject
 
