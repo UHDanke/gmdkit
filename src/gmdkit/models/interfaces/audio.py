@@ -22,7 +22,7 @@ class VolumeInterface(BaseInterface):
     def dist_near(self):
         return self.dist_1
     
-    @dist_near.setter()
+    @dist_near.setter
     def dist_near(self, value:float):
         d1 = self.dist_1
         d2 = self.dist_2
@@ -35,7 +35,7 @@ class VolumeInterface(BaseInterface):
     def dist_med(self):
         return self.dist_1 + self.dist_2
     
-    @dist_med.setter()
+    @dist_med.setter
     def dist_med(self, value:float):
         d1 = self.dist_1
         d2 = self.dist_2
@@ -49,7 +49,7 @@ class VolumeInterface(BaseInterface):
     def dist_far(self):
         return self.dist_1 + self.dist_2 + self.dist_3
     
-    @dist_far.setter()
+    @dist_far.setter
     def dist_far(self, value:float):
         self.dist_3 = value - self.dist_1 - self.dist_2
 
