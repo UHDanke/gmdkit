@@ -59,7 +59,6 @@ def add_toggles(
     return init_toggles
 
 
-
 def start_pos_fix(
         obj_list:ObjectList,
         target_id:int,

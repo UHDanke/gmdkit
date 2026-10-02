@@ -1,5 +1,10 @@
+# Imports
+from typing import Self
+
 # Package Imports
 from gmdkit.utils import enums
+from gmdkit.models.prop.color import Color
+from gmdkit.models.object import Object
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
@@ -24,7 +29,50 @@ class ColorTrigger(TriggerObject):
     copy_id: int = Field(50)
     copy_opacity: bool = Field(60)
     disable_legacy_hsv: bool = Field(210)
+    
 
+    @classmethod
+    def from_color(cls, color:Color) -> Self:
+        new = cls(Object.default(899))
+        new.red = color.red
+        new.green = color.green
+        new.blue = color.blue
+
+        match color.player:
+            case 1: new.player_1 = True
+            case 2: new.player_2 = True
+            case _: pass
+
+        new.blending = color.blending
+        new.color_channel = color.channel
+        new.opacity = color.opacity
+        new.copy_id = color.copy_id
+        if color.has_hsv(): new.hsv = color.hsv
+        if color.copy_opacity: color.copy_opacity = True
+
+        return new
+
+    def to_color(self) -> Color:
+        color = Color()
+        color.red = self.red
+        color.green = self.green
+        color.blue = self.blue            
+        color.blending = self.blending
+        color.channel = self.color_channel
+        color.opacity = self.opacity
+        color.copy_id = self.copy_id
+        color.hsv = self.hsv
+        color.copy_opacity = self.copy_opacity
+        
+        if self.player_1:
+            color.player = enums.TargetPlayer.P1
+        elif self.player_2:
+            color.player = enums.TargetPlayer.P1
+        else:
+            color.player = enums.TargetPlayer.NONE
+
+        return color
+    
 
 class PulseTrigger(TriggerObject):
     red: int = Field(7)
@@ -73,7 +121,7 @@ class BackgroundTrigger(TriggerObject):
 
 
 class GroundTrigger(TriggerObject):
-    # this trigger displays line options but they don't do anything
+    # this trigger displays line options but they don't get saved
     gr_id: int = Field(533)
 
 

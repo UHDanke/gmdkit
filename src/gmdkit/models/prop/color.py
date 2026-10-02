@@ -76,7 +76,7 @@ class Color(DataclassDecoderMixin):
         if alpha is not None:
             self.opacity = alpha
 
-    def get_rgba(self):
+    def get_rgba(self) -> tuple[int,int,int,float]:
         r = self.red
         g = self.green
         b = self.blue
@@ -93,9 +93,12 @@ class Color(DataclassDecoderMixin):
         b = int(hex_string[4:6], 16)
         self.set_rgba(r, g, b)
 
-    def get_hex(self):
+    def get_hex(self) -> tuple[int,int,int]:
         r, g, b, _ = self.get_rgba()
         return "#{:02X}{:02X}{:02X}".format(r, g, b)
+    
+    def has_hsv(self) -> bool:
+        return not type(self).CONDITION("hsv",v=self.hsv)
 
 
 class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):

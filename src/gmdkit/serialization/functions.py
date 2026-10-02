@@ -560,3 +560,34 @@ def to_node_dict(functions:dict[str,Callable],exclude:Optional[dict[str,bool]]=N
             d[k] = to_node_wrap(f)
 
     return d
+
+
+def codec_cast(
+    codecs,
+    *,
+    key_start=None,
+    key_end=None,
+    default=None,
+):
+    c_get = codecs.get
+    has_default = callable(default)
+    use_start = callable(key_start)
+    use_end = callable(key_end)
+
+    def cast_func(key, value, **kwargs):
+        if use_start:
+            key = key_start(key)
+
+        codec = c_get(key)
+        if codec is None:
+            value = default(value) if has_default else value
+        else:
+            value = codec(value, **kwargs)
+
+        if use_end:
+            key = key_end(key)
+
+        return key, value
+
+    return cast_func
+

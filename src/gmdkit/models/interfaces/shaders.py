@@ -1,16 +1,24 @@
 # Package Imports
 from gmdkit.utils import enums
+from gmdkit.mappings import color_id
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
 
-class ShaderOptions(TriggerObject):
+class ShaderTrigger(TriggerObject):
+    
+    def fix_color(self) -> None:        
+        super().fix_color()
+        self.color_1 = color_id.WHITE
+
+
+class ShaderOptions(ShaderTrigger):
     ignore_player_particles: bool = Field(188)
     disable_all: bool = Field(192)
     layer_min: enums.GradientLayer = Field(196)
     layer_max: enums.GradientLayer = Field(197)
 
 
-class BulgeShader(TriggerObject):
+class BulgeShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -26,7 +34,7 @@ class BulgeShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class ChromaticShader(TriggerObject):
+class ChromaticShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)
@@ -38,7 +46,7 @@ class ChromaticShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class ChromaticGlitchShader(TriggerObject):
+class ChromaticGlitchShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     speed: float = Field(175)
@@ -53,7 +61,7 @@ class ChromaticGlitchShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class EditColorShader(TriggerObject):
+class EditColorShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)
@@ -66,7 +74,7 @@ class EditColorShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class GlitchShader(TriggerObject):
+class GlitchShader(ShaderTrigger):
     duration: float = Field(10)
     speed: float = Field(175)
     strength: float = Field(176)
@@ -78,7 +86,7 @@ class GlitchShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class GrayScaleShader(TriggerObject):
+class GrayScaleShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     tint_channel: int = Field(51)
@@ -89,7 +97,7 @@ class GrayScaleShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class HueShader(TriggerObject):
+class HueShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)
@@ -97,7 +105,7 @@ class HueShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class InvertColorShader(TriggerObject):
+class InvertColorShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)
@@ -111,7 +119,7 @@ class InvertColorShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class LensCircleShader(TriggerObject):
+class LensCircleShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -128,7 +136,7 @@ class LensCircleShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class MotionBlurShader(TriggerObject):
+class MotionBlurShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -150,7 +158,7 @@ class MotionBlurShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class PinchShader(TriggerObject):
+class PinchShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -169,7 +177,7 @@ class PinchShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class PixelateShader(TriggerObject):
+class PixelateShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)
@@ -183,7 +191,7 @@ class PixelateShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class RadialBlurShader(TriggerObject):
+class RadialBlurShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -201,7 +209,7 @@ class RadialBlurShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class SepiaShader(TriggerObject):
+class SepiaShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)
@@ -209,7 +217,7 @@ class SepiaShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class ShockLineShader(TriggerObject):
+class ShockLineShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -236,7 +244,7 @@ class ShockLineShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class ShockwaveShader(TriggerObject):
+class ShockwaveShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     center_id: int = Field(51)
@@ -263,7 +271,7 @@ class ShockwaveShader(TriggerObject):
     disable_preview: bool = Field(531)
 
 
-class SplitScreenShader(TriggerObject):
+class SplitScreenShader(ShaderTrigger):
     duration: float = Field(10)
     easing: enums.Easing = Field(30)
     ease_rate: float = Field(85)

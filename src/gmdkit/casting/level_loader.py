@@ -1,6 +1,7 @@
 # Package Imports
 from gmdkit.utils import enums
 from gmdkit.serialization.type_cast import decode_text, encode_text, get_string
+from gmdkit.models.object import Object, ObjectList
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
@@ -304,6 +305,234 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     editor_build_tab_pages: dict = DictField(key="kI6", default_factory=dict, is_node=True)
 
     editor_layer: int = DictField(key="kI7", default=0)
+    
+    @property
+    def start(self) -> Object:
+        objstr = self.object_string
+
+        if not hasattr(objstr, "start"):
+            objstr.load()
+
+        return getattr(objstr, "start")
+
+    @start.setter
+    def start(self, value: Object):
+        objstr = self.object_string
+
+        if not hasattr(objstr, "start"):
+            objstr.load()
+
+        setattr(objstr, "start", value)
+
+    @property
+    def objects(self) -> ObjectList:
+        objstr = self.object_string
+
+        if not hasattr(objstr, "objects"):
+            objstr.load()
+
+        return getattr(objstr, "objects")
+
+    @objects.setter
+    def objects(self, value: ObjectList):
+        objstr = self.object_string
+
+        if not hasattr(objstr, "objects"):
+            objstr.load()
+
+        setattr(objstr, "objects", value)
+    
+    @property
+    def difficulty(self) -> enums.LevelDifficulty:
+        """
+        Gets the difficulty rating of a level.
+
+        Returns
+        -------
+        enums.LevelDifficulty
+            An enum specifying the level's difficulty.
+        """
+        if self.rating == 0:
+            return enums.LevelDifficulty.NA
+
+        match self.rating_sum:
+            case enums.LevelRating.NONE:
+                return enums.LevelDifficulty.NA
+            case enums.LevelRating.EASY:
+                if self.is_auto:
+                    return enums.LevelDifficulty.AUTO
+                else:
+                    return enums.LevelDifficulty.EASY
+            case enums.LevelRating.NORMAL:
+                return enums.LevelDifficulty.NORMAL
+            case enums.LevelRating.HARD:
+                return enums.LevelDifficulty.HARD
+
+            case enums.LevelRating.HARDER:
+                return enums.LevelDifficulty.HARDER
+
+            case enums.LevelRating.INSANE:
+                if self.is_demon:
+
+                    match self.demon_type:
+
+                        case enums.DemonRating.EASY:
+                            return enums.LevelDifficulty.EASY_DEMON
+
+                        case enums.DemonRating.MEDIUM:
+                            return enums.LevelDifficulty.MEDIUM_DEMON
+
+                        case enums.DemonRating.HARD:
+                            return enums.LevelDifficulty.HARD_DEMON
+
+                        case enums.DemonRating.INSANE:
+                            return enums.LevelDifficulty.INSANE_DEMON
+
+                        case enums.DemonRating.EXTREME:
+                            return enums.LevelDifficulty.EXTREME_DEMON
+
+                        case _:
+                            return enums.LevelDifficulty.HARD_DEMON
+                else:
+                    return enums.LevelDifficulty.INSANE
+
+            case _:
+                return enums.LevelDifficulty.NA
+    
+    @difficulty.setter
+    def difficulty(self, value: enums.LevelDifficulty):
+        del self.is_auto
+        del self.is_demon
+        self.rating = 10
+        
+        match value:
+            case enums.LevelDifficulty.NA:
+                del self.rating
+                self.rating_sum = enums.LevelRating.NONE
+                
+            case enums.LevelDifficulty.AUTO:
+                self.rating_sum = enums.LevelRating.EASY
+                self.is_auto = True
+                
+            case enums.LevelDifficulty.EASY:
+                self.rating_sum = enums.LevelRating.EASY
+                
+            case enums.LevelDifficulty.NORMAL:
+                self.rating_sum = enums.LevelRating.NORMAL
+                
+            case enums.LevelDifficulty.HARD:
+                self.rating_sum = enums.LevelRating.HARD
+                
+            case enums.LevelDifficulty.HARDER:
+                self.rating_sum = enums.LevelRating.HARDER
+                
+            case enums.LevelDifficulty.INSANE:
+                self.rating_sum = enums.LevelRating.INSANE
+                
+            case (
+                enums.LevelDifficulty.EASY_DEMON
+                | enums.LevelDifficulty.MEDIUM_DEMON
+                | enums.LevelDifficulty.HARD_DEMON
+                | enums.LevelDifficulty.INSANE_DEMON
+                | enums.LevelDifficulty.EXTREME_DEMON
+            ):
+                self.rating_sum = enums.LevelRating.INSANE
+                self.is_demon = True
+                
+                match value:
+                    case enums.LevelDifficulty.EASY_DEMON: 
+                        self.demon_type = enums.DemonRating.EASY,
+                    case enums.LevelDifficulty.MEDIUM_DEMON: 
+                        self.demon_type = enums.DemonRating.MEDIUM,
+                    case enums.LevelDifficulty.HARD_DEMON: 
+                        self.demon_type = enums.DemonRating.HARD,
+                    case enums.LevelDifficulty.INSANE_DEMON: 
+                        self.demon_type = enums.DemonRating.INSANE,
+                    case enums.LevelDifficulty.EXTREME_DEMON: 
+                        self.demon_type = enums.DemonRating.EXTREME,
+                        
+            case _:
+                raise ValueError(f"Unsupported level difficulty: {value!r}")
+
+    @property
+    def feature_rating(self) -> enums.FeatureRating:
+        match self.epic_rating:
+
+            case enums.EpicRating.EPIC:
+                return enums.FeatureRating.EPIC
+
+            case enums.EpicRating.LEGENDARY:
+                return enums.FeatureRating.LEGENDARY
+
+            case enums.EpicRating.MYTHIC:
+                return enums.FeatureRating.MYTHIC
+
+            case _:
+                if self.feature_score:
+                    return enums.FeatureRating.FEATURED
+
+                elif self.stars:
+                    return enums.FeatureRating.RATED
+
+                else:
+                    return enums.FeatureRating.UNRATED
+
+    @feature_rating.setter
+    def feature_rating(self, value: enums.FeatureRating) -> None:
+        match value:
+            case enums.FeatureRating.UNRATED:
+                self.epic_rating = enums.EpicRating.NONE
+                self.feature_score = 0
+                self.stars = 0
+
+            case enums.FeatureRating.RATED:
+                self.epic_rating = enums.EpicRating.NONE
+                self.feature_score = 0
+
+            case enums.FeatureRating.FEATURED:
+                self.epic_rating = enums.EpicRating.NONE
+                self.feature_score = self.feature_score or 1
+
+            case enums.FeatureRating.EPIC:
+                self.epic_rating = enums.EpicRating.EPIC
+
+            case enums.FeatureRating.LEGENDARY:
+                self.epic_rating = enums.EpicRating.LEGENDARY
+
+            case enums.FeatureRating.MYTHIC:
+                self.epic_rating = enums.EpicRating.MYTHIC
+
+            case _:
+                raise ValueError(f"Unsupported feature rating: {value!r}")
+
+    @property
+    def timely_type(self) -> enums.TimelyType:
+        """
+        Gets the timely (daily, weekly, event) type of a level.
+        
+        Parameters
+        ----------
+        level : Level
+            The level to check.
+            
+        Returns
+        -------
+        enums.TimelyType
+            An enum specifying the level's timely type.
+        """
+        tid = self.timely_id
+        
+        if tid is None:
+            return enums.TimelyType.NONE
+        elif (0<tid<=10000):
+            return enums.TimelyType.DAILY
+        elif (10000<tid<=20000):
+            return enums.TimelyType.WEEKLY
+        elif (20000<tid<=30000):
+            return enums.TimelyType.EVENT
+        else:
+            return enums.TimelyType.NONE
+    
 
 FieldLoaderMixin.add_field(key="k24") # dislikes, unused
 FieldLoaderMixin.add_field(key="k106") # unknown

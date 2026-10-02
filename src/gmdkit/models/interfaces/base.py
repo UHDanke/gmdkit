@@ -1,5 +1,6 @@
 # Package Imports
 from gmdkit.utils import enums
+from gmdkit.mappings import color_id
 from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.casting.object_loader import FieldLoaderMixin
 from gmdkit.models.prop.groups import IDList
@@ -155,6 +156,76 @@ class BaseObject(BaseInterface):
         factor = value / current
         self.scale_x *= factor
         self.scale_y *= factor
+        
+    def clear_transforms(self):
+        del self.rotation
+        del self.scale_x
+        del self.scale_y
+        del self.skew_x
+        del self.skew_y
+        
+    def clear_position(self):
+        del self.x
+        del self.y
+
+    def clear_color(self):
+        del self.color_1
+        del self.color_2
+        del self.color_1_index
+        del self.color_2_index
+        
+    def fix_transform(self):
+        if self.scale_x < -1:
+            self.scale_x *= -1
+            
+            if self.flip_x:
+                del self.flip_x
+            else:
+                self.flip_x = not self.flip_x
+                
+        if self.scale_y < -1:
+            self.scale_y *= -1
+            
+            if self.flip_y:
+                del self.flip_y
+            else:
+                self.flip_y = not self.flip_y
+        
+        self.skew_x %= 360
+        self.skew_y %= 360
+        self.rotation %= 360
+        
+        if self.skew_x == self.skew_y:
+            self.rotation += self.skew_x
+            self.rotation %= 360
+            self.skew_x = self.skew_y =  0
+        
+        elif self.rotation > 0:
+            self.skew_x += self.rotation
+            self.skew_y += self.rotation
+            self.skew_x %= 360
+            self.skew_y %= 360
+            self.rotation = 0
+        
+        if self.skew_x == self.skew_y == 0:
+            del self.skew_x
+            del self.skew_y
+            
+        if self.rotation == 0:
+            del self.rotation
+            
+    def fix_groups(self):
+        # clean duplicates
+        groups = set(self.groups)
+        parents = set(self.parent_groups)
+        groups = sorted(groups)[:10] # limit groups
+        parents &= groups # clean phantom groups
+        self.groups[:] = groups
+        self.parent_groups[:] = sorted(parents)[:10]
+        
+    def fix_color(self):
+        if self.color_1 == color_id.LIGHTER:
+            self.color_1 = color_id.WHITE
 
 
 class EffectObject(BaseObject):

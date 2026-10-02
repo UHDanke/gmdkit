@@ -20,8 +20,6 @@ class IntBoolDict(PlistDecoderMixin,DictClass[int,bool]):
 
 class PlistDict(PlistDecoderMixin,DictClass[str, Any]):
     pass
-    #DECODER = staticmethod(kv_wrap(None, None, None))
-    #ENCODER = staticmethod(kv_wrap(None, None, None))
 
 class StrIntDict(PlistDecoderMixin,DictClass[str,int]):
     DECODER = staticmethod(kv_wrap(str, int, None))

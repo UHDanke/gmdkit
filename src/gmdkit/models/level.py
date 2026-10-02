@@ -3,7 +3,6 @@ from typing import Any
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.mixins import (
     FilePathMixin,
     FolderLoaderMixin,
@@ -25,42 +24,6 @@ class Level(FilePathMixin,FieldLoaderMixin,DictClass[str,Any]):
 
     def _name_fallback_(self):
         return str(self.name)
-
-    @property
-    def start(self) -> Object:
-        objstr = self.object_string
-
-        if not hasattr(objstr, "start"):
-            objstr.load()
-
-        return getattr(objstr, "start")
-
-    @start.setter
-    def start(self, value: Object):
-        objstr = self.object_string
-
-        if not hasattr(objstr, "start"):
-            objstr.load()
-
-        setattr(objstr, "start", value)
-
-    @property
-    def objects(self) -> ObjectList:
-        objstr = self.object_string
-
-        if not hasattr(objstr, "objects"):
-            objstr.load()
-
-        return getattr(objstr, "objects")
-
-    @objects.setter
-    def objects(self, value: ObjectList):
-        objstr = self.object_string
-
-        if not hasattr(objstr, "objects"):
-            objstr.load()
-
-        setattr(objstr, "objects", value)
 
     @classmethod
     def default(cls, name:str, **kwargs):

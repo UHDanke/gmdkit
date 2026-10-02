@@ -1,14 +1,13 @@
-from typing import Callable, Any, Optional, TypeVar, overload, Type
+# Imports
+from typing import Callable, Any, Optional, TypeVar, overload, Type, Union
 from collections import ChainMap
 
+# Package Imports
 from gmdkit.utils.typing import MISSING
 from gmdkit.utils.types import DictClass
 from gmdkit.serialization.functions import (
-    read_plist, write_plist,
+    read_plist, write_plist, codec_cast
     )
-
-
-V = TypeVar("V", bound="BaseInterface")
 
 
 class BaseInterface:
@@ -45,6 +44,10 @@ class BaseInterface:
 
     def __repr__(self):
         return f"{type(self).__name__}({self.obj!r})"
+
+
+V = TypeVar("V", bound=BaseInterface)
+T = TypeVar("T")
 
 
 class Default:
@@ -89,36 +92,6 @@ class EncoderCodec(Codec):
     def __call__(self, value, **kwargs):
         result = super().__call__(value, **kwargs)
         return write_plist(result)
-
-
-def codec_cast(
-    codecs,
-    *,
-    key_start=None,
-    key_end=None,
-    default=None,
-):
-    c_get = codecs.get
-    has_default = callable(default)
-    use_start = callable(key_start)
-    use_end = callable(key_end)
-
-    def cast_func(key, value, **kwargs):
-        if use_start:
-            key = key_start(key)
-
-        codec = c_get(key)
-        if codec is None:
-            value = default(value) if has_default else value
-        else:
-            value = codec(value, **kwargs)
-
-        if use_end:
-            key = key_end(key)
-
-        return key, value
-
-    return cast_func
 
 
 class AliasField:
@@ -342,39 +315,31 @@ class FieldInterface(DictClass, metaclass=InterfaceMetaclass):
     @property
     def current_id(self):
         return dict.get(self, type(self).ID_KEY) if type(self).ID_KEY else None
-
+    
+    @property
+    def interface(self) -> BaseInterface:
+        schema = type(self).get_schema(self.current_id)
+        return schema(self)
+    
     @overload
-    def interface(self, key: None = None) -> BaseInterface: ...
+    def require_interface(self, cls: Type[V]) -> V: ...
     @overload
-    def interface(self, key: type[V]) -> Optional[V]: ...
+    def require_interface(self, cls: Type[V], fallback: T) -> Union[V,T]: ...
+    def require_interface(self, cls, fallback=MISSING):
+        schema = type(self).get_schema(self.current_id)
+        if issubclass(schema, cls):
+            return schema(self)
+        if fallback is not MISSING:
+            return fallback
+        raise TypeError(...)
+    
     @overload
-    def interface(self, key: int | str) -> Optional[BaseInterface]: ...
-
-    def interface(self, key: type[BaseInterface] | int | str | None = None):
-        cls = type(self)
-        current_id = self.current_id
-
-        if key is None:
-            view_cls = cls.get_schema(current_id)
-        elif isinstance(key, type) and issubclass(key, BaseInterface):
-            resolved = cls.get_schema(current_id)
-            view_cls = resolved if issubclass(resolved, key) else None
-        else:
-            view_cls = cls._VIEW_CHAIN.get(key) if key == current_id else None
-
-        return view_cls(self) if view_cls is not None else None
-
+    def require_interface_by_id(self, id: int | str) -> BaseInterface: ...
     @overload
-    def require_interface(self, key: None = None) -> BaseInterface: ...
-    @overload
-    def require_interface(self, key: type[V]) -> V: ...
-    @overload
-    def require_interface(self, key: int | str) -> BaseInterface: ...
-
-    def require_interface(self, key=None):
-        result = self.interface(key)
-        if result is None:
-            raise TypeError(
-                f"{type(self).__name__} has no interface for id {self.current_id!r}"
-            )
-        return result
+    def require_interface_by_id(self, id: int | str, fallback: T) -> BaseInterface | T: ...
+    def require_interface_by_id(self, id, fallback=MISSING):
+        if id == self.current_id:
+            return self.interface
+        if fallback is not MISSING:
+            return fallback
+        raise TypeError(...)
