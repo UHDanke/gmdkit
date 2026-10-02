@@ -1,7 +1,7 @@
 # Package Imports
-from gmdkit.mappings import obj_prop, obj_id
+from gmdkit.models import interfaces as I
 from gmdkit.remapping.base import ID_RULES as BASE_ID_HANDLER
-from gmdkit.remapping.classes import IDRule, RuleHandler
+from gmdkit.remapping.classes import RuleHandler
 from gmdkit.remapping.types import IDType
 from gmdkit.remapping.utils import create_text_rule, create_label_rule
 
@@ -87,16 +87,20 @@ TEXT_ID_LABEL_RULE = create_label_rule(
     id_type=IDType.LABEL
     )
 
-TEXT_ID_HANDLER = RuleHandler(by_id={obj_id.TEXT:(TEXT_NUM_RULE,TEXT_ID_RULE,TEXT_REMAP_RULE)})
+TEXT_ID_HANDLER = RuleHandler({I.Text: (TEXT_NUM_RULE, TEXT_ID_RULE, TEXT_REMAP_RULE)})
 
-EDITOR_LAYERS_HANDLER = RuleHandler(base=(
-    IDRule(obj_prop.EDITOR_L1, IDType.GENERIC, reference=True, default=0, id_min=-32768, id_max=32767),
-    IDRule(obj_prop.EDITOR_L2, IDType.GENERIC, reference=True, default=lambda obj: 0 if obj.get(obj_prop.EDITOR_L1) else None, id_min=-32768, id_max=32767)
-    ))
+EDITOR_LAYERS_HANDLER = RuleHandler()
+EDITOR_LAYERS_HANDLER.register_rule(
+    I.BaseObject, "editor_l1", IDType.GENERIC,
+    when_unset=True, reference=True, id_min=-32768, id_max=32767)
+EDITOR_LAYERS_HANDLER.register_rule(
+    I.BaseObject, "editor_l2", IDType.GENERIC,
+    when_unset=lambda view: bool(view.editor_l1), reference=True, id_min=-32768, id_max=32767)
 
-Z_LAYER_HANDLER = RuleHandler(base=(
-    IDRule(obj_prop.Z_LAYER, IDType.GENERIC, reference=True, id_min=-5, id_max=11),
-    ))
+Z_LAYER_HANDLER = RuleHandler()
+Z_LAYER_HANDLER.register_rule(
+    I.BaseObject, "z_layer", IDType.GENERIC,
+    reference=True, id_min=-5, id_max=11)
 
 COLOR_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=(IDType.COLOR_ID,))
 

@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.models.interfaces.base import (
-    EffectObject, TriggerObject, Field, register_id
+    TriggerObject, Field, register_id
     )
 from gmdkit.models.interfaces.animated import AnimatedObject
 
@@ -24,7 +24,7 @@ class SmallCoin(AnimatedObject,CollectibleObject):
     pass
 
 
-class UserCoin(AnimatedObject,EffectObject):
+class UserCoin(AnimatedObject,CollectibleObject):
     pass
 
 

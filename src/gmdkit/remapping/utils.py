@@ -4,7 +4,6 @@ import bisect
 from typing import Callable, Optional, Iterable
 
 # Package Imports
-from gmdkit.mappings import obj_prop
 from gmdkit.remapping.classes import IDRule
 from gmdkit.remapping.types import IDType, LabelID
 
@@ -14,7 +13,8 @@ def create_text_rule(
         id_type:IDType,
         condition:Optional[Callable]=None,
         id_min:Optional[int]=None,
-        id_max:Optional[int]=None
+        id_max:Optional[int]=None,
+        field:str="data"
         ) -> IDRule:
     # Compiles an ID rule that retrieves a group ID from a text object field.
     
@@ -41,7 +41,7 @@ def create_text_rule(
         optionals["id_max"] = id_max
          
     return IDRule(
-        obj_prop_id=obj_prop.text.DATA,
+        field=field,
         id_type=id_type,
         function=function,
         replace=replace,
@@ -53,7 +53,8 @@ def create_label_rule(
         id_type: IDType,
         condition: Optional[Callable] = None,
         id_min: Optional[int] = None,
-        id_max: Optional[int] = None
+        id_max: Optional[int] = None,
+        field:str="data"
         ) -> IDRule:
     # Compiles an ID rule for LabelID objects with a specific template.
 
@@ -74,7 +75,7 @@ def create_label_rule(
         optionals["id_max"] = id_max
 
     return IDRule(
-        obj_prop_id=obj_prop.text.DATA,
+        field=field,
         id_type=id_type,
         function=function,
         replace=replace,

@@ -82,6 +82,7 @@ __all__ = [
     "TimerTrigger",
     "AdvancedRandomTrigger",
     "EventTrigger",
+    "LevelSettings",
     "LinkVisibleTrigger",
     "ObjectControlTrigger",
     "OnDeathTrigger",
@@ -176,6 +177,7 @@ from .audio import (
     SongTrigger
 )
 from .base import (
+    LevelSettings,
     BaseObject,
     EffectObject,
     TriggerObject

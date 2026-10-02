@@ -6,7 +6,8 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.mappings import obj_prop, obj_id
+from gmdkit.models import interfaces
+from gmdkit.mappings import obj_id
 
 
 MAGIC = b'\xc4\x19\x7b\xfa'
@@ -163,7 +164,8 @@ class GlobedScript:
         
     def load(self):
         try:
-            string = self.object[obj_prop.text.DATA]
+            intf = self.object.require_interface(interfaces.Text)
+            string = intf.data
             string_bytes = string.encode("utf-8", errors="surrogateescape")              
             pre, main, fn, content, sig, tail = decode_script(string_bytes)
             self.prefix = pre
@@ -189,7 +191,8 @@ class GlobedScript:
                 )
             
             string = string_bytes.decode("utf-8", errors="surrogateescape")
-            self.object[obj_prop.text.DATA] = string
+            intf = self.object.require_interface(interfaces.Text)
+            intf.data = string
             
         except Exception as e:
             raise RuntimeError(f"Error while saving script data to object: {e}") from e
@@ -225,11 +228,13 @@ class GlobedScript:
         result = []
         
         for obj in obj_list:
+            obj: Object
+            intf = obj.require_interface(interfaces.Text, fallback=None)
             
-            if obj_id.TEXT != obj.get(obj_prop.ID):
+            if intf is None:
                 continue
             
-            string = obj.get(obj_prop.text.DATA)
+            string = intf.data
             
             if string is None:
                 continue

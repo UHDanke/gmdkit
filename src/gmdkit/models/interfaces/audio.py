@@ -115,7 +115,7 @@ class SongTrigger(TriggerObject):
     end: int = Field(410)
     fade_out: int = Field(411)
     loop: bool = Field(413)
-    channel: int = Field(432)
+    song_channel: int = Field(432)
     dont_reset: bool = Field(595)
 
 
@@ -127,7 +127,7 @@ class EditSongTrigger(VolumeInterface,TriggerObject):
     stop: bool = Field(417)
     change_volume: bool = Field(418)
     change_speed: bool = Field(419)
-    channel: int = Field(432)
+    song_channel: int = Field(432)
 
 
 # BPMTrigger

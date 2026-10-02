@@ -1,1220 +1,674 @@
-# Package Imports
-from gmdkit.mappings import obj_id, obj_prop
-from gmdkit.remapping.classes import IDRule, RuleHandler, IDType, IDActions
-from gmdkit.remapping.base_func import (
-    item_edit_target_is_item,
-    area_use_effect_id,
-    get_area_default_center,
-    get_default_pinch_target,
-    get_move_default_target,
-    get_custom_color_copies,
-    special_color,
-    get_rotate_default_aim,
-    get_default_shockline_target,
-    item_compare_first_is_item,
-    get_special_color_copies,
-    get_default_collision_block_b,
-    get_default_gradient,
-    remap_special_base_color_copies,
-    item_label_display_item,
-    get_custom_color_channels,
-    remap_custom_color_copies,
-    get_rotate_default_aim_target,
-    item_edit_first_is_item,
-    stop_use_control_id,
-    remap_custom_color_channels,
-    item_compare_second_is_timer,
-    get_default_radial_blur_target,
-    item_persist_timer,
-    get_secondary_color,
-    get_default_collision_block_a,
-    get_default_keyframe_group,
-    item_persist_item,
-    item_compare_second_is_item,
-    item_edit_second_is_timer,
-    get_sfx_default_volume_group,
-    item_edit_target_is_timer,
-    remap,
-    edit_adv_follow_use_control_id,
-    pulse_target_channel,
-    remap_special_color_channels,
-    remap_pairs_keys,
-    get_gray_scale_default_color,
-    edit_adv_follow_use_group,
-    get_default_instant_coll_block_b,
-    get_default_motion_blur_target,
-    get_default_shockwave_target,
-    get_song_default_volume_group,
-    get_default_lens_circle_target,
-    remap_pairs_vals,
-    get_effect_tint_channel,
-    get_keys,
-    get_collectible_default_group_id,
-    area_use_group_id,
-    item_edit_second_is_item,
-    get_collectible_default_item_id,
-    spawn_keep_remap,
-    item_label_display_timer,
-    item_compare_first_is_timer,
-    get_special_color_channels,
-    pulse_target_group,
-    get_values,
-    get_default_bulge_target,
-    item_edit_first_is_timer,
-    stop_use_group,
-    get_default_instant_coll_block_a,
-    get_base_color
-)
-    
+from gmdkit.models import interfaces as I
+from gmdkit.models.interfaces.area import AreaTrigger
+from gmdkit.models.interfaces.area import EditAreaTrigger
+from gmdkit.models.interfaces.enter import EnterTrigger
+from gmdkit.models.interfaces.base import LevelSettings
+from gmdkit.models.interfaces.audio import VolumeInterface
+from gmdkit.remapping.classes import RuleHandler
+from gmdkit.remapping.types import IDType, IDActions
+from typing import Optional, Any
+from gmdkit.models.object import Object
+from gmdkit.models.prop.color import Color, ColorList
+from gmdkit.models.prop.list import IntPairList
+from gmdkit.mappings import obj_prop
+from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
+from gmdkit.remapping.types import AutoID
+ 
 
-ID_RULES = RuleHandler(
-    base = (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.COLOR_1, fallback=get_base_color, default=0, actions=(IDActions.ALPHA, IDActions.COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.COLOR_2, fallback=get_secondary_color, default=0, actions=(IDActions.ALPHA, IDActions.COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.GROUPS, replace=remap, id_min=1, id_max=9999, iterable=True, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.PARENT_GROUPS, replace=remap, id_min=1, id_max=9999, iterable=True, reference=True),
-            IDRule(id_type=IDType.LINK_ID, obj_prop_id=obj_prop.LINKED_GROUP, id_min=1, reference=True),
-            IDRule(id_type=IDType.TRIGGER_CHANNEL, obj_prop_id=obj_prop.trigger.CHANNEL, default=0, reference=True),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.ENTER_CHANNEL, default=0, id_min=-32768, id_max=32767, reference=True),
-            IDRule(id_type=IDType.MATERIAL_ID, obj_prop_id=obj_prop.MATERIAL, default=0, id_min=-32768, id_max=32767, reference=True),
-            IDRule(id_type=IDType.CONTROL_ID, obj_prop_id=obj_prop.trigger.CONTROL_ID, default=0, remappable=True, reference=True)
-        ),
-    by_id = {
-        obj_id.trigger.COLOR: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.color.CHANNEL, actions=(IDActions.ALPHA, IDActions.COLOR), fixed=special_color, id_min=1, id_max=1101),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.color.COPY_ID, actions=(IDActions.ALPHA, IDActions.COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True)
-        ),
-    obj_id.trigger.shader.GRAY_SCALE: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.shader.GRAY_SCALE_TINT_CHANNEL, default=get_gray_scale_default_color, actions=(IDActions.COLOR), fixed=special_color, remappable=True, id_min=1, id_max=1101, reference=True)
-        ,),
-    obj_id.trigger.shader.LENS_CIRCLE: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.shader.LENS_CIRCLE_TINT_CHANNEL, default=0, actions=(IDActions.COLOR), fixed=special_color, remappable=True, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.LENS_CIRCLE_CENTER_ID, default=get_default_lens_circle_target, remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.shader.RADIAL_BLUR: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.shader.RADIAL_BLUR_REF_CHANNEL, default=0, actions=(IDActions.COLOR), fixed=special_color, remappable=True, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.RADIAL_BLUR_CENTER_ID, default=get_default_radial_blur_target, remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.shader.MOTION_BLUR: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.shader.MOTION_BLUR_REF_CHANNEL, default=0, actions=(IDActions.COLOR), fixed=special_color, remappable=True, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.MOTION_BLUR_CENTER_ID, default=get_default_motion_blur_target, remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.PULSE: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.pulse.COPY_ID, actions=(IDActions.COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.pulse.TARGET_ID, condition=pulse_target_channel, default=0, actions=(IDActions.FOLLOW_COLOR), fixed=special_color, remappable=True, id_min=1, id_max=1101),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.pulse.TARGET_ID, condition=pulse_target_group, default=0, remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.AREA_TINT: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.effect.TINT_CHANNEL, default=get_effect_tint_channel, actions=(IDActions.FOLLOW_COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.COLOR), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
-        ),
-    obj_id.trigger.enter.TINT: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.trigger.effect.TINT_CHANNEL, default=get_effect_tint_channel, actions=(IDActions.FOLLOW_COLOR), fixed=special_color, id_min=1, id_max=1101, reference=True),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ),
-    obj_id.LEVEL_START: (
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_custom_color_channels, replace=remap_custom_color_channels, actions=(IDActions.ALPHA, IDActions.COLOR), id_min=1, id_max=1101, iterable=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_custom_color_copies, replace=remap_custom_color_copies, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR), id_min=1, id_max=1101, iterable=True, reference=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_special_color_channels, replace=remap_special_color_channels, actions=(IDActions.ALPHA, IDActions.COLOR), fixed=True, id_min=1, id_max=1101, iterable=True),
-            IDRule(id_type=IDType.COLOR_ID, obj_prop_id=obj_prop.level.COLORS, function=get_special_color_copies, replace=remap_special_base_color_copies, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR), fixed=True, id_min=1, id_max=1101, iterable=True, reference=True),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.level.PLAYER_SPAWN, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.MOVE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_POS, default=get_move_default_target, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.move.TARGET_CENTER_ID, default=get_move_default_target, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.ALPHA: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.alpha.GROUP_ID, default=0, actions=(IDActions.ALPHA), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.TOGGLE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.toggle.GROUP_ID, default=0, actions=(IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.TOGGLE_BLOCK: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.toggle_block.GROUP_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.orb.TOGGLE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.toggle_block.GROUP_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.ON_DEATH: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.on_death.GROUP_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.SPAWN: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.spawn.GROUP_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.REMAP_BASE, obj_prop_id=obj_prop.trigger.spawn.REMAPS, function=get_keys, replace=remap_pairs_keys, iterable=True),
-            IDRule(id_type=IDType.REMAP_TARGET, obj_prop_id=obj_prop.trigger.spawn.REMAPS, function=get_values, replace=remap_pairs_vals, remappable=spawn_keep_remap, iterable=True)
-        ),
-    obj_id.trigger.TELEPORT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ,),
-    747: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ,),
-    2902: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ,),
-    3027: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.teleport.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.EDIT_SONG: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.song.GROUP_ID_1, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.song.GROUP_ID_2, default=get_song_default_volume_group, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.SONG_CHANNEL, obj_prop_id=obj_prop.trigger.song.CHANNEL, default=0, remappable=True, id_min=0, id_max=4)
-        ),
-    obj_id.trigger.SFX: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.sfx.GROUP_ID_1, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.sfx.GROUP_ID_2, default=get_sfx_default_volume_group, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.SFX_ID, obj_prop_id=obj_prop.trigger.sfx.SFX_ID, default=0, remappable=True, reference=True),
-            IDRule(id_type=IDType.UNIQUE_SFX_ID, obj_prop_id=obj_prop.trigger.sfx.UNIQUE_ID, default=0, remappable=True, reference=True),
-            IDRule(id_type=IDType.SFX_GROUP, obj_prop_id=obj_prop.trigger.sfx.GROUP_ID, default=0, remappable=True)
-        ),
-    obj_id.trigger.EDIT_SFX: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.sfx.GROUP_ID_1, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.sfx.GROUP_ID_2, default=get_sfx_default_volume_group, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.sfx.GROUP, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.UNIQUE_SFX_ID, obj_prop_id=obj_prop.trigger.sfx.UNIQUE_ID, default=0, remappable=True),
-            IDRule(id_type=IDType.SFX_GROUP, obj_prop_id=obj_prop.trigger.sfx.GROUP_ID, default=0, remappable=True)
-        ),
-    obj_id.trigger.ROTATE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION, IDActions.ROTATE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.CENTER_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.AIM_TARGET, default=get_rotate_default_aim_target, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.MIN_X_ID, default=get_rotate_default_aim, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.MIN_Y_ID, default=get_rotate_default_aim, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.MAX_X_ID, default=get_rotate_default_aim, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.rotate.MAX_Y_ID, default=get_rotate_default_aim, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.FOLLOW: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.follow.TARGET_ID, default=0, actions=(IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.follow.FOLLOW_TARGET, default=0, actions=(IDActions.FOLLOW_MOVE), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.ANIMATE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate.TARGET_ID, default=0, actions=(IDActions.ANIMATE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.TOUCH: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.touch.GROUP_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.COUNT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.count.TARGET_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.count.ITEM_ID, default=0, actions=(IDActions.TRACK_ITEM), remappable=True, id_min=0, id_max=9999)
-        ),
-    obj_id.trigger.INSTANT_COUNT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.instant_count.TARGET_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.instant_count.ITEM_ID, default=0, actions=(IDActions.GET_ITEM), remappable=True, id_min=0, id_max=9999, reference=True)
-        ),
-    obj_id.trigger.FOLLOW_PLAYER_Y: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.follow_player_y.TARGET_ID, default=0, actions=(IDActions.MOVE), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.COLLISION: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collision.TARGET_ID, default=0, actions=(IDActions.SPAWN, IDActions.TOGGLE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.COLLISION_ID, obj_prop_id=obj_prop.trigger.collision.BLOCK_A, default=get_default_collision_block_a, actions=(IDActions.TRACK_COLLISION), remappable=True, id_min=0, id_max=9999),
-            IDRule(id_type=IDType.COLLISION_ID, obj_prop_id=obj_prop.trigger.collision.BLOCK_B, default=get_default_collision_block_b, actions=(IDActions.TRACK_COLLISION), remappable=True, id_min=0, id_max=9999)
-        ),
-    obj_id.trigger.RANDOM: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.random.TRUE_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.random.FALSE_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.END_WALL: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.end_wall.GROUP_ID, default=0, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.CAMERA_EDGE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.camera_edge.TARGET_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.CHECKPOINT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.checkpoint.SPAWN_ID, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.checkpoint.TARGET_POS, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.checkpoint.RESPAWN_ID, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.SCALE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.scale.TARGET_ID, default=0, actions=(IDActions.SCALE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.scale.CENTER_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.ADV_FOLLOW: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_follow.TARGET_ID, default=0, actions=(IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_follow.FOLLOW_ID, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_follow.MAX_RANGE_REF, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_follow.START_SPEED_REF, default=0, actions=(IDActions.FOLLOW_MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_follow.START_DIR_REF, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.KEYFRAME: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.keyframe.GROUP_ID, default=get_default_keyframe_group, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.keyframe.SPAWN_ID, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.KEYFRAME_ID, obj_prop_id=obj_prop.trigger.keyframe.KEY_ID, default=0, id_min=0, reference=True)
-        ),
-    obj_id.trigger.ANIMATE_KEYFRAME: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.TARGET_ID, default=0, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.PARENT_ID, default=0, actions=(IDActions.FOLLOW_SCALE, IDActions.FOLLOW_ROTATE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.animate_keyframe.ANIMATION_ID, default=0, actions=(IDActions.KEYFRAME), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.END: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.end.SPAWN_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.end.TARGET_POS, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.EVENT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.event.SPAWN_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.MATERIAL_ID, obj_prop_id=obj_prop.trigger.event.EXTRA_ID_1, default=0, remappable=True)
-        ),
-    obj_id.trigger.SPAWN_PARTICLE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.spawn_particle.PARTICLE_GROUP, default=0, actions=(IDActions.PARTICLES), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.spawn_particle.POSITION_GROUP, default=0, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.INSTANT_COLLISION: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.instant_collision.TRUE_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.instant_collision.FALSE_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.COLLISION_ID, obj_prop_id=obj_prop.trigger.instant_collision.BLOCK_A, default=get_default_instant_coll_block_a, actions=(IDActions.CHECK_COLLISION), remappable=True, id_min=0, id_max=9999),
-            IDRule(id_type=IDType.COLLISION_ID, obj_prop_id=obj_prop.trigger.instant_collision.BLOCK_B, default=get_default_instant_coll_block_b, actions=(IDActions.CHECK_COLLISION), remappable=True, id_min=0, id_max=9999)
-        ),
-    obj_id.trigger.UI: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.ui.GROUP_ID, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.ui.UI_TARGET, default=0, actions=(IDActions.UI, IDActions.MOVE), id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.TIME: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.time.TARGET_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.time.ITEM_ID, default=0, actions=(IDActions.SET_ITEM), remappable=True, reference=True)
-        ),
-    obj_id.trigger.TIME_EVENT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.time_event.TARGET_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.time_event.ITEM_ID, default=0, actions=(IDActions.TRACK_ITEM), remappable=True, reference=True)
-        ),
-    obj_id.trigger.RESET: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.reset.GROUP_ID, default=0, actions=(IDActions.RESET), remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.OBJECT_CONTROL: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.object_control.TARGET_ID, default=0, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.LINK_VISIBLE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.link_visible.GROUP_ID, default=0, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.ITEM_COMPARE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.item_compare.TRUE_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.item_compare.FALSE_ID, default=0, actions=(IDActions.SPAWN), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.item_compare.ITEM_ID_1, condition=item_compare_first_is_item, default=0, actions=(IDActions.GET_ITEM), remappable=True, id_min=0, id_max=9999, reference=True),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.item_compare.ITEM_ID_1, condition=item_compare_first_is_timer, default=0, actions=(IDActions.GET_ITEM), remappable=True, id_min=0, id_max=9999, reference=True),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.item_compare.ITEM_ID_2, condition=item_compare_second_is_item, default=0, actions=(IDActions.GET_ITEM), remappable=True, id_min=1, id_max=9999, reference=True),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.item_compare.ITEM_ID_2, condition=item_compare_second_is_timer, default=0, actions=(IDActions.GET_ITEM), remappable=True, id_min=1, id_max=9999, reference=True)
-        ),
-    obj_id.trigger.STATE_BLOCK: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.state_block.STATE_ON, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.state_block.STATE_OFF, default=0, actions=(IDActions.SPAWN), id_min=1, id_max=9999)
-        ),
-    obj_id.trigger.STATIC_CAMERA: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.static_camera.TARGET_ID, default=0, remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.GRADIENT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.gradient.U, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.gradient.D, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.gradient.L, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.gradient.R, default=0, actions=(IDActions.FOLLOW_POSITION), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GRADIENT_ID, obj_prop_id=obj_prop.trigger.gradient.GRADIENT_ID, default=get_default_gradient, id_min=0, id_max=1000, reference=True)
-        ),
-    obj_id.trigger.shader.SHOCKWAVE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.SHOCKWAVE_CENTER_ID, default=get_default_shockwave_target, remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.shader.SHOCKLINE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.SHOCKLINE_CENTER_ID, default=get_default_shockline_target, remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.shader.BULGE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.BULGE_CENTER_ID, default=get_default_bulge_target, remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.shader.PINCH: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.shader.PINCH_CENTER_ID, default=get_default_pinch_target, remappable=True, id_min=1, id_max=9999)
-        ,),
-    obj_id.trigger.STOP: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.stop.TARGET_ID, condition=stop_use_group, default=0, actions=(IDActions.STOP), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.CONTROL_ID, obj_prop_id=obj_prop.trigger.stop.TARGET_ID, condition=stop_use_control_id, default=0, actions=(IDActions.STOP), remappable=True)
-        ),
-    obj_id.trigger.SEQUENCE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.sequence.SEQUENCE, function=get_keys, replace=remap_pairs_keys, actions=(IDActions.SPAWN), id_min=1, id_max=9999, iterable=True)
-        ,),
-    obj_id.trigger.ADV_RANDOM: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.adv_random.TARGETS, function=get_keys, replace=remap_pairs_keys, actions=(IDActions.SPAWN), id_min=1, id_max=9999, iterable=True)
-        ,),
-    obj_id.trigger.EDIT_ADV_FOLLOW: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.TARGET_ID, condition=edit_adv_follow_use_group, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.SPEED_REF, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.DIR_REF, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.CONTROL_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.TARGET_ID, condition=edit_adv_follow_use_control_id, default=0, remappable=True)
-        ),
-    obj_id.trigger.RETARGET_ADV_FOLLOW: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.TARGET_ID, condition=edit_adv_follow_use_group, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.FOLLOW_ID, default=0, remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.CONTROL_ID, obj_prop_id=obj_prop.trigger.edit_adv_follow.TARGET_ID, condition=edit_adv_follow_use_control_id, default=0, remappable=True)
-        ),
-    obj_id.collectible.USER_COIN: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    obj_id.collectible.KEY: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    1587: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    1589: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    1598: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    obj_id.collectible.SMALL_COIN: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    3601: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4401: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4402: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4403: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4404: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4405: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4406: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4407: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4408: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4409: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4410: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4411: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4412: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4413: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4414: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4415: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4416: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4417: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4418: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4419: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4420: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4421: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4422: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4423: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4424: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4425: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4426: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4427: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4428: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4429: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4430: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4431: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4432: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4433: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4434: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4435: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4436: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4437: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4438: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4439: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4440: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4441: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4442: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4443: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4444: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4445: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4446: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4447: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4448: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4449: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4450: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4451: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4452: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4453: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4454: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4455: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4456: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4457: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4458: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4459: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4460: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4461: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4462: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4463: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4464: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4465: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4466: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4467: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4468: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4469: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4470: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4471: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4472: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4473: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4474: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4475: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4476: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4477: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4478: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4479: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4480: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4481: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4482: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4483: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4484: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4485: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4486: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4487: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4488: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4538: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4489: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4490: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4491: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4492: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4493: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4494: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4495: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4496: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4497: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4537: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4498: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4499: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4500: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4501: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4502: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4503: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4504: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4505: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4506: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4507: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4508: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4509: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4510: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4511: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4512: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4513: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4514: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4515: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4516: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4517: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4518: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4519: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4520: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4521: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4522: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4523: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4524: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4525: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4526: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4527: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4528: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4529: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4530: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4531: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4532: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4533: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4534: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4535: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4536: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    4539: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.GROUP_ID, default=get_collectible_default_group_id, actions=(IDActions.SPAWN, IDActions.TOGGLE), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.collectible.PARTICLE, default=0, actions=(IDActions.PARTICLES), id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.collectible.ITEM_ID, default=get_collectible_default_item_id, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999)
-        ),
-    obj_id.trigger.AREA_MOVE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
-        ),
-    obj_id.trigger.AREA_SCALE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.SCALE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
-        ),
-    obj_id.trigger.AREA_ROTATE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.ROTATE, IDActions.MOVE), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
-        ),
-    obj_id.trigger.AREA_FADE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.CENTER_ID, default=get_area_default_center, actions=(IDActions.FOLLOW_POSITION), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.ALPHA), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True)
-        ),
-    obj_id.trigger.EDIT_AREA_MOVE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
-        ),
-    obj_id.trigger.EDIT_AREA_SCALE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
-        ),
-    obj_id.trigger.EDIT_AREA_ROTATE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
-        ),
-    obj_id.trigger.EDIT_AREA_FADE: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
-        ),
-    obj_id.trigger.EDIT_AREA_TINT: (
-            IDRule(id_type=IDType.GROUP_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_group_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, condition=area_use_effect_id, default=0, actions=(IDActions.EDIT_EFFECT), remappable=True)
-        ),
-    obj_id.trigger.ITEM_EDIT: (
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.item_edit.TARGET_ITEM_ID, condition=item_edit_target_is_item, actions=(IDActions.SET_ITEM), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.item_edit.TARGET_ITEM_ID, condition=item_edit_target_is_timer, actions=(IDActions.SET_ITEM), remappable=True, id_min=1, id_max=9999),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.item_edit.ITEM_ID_1, condition=item_edit_first_is_item, actions=(IDActions.GET_ITEM), remappable=True, id_min=1, id_max=9999, reference=True),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.item_edit.ITEM_ID_1, condition=item_edit_first_is_timer, actions=(IDActions.GET_ITEM), remappable=True, id_min=1, id_max=9999, reference=True),
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.item_edit.ITEM_ID_2, condition=item_edit_second_is_item, actions=(IDActions.GET_ITEM), remappable=True, id_min=1, id_max=9999, reference=True),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.item_edit.ITEM_ID_2, condition=item_edit_second_is_timer, actions=(IDActions.GET_ITEM), remappable=True, id_min=1, id_max=9999, reference=True)
-        ),
-    obj_id.ITEM_LABEL: (
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.item_label.ITEM_ID, condition=item_label_display_item, default=0, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999, reference=True),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.item_label.ITEM_ID, condition=item_label_display_timer, default=0, actions=(IDActions.SET_ITEM), id_min=0, id_max=9999, reference=True)
-        ),
-    obj_id.trigger.PICKUP: (
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.pickup.ITEM_ID, default=0, actions=(IDActions.SET_ITEM), remappable=True, id_min=0, id_max=9999)
-        ,),
-    obj_id.trigger.TIME_CONTROL: (
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.time_control.ITEM_ID, default=0, remappable=True)
-        ,),
-    obj_id.trigger.ITEM_PERSIST: (
-            IDRule(id_type=IDType.ITEM_ID, obj_prop_id=obj_prop.trigger.item_persist.ITEM_ID, condition=item_persist_item, default=0, actions=(IDActions.PERSIST_ITEM), remappable=True, id_min=0, id_max=9999),
-            IDRule(id_type=IDType.TIME_ID, obj_prop_id=obj_prop.trigger.item_persist.ITEM_ID, condition=item_persist_timer, default=0, actions=(IDActions.PERSIST_ITEM), remappable=True)
-        ),
-    obj_id.trigger.COLLISION_BLOCK: (
-            IDRule(id_type=IDType.COLLISION_ID, obj_prop_id=obj_prop.trigger.collision_block.BLOCK_ID, default=0, id_min=0, id_max=9999, reference=True)
-        ,),
-    obj_id.trigger.ARROW: (
-            IDRule(id_type=IDType.TRIGGER_CHANNEL, obj_prop_id=obj_prop.trigger.arrow.TARGET_CHANNEL, default=0, actions=(IDActions.SET_ITEM), reference=True)
-        ,),
-    obj_id.trigger.START_POSITION: (
-            IDRule(id_type=IDType.TRIGGER_CHANNEL, obj_prop_id=obj_prop.start_pos.TARGET_CHANNEL, default=0, actions=(IDActions.SET_ITEM))
-        ,),
-    obj_id.trigger.AREA_STOP: (
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.TARGET_ID, default=0, actions=(IDActions.STOP_EFFECT), remappable=True, reference=True)
-        ,),
-    obj_id.trigger.enter.MOVE: (
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ),
-    obj_id.trigger.enter.SCALE: (
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ),
-    obj_id.trigger.enter.ROTATE: (
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ),
-    obj_id.trigger.enter.FADE: (
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, reference=True),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ),
-    obj_id.trigger.enter.STOP: (
-            IDRule(id_type=IDType.EFFECT_ID, obj_prop_id=obj_prop.trigger.effect.EFFECT_ID, default=0, actions=(IDActions.STOP_EFFECT)),
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.effect.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ),
-    22: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    24: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    23: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    25: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    26: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    27: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    28: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    55: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    56: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    57: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    58: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    59: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    1915: (
-            IDRule(id_type=IDType.ENTER_CHANNEL, obj_prop_id=obj_prop.trigger.enter_preset.ENTER_CHANNEL, default=0, remappable=True, id_min=-32768, id_max=32767)
-        ,),
-    obj_id.trigger.SONG: (
-            IDRule(id_type=IDType.SONG_ID, obj_prop_id=obj_prop.trigger.song.SONG_ID, default=0, remappable=True, reference=True),
-            IDRule(id_type=IDType.SONG_CHANNEL, obj_prop_id=obj_prop.trigger.song.CHANNEL, default=0, remappable=True, id_min=0, id_max=4, reference=True)
-        ),
-    obj_id.trigger.FORCE_BLOCK: (
-            IDRule(id_type=IDType.FORCE_ID, obj_prop_id=obj_prop.trigger.force_block.FORCE_ID, default=0, reference=True)
-        ,),
-    obj_id.trigger.FORCE_CIRCLE: (
-            IDRule(id_type=IDType.FORCE_ID, obj_prop_id=obj_prop.trigger.force_block.FORCE_ID, default=0, id_min=-32768, id_max=32767, reference=True)
-        ,)
-    }
-)
+ID_RULES = RuleHandler()
+register = ID_RULES.register_rule
+ 
+ 
+# BaseObject
+def _get_base_color(obj:Object) -> int:
+    return COLOR_1_DEFAULT.get(obj.get(obj_prop.ID,0))
+ 
+def _special_color(color_id:int) -> bool:
+    if color_id is None:
+        return False
+    elif isinstance(color_id, AutoID):
+        return False
+    return not (1 <= color_id <= 999)
+ 
+def _get_secondary_color(obj:Object) -> int:
+    return COLOR_2_DEFAULT.get(obj.get(obj_prop.ID,0))
+ 
+def _remap(remappable:Any, kvm:dict[int,int]):
+    remappable.remap(kvm)
+    return remappable
+ 
+register(I.BaseObject, 'color_1', id_type=IDType.COLOR_ID, fallback=_get_base_color, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.BaseObject, 'color_2', id_type=IDType.COLOR_ID, fallback=_get_secondary_color, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.BaseObject, 'groups', id_type=IDType.GROUP_ID, replace=_remap, iterable=True, reference=True, id_min=1, id_max=9999)
+register(I.BaseObject, 'parent_groups', id_type=IDType.GROUP_ID, replace=_remap, iterable=True, reference=True, id_min=1, id_max=9999)
+register(I.BaseObject, 'linked_group', id_type=IDType.LINK_ID, reference=True, id_min=1)
+register(I.BaseObject, 'enter_channel', id_type=IDType.ENTER_CHANNEL, when_unset=True, reference=True, id_min=-32768, id_max=32767)
+register(I.BaseObject, 'material', id_type=IDType.MATERIAL_ID, when_unset=True, reference=True, id_min=-32768, id_max=32767)
+ 
+ 
+# LevelSettings
+def _custom_color(color_id:int) -> bool:
+    if color_id is None:
+        return False
+    elif isinstance(color_id, AutoID):
+        return True
+    return (1 <= color_id <= 999)
+ 
+def _get_one_color_channel(color:Color) -> Optional[int]:
+    return (color.channel,)
+ 
+def _get_color_channels(color_list:ColorList) -> set[int]:
+    return color_list.unique_values(_get_one_color_channel)
+ 
+def _get_custom_color_channels(color_list:ColorList) -> set[int]:
+    return {i for i in _get_color_channels(color_list) if _custom_color(i)}
+ 
+def _remap_custom_color_channels(color_list:ColorList, kvm:dict[int,int]):
+    for color in color_list:
+        i = color.channel
+        if _custom_color(i):
+            color.channel = kvm.get(i,i)
+    return color_list
+ 
+def _get_one_color_copy(color:Color) -> Optional[int]:
+    return (color.copy_id,)
+ 
+def _get_color_copies(color_list:ColorList) -> set[int]:
+    return color_list.unique_values(_get_one_color_copy)
+ 
+def _get_custom_color_copies(color_list:ColorList) -> set[int]:
+    return {i for i in _get_color_copies(color_list) if _custom_color(i)}
+ 
+def _remap_custom_color_copies(color_list:ColorList, kvm:dict[int,int]):
+    for color in color_list:
+        i = color.copy_id
+        if _custom_color(i):
+            color.copy_id = kvm.get(i,i)
+    return color_list
+ 
+def _get_special_color_channels(color_list:ColorList) -> set[int]:
+    return {i for i in _get_color_channels(color_list) if _special_color(i)}
+ 
+def _remap_special_color_channels(color_list:ColorList, kvm:dict[int,int]):
+    for color in color_list:
+        i = color.channel
+        if _special_color(i):
+            color.channel = kvm.get(i,i)
+    return color_list
+ 
+def _get_special_color_copies(color_list:ColorList) -> set[int]:
+    return {i for i in _get_color_channels(color_list) if _special_color(i)}
+ 
+def _remap_special_base_color_copies(color_list:ColorList, kvm:dict[int,int]):
+    for color in color_list:
+        i = color.copy_id
+        if _special_color(i):
+            color.copy_id = kvm.get(i,i)
+    return color_list
+ 
+register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_channels, replace=_remap_custom_color_channels, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_copies, replace=_remap_custom_color_copies, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
+register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_channels, replace=_remap_special_color_channels, fixed=True, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_copies, replace=_remap_special_base_color_copies, fixed=True, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
+register(LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# VolumeInterface
+def _has_default_volume_group(view) -> bool:
+    # VolumeInterface (song and sfx triggers)
+    return not (view.player_1 or view.player_2 or view.camera)
+ 
+register(VolumeInterface, 'group_id_1', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(VolumeInterface, 'group_id_2', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_volume_group, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# EffectObject
+register(I.EffectObject, 'channel', id_type=IDType.TRIGGER_CHANNEL, when_unset=True, reference=True)
+register(I.EffectObject, 'control_id', id_type=IDType.CONTROL_ID, remappable=True, when_unset=True, reference=True)
+ 
+ 
+# StartPosition
+register(I.StartPosition, 'target_channel', id_type=IDType.TRIGGER_CHANNEL, when_unset=True, actions=IDActions.SET_ITEM)
+ 
+ 
+# AdvancedFollowTrigger
+register(I.AdvancedFollowTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.MOVE)
+register(I.AdvancedFollowTrigger, 'follow_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.AdvancedFollowTrigger, 'max_range_ref', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.AdvancedFollowTrigger, 'start_speed_ref', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_MOVE)
+register(I.AdvancedFollowTrigger, 'start_dir_ref', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# AdvancedRandomTrigger
+def _get_keys(obj:Object) -> list[int]:
+    return obj.keys()
+ 
+def _remap_pairs_keys(pairs:IntPairList, kvm:dict[int,int]):
+    pairs.remap_keys(kvm)
+    return pairs
+ 
+register(I.AdvancedRandomTrigger, 'group_weights', id_type=IDType.GROUP_ID, function=_get_keys, replace=_remap_pairs_keys, iterable=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+ 
+ 
+# AlphaTrigger
+register(I.AlphaTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.ALPHA)
+ 
+ 
+# AnimateKeyframeTrigger
+register(I.AnimateKeyframeTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE,))
+register(I.AnimateKeyframeTrigger, 'parent_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_SCALE, IDActions.FOLLOW_ROTATE,))
+register(I.AnimateKeyframeTrigger, 'animation_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.KEYFRAME)
+ 
+ 
+# AnimateTrigger
+register(I.AnimateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.ANIMATE)
+ 
+ 
+# BulgeShader
+def _has_default_bulge_target(view) -> bool:
+    return bool(view.target) and not (view.player_1 or view.player_2)
+ 
+register(I.BulgeShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_bulge_target, id_min=1, id_max=9999)
+ 
+ 
+# CameraEdgeTrigger
+register(I.CameraEdgeTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# CheckpointTrigger
+register(I.CheckpointTrigger, 'spawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.CheckpointTrigger, 'target_pos', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.CheckpointTrigger, 'respawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+ 
+ 
+# CollectibleObject
+def _has_collectible_default_group_id(view) -> bool:
+    return bool(view.toggle_trigger)
+ 
+def _has_collectible_default_item_id(view) -> bool:
+    return bool(view.pickup_item)
+ 
+register(I.CollectibleObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.CollectibleObject, 'particle', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.PARTICLES)
+register(I.CollectibleObject, 'item_id', id_type=IDType.ITEM_ID, when_unset=_has_collectible_default_item_id, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
+ 
+ 
+# CollisionBlock
+register(I.CollisionBlock, 'block_id', id_type=IDType.COLLISION_ID, when_unset=True, reference=True, id_min=0, id_max=9999)
+ 
+ 
+# CollisionTrigger
+def _has_default_collision_block_a(view) -> bool:
+    return not (view.player_1 or view.player_2 or view.between_players)
+ 
+def _has_default_collision_block_b(view) -> bool:
+    return not view.between_players
+ 
+register(I.CollisionTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.CollisionTrigger, 'block_a', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_collision_block_a, id_min=0, id_max=9999, actions=IDActions.TRACK_COLLISION)
+register(I.CollisionTrigger, 'block_b', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_collision_block_b, id_min=0, id_max=9999, actions=IDActions.TRACK_COLLISION)
+ 
+ 
+# ColorTrigger
+register(I.ColorTrigger, 'color_channel', id_type=IDType.COLOR_ID, fixed=_special_color, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.ColorTrigger, 'copy_id', id_type=IDType.COLOR_ID, fixed=_special_color, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+ 
+ 
+# CountTrigger
+register(I.CountTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.CountTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, when_unset=True, id_min=0, id_max=9999, actions=IDActions.TRACK_ITEM)
+ 
+ 
+# EditAdvancedFollowTrigger
+def _edit_adv_follow_use_group(obj:Object) -> bool:
+    return not obj.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID, False)
+ 
+def _edit_adv_follow_use_control_id(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID, False)
+ 
+register(I.EditAdvancedFollowTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_edit_adv_follow_use_group, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.EditAdvancedFollowTrigger, 'speed_ref', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.EditAdvancedFollowTrigger, 'dir_ref', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.EditAdvancedFollowTrigger, 'target_id', id_type=IDType.CONTROL_ID, condition=_edit_adv_follow_use_control_id, remappable=True, when_unset=True)
+ 
+ 
+# EndTrigger
+register(I.EndTrigger, 'spawn_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.EndTrigger, 'target_pos', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# EndWallTrigger
+register(I.EndWallTrigger, 'group_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999)
+ 
+ 
+# EnterPreset
+register(I.EnterPreset, 'enter_channel', id_type=IDType.ENTER_CHANNEL, remappable=True, when_unset=True, id_min=-32768, id_max=32767)
+ 
+ 
+# EventTrigger
+register(I.EventTrigger, 'spawn_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.EventTrigger, 'extra_id_1', id_type=IDType.MATERIAL_ID, remappable=True, when_unset=True)
+ 
+ 
+# FollowPlayerYTrigger
+register(I.FollowPlayerYTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.MOVE)
+ 
+ 
+# FollowTrigger
+register(I.FollowTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.MOVE)
+register(I.FollowTrigger, 'follow_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_MOVE)
+ 
+ 
+# ForceBlock
+register(I.ForceBlock, 'force_id', id_type=IDType.FORCE_ID, when_unset=True, reference=True, id_min=-32768, id_max=32767)
+ 
+ 
+# GameplayArrow
+register(I.GameplayArrow, 'target_channel', id_type=IDType.TRIGGER_CHANNEL, when_unset=True, reference=True, actions=IDActions.SET_ITEM)
+ 
+ 
+# GradientTrigger
+def _has_default_gradient(view) -> bool:
+    return not view.disable_all
+ 
+register(I.GradientTrigger, 'bl_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.GradientTrigger, 'br_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.GradientTrigger, 'tl_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.GradientTrigger, 'tr_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.GradientTrigger, 'gradient_id', id_type=IDType.GRADIENT_ID, when_unset=_has_default_gradient, reference=True, id_min=0, id_max=1000)
+ 
+ 
+# GrayScaleShader
+def _has_gray_scale_default_color(view) -> bool:
+    return bool(view.use_tint)
+ 
+register(I.GrayScaleShader, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=_has_gray_scale_default_color, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
+ 
+ 
+# InstantCollisionTrigger
+def _has_default_instant_coll_block_a(view) -> bool:
+    return not (view.player_1 or view.player_2 or view.between_players)
+ 
+def _has_default_instant_coll_block_b(view) -> bool:
+    return not view.between_players
+ 
+register(I.InstantCollisionTrigger, 'true_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.InstantCollisionTrigger, 'false_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.InstantCollisionTrigger, 'block_a', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_instant_coll_block_a, id_min=0, id_max=9999, actions=IDActions.CHECK_COLLISION)
+register(I.InstantCollisionTrigger, 'block_b', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_instant_coll_block_b, id_min=0, id_max=9999, actions=IDActions.CHECK_COLLISION)
+ 
+ 
+# InstantCountTrigger
+register(I.InstantCountTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.InstantCountTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
+ 
+ 
+# ItemCompareTrigger
+def _item_compare_first_is_item(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) in (0,1)
+ 
+def _item_compare_first_is_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) == 2
+ 
+def _item_compare_second_is_item(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) in (0,1)
+ 
+def _item_compare_second_is_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) == 2
+ 
+register(I.ItemCompareTrigger, 'true_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.ItemCompareTrigger, 'false_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.ItemCompareTrigger, 'item_id_1', id_type=IDType.ITEM_ID, condition=_item_compare_first_is_item, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemCompareTrigger, 'item_id_1', id_type=IDType.TIME_ID, condition=_item_compare_first_is_timer, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemCompareTrigger, 'item_id_2', id_type=IDType.ITEM_ID, condition=_item_compare_second_is_item, remappable=True, when_unset=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemCompareTrigger, 'item_id_2', id_type=IDType.TIME_ID, condition=_item_compare_second_is_timer, remappable=True, when_unset=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+ 
+ 
+# ItemEditTrigger
+def _item_edit_target_is_item(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) in (0,1)
+ 
+def _item_edit_target_is_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) == 2
+ 
+def _item_edit_first_is_item(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) in (0,1)
+ 
+def _item_edit_first_is_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) == 2
+ 
+def _item_edit_second_is_item(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) in (0,1)
+ 
+def _item_edit_second_is_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) == 2
+ 
+register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.ITEM_ID, condition=_item_edit_target_is_item, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
+register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.TIME_ID, condition=_item_edit_target_is_timer, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
+register(I.ItemEditTrigger, 'item_id_1', id_type=IDType.ITEM_ID, condition=_item_edit_first_is_item, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemEditTrigger, 'item_id_1', id_type=IDType.TIME_ID, condition=_item_edit_first_is_timer, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemEditTrigger, 'item_id_2', id_type=IDType.ITEM_ID, condition=_item_edit_second_is_item, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemEditTrigger, 'item_id_2', id_type=IDType.TIME_ID, condition=_item_edit_second_is_timer, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+ 
+ 
+# ItemLabel
+def _item_label_display_item(obj:Object) -> bool:
+    return not obj.get(obj_prop.item_label.TIME_COUNTER, False)
+ 
+def _item_label_display_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.item_label.TIME_COUNTER, False)
+ 
+register(I.ItemLabel, 'item_id', id_type=IDType.ITEM_ID, condition=_item_label_display_item, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
+register(I.ItemLabel, 'item_id', id_type=IDType.TIME_ID, condition=_item_label_display_timer, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
+ 
+ 
+# ItemPersistTrigger
+def _item_persist_item(obj:Object) -> bool:
+    return not obj.get(obj_prop.trigger.item_persist.TIMER, False)
+ 
+def _item_persist_timer(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.item_persist.TIMER, False)
+ 
+register(I.ItemPersistTrigger, 'item_id', id_type=IDType.ITEM_ID, condition=_item_persist_item, remappable=True, when_unset=True, id_min=0, id_max=9999, actions=IDActions.PERSIST_ITEM)
+register(I.ItemPersistTrigger, 'item_id', id_type=IDType.TIME_ID, condition=_item_persist_timer, remappable=True, when_unset=True, actions=IDActions.PERSIST_ITEM)
+ 
+ 
+# KeyframeObject
+def _has_default_keyframe_group(view) -> bool:
+    return view.index == 1
+ 
+register(I.KeyframeObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_default_keyframe_group, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE,))
+register(I.KeyframeObject, 'spawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.KeyframeObject, 'key_id', id_type=IDType.KEYFRAME_ID, when_unset=True, reference=True, id_min=0)
+ 
+ 
+# LensCircleShader
+def _has_default_lens_circle_target(view) -> bool:
+    return not (view.player_1 or view.player_2)
+ 
+register(I.LensCircleShader, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
+register(I.LensCircleShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_lens_circle_target, id_min=1, id_max=9999)
+ 
+ 
+# LinkVisibleTrigger
+register(I.LinkVisibleTrigger, 'group_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999)
+ 
+ 
+# MotionBlurShader
+def _has_default_motion_blur_target(view) -> bool:
+    return not (view.player_1 or view.player_2 or view.center)
+ 
+register(I.MotionBlurShader, 'ref_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
+register(I.MotionBlurShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_motion_blur_target, id_min=1, id_max=9999)
+ 
+ 
+# MoveTrigger
+def _has_move_default_target(view) -> bool:
+    return bool(view.direction_mode or view.target_mode)
+ 
+register(I.MoveTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_POSITION, IDActions.MOVE,))
+register(I.MoveTrigger, 'target_pos', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_move_default_target, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.MoveTrigger, 'target_center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_move_default_target, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# ObjectControlTrigger
+register(I.ObjectControlTrigger, 'target_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999)
+ 
+ 
+# OnDeathTrigger
+register(I.OnDeathTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+ 
+ 
+# PickupTrigger
+register(I.PickupTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, when_unset=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
+ 
+ 
+# PinchShader
+def _has_default_pinch_target(view) -> bool:
+    return bool(view.target) and not (view.player_1 or view.player_2)
+ 
+register(I.PinchShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_pinch_target, id_min=1, id_max=9999)
+ 
+ 
+# PulseTrigger
+def _pulse_target_channel(obj:Object) -> bool:
+    return not obj.get(obj_prop.trigger.pulse.TARGET_TYPE, False)
+ 
+def _pulse_target_group(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.pulse.TARGET_TYPE, False)
+ 
+register(I.PulseTrigger, 'copy_id', id_type=IDType.COLOR_ID, fixed=_special_color, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
+register(I.PulseTrigger, 'target_id', id_type=IDType.COLOR_ID, condition=_pulse_target_channel, fixed=_special_color, remappable=True, when_unset=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_COLOR)
+register(I.PulseTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_pulse_target_group, remappable=True, when_unset=True, id_min=1, id_max=9999)
+ 
+ 
+# RadialBlurShader
+def _has_default_radial_blur_target(view) -> bool:
+    return bool(view.target) and not (view.player_1 or view.player_2)
+ 
+register(I.RadialBlurShader, 'ref_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
+register(I.RadialBlurShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_radial_blur_target, id_min=1, id_max=9999)
+ 
+ 
+# RandomTrigger
+register(I.RandomTrigger, 'true_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.RandomTrigger, 'false_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+ 
+ 
+# ResetTrigger
+register(I.ResetTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.RESET)
+ 
+ 
+# RetargetAdvancedFollowTrigger
+register(I.RetargetAdvancedFollowTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_edit_adv_follow_use_group, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.RetargetAdvancedFollowTrigger, 'follow_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.RetargetAdvancedFollowTrigger, 'target_id', id_type=IDType.CONTROL_ID, condition=_edit_adv_follow_use_control_id, remappable=True, when_unset=True)
+ 
+ 
+# RotateTrigger
+def _has_rotate_default_aim_target(view) -> bool:
+    return bool(view.aim_mode or view.follow_mode)
+ 
+def _has_rotate_default_aim(view) -> bool:
+    return bool(view.aim_mode)
+ 
+register(I.RotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_POSITION, IDActions.ROTATE, IDActions.MOVE,))
+register(I.RotateTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.RotateTrigger, 'aim_target', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim_target, id_min=1, id_max=9999)
+register(I.RotateTrigger, 'min_x_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.RotateTrigger, 'min_y_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.RotateTrigger, 'max_x_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.RotateTrigger, 'max_y_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# ScaleTrigger
+register(I.ScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SCALE, IDActions.MOVE,))
+register(I.ScaleTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# SequenceTrigger
+register(I.SequenceTrigger, 'sequence', id_type=IDType.GROUP_ID, function=_get_keys, replace=_remap_pairs_keys, iterable=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+ 
+ 
+# ShockLineShader
+def _has_default_shockline_target(view) -> bool:
+    return bool(view.target) and not (view.player_1 or view.player_2)
+ 
+register(I.ShockLineShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_shockline_target, id_min=1, id_max=9999)
+ 
+ 
+# ShockwaveShader
+def _has_default_shockwave_target(view) -> bool:
+    return bool(view.target) and not (view.player_1 or view.player_2)
+ 
+register(I.ShockwaveShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_shockwave_target, id_min=1, id_max=9999)
+ 
+ 
+# SongTrigger
+register(I.SongTrigger, 'song_id', id_type=IDType.SONG_ID, remappable=True, when_unset=True, reference=True)
+register(I.SongTrigger, 'channel', id_type=IDType.SONG_CHANNEL, remappable=True, when_unset=True, reference=True, id_min=0, id_max=4)
+ 
+ 
+# SpawnParticleTrigger
+register(I.SpawnParticleTrigger, 'particle_group', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.PARTICLES)
+register(I.SpawnParticleTrigger, 'position_group', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# SpawnTrigger
+def _get_values(obj:Object) -> list[int]:
+    return obj.values()
+ 
+def _remap_pairs_vals(pairs:IntPairList, kvm:dict[int,int]):
+    pairs.remap_vals(kvm)
+    return pairs
+ 
+def _spawn_keep_remap(obj:Object) -> bool:
+    return not obj.get(obj_prop.trigger.spawn.RESET_REMAP, False)
+ 
+register(I.SpawnTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.SpawnTrigger, 'remaps', id_type=IDType.REMAP_BASE, function=_get_keys, replace=_remap_pairs_keys, iterable=True)
+register(I.SpawnTrigger, 'remaps', id_type=IDType.REMAP_TARGET, function=_get_values, replace=_remap_pairs_vals, remappable=_spawn_keep_remap, iterable=True)
+ 
+ 
+# StateBlock
+register(I.StateBlock, 'state_on', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.StateBlock, 'state_off', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+ 
+ 
+# StaticCameraTrigger
+register(I.StaticCameraTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+ 
+ 
+# StopAreaTrigger
+register(I.StopAreaTrigger, 'effect_id', id_type=IDType.EFFECT_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.STOP_EFFECT)
+ 
+ 
+# StopEnterTrigger
+register(I.StopEnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, actions=IDActions.STOP_EFFECT)
+register(I.StopEnterTrigger, 'enter_channel', id_type=IDType.ENTER_CHANNEL, remappable=True, when_unset=True, id_min=-32768, id_max=32767)
+ 
+ 
+# StopTrigger
+def _stop_use_group(obj:Object) -> bool:
+    return not obj.get(obj_prop.trigger.stop.USE_CONTROL_ID, False)
+ 
+def _stop_use_control_id(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.stop.USE_CONTROL_ID, False)
+ 
+register(I.StopTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_stop_use_group, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.STOP)
+register(I.StopTrigger, 'target_id', id_type=IDType.CONTROL_ID, condition=_stop_use_control_id, remappable=True, when_unset=True, actions=IDActions.STOP)
+ 
+ 
+# TimerControlTrigger
+register(I.TimerControlTrigger, 'item_id', id_type=IDType.TIME_ID, remappable=True, when_unset=True)
+ 
+ 
+# TimerEventTrigger
+register(I.TimerEventTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.TimerEventTrigger, 'item_id', id_type=IDType.TIME_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.TRACK_ITEM)
+ 
+ 
+# TimerTrigger
+register(I.TimerTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.TimerTrigger, 'item_id', id_type=IDType.TIME_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.SET_ITEM)
+ 
+ 
+# ToggleBlock
+register(I.ToggleBlock, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+ 
+ 
+# ToggleTrigger
+register(I.ToggleTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.TOGGLE)
+ 
+ 
+# TouchTrigger
+register(I.TouchTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+ 
+ 
+# UITrigger
+register(I.UITrigger, 'group_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.UITrigger, 'ui_target', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.UI, IDActions.MOVE,))
+ 
+ 
+# AreaTrigger
+def _has_area_default_center(view) -> bool:
+    return not view.special_center
+ 
+register(AreaTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_area_default_center, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(AreaTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, reference=True)
+ 
+ 
+# EditAreaTrigger
+def _area_use_group_id(obj:Object) -> bool:
+    return not obj.get(obj_prop.trigger.effect.USE_EFFECT_ID, False)
+ 
+def _area_use_effect_id(obj:Object) -> bool:
+    return obj.get(obj_prop.trigger.effect.USE_EFFECT_ID, False)
+ 
+register(EditAreaTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_area_use_group_id, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.EDIT_EFFECT)
+register(EditAreaTrigger, 'target_id', id_type=IDType.EFFECT_ID, condition=_area_use_effect_id, remappable=True, when_unset=True, actions=IDActions.EDIT_EFFECT)
+ 
+ 
+# EditSFXTrigger
+register(I.EditSFXTrigger, 'sfx_group', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.EditSFXTrigger, 'unique_id', id_type=IDType.UNIQUE_SFX_ID, remappable=True, when_unset=True)
+register(I.EditSFXTrigger, 'group_id', id_type=IDType.SFX_GROUP, remappable=True, when_unset=True)
+ 
+ 
+# EditSongTrigger
+register(I.EditSongTrigger, 'channel', id_type=IDType.SONG_CHANNEL, remappable=True, when_unset=True, id_min=0, id_max=4)
+ 
+ 
+# EnterTrigger
+register(EnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, reference=True)
+ 
+ 
+# SFXTrigger
+register(I.SFXTrigger, 'sfx_id', id_type=IDType.SFX_ID, remappable=True, when_unset=True, reference=True)
+register(I.SFXTrigger, 'unique_id', id_type=IDType.UNIQUE_SFX_ID, remappable=True, when_unset=True, reference=True)
+ 
+ 
+# TeleportTrigger
+register(I.TeleportTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# EnterTintTrigger
+def _has_effect_tint_channel(view) -> bool:
+    return bool(view.enable_hsv)
+ 
+register(I.EnterTintTrigger, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=_has_effect_tint_channel, reference=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_COLOR)
+ 
+ 
+# TeleportOrb
+register(I.TeleportOrb, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# UnlinkedTeleportPortal
+register(I.UnlinkedTeleportPortal, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+ 
+ 
+# AreaFadeTrigger
+register(I.AreaFadeTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.ALPHA)
+ 
+ 
+# AreaTintTrigger
+register(I.AreaTintTrigger, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=_has_effect_tint_channel, reference=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_COLOR)
+register(I.AreaTintTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.COLOR)
+ 
+ 
+# SmallCoin
+register(I.SmallCoin, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.SmallCoin, 'particle', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.PARTICLES)
+register(I.SmallCoin, 'item_id', id_type=IDType.ITEM_ID, when_unset=_has_collectible_default_item_id, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
+ 
+ 
+# AreaMoveTrigger
+register(I.AreaMoveTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.MOVE)
+ 
+ 
+# AreaRotateTrigger
+register(I.AreaRotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.MOVE,))
+ 
+ 
+# AreaScaleTrigger
+register(I.AreaScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SCALE, IDActions.MOVE,))

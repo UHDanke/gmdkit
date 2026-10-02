@@ -6,7 +6,7 @@ from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
 class EnterPreset(TriggerObject):
     enter_exit_only: enums.EnterMode = Field(217)
-    enter_channel: int = Field(344)
+    target_enter_channel: int = Field(344)
 
 
 class EnterTrigger(EnterPreset):

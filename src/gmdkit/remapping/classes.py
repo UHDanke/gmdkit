@@ -1,12 +1,13 @@
 # Imports
-from typing import Callable, Any, Optional, Sequence, Self
-from dataclasses import dataclass, field
+from typing import Callable, Optional, Sequence, Self
+from dataclasses import dataclass, field as dc_field
+from collections import ChainMap
+from functools import lru_cache
 
 # Package Imports
 from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.mappings import obj_prop, obj_id
-from gmdkit.remapping.base_func import obj_can_be_spawned
+from gmdkit.serialization.classes import BaseInterface
 from gmdkit.remapping.types import IDType, IDActions, AutoID
 
 ID_MIN = -2147483648
@@ -32,7 +33,7 @@ class Identifier:
     replaceable: bool = True
     replace: Optional[Callable] = None
     # derived
-    is_default: bool = field(init=False, default=False)
+    is_default: bool = dc_field(init=False, default=False)
 
     def __post_init__(self):
 
@@ -63,8 +64,8 @@ class Identifier:
 @dataclass(slots=True)
 class IdentifierList:
 
-    values: tuple[Identifier] = field(default_factory=tuple)
-    ignored: set[int] = field(default_factory=set)
+    values: tuple[Identifier] = dc_field(default_factory=tuple)
+    ignored: set[int] = dc_field(default_factory=set)
     vmin: int = ID_MIN
     vmax: int = ID_MAX
 
@@ -112,8 +113,10 @@ class IdentifierList:
             if has_cond and not condition(i):
                 continue
 
-            if has_tags and i.actions not in i.has_tags:
-                continue
+            if has_tags:
+                own = i.actions if isinstance(i.actions, tuple) else (i.actions,)
+                if not any(t in own for t in has_tags):
+                    continue
 
             result.append(i)
 
@@ -207,9 +210,30 @@ class IdentifierList:
         return {k: IdentifierList(values=v) for k, v in result.items()}
 
 
-@dataclass(slots=True,frozen=True)
+@lru_cache(maxsize=None)
+def _property_key(schema: type[BaseInterface], name: str) -> int | str:
+    """The property key behind an interface field name (resolved once per class)."""
+    return getattr(schema, name).canonical
+
+
+@dataclass(slots=True, frozen=True)
 class IDRule:
-    obj_prop_id: int | str
+    """
+    Describes one ID held by an interface field.
+
+    field       name of the interface field, e.g. "color_1" (the owning class is the
+                key the rule is stored under in RuleHandler)
+    when_unset  what an unset field (value equal to the interface default, 0 / empty)
+                means. False: no identifier. True: a default-valued identifier.
+                A callable(view) decides per object, e.g. "only while mode X is on".
+                It is evaluated only for unset fields: set values always count.
+    condition   callable(view); a falsy result drops the identifier, set or not.
+
+    Callables (condition, when_unset, fallback, remappable) receive the interface view
+    of the object, so they can use fields (view.x). `function`, `fixed` and `replace`
+    receive the field value, as before.
+    """
+    field: str
     id_type: IDType
     condition: Optional[Callable] = None
     function: Optional[Callable] = None
@@ -217,41 +241,51 @@ class IDRule:
     replace: Optional[Callable] = None
     fixed: Optional[Callable|bool] = None
     remappable: Optional[Callable|bool] = None
-    default: Any = None
+    when_unset: Callable|bool = False
     iterable: bool = False
     reference: bool = False
     id_min: int = ID_MIN
     id_max: int = ID_MAX
     actions: Optional[tuple] = None
 
+    def key_for(self, schema: type[BaseInterface]) -> int | str:
+        """The property key of the field on the given interface class."""
+        return _property_key(schema, self.field)
+
     def is_matched(
             self,
-            id_types:Optional[Sequence[IDType]]=None,
-            reference:Optional[bool]=None,
-            actions: Optional[tuple]=None
-            ):
+            id_types: Optional[Sequence[IDType]] = None,
+            reference: Optional[bool] = None,
+            actions: Optional[Sequence[IDActions]] = None
+            ) -> bool:
         if id_types and self.id_type not in id_types:
             return False
         if reference is not None and self.reference != reference:
             return False
-        if actions and self.id_type not in id_types:
-            return False
+        if actions:
+            own = self.actions if isinstance(self.actions, tuple) else (self.actions,)
+            if not any(a in own for a in actions):
+                return False
         return True
 
-    def get_id(self, obj: Object):
-        val = obj.get(self.obj_prop_id)
+    def get_id(self, iface: BaseInterface) -> Optional[Identifier]:
+        schema = type(iface)
+        val = getattr(iface, self.field)
+        has_default = bool(self.when_unset)
 
-        default = self.default(obj) if callable(self.default) else self.default
-
-        if val is None:
+        if not val:  # unset: the interface hands out its default (0 / empty)
             if callable(self.fallback):
-                val = self.fallback(obj)
-            if val is None:
-                if default is None:
+                fb = self.fallback(iface)
+                if fb is not None:
+                    val = fb
+            if not val:
+                unset = self.when_unset
+                if callable(unset):
+                    unset = unset(iface)
+                if not unset:
                     return
-                val = default
 
-        if callable(self.condition) and not self.condition(obj):
+        if callable(self.condition) and not self.condition(iface):
             return
 
         if callable(self.function):
@@ -264,50 +298,124 @@ class IDRule:
             fixed = self.fixed
         elif val is None:
             return
-
         else:
             fixed = self.fixed(val) if callable(self.fixed) else self.fixed
 
-        remappable = self.remappable(obj) if callable(self.remappable) else self.remappable
+        remappable = self.remappable(iface) if callable(self.remappable) else self.remappable
+        obj = iface.obj
 
         return Identifier(
             obj=obj,
-            obj_prop_id =self.obj_prop_id,
-            id_val = val,
-            id_type = self.id_type,
-            default = default,
-            fixed = bool(fixed),
-            remappable = bool(remappable) and obj_can_be_spawned(obj),
-            reference = self.reference,
-            iterable = self.iterable,
-            id_min = self.id_min,
-            id_max = self.id_max,
-            actions = self.actions,
-            replace = self.replace,
+            obj_prop_id=self.key_for(schema),
+            id_val=val,
+            id_type=self.id_type,
+            default=0 if has_default else None,
+            fixed=bool(fixed),
+            remappable=bool(remappable) and bool(getattr(iface, "spawn_trigger", False)),
+            reference=self.reference,
+            iterable=self.iterable,
+            id_min=self.id_min,
+            id_max=self.id_max,
+            actions=self.actions,
+            replace=self.replace,
         )
 
 
 @dataclass(slots=True)
 class RuleHandler:
+    """
+    ID rules per interface class, resolved through ChainMaps.
 
-    base: tuple[IDRule] = field(default_factory=tuple)
-    by_id: dict[int|str, tuple[IDRule]] = field(default_factory=dict)
+    Every interface class owns a dict of its rules. The rules of a class are the
+    ChainMap over the own-dicts of its MRO, so an object gets the rules of its interface
+    class plus those of every base class and mixin (rules for BaseObject apply to every
+    object interface, not to unrelated ones such as LevelSettings).
+
+    The chains are live views over the own-dicts: registering a rule on a base class is
+    seen by every chain already built, so nothing has to be invalidated.
+    Iterating a chain yields base classes first, then more specific ones.
+    """
+    rules: dict[type[BaseInterface], dict[IDRule, None]] = dc_field(default_factory=dict)
     groups: Optional[list[Sequence]] = None
+    _chains: dict = dc_field(default_factory=dict, repr=False, compare=False)
 
-    def compile_rules(self, **kwargs):
+    def __post_init__(self):
+        # accept {class: (rule, ...)} and keep dicts (ordered sets) internally
+        self.rules = {k: dict.fromkeys(v) for k, v in self.rules.items()}
 
-        base = tuple(i for i in self.base if i.is_matched(**kwargs))
-        by_id = {}
-        groups = self.groups
+    def _own(self, klass: type[BaseInterface]) -> dict[IDRule, None]:
+        own = self.rules.get(klass)
+        if own is None:
+            own = self.rules[klass] = {}
+        return own
 
-        for k, v in self.by_id.items():
-            r = tuple(i for i in v if i.is_matched(**kwargs))
-            if r:
-                by_id[k] = r
+    def chain_for(self, schema: type[BaseInterface]) -> ChainMap:
+        """Live ChainMap over the own-rules of `schema` and its interface base classes."""
+        chain = self._chains.get(schema)
+        if chain is None:
+            chain = self._chains[schema] = ChainMap(
+                *(self._own(k) for k in schema.__mro__ if issubclass(k, BaseInterface)))
+        return chain
 
-        return self.__class__(base=base,by_id=by_id,groups=groups)
+    def rules_for(self, schema: type[BaseInterface]) -> tuple[IDRule, ...]:
+        """Rules for an interface class: base classes first, own rules last."""
+        return tuple(self.chain_for(schema))
 
-    def add_groups(self, *groups):
+    def register(self, interface: type[BaseInterface], rule: IDRule) -> IDRule:
+        """Attach an existing rule to an interface class (checked against its fields)."""
+        try:
+            rule.key_for(interface)
+        except AttributeError:
+            raise AttributeError(
+                f"{interface.__name__} has no field {rule.field!r}") from None
+        self._own(interface)[rule] = None
+        return rule
+
+    def register_rule(
+            self,
+            interface: type[BaseInterface] | Sequence[type[BaseInterface]],
+            field: str,
+            id_type: IDType,
+            condition: Optional[Callable] = None,
+            function: Optional[Callable] = None,
+            fallback: Optional[Callable] = None,
+            replace: Optional[Callable] = None,
+            fixed: Optional[Callable|bool] = None,
+            remappable: Optional[Callable|bool] = None,
+            when_unset: Callable|bool = False,
+            iterable: bool = False,
+            reference: bool = False,
+            id_min: int = ID_MIN,
+            id_max: int = ID_MAX,
+            actions: Optional[tuple] = None
+            ) -> IDRule:
+        """
+        Build an IDRule for `field` and register it on `interface` (a class, or several).
+
+        Interfaces inheriting from `interface` get the rule too. The field is checked
+        right away, so a renamed or mistyped field fails at registration.
+        """
+        rule = IDRule(
+            field=field, id_type=id_type, condition=condition, function=function,
+            fallback=fallback, replace=replace, fixed=fixed, remappable=remappable,
+            when_unset=when_unset, iterable=iterable, reference=reference,
+            id_min=id_min, id_max=id_max, actions=actions,
+            )
+        targets = interface if isinstance(interface, (tuple, list)) else (interface,)
+        for target in targets:
+            self.register(target, rule)
+        return rule
+
+    def compile_rules(self, **kwargs) -> Self:
+        """A new handler holding only the rules that match the given filters."""
+        filtered = {}
+        for klass, own in self.rules.items():
+            kept = tuple(r for r in own if r.is_matched(**kwargs))
+            if kept:
+                filtered[klass] = kept
+        return self.__class__(rules=filtered, groups=self.groups)
+
+    def add_groups(self, *groups) -> None:
         current = list(self.groups) if self.groups else []
 
         for spec in groups:
@@ -316,47 +424,24 @@ class RuleHandler:
 
         self.groups = current
 
-
-    def add_rules(self, *rules):
-
-        base = set()
-        by_id = {}
-        rule_list = [self, *rules]
-
+    def add_rules(self, *handlers: Self) -> Self:
+        """A new handler combining this one with the given handlers."""
         new = self.__class__()
 
-        for r in rule_list:
-            base.update(r.base)
-            new.add_groups(r.groups)
+        for h in (self, *handlers):
+            new.add_groups(h.groups)
+            for klass, own in h.rules.items():
+                new._own(klass).update(own)
 
-            for k,v in r.by_id.items():
-                by_id.setdefault(k,set()).update(v)
+        return new
 
-
-        new.base = tuple(base)
-        new.by_id={k:tuple(v) for k,v in by_id.items()}
-
-
-    def fetch_ids(
-            self,
-            obj:Object
-            ):
-
-        result = []
-        oid = obj.get(obj_prop.ID, 0)
-        rules = self.by_id.get(oid)
-
-        if rules is not None:
-            for rule in rules:
-                if (i:= rule.get_id(obj)) is not None:
-                    result.append(i)
-
-        if oid != obj_id.LEVEL_START and self.base:
-            for rule in self.base:
-                if (i:= rule.get_id(obj)) is not None:
-                    result.append(i)
-
-        return tuple(result)
+    def fetch_ids(self, obj: Object) -> tuple[Identifier, ...]:
+        schema = type(obj).get_schema(obj.current_id)
+        rules = self.rules_for(schema)
+        if not rules:
+            return ()
+        iface = schema(obj)
+        return tuple(i for r in rules if (i := r.get_id(iface)) is not None)
 
     def compile_ids(
             self,

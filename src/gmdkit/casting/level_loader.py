@@ -509,11 +509,6 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     def timely_type(self) -> enums.TimelyType:
         """
         Gets the timely (daily, weekly, event) type of a level.
-        
-        Parameters
-        ----------
-        level : Level
-            The level to check.
             
         Returns
         -------

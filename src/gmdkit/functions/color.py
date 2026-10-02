@@ -1,5 +1,4 @@
 # Package Imports
-from gmdkit.mappings import obj_prop
 from gmdkit.models.level import Level
 from gmdkit.models.object import ObjectList
 from gmdkit.models.prop.color import Color, ColorList
@@ -85,20 +84,19 @@ def create_color_triggers(
 
 
 def create_lvl_color_triggers(
-        level:Level,
+        lvl:Level,
         ignore_default:bool=True,
         pos_x:float=0,
         pos_y:float=0
         ) -> ObjectList:
-    colors: ColorList = level.start.get(obj_prop.level.COLORS)#.where(lambda x: x.channel in color_id.LEVEL)
-    level.objects += create_color_triggers(colors,ignore_default,pos_x,pos_y)
+    intf = lvl.start.require_interface(interfaces.LevelSettings)
+    lvl.objects += create_color_triggers(intf.colors,ignore_default,pos_x,pos_y)
 
 
 def set_used_colors(lvl:Level):
     used = remapping.rules.COLOR_ID_HANDLER.compile_ids(lvl).filter_values(reference=True).get_ids()
-    colors: ColorList = lvl.start.get(obj_prop.level.COLORS)
-    print(lvl.name,used)
-    colors.set_defaults(*used)
+    intf = lvl.start.require_interface(interfaces.LevelSettings)
+    intf.colors.set_defaults(*used)
 
 
 def free_unused_colors(lvl:Level, ignore_ids:dict):
@@ -110,6 +108,6 @@ def free_unused_colors(lvl:Level, ignore_ids:dict):
     id_base = ids.filter_values(reference=False).get_ids()
     id_ref = ids.filter_values(reference=True).get_ids()
     unused = id_base - id_ref - ignore_ids
-
-    if (colors:=lvl.start.get(obj_prop.level.COLORS)) is not None:
-        lvl.start[obj_prop.level.COLORS] = colors.where(lambda color: color.channel not in unused)
+    
+    intf = lvl.start.require_interface(interfaces.LevelSettings)
+    intf.colors.exclude(lambda color: color.channel in unused)
