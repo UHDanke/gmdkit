@@ -4,7 +4,7 @@ import math
 
 # Package Imports
 from gmdkit import Object, ObjectList
-from gmdkit.mappings import obj_prop
+from gmdkit.models import interfaces
 
 
 def objs_from_key(object_ids:Sequence):
@@ -35,20 +35,16 @@ def brickify(obj_list:ObjectList, height:Optional[int]=None):
     if height is None:
         height = math.ceil(math.sqrt(len(obj_list)))
     
-    X = 0
-    Y = 0
-    i = 0
+    X = Y = i = 0
     for obj in obj_list:
-        obj.update(
-            {
-                obj_prop.X: X,
-                obj_prop.Y: Y,
-                }
-            )
-        i+=1
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        intf.x = X
+        intf.y = Y
+        
+        i += 1
         if i >= height:
             X += 30
-            Y = 0
-            i = 0 
+            Y = i = 0
         else:
             Y-=30

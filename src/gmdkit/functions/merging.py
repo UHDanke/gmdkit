@@ -2,13 +2,12 @@
 from typing import Optional
 
 # Package Imports
-from gmdkit.mappings import obj_prop, obj_id
+from gmdkit.mappings import obj_id
 from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.functions.object import reset_transforms, reset_spawn_touch, offset_position
 from gmdkit.functions.object_list import boundaries, add_groups, group_objects_x
 from gmdkit import remapping
-from gmdkit.mappings.obj_id_set import AREA_TRIGGERS
+from gmdkit.models import interfaces
 
 
 def add_toggles(
@@ -24,35 +23,26 @@ def add_toggles(
         g = remapping.AutoID()
 
         init_toggle = Object.default(obj_id.trigger.TOGGLE)
-        init_toggle.update(
-            {
-                obj_prop.X: 0,
-                obj_prop.Y: 15+Y,
-                obj_prop.trigger.toggle.GROUP_ID: g,
-                }
-            )
+        intf_it = init_toggle.require_interface(interfaces.ToggleTrigger)
+        intf_it.x = 0
+        intf_it.y = 15+Y
+        intf_it.group_id = g
         obj_list.append(init_toggle)
         init_toggles.append(init_toggle)
 
         start_toggle = Object.default(obj_id.trigger.TOGGLE)
-        start_toggle.update(
-            {
-                obj_prop.X: min_x,
-                obj_prop.Y: 15,
-                obj_prop.trigger.toggle.GROUP_ID: g,
-                obj_prop.trigger.toggle.ACTIVATE_GROUP: True
-                }
-            )
+        intf_st = init_toggle.require_interface(interfaces.ToggleTrigger)
+        intf_st.x = min_x
+        intf_st.y = 15
+        intf_st.group_id = g
+        intf_st.activate_group = True
         obj_list.append(start_toggle)
 
         end_toggle = Object.default(obj_id.trigger.TOGGLE)
-        end_toggle.update(
-            {
-                obj_prop.X: max_x,
-                obj_prop.Y: 15,
-                obj_prop.trigger.toggle.GROUP_ID: g,
-                }
-            )
+        intf_et = init_toggle.require_interface(interfaces.ToggleTrigger)
+        intf_et.x = max_x
+        intf_et.y = 15
+        intf_et.group_id = g
         obj_list.append(end_toggle)
         Y -= 30
 
@@ -75,22 +65,20 @@ def start_pos_fix(
         i = remapping.AutoID()
 
         event = Object.default(obj_id.trigger.TIME_EVENT)
-        event.update({
-            obj_prop.X: x,
-            obj_prop.Y: -15,
-            obj_prop.trigger.time_event.ITEM_ID: target_id,
-            obj_prop.trigger.time_event.TARGET_ID: i,
-            obj_prop.trigger.time_event.TARGET_TIME: 1.00
-            })
+        intf_ev = event.require_interface(interfaces.TimerEventTrigger)
+        intf_ev.x = x
+        intf_ev.y = -15
+        intf_ev.item_id = target_id
+        intf_ev.target_id = i
+        intf_ev.target_time = 1.00
         result.append(event)
 
         if include_stop:
             stop = Object.default(obj_id.trigger.STOP)
-            stop.update({
-                obj_prop.X: x + stop_offset,
-                obj_prop.Y: -45,
-                obj_prop.trigger.stop.TARGET_ID: i,
-                })
+            intf_stp = stop.require_interface(interfaces.StopTrigger)
+            intf_stp.x = x + stop_offset
+            intf_stp.y = -45
+            intf_stp.target_id = i
             result.append(stop)
 
         add_groups(objs, i)
@@ -105,61 +93,25 @@ def create_start_pos_fix_activator(
         pos_y=-45
         ) -> ObjectList:
      new = ObjectList()
+     group = remapping.AutoID()
+     
+     advf = Object.default(obj_id.trigger.ADV_FOLLOW)
+     intf_advf = advf.require_interface(interfaces.AdvancedFollowTrigger)
+     intf_advf.x = pos_x
+     intf_advf.y = pos_y
+     intf_advf.target_id = group
+     intf_advf.player_1 = True
+     new.append(advf)
 
-     group_ie = remapping.AutoID()
-     group_c1 = remapping.AutoID()
-     group_c2 = remapping.AutoID()
-
-     coll_1 = Object.default(obj_id.trigger.COLLISION_BLOCK)
-     coll_1.setdefault(obj_prop.GROUPS).append(group_c1)
-     coll_1.update({
-         obj_prop.trigger.collision_block.BLOCK_ID: group_c1,
-         obj_prop.trigger.collision_block.DYNAMIC: True,
-         obj_prop.X: pos_x+45,
-         obj_prop.Y: pos_y,
-         })
-     new.append(coll_1)
-
-     coll_2 = Object.default(obj_id.trigger.COLLISION_BLOCK)
-     coll_2.setdefault(obj_prop.GROUPS).append(group_c2)
-     coll_2.update({
-         obj_prop.trigger.collision_block.BLOCK_ID: group_c2,
-         obj_prop.X: pos_x+90,
-         obj_prop.Y: pos_y,
-         })
-     new.append(coll_2)
-
-     adv_f = Object.default(obj_id.trigger.ADV_FOLLOW)
-     adv_f.update({
-         obj_prop.trigger.adv_follow.TARGET_ID: group_c1,
-         obj_prop.trigger.adv_follow.FOLLOW_ID: group_c2,
-         obj_prop.X: pos_x,
-         obj_prop.Y: pos_y,
-         })
-     new.append(adv_f)
-
-     coll_t = Object.default(obj_id.trigger.COLLISION)
-     coll_t.update({
-         obj_prop.trigger.collision.BLOCK_A: group_c1,
-         obj_prop.trigger.collision.BLOCK_B: group_c2,
-         obj_prop.trigger.collision.ACTIVATE_GROUP: True,
-         obj_prop.trigger.collision.TARGET_ID: group_ie,
-         obj_prop.X: pos_x,
-         obj_prop.Y: pos_y-60,
-         })
-     new.append(coll_t)
-
-     item_e = Object.default(obj_id.trigger.ITEM_EDIT)
-     item_e.setdefault(obj_prop.GROUPS).append(group_ie)
-     item_e.update({
-         obj_prop.trigger.item_edit.TARGET_ITEM_ID: target_id,
-         obj_prop.trigger.item_edit.MOD: 1.0,
-         obj_prop.trigger.item_edit.ITEM_TYPE_3: 2,
-         obj_prop.trigger.SPAWN_TRIGGER: True,
-         obj_prop.X: pos_x+45,
-         obj_prop.Y: pos_y-60,
-         })
-     new.append(item_e)
+     iedit = Object.default(obj_id.trigger.ITEM_EDIT)
+     intf_edit = iedit.require_interface(interfaces.ItemEditTrigger)
+     intf_edit.groups.append(group)
+     intf_edit.x = pos_x+45
+     intf_edit.y = pos_y-60
+     intf_edit.target_item_id = target_id
+     intf_edit.target_item_type = 2
+     intf_edit.set_spawn_trigger()
+     new.append(iedit)
 
      return new
 
@@ -171,11 +123,11 @@ def area_start_pos_fix(
         forward_limit:float=30
         ) -> tuple[ObjectList]:
 
-    def filter_area(obj):
-        return obj.get(obj_prop.ID) in AREA_TRIGGERS and not obj.get(obj_prop.trigger.SPAWN_TRIGGER)
-
-    def add_spawn(obj):
-        obj[obj_prop.trigger.SPAWN_TRIGGER] = True
+    def filter_area(obj:Object):
+        intf = obj.require_interface(interfaces.area.AreaTrigger,None)
+        if intf and not intf.spawn_trigger:
+            return True
+        return False
 
     areas = objects.where(filter_area)
 
@@ -186,9 +138,12 @@ def area_start_pos_fix(
         stop_offset=stop_offset,
         forward_limit=forward_limit
         )
-
-    areas.apply(reset_transforms,reset_spawn_touch,add_spawn)
-
+    
+    for obj in areas:
+        obj: Object
+        intf = obj.require_interface(interfaces.area.AreaTrigger)
+        intf.clear_transforms()
+        intf.set_spawn_trigger(True)
     objects += events
 
     return areas, events
@@ -202,7 +157,8 @@ def boundary_offset(
         ):
 
     i = None
-
+    x = 0
+    y = 0
     for level in levels:
 
         bounds = boundaries(level.objects)
@@ -213,7 +169,7 @@ def boundary_offset(
                 i = bounds[5]
 
             else:
-                level.objects.apply(offset_position, offset_y = i)
+                y = i
                 i += bounds[5]-bounds[1] + block_offset * 30
 
         else:
@@ -221,14 +177,16 @@ def boundary_offset(
                 i = bounds[4]
 
             else:
-                level.objects.apply(offset_position, offset_x = i)
+                x = i
                 i += bounds[4]-bounds[0] + block_offset * 30
-
+        
+        for obj in level.objects:
+            obj: Object
+            intf = obj.require_interface(interfaces.BaseObject)
+            intf.x += x
+            intf.y += y
+            
         i = i // 30 * 30
-
-
-
-
 
 
 def get_useless_triggers():

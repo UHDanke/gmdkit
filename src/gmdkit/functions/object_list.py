@@ -4,16 +4,15 @@ from statistics import mean, median
 import math
 
 # Package Imports
-from gmdkit.mappings import obj_prop, obj_id
 from gmdkit.models.object import ObjectList, Object
-from gmdkit.models.prop.groups import IDList
-from gmdkit.functions.object import get_keyframe_id
 from gmdkit import remapping
+from gmdkit.models import interfaces
+
 
 ObjectListMapping = dict[Optional[int],ObjectList]
 ObjectMapping = dict[int,Object]
 
-
+    
 def add_groups(obj_list:ObjectList, *groups:Sequence[int],ignore_extra:bool=False):
     """
     Adds groups to every object in the list.
@@ -44,20 +43,20 @@ def add_groups(obj_list:ObjectList, *groups:Sequence[int],ignore_extra:bool=Fals
         raise ValueError("cannot add more than 10 groups")
 
     for obj in obj_list:
-        g = obj.setdefault(obj_prop.GROUPS,IDList())
-        g_set = set(g)
-
-        new = group_set | g_set
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        g = set(intf.groups)
+        new = group_set | g
 
         if len(new) > 10:
             raise ValueError(f"expected at most 10 groups, got {len(new)}")
 
-        g[:] = new
+        intf.groups[:] = new
 
-# TODO REVIEW
+
 def group_objects(
         obj_list:ObjectList,
-        key_func:Callable=lambda obj: obj.get(obj_prop.ID),
+        key_func:Callable=lambda obj: obj.interface.obj_id,
         value_func:Callable=ObjectList
         ):
 
@@ -69,6 +68,7 @@ def group_objects(
         v.append(obj)
 
     return {k:value_func(v) for k, v in new.items()}
+
 
 def clean_gid_parents(obj_list:ObjectList):
     """
@@ -87,16 +87,14 @@ def clean_gid_parents(obj_list:ObjectList):
     seen = set()
 
     for obj in obj_list:
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        intf.fix_groups()
+        new = set(intf.parent_groups).intersection(intf.groups)
+        new.difference_update(seen)
+        seen.update(new)
+        intf.parent_groups[:] = new
 
-        if (parents:=obj.get(obj_prop.PARENT_GROUPS)) is not None:
-
-            new = set(parents).intersection(obj.get(obj_prop.GROUPS,[]))
-
-            new.difference_update(seen)
-
-            seen.update(new)
-
-            obj[obj_prop.PARENT_GROUPS][:] = new
 
 def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
     """
@@ -118,8 +116,9 @@ def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
     groups.setdefault(None, ObjectList())
 
     for obj in obj_list:
-
-        gids = obj.get(obj_prop.GROUPS,[])
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        gids = intf.groups
 
         if gids:
             for gid in gids:
@@ -165,42 +164,39 @@ def compile_parents(
     gid_parents = {}
     group_parents = {}
     area_parents = {}
-
+    
     for obj in obj_list:
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
 
-        if (parents:=obj.get(obj_prop.PARENT_GROUPS)):
-
-            for parent in parents:
-
-                gid_parents.setdefault(parent, obj)
+        for parent in intf.parent_groups:
+            gid_parents.setdefault(parent, obj)
 
 
     for gid, parent in gid_parents.items():
-
-        if parent.get(obj_prop.GROUP_PARENT):
+        parent: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        if intf.group_parent:
             group_parents[gid] = parent
 
-        if parent.get(obj_prop.AREA_PARENT):
+        if intf.area_parent:
             area_parents[gid] = parent
-
-
-    priority = lambda obj: (obj.get(obj_prop.X,0),obj.get(obj_prop.Y,0))
-
+    
+    priority = lambda obj: obj.interface.get_positions()
+    
     for gid, group in groups.items():
-
-        if not gid_parents.get(gid):
-            continue
+        if not gid_parents.get(gid): continue
 
         gp = group_parents.get(gid)
         ap = area_parents.get(gid)
 
         if gp is None:
-            gp = group.where(lambda obj: obj.get(obj_prop.GROUP_PARENT) is not None)
+            gp = group.where(lambda obj: obj.interface.group_parent)
 
             if gp: group_parents[gid] = min(gp, key=priority)
 
         if ap is None:
-            ap = group.where(lambda obj: obj.get(obj_prop.AREA_PARENT) is not None)
+            ap = group.where(lambda obj: obj.interface.area_parent)
 
             if ap: area_parents[gid] = min(ap, key=priority)
 
@@ -210,8 +206,8 @@ def compile_parents(
         elif ap is None and gp is not None:
             area_parents[gid] = gp
 
-
     return groups, gid_parents, group_parents, area_parents
+
 
 def compile_chunks(
         obj_list:ObjectList,
@@ -246,13 +242,16 @@ def compile_chunks(
     result = dict()
 
     for obj in obj_list:
-        x = int(((obj.get(obj_prop.X,ox))-ox)/chunk_size)
-        y = int((obj.get(obj_prop.Y,oy)-oy)/chunk_size)
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        x = int((intf.x-ox)/chunk_size)
+        y = int((intf.y-oy)/chunk_size)
 
         chunk = result.setdefault((x,y),[])
         chunk.append(obj)
 
     return {k:function(v) for k, v in result.items()}
+
 
 def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
     """
@@ -272,25 +271,22 @@ def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
     result = dict()
 
     for obj in obj_list:
-
-        if obj_id.trigger.KEYFRAME != obj.get(obj_prop.ID):
-            continue
-
-        if (key_id:=obj.get(obj_prop.trigger.keyframe.KEY_ID, 0)) is not None:
-
-            pool = result.setdefault(key_id,ObjectList())
-
-            pool.append(obj)
+        obj: Object
+        intf = obj.require_interface(interfaces.KeyframeObject,None)
+        if not intf: continue
+        
+        pool = result.setdefault(intf.key_id,ObjectList())
+        pool.append(obj)
 
     for value in result.values():
-
-        value.sort(key=lambda obj: obj.get(obj_prop.trigger.keyframe.INDEX,0))
+        value.sort(key=lambda obj: obj.interface.index)
 
     return result
 
+
 def compile_keyframe_groups(
         obj_list:ObjectList,
-        function:Callable=get_keyframe_id
+        function:Callable=lambda obj: obj.interface.key_id
         ) -> dict[int|None,list[Any]]:
     """
     Compiles keyframe properties by group IDs that reference them.
@@ -314,12 +310,15 @@ def compile_keyframe_groups(
     no_group = set()
 
     for obj in obj_list:
+        obj: Object
+        intf = obj.require_interface(interfaces.KeyframeObject,None)
+        if not intf: continue
 
-        if obj_id.trigger.KEYFRAME != obj.get(obj_prop.ID):
-            continue
-
-        if function is not None and callable(function) and (value:=function(obj)) is not None:
-            groups = obj.get(obj_prop.GROUPS)
+        if (
+            function is not None and callable(function) and 
+            (value:=function(obj)) is not None
+            ):
+            groups = intf.groups
 
             if groups:
                 no_group.discard(value)
@@ -338,6 +337,7 @@ def compile_keyframe_groups(
         result[key] = tuple(sorted(result[key]))
 
     return result
+
 
 def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,ObjectMapping]:
     """
@@ -368,28 +368,29 @@ def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,
     area_parents = {}
 
     for obj in obj_list:
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
 
-        if (link_id:=obj.get(obj_prop.LINKED_GROUP)):
-
+        if (link_id:=intf.linked_group):
             link = links.setdefault(link_id,ObjectList())
             link.append(obj)
 
-
-    priority = lambda obj: (obj.get(obj_prop.X,0),obj.get(obj_prop.Y,0))
-
+    priority = lambda obj: obj.interface.get_positions()
+    
     for link_id, link in links.items():
 
         if link_id is None: continue
 
-        gp = link.where(lambda obj: obj.get(obj_prop.GROUP_PARENT) is not None)
+        gp = link.where(lambda obj: obj.interface.group_parent)
 
         if gp: group_parents[link_id] = min(gp, key=priority)
 
-        ap = link.where(lambda obj: obj.get(obj_prop.AREA_PARENT) is not None)
+        ap = link.where(lambda obj: obj.interface.area_parent)
 
         if ap: area_parents[link_id] = min(ap, key=priority)
 
     return links, group_parents, area_parents
+
 
 def compile_spawn_groups(obj_list:ObjectList) -> ObjectListMapping:
     """
@@ -406,15 +407,20 @@ def compile_spawn_groups(obj_list:ObjectList) -> ObjectListMapping:
         A dictionary mapping all spawn trigger objects to a group ID.
 
     """
-    spawn_triggers = obj_list.where(lambda obj: obj.get(obj_prop.trigger.SPAWN_TRIGGER,False))
-
+    
+    def filter_spawn(obj:Object):
+        intf = obj.require_interface(interfaces.TriggerObject,None)
+        if not intf: return False
+        return intf.spawn_trigger
+        
+    spawn_triggers = obj_list.where(filter_spawn)
     spawn_groups = compile_groups(obj_list=spawn_triggers)
 
     for gid, group in spawn_groups.items():
-
-        group.sort(key=lambda obj: obj.get(obj_prop.X,0))
+        group.sort(key=lambda obj: obj.interface.x)
 
     return spawn_groups
+
 
 def boundaries(
         obj_list:ObjectList,
@@ -442,44 +448,28 @@ def boundaries(
     bounds : dict
         A dictionary containing min_x, min_y, center_x, center_y, max_x, max_y
     """
-    x = []
-    y = []
-
-    for obj in obj_list:
-        if (pos_x:=obj.get(obj_prop.X)) is not None:
-            x.append(pos_x)
-        if (pos_y:=obj.get(obj_prop.Y)) is not None:
-            y.append(pos_y)
-
-    if x:
-        min_x = min(x)
-        max_x = max(x)
-
+    # Extract coordinates
+    coords = [(intf.x, intf.y) 
+             for obj in obj_list 
+             if (intf := obj.require_interface(interfaces.BaseObject))]
+    
+    if not coords:
+        return {k: 0.0 for k in ["min_x", "max_x", "center_x", "min_y", "max_y", "center_y"]}
+    
+    x, y = zip(*coords)
+    
+    # Calculate center
+    def get_center(values):
         match center_type:
-            case "midpoint":
-                center_x = (max_x + min_x) / 2
-            case "mean":
-                center_x = mean(x)
-            case "median":
-                center_x = median(x)
-    else:
-        min_x = center_x = max_x = 0.0
+            case "midpoint": return (max(values) + min(values)) / 2
+            case "mean": return mean(values)
+            case "median": return median(values)
+    
+    return {
+        "min_x": min(x), "max_x": max(x), "center_x": get_center(x),
+        "min_y": min(y), "max_y": max(y), "center_y": get_center(y),
+    }
 
-    if y:
-        min_y = min(y)
-        max_y = max(y)
-
-        match center_type:
-            case "midpoint":
-                center_y = (max_y + min_y) / 2
-            case "mean":
-                center_y = mean(y)
-            case "median":
-                center_y = median(y)
-    else:
-        min_y = center_y = max_y = 0.0
-
-    return {"min_x": min_x, "min_y":min_y, "center_x":center_x, "center_y":center_y, "max_x":max_x, "max_y": max_y}
 
 def grid_align(
         obj_list:ObjectList,
@@ -491,7 +481,7 @@ def grid_align(
         ):
     """
     Alings a list of objects to a grid of a given size.
-
+    
     Parameters
     ----------
     obj_list : ObjectList
@@ -506,21 +496,23 @@ def grid_align(
         The grid's Y offset. The default is 0.
     snap_func : Callable, optional
         The function used to snap the position of the objects. Uses round() by default.
-
+    
     Returns
     -------
     None.
-
     """
-
+    
     if not (unit_x or unit_y) or not callable(snap_func): return
-
+    
     for obj in obj_list:
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        
         if unit_x is not None:
-            obj[obj_prop.X] = snap_func((obj.get(obj_prop.X) - offset_x) / unit_x) * unit_x + offset_x
-
+            intf.x = snap_func((intf.x - offset_x) / unit_x) * unit_x + offset_x
+            
         if unit_y is not None:
-            obj[obj_prop.Y] = snap_func((obj.get(obj_prop.Y) - offset_y) / unit_y) * unit_y + offset_y
+            intf.y = snap_func((intf.y - offset_y) / unit_y) * unit_y + offset_y
 
 # TODO TEST
 def warp_objects(
@@ -553,18 +545,16 @@ def warp_objects(
     m11 = cos_r
 
     for obj in obj_list:
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
 
         if not only_move:
-
-            obj_scale_x = obj.get(obj_prop.SCALE_X, 1.00)
-            obj_scale_y = obj.get(obj_prop.SCALE_Y, 1.00)
-            obj_skew_x = obj.get(obj_prop.SKEW_X, 0)
-            obj_skew_y = obj.get(obj_prop.SKEW_Y, 0)
-
-            if (obj_rot:=obj.get(obj_prop.ROTATION)) is not None:
-                obj_skew_x += obj_rot
-                obj_skew_y += obj_rot
-
+            obj_scale_x = intf.scale_x
+            obj_scale_y = intf.scale_y
+            obj_rot = intf.rotation
+            obj_skew_x = intf.skew_x + obj_rot
+            obj_skew_y = intf.skew_y + obj_rot
+            
             obj_tx = math.radians(obj_skew_x)
             obj_ty = math.radians(obj_skew_y)
 
@@ -581,39 +571,24 @@ def warp_objects(
             vx += ty * wx
             vy += ty * wy
 
-            obj_scale_x = math.hypot(vx, vy)
-            obj_scale_y = math.hypot(wx, wy)
-            obj_skew_x = math.degrees(math.atan2(vy, vx))
-            obj_skew_y = math.degrees(math.atan2(wy, wx))
+            intf.scale_x = math.hypot(vx, vy)
+            intf.scale_y = math.hypot(wx, wy)
+            intf.skew_x = math.degrees(math.atan2(vy, vx))
+            intf.skew_y = math.degrees(math.atan2(wy, wx))
 
-            if obj_scale_x == 1:
-                obj.pop(obj_prop.SCALE_X,None)
-            else:
-                obj[obj_prop.SCALE_X] = obj_scale_x
+            if intf.scale_x == 1: del intf.scale_x
+            if intf.scale_y == 1: del intf.scale_y
 
-            if obj_scale_y == 1:
-                obj.pop(obj_prop.SCALE_Y,None)
-            else:
-                obj[obj_prop.SCALE_Y] = obj_scale_y
+            if intf.skew_x == intf.skew_y:
+                intf.rotation = intf.skew_x
+                del intf.skew_x
+                del intf.skew_y
+                
+        dx = intf.x - center_x
+        dy = intf.y - center_y
 
-            if obj_skew_x == obj_skew_y:
-                obj.pop(obj_prop.SKEW_X, None)
-                obj.pop(obj_prop.SKEW_Y, None)
-                obj[obj_prop.ROTATION] = obj_skew_x
-
-            else:
-                obj[obj_prop.SKEW_X] = obj_skew_x
-                obj[obj_prop.SKEW_Y] = obj_skew_y
-
-        x = obj.get(obj_prop.X, 0)
-        y = obj.get(obj_prop.Y, 0)
-        dx = x - center_x
-        dy = y - center_y
-
-        if x is not None:
-            obj[obj_prop.X] = m00 * dx + m01 * dy + center_x
-        if y is not None:
-            obj[obj_prop.Y] = m10 * dx + m11 * dy + center_y
+        intf.x = m00 * dx + m01 * dy + center_x
+        intf.y = m10 * dx + m11 * dy + center_y
 
 # TODO TEST
 def align_objects(
@@ -649,85 +624,75 @@ def align_objects(
     None
 
     """
-    if not x_axis and not y_axis:
+    if not (x_axis or y_axis) or not obj_list:
         return
-
-    item_list = []
-
+    
+    # Get links and parent info
     if ignore_links:
-
-        for obj in obj_list:
-            data = ObjectList([obj])
-            x = obj.get(obj_prop.X,0)
-            y = obj.get(obj_prop.Y,0)
-            item_list.append({'data':data,'x':x,'y':y})
-
+        links, group_parents = {None: obj_list}, {}
     else:
-
-        links, group_parents, _ = compile_links(obj_list)
-
-        for link_id, link in links.items():
-
-            if link_id is None:
-                for obj in link:
-                    data = ObjectList([obj])
-                    x = obj.get(obj_prop.X,0)
-                    y = obj.get(obj_prop.Y,0)
-                    item_list.append({'data':data,'x':x,'y':y})
-
-            else:
-                data = link
-
-                if center_gparent == True and link_id in group_parents:
-                    obj = group_parents[link_id]
-                    x = obj.get(obj_prop.X,0)
-                    y = obj.get(obj_prop.Y,0)
-
-                else:
-                    x = mean([obj.get(obj_prop.X,0) for obj in link])
-                    y = mean([obj.get(obj_prop.Y,0) for obj in link])
-
-                item_list.append({'data':data,'x':x,'y':y})
-
-    def per_axis(ax, pid):
-        if keep_alignment:
-            d = {}
-
-            for item in item_list:
-                data = d.setdefault(item[ax],[])
-                data.extend(item['data'])
-
-            l = [{'data':v,ax:k} for k, v in d.items()]
-
+        links, group_parents = compile_links(obj_list)[:2]
+    
+    # Build items: (object_list, x_pos, y_pos)
+    items = []
+    for link_id, link in links.items():
+        if link_id is None:
+            for obj in link:
+                items.append((ObjectList([obj]), obj.interface.x, obj.interface.y))
         else:
-            l = item_list
+            if center_gparent and link_id in group_parents:
+                p = group_parents[link_id].interface
+                x, y = p.x, p.y
+            else:
+                x = mean(o.interface.x for o in link)
+                y = mean(o.interface.y for o in link)
+            items.append((link, x, y))
+    
+    def align_on_axis(axis_idx):
+        if keep_alignment:
+            pos_map = {}
+            for data, x, y in items:
+                pos = (x, y)[axis_idx]
+                pos_map.setdefault(pos, ObjectList()).extend(data)
+            targets = [(pos_map[p], p) for p in sorted(pos_map)]
+        else:
+            targets = [(data, (x, y)[axis_idx]) for data, x, y in items]
+        
+        if len(targets) < 2:
+            return
+        
+        positions = [p for _, p in targets]
+        interval = (max(positions) - min(positions)) / (len(targets) - 1)
+        
+        for i, (data, old_pos) in enumerate(targets):
+            new_pos = min(positions) + i * interval
+            offset = new_pos - old_pos
+            for obj in data:
+                if axis_idx == 0:
+                    obj.interface.x += offset
+                else:
+                    obj.interface.y += offset
+    
+    if x_axis: align_on_axis(0)
+    if y_axis: align_on_axis(1)
 
-        first = min(l, key=lambda i: i.get(ax,0))
-        last = max(l, key=lambda i: i.get(ax,0))
-        interval = (last-first) / len(l)
 
-        for i, item in enumerate(l):
-            offset = first + i*interval - l.get(ax,0)
-
-            for obj in item['data']:
-                if (val := obj.get(pid)): obj[pid] = val + offset
-
-    if x_axis: per_axis('x', obj_prop.X)
-
-    if y_axis: per_axis('y', obj_prop.Y)
-
-# TODO
-def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_limit:float=0):
-
-    objs = sorted(obj_list, key=lambda obj: obj.get(obj_prop.X,0))
-
+def group_objects_x(
+        obj_list:ObjectList, 
+        function:Callable=ObjectList, 
+        forward_limit:float=0
+        ):
+    
+    objs = sorted(obj_list, key=lambda obj: obj.interface.x)
     groups = {}
 
     x = None
     for obj in objs:
-        ox = obj.get(obj_prop.X)
-        if x is None or ox is not None and ox-x > forward_limit:
-            x = ox
+        obj: Object
+        intf = obj.require_interface(interfaces.BaseObject)
+        
+        if x is None or intf.x-x > forward_limit:
+            x = intf.x
         gx = groups.setdefault(x, [])
         gx.append(obj)
 
@@ -736,7 +701,7 @@ def group_objects_x(obj_list:ObjectList, function:Callable=ObjectList, forward_l
 
 def set_common_group(objects:ObjectList, rules) -> tuple[int]:
 
-    common = objects.shared_values(lambda obj: obj.get(obj_prop.GROUPS))
+    common = objects.shared_values(lambda obj: obj.interface.groups)
 
     if common:
         return tuple(common)

@@ -226,6 +226,13 @@ class BaseObject(BaseInterface):
     def fix_color(self):
         if self.color_1 == color_id.LIGHTER:
             self.color_1 = color_id.WHITE
+            
+    def offset_position(self,x:float=0,y:float=0):
+        if x: self.x += x
+        if y: self.y += y
+    
+    def get_positions(self):
+        return (self.x,self.y)
 
 
 class EffectObject(BaseObject):
