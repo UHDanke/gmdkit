@@ -20,7 +20,6 @@ def compile_spawn_groups(obj_list:ObjectList):
     spawn_groups = { 0: ObjectList() }
     
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.TriggerObject,None)
         if not intf: continue
         

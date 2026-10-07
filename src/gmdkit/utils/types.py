@@ -1,12 +1,17 @@
 # Imports
-from typing import Self, Any
+from typing import Self, Any, SupportsIndex, overload, TypeVar
 from collections.abc import Iterable, Callable
 
 # Package Imports
 from gmdkit.utils.functions import filter_kwargs
 
 
-class ListClass(list[Any]):
+T = TypeVar("T")
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class ListClass(list[T]):
     
     def __init__(self, *args):
         super().__init__(*args)
@@ -14,35 +19,32 @@ class ListClass(list[Any]):
     def __add__(self, other) -> Self:
         return self.__class__(super().__add__(other))
 
-
     def __radd__(self, other) -> Self:
         return self.__class__(other + list(self))
-
 
     def __mul__(self, n) -> Self:
         return self.__class__(super().__mul__(n))
 
-
     def __rmul__(self, n) -> Self:
         return self.__class__(super().__rmul__(n))
 
-
-    def __getitem__(self, item) -> Self:
+    @overload
+    def __getitem__(self, item: SupportsIndex) -> T: ...
+    @overload
+    def __getitem__(self, item: slice) -> Self: ...
+    def __getitem__(self, item):
         result = super().__getitem__(item)
         return self.__class__(result) if isinstance(item, slice) else result
-
     
     def __repr__(self):
         return f"{self.__class__.__name__}({super().__repr__()})"
-        
-        
+                
     def copy(self) -> Self:
         return self.__class__(self)
     
     @classmethod
     def wrap(cls, *args:Any):
         return cls(args)
-        
     
     def where(self, *conditions:Callable, **kwargs:Any) -> Self:
         """
@@ -282,7 +284,7 @@ class ListClass(list[Any]):
         return result if result is not None else set()
 
         
-class DictClass(dict[Any,Any]):
+class DictClass(dict[K,V]):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -291,20 +293,16 @@ class DictClass(dict[Any,Any]):
     def fromkeys(cls, iterable, value: Any = None):
         return cls(dict.fromkeys(iterable, value))
 
-
     def __repr__(self):
         return f"{self.__class__.__name__}({super().__repr__()})"
-
 
     def copy(self):
         return self.__class__(self)
     
-
     def __or__(self, other):
         if not isinstance(other, dict):
             return NotImplemented
         return self.__class__(dict(self, **other))
-
 
     def __ror__(self, other):
         if not isinstance(other, dict):
@@ -346,7 +344,6 @@ class DictClass(dict[Any,Any]):
                 return [self[k] for k in keys if k in self]
         else:
             return [self.get(k) for k in keys]
-
 
     def discard(self, *keys:str, ignore_missing:bool=False) -> list:
         """

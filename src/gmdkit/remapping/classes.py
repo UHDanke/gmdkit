@@ -394,7 +394,7 @@ class RuleHandler:
 
         return new
 
-    def fetch_ids(self, obj: Object) -> tuple[Identifier, ...]:
+    def fetch_ids(self, obj:Object) -> tuple[Identifier, ...]:
         schema = type(obj).get_schema(obj.current_id)
         rules = self.rules_for(schema)
         if not rules:

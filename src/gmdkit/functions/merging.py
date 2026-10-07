@@ -116,7 +116,7 @@ def create_start_pos_fix_activator(
      return new
 
 def area_start_pos_fix(
-        objects,
+        objects:ObjectList,
         target_id:int,
         include_stop:bool=True,
         stop_offset:float=0,
@@ -130,7 +130,7 @@ def area_start_pos_fix(
         return False
 
     areas = objects.where(filter_area)
-
+    
     events = start_pos_fix(
         areas,
         target_id=target_id,
@@ -140,7 +140,6 @@ def area_start_pos_fix(
         )
     
     for obj in areas:
-        obj: Object
         intf = obj.require_interface(interfaces.area.AreaTrigger)
         intf.clear_transforms()
         intf.set_spawn_trigger(True)
@@ -181,7 +180,6 @@ def boundary_offset(
                 i += bounds[4]-bounds[0] + block_offset * 30
         
         for obj in level.objects:
-            obj: Object
             intf = obj.require_interface(interfaces.BaseObject)
             intf.x += x
             intf.y += y

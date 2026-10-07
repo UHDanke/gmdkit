@@ -13,7 +13,11 @@ ObjectListMapping = dict[Optional[int],ObjectList]
 ObjectMapping = dict[int,Object]
 
     
-def add_groups(obj_list:ObjectList, *groups:Sequence[int],ignore_extra:bool=False):
+def add_groups(
+        obj_list:ObjectList, 
+        *groups:Sequence[int],
+        ignore_extra:bool=False
+        ):
     """
     Adds groups to every object in the list.
 
@@ -43,7 +47,6 @@ def add_groups(obj_list:ObjectList, *groups:Sequence[int],ignore_extra:bool=Fals
         raise ValueError("cannot add more than 10 groups")
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         g = set(intf.groups)
         new = group_set | g
@@ -87,7 +90,6 @@ def clean_gid_parents(obj_list:ObjectList):
     seen = set()
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         intf.fix_groups()
         new = set(intf.parent_groups).intersection(intf.groups)
@@ -116,7 +118,6 @@ def compile_groups(obj_list:ObjectList) -> ObjectListMapping:
     groups.setdefault(None, ObjectList())
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         gids = intf.groups
 
@@ -166,7 +167,6 @@ def compile_parents(
     area_parents = {}
     
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
 
         for parent in intf.parent_groups:
@@ -242,7 +242,6 @@ def compile_chunks(
     result = dict()
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         x = int((intf.x-ox)/chunk_size)
         y = int((intf.y-oy)/chunk_size)
@@ -271,7 +270,6 @@ def compile_keyframe_ids(obj_list:ObjectList) -> ObjectListMapping:
     result = dict()
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.KeyframeObject,None)
         if not intf: continue
         
@@ -310,7 +308,6 @@ def compile_keyframe_groups(
     no_group = set()
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.KeyframeObject,None)
         if not intf: continue
 
@@ -368,7 +365,6 @@ def compile_links(obj_list:ObjectList) -> tuple[ObjectListMapping,ObjectMapping,
     area_parents = {}
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
 
         if (link_id:=intf.linked_group):
@@ -505,7 +501,6 @@ def grid_align(
     if not (unit_x or unit_y) or not callable(snap_func): return
     
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         
         if unit_x is not None:
@@ -545,7 +540,6 @@ def warp_objects(
     m11 = cos_r
 
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
 
         if not only_move:
@@ -688,7 +682,6 @@ def group_objects_x(
 
     x = None
     for obj in objs:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         
         if x is None or intf.x-x > forward_limit:

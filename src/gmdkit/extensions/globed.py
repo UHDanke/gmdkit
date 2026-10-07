@@ -228,7 +228,6 @@ class GlobedScript:
         result = []
         
         for obj in obj_list:
-            obj: Object
             intf = obj.require_interface(interfaces.Text, fallback=None)
             
             if intf is None:

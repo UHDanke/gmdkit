@@ -37,7 +37,6 @@ def brickify(obj_list:ObjectList, height:Optional[int]=None):
     
     X = Y = i = 0
     for obj in obj_list:
-        obj: Object
         intf = obj.require_interface(interfaces.BaseObject)
         intf.x = X
         intf.y = Y

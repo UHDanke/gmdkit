@@ -9,9 +9,12 @@ class EnumClass(IntEnum):
 
     @classmethod
     def _missing_(cls, value):
-        member = cls._value2member_map_.get(value)
-        if member is None:
+        try:
             v = int(value)
+        except (TypeError, ValueError):
+            return None
+        member = cls._value2member_map_.get(v)
+        if member is None:
             member = int.__new__(cls, v)
             member._name_ = f"UNKNOWN_{'N' if v <0 else ''}{abs(v)}"
             member._value_ = v
@@ -20,6 +23,7 @@ class EnumClass(IntEnum):
 
 
 class OldColor(EnumClass):
+    DEFAULT = 0
     PLAYER_1 = 1
     PLAYER_2 = 2
     COLOR_1 = 3
