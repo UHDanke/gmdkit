@@ -3,11 +3,8 @@ import tempfile
 import shutil
 import warnings
 from pathlib import Path
-
 from gmdkit import Object, ObjectList
-from gmdkit.models.prop import IDList
-from gmdkit.mappings import obj_prop
-
+from gmdkit.models import interfaces
 
 LEVELS_DIR = Path(__file__).parent.parent / "data" / "gmd"
 
@@ -45,18 +42,25 @@ def example_level_path():
 
 @pytest.fixture
 def sample_object():
-    return Object({
-        obj_prop.ID: 1899,
-        obj_prop.X: 100.5,
-        obj_prop.Y: 200.0,
-        obj_prop.GROUPS: IDList([1, 2, 3])
-    })
+    obj = Object()
+    intf = interfaces.BaseObject(obj)
+    intf.obj_id = 1899
+    intf.x = 100.5
+    intf.y = 200.0
+    intf.groups[:] = [1,2,3]
+    return obj
 
 
 @pytest.fixture
 def sample_object_list():
-    return ObjectList([
-        Object({obj_prop.ID: 1, obj_prop.X: 100.5, obj_prop.Y: 150.5}),
-        Object({obj_prop.ID: 2, obj_prop.X: 200.5, obj_prop.Y: 250.5}),
-        Object({obj_prop.ID: 3, obj_prop.X: 300.5, obj_prop.Y: 350.5}),
-    ])
+    objs = ObjectList()
+    
+    for i in range(3):
+        obj = Object()
+        intf = interfaces.BaseObject(obj)
+        intf.obj_id = 1+i
+        intf.x = 100.5+i*100
+        intf.y = 150.5+i*100
+        objs.append(obj)
+    
+    return objs

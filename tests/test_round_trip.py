@@ -1,10 +1,7 @@
-
 import pytest
 from pathlib import Path
-
 from gmdkit import Level, Object
-from gmdkit.mappings import obj_prop
-
+from gmdkit.models import interfaces
 from tests.utils import ONLINE_LEVELS, OFFLINE_LEVELS
 
 level_paths = (ONLINE_LEVELS + OFFLINE_LEVELS)[:10]
@@ -17,14 +14,16 @@ def test_roundtrip(level_file: Path, tmp_path: Path) -> None:
     
     for i, obj in enumerate(level.objects):
         assert len(obj) > 0, f"Object {i} is empty before modification"
-
-    level.objects.append(Object({
-        obj_prop.ID: 901,
-        obj_prop.X: 100.0,
-        obj_prop.Y: 100.0,
-        obj_prop.trigger.move.DURATION: 1.0,
-        obj_prop.trigger.move.TARGET_ID: 1,
-    }))
+    
+    obj = Object()
+    intf = interfaces.MoveTrigger(obj)
+    intf.obj_id = 901
+    intf.x = 100.0
+    intf.y = 100.0
+    intf.duration = 1.0
+    intf.target_id = 1
+    
+    level.objects.append(obj)
 
     assert len(level.objects) == initial_count + 1, (
         "Object count should increase by exactly 1 after append"
@@ -45,6 +44,8 @@ def test_roundtrip(level_file: Path, tmp_path: Path) -> None:
     )
     
     appended = reloaded.objects[-1]
-    assert appended[obj_prop.ID] == 901, "Object ID should survive round-trip"
-    assert appended[obj_prop.X] == 100.0, "X position should survive round-trip"
-    assert appended[obj_prop.Y] == 100.0, "Y position should survive round-trip"
+    app_intf = appended.require_interface(interfaces.MoveTrigger)
+    
+    assert app_intf.obj_id == 901, "Object ID should survive round-trip"
+    assert app_intf.x == 100.0, "X position should survive round-trip"
+    assert app_intf.y == 100.0, "Y position should survive round-trip"
