@@ -47,11 +47,8 @@ from gmdkit import Level
 # import object
 from gmdkit import Object
 
-# import property mappings
-from gmdkit.mappings import obj_prop
-
-# import object functions
-import gmdkit.functions.object as obj_func
+# import interfaces
+from gmdkit.models import interfaces
 
 # open file
 level = Level.from_file("example.gmd")
@@ -61,31 +58,18 @@ start = level.start
 
 # get level objects as an ObjectList()
 # object lists subclass list() so they can use all list methods alongside the ones defined by ListClass
-# level.objects WILL throw an error if the level lacks an object string,
-# or if you passed load = False to Level.from_file(), which skips loading objects
-# LevelSave by default does not load the objects of levels
-# so for any level you want to edit the objects of you must call level.load() first
 obj_list = level.objects
 
 # filter by condition
-after_origin = obj_list.where(lambda obj: obj.get(obj_prop.X, 0) > 0)
-
-# apply functions, kwargs are filtered for each called function
-# ex: obj_func.fix_lighter has 'replacement' as a key argument
-after_origin.apply(obj_func.clean_duplicate_groups, obj_func.fix_lighter, replacement=0)
+after_origin = obj_list.where(lambda obj: obj.interface.x > 0)
 
 # create new object
 new_obj = Object.default(1)
-# set properties of object
-# objects subclass dict() so they can use all dict methods alongside the ones defined by DictClass
-new_obj.update(
-  {
-    obj_prop.X: 100,
-    obj_prop.Y: 200,
-    obj_prop.SCALE_X: 2,
-    obj_prop.SCALE_Y: 2
-  }
-)
+# set properties of object using the typed interface
+intf = new_obj.require_interface(interfaces.BaseObject)
+intf.x = 100
+intf.y = 200
+intf.scale = 2
 
 # append object to the level's object list
 # can also be done directly to level.objects or level['k4'].objects (which level.objects references)
