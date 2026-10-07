@@ -2,7 +2,6 @@ __all__ = [
     "constants",
     "extensions",
     "functions",
-    "mappings",
     "models",
     "remapping",
     "typing",
@@ -23,7 +22,6 @@ __all__ = [
 from . import constants
 from . import extensions
 from . import functions
-from . import mappings
 from . import models
 from . import remapping
 from .utils import typing, enums

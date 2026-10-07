@@ -4,8 +4,8 @@ from typing import Optional
 
 # Package Imports
 from gmdkit.models.object import Object
-from gmdkit.mappings import obj_id
 from gmdkit.models import interfaces
+from gmdkit.utils import enums
 
 
 def scale_position(
@@ -115,6 +115,6 @@ def to_user_coins(obj:Object):
     """
     intf = obj.require_interface(interfaces.SecretCoin,None)
     if intf:
-        intf.obj_id = obj_id.collectible.USER_COIN
+        intf.obj_id = enums.ObjectID.COLLECTIBLE_USER_COIN
         del intf.coin_id 
 

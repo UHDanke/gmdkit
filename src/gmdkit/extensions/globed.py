@@ -7,8 +7,7 @@ from os import PathLike
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.models import interfaces
-from gmdkit.mappings import obj_id
-
+from gmdkit.utils import enums
 
 MAGIC = b'\xc4\x19\x7b\xfa'
 PREFIX = "GLOBED_SCRIPT"
@@ -148,7 +147,7 @@ class GlobedScript:
             tail:bytes|None=None
             ):
         
-        self.object = text_object or Object.default(obj_id.TEXT)
+        self.object = text_object or Object.default(enums.ObjectID.OBJECT_TEXT)
         self.prefix = prefix
         self.main = main
         self.filename = filename

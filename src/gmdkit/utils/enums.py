@@ -1,7 +1,12 @@
-# Imports
+# Package Imports
 from enum import IntEnum
 
+
 class EnumClass(IntEnum):
+    
+    @classmethod
+    def _missing_name(cls, value:int) -> str:
+        return f"UNKNOWN_{'N' if value<0 else ''}{abs(value)}"
 
     @classmethod
     def from_string(cls, string: str):
@@ -15,13 +20,203 @@ class EnumClass(IntEnum):
             return None
         member = cls._value2member_map_.get(v)
         if member is None:
+            name = cls._missing_name(v)
+            if name is None: return None
             member = int.__new__(cls, v)
-            member._name_ = f"UNKNOWN_{'N' if v <0 else ''}{abs(v)}"
+            member._name_ = name
             member._value_ = v
             cls._value2member_map_[v] = member
         return member
 
+from enum import IntEnum
 
+
+class ObjectID(IntEnum):
+    LEVEL_SETTINGS = 0
+    PORTAL_GRAVITY_NORMAL = 10
+    PORTAL_GRAVITY_INVERTED = 11
+    PORTAL_CUBE = 12
+    PORTAL_SHIP = 13
+    ENTER_PRESET_FADE_ONLY = 22
+    ENTER_PRESET_FADE_BOTTOM = 23
+    ENTER_PRESET_FADE_TOP = 24
+    ENTER_PRESET_FADE_LEFT = 25
+    ENTER_PRESET_FADE_RIGHT = 26
+    ENTER_PRESET_SCALE_UP = 27
+    ENTER_PRESET_SCALE_DOWN = 28
+    START_POSITION = 31
+    TRIGGER_ENABLE_PLAYER_TRAIL = 32
+    TRIGGER_DISABLE_PLAYER_TRIAL = 33
+    PAD_YELLOW = 35
+    ORB_YELLOW = 36
+    PORTAL_MIRROR_ENTER = 45
+    PORTAL_MIRROR_EXIT = 46
+    PORTAL_BALL = 47
+    ENTER_PRESET_CHAOTIC = 55
+    ENTER_PRESET_HALF_LEFT = 56
+    ENTER_PRESET_HALF_RIGHT = 57
+    ENTER_PRESET_HALF = 58
+    ENTER_PRESET_HALF_INVERT = 59
+    PAD_BLUE = 67
+    ORB_BLUE = 84
+    PORTAL_SIZE_NORMAL = 99
+    PORTAL_SIZE_SMALL = 101
+    PORTAL_UFO = 111
+    PAD_PINK = 140
+    ORB_PINK = 141
+    COLLECTIBLE_SECRET_COIN = 142
+    PORTAL_SPEED_SLOW = 200
+    PORTAL_SPEED_NORMAL = 201
+    PORTAL_SPEED_FAST = 202
+    PORTAL_SPEED_VERY_FAST = 203
+    PORTAL_DUAL_ENTER = 286
+    PORTAL_DUAL_EXIT = 287
+    PORTAL_WAVE = 660
+    PORTAL_ROBOT = 745
+    PORTAL_LINKED_TELEPORT = 747
+    TRIGGER_COLOR = 899
+    TRIGGER_MOVE = 901
+    OBJECT_TEXT = 914
+    TRIGGER_PULSE = 1006
+    TRIGGER_ALPHA = 1007
+    ORB_GREEN = 1022
+    TRIGGER_TOGGLE = 1049
+    TRIGGER_SPAWN = 1268
+    COLLECTIBLE_KEY = 1275
+    COLLECTIBLE_USER_COIN = 1329
+    ORB_BLACK = 1330
+    PORTAL_SPIDER = 1331
+    PAD_RED = 1332
+    ORB_RED = 1333
+    PORTAL_SPEED_SUPER_FAST = 1334
+    TRIGGER_ROTATE = 1346
+    TRIGGER_FOLLOW = 1347
+    TRIGGER_SHAKE = 1520
+    TRIGGER_ANIMATE = 1585
+    ORB_TOGGLE = 1594
+    TRIGGER_TOUCH = 1595
+    TRIGGER_COUNT = 1611
+    TRIGGER_PLAYER_HIDE = 1612
+    TRIGGER_PLAYER_SHOW = 1613
+    COLLECTIBLE_SMALL_COIN = 1614
+    OBJECT_ITEM_LABEL = 1615
+    TRIGGER_STOP = 1616
+    ORB_DASH_GREEN = 1704
+    ORB_DASH_PINK = 1751
+    MODIFIER_WAVE_COLLISION = 1755
+    TRIGGER_INSTANT_COUNT = 1811
+    TRIGGER_ON_DEATH = 1812
+    MODIFIER_STOP_JUMP = 1813
+    TRIGGER_FOLLOW_PLAYER_Y = 1814
+    TRIGGER_COLLISION = 1815
+    OBJECT_COLLISION_BLOCK = 1816
+    TRIGGER_PICKUP = 1817
+    TRIGGER_BG_EFFECT_ENABLE = 1818
+    TRIGGER_BG_EFFECT_DISABLE = 1819
+    MODIFIER_STOP_DASH = 1829
+    MODIFIER_HEAD_COLLISION = 1859
+    TRIGGER_RANDOM = 1912
+    TRIGGER_ZOOM_CAMERA = 1913
+    TRIGGER_STATIC_CAMERA = 1914
+    ENTER_PRESET_NO_FADE = 1915
+    TRIGGER_OFFSET_CAMERA = 1916
+    TRIGGER_REVERSE = 1917
+    TRIGGER_END_WALL = 1931
+    TRIGGER_PLAYER_CONTROL = 1932
+    PORTAL_SWING = 1933
+    TRIGGER_SONG = 1934
+    TRIGGER_TIMEWARP = 1935
+    TRIGGER_ROTATE_CAMERA = 2015
+    TRIGGER_CAMERA_GUIDE = 2016
+    TRIGGER_CAMERA_EDGE = 2062
+    TRIGGER_CHECKPOINT = 2063
+    PORTAL_EXIT_TELEPORT = 2064
+    OBJECT_PARTICLE = 2065
+    TRIGGER_GRAVITY = 2066
+    TRIGGER_SCALE = 2067
+    TRIGGER_ADV_RANDOM = 2068
+    OBJECT_FORCE_BLOCK = 2069
+    MODIFIER_FLIP_GRAVITY = 2866
+    TRIGGER_OPTIONS = 2899
+    TRIGGER_GP_ARROW = 2900
+    TRIGGER_GAMEPLAY_OFFSET = 2901
+    PORTAL_ENTER_TELEPORT = 2902
+    TRIGGER_GRADIENT = 2903
+    SHADER_OPTIONS = 2904
+    SHADER_SHOCKWAVE = 2905
+    SHADER_SHOCKLINE = 2907
+    SHADER_GLITCH = 2909
+    SHADER_CHROMATIC = 2910
+    SHADER_CHROMATIC_GLITCH = 2911
+    SHADER_PIXELATE = 2912
+    SHADER_LENS_CIRCLE = 2913
+    SHADER_RADIAL_BLUR = 2914
+    SHADER_MOTION_BLUR = 2915
+    SHADER_BULGE = 2916
+    SHADER_PINCH = 2917
+    SHADER_GRAY_SCALE = 2919
+    SHADER_SEPIA = 2920
+    SHADER_INVERT_COLOR = 2921
+    SHADER_HUE = 2922
+    SHADER_EDIT_COLOR = 2923
+    TRIGGER_SPLIT_SCREEN = 2924
+    TRIGGER_CAMERA_MODE = 2925
+    PORTAL_GRAVITY_TOGGLE = 2926
+    TRIGGER_EDIT_MG = 2999
+    ORB_SPIDER = 3004
+    PAD_SPIDER = 3005
+    TRIGGER_AREA_MOVE = 3006
+    TRIGGER_AREA_ROTATE = 3007
+    TRIGGER_AREA_SCALE = 3008
+    TRIGGER_AREA_FADE = 3009
+    TRIGGER_AREA_TINT = 3010
+    TRIGGER_EDIT_AREA_MOVE = 3011
+    TRIGGER_EDIT_AREA_ROTATE = 3012
+    TRIGGER_EDIT_AREA_SCALE = 3013
+    TRIGGER_EDIT_AREA_FADE = 3014
+    TRIGGER_EDIT_AREA_TINT = 3015
+    TRIGGER_ADV_FOLLOW = 3016
+    TRIGGER_ENTER_MOVE = 3017
+    TRIGGER_ENTER_ROTATE = 3018
+    TRIGGER_ENTER_SCALE = 3019
+    TRIGGER_ENTER_FADE = 3020
+    TRIGGER_ENTER_TINT = 3021
+    TRIGGER_TELEPORT = 3022
+    TRIGGER_STOP_ENTER = 3023
+    TRIGGER_AREA_STOP = 3024
+    ORB_TELEPORT = 3027
+    TRIGGER_CHANGE_BG = 3029
+    TRIGGER_CHANGE_GR = 3030
+    TRIGGER_CHANGE_MG = 3031
+    TRIGGER_KEYFRAME = 3032
+    TRIGGER_ANIMATE_KEYFRAME = 3033
+    TRIGGER_END = 3600
+    TRIGGER_SFX = 3602
+    TRIGGER_EDIT_SFX = 3603
+    TRIGGER_EVENT = 3604
+    TRIGGER_EDIT_SONG = 3605
+    TRIGGER_BG_SPEED = 3606
+    TRIGGER_SEQUENCE = 3607
+    TRIGGER_SPAWN_PARTICLE = 3608
+    TRIGGER_INSTANT_COLLISION = 3609
+    TRIGGER_MG_SPEED = 3612
+    TRIGGER_UI = 3613
+    TRIGGER_TIMER = 3614
+    TRIGGER_TIMER_EVENT = 3615
+    TRIGGER_TIMER_CONTROL = 3617
+    TRIGGER_RESET = 3618
+    TRIGGER_ITEM_EDIT = 3619
+    TRIGGER_ITEM_COMPARE = 3620
+    OBJECT_STATE_BLOCK = 3640
+    TRIGGER_ITEM_PERSIST = 3641
+    BPM_GUIDE = 3642
+    OBJECT_TOGGLE_BLOCK = 3643
+    OBJECT_FORCE_CIRCLE_BLOCK = 3645
+    TRIGGER_OBJECT_CONTROL = 3655
+    TRIGGER_EDIT_ADV_FOLLOW = 3660
+    TRIGGER_RETARGET_ADV_FOLLOW = 3661
+    TRIGGER_LINK_VISIBLE = 3662
+    
 class OldColor(EnumClass):
     DEFAULT = 0
     PLAYER_1 = 1
@@ -32,6 +227,69 @@ class OldColor(EnumClass):
     COLOR_3 = 6
     COLOR_4 = 7
     LINE_3D = 8
+    
+class ColorID(EnumClass):
+    DEFAULT = 0
+    BACKGROUND = 1000
+    GROUND = 1001
+    LINE = 1002
+    LINE_3D = 1003
+    OBJECT = 1004
+    PLAYER_1 = 1005
+    PLAYER_2 = 1006
+    LIGHT_BG = 1007
+    GROUND_2 = 1009
+    BLACK = 1010
+    WHITE = 1011
+    LIGHTER = 1012
+    MIDDLEGROUND = 1013
+    MIDDLEGROUND_2 = 1014
+    
+    @classmethod
+    def _missing_name(cls, value:int) -> str:
+        if 0<=value<=999:
+            p = "CUSTOM"
+        elif 1000<=value<1101:
+            p = "NA"
+        else:
+            p = "UNKNOWN"
+        return f"{p}_{'N' if value<0 else ''}{abs(value)}"
+    
+    @property
+    def is_editable(self):
+        cls = type(self)
+        ids = {
+            cls.BLACK, 
+            cls.WHITE, 
+            cls.LIGHTER, 
+            cls.LIGHT_BG, 
+            cls.PLAYER_1, 
+            cls.PLAYER_2
+            }
+        return self not in ids
+    
+    @property
+    def is_custom(self):
+        return 1<=self<=999
+    
+    @property
+    def is_special(self):
+        cls = type(self)
+        ids = {
+             cls.GROUND, 
+             cls.LINE, 
+             cls.LINE_3D, 
+             cls.OBJECT, 
+             cls.GROUND_2, 
+             cls.MIDDLEGROUND, 
+             cls.MIDDLEGROUND_2
+            }
+        return self not in ids
+    
+    @property
+    def is_na(self):
+        return self.name.startswith("NA")
+
 
 class SingleColorMode(EnumClass):
     DEFAULT = 0
@@ -279,7 +537,6 @@ class ArrowDir(EnumClass):
         }
         return opposites.get(self, cls.NONE)
 
-
 class AdvFollowInit(EnumClass):
     INIT = 0
     SET = 1
@@ -416,23 +673,6 @@ class Speed(EnumClass):
     VERY_FAST = 3
     SUPER_FAST = 4
 
-class ColorID(EnumClass):
-    DEFAULT = 0
-    BACKGROUND = 1000
-    GROUND = 1001
-    LINE = 1002
-    LINE_3D = 1003
-    OBJECT = 1004
-    PLAYER_1 = 1005
-    PLAYER_2 = 1006
-    LIGHT_BG = 1007
-    GROUND_2 = 1009
-    BLACK = 1010
-    WHITE = 1011
-    LIGHTER = 1012
-    MIDDLEGROUND = 1013
-    MIDDLEGROUND_2 = 1014
-
 class LevelDifficulty(EnumClass):
     NA = -1
     AUTO = 0
@@ -460,7 +700,6 @@ class ListDifficulty(EnumClass):
     HARD_DEMON = 8
     INSANE_DEMON = 9
     EXTREME_DEMON = 10
-
 
 class LevelLength(EnumClass):
     TINY = 0
@@ -619,8 +858,8 @@ class Resolution(EnumClass):
 
 class ModStatus(EnumClass):
     NONE = 0
-    MODERATOR = 1
-    ELDER_MODERATOR = 2
+    RATE_ADVISOR = 1
+    MODERATOR = 2
 
 class DisplayIcon(EnumClass):
     CUBE = 0

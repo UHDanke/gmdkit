@@ -1,6 +1,5 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.mappings import color_id
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
 
@@ -8,7 +7,7 @@ class ShaderTrigger(TriggerObject):
     
     def fix_color(self) -> None:        
         super().fix_color()
-        self.color_1 = color_id.WHITE
+        self.color_1 = enums.ColorID.WHITE
 
 
 class ShaderOptions(ShaderTrigger):

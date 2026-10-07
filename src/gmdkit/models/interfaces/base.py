@@ -1,6 +1,5 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.mappings import color_id
 from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.casting.object_loader import FieldLoaderMixin
 from gmdkit.models.prop.groups import IDList
@@ -224,8 +223,8 @@ class BaseObject(BaseInterface):
         self.parent_groups[:] = sorted(parents)[:10]
         
     def fix_color(self):
-        if self.color_1 == color_id.LIGHTER:
-            self.color_1 = color_id.WHITE
+        if self.color_1 == enums.ColorID.LIGHTER:
+            self.color_1 = enums.ColorID.WHITE
             
     def offset_position(self,x:float=0,y:float=0):
         if x: self.x += x
