@@ -1,16 +1,16 @@
+# Imports
+from typing import Optional, Any
+
+# Package Imports
 from gmdkit.models import interfaces as I
-from gmdkit.models.interfaces.area import AreaTrigger
-from gmdkit.models.interfaces.area import EditAreaTrigger
 from gmdkit.models.interfaces.enter import EnterTrigger
 from gmdkit.models.interfaces.base import LevelSettings
 from gmdkit.models.interfaces.audio import VolumeInterface
 from gmdkit.remapping.classes import RuleHandler
 from gmdkit.remapping.types import IDType, IDActions
-from typing import Optional, Any
 from gmdkit.models.object import Object
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.models.prop.list import IntPairList
-from gmdkit.mappings import obj_prop
 from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 from gmdkit.remapping.types import AutoID
  
@@ -20,8 +20,8 @@ register = ID_RULES.register_rule
  
  
 # BaseObject
-def _get_base_color(obj:Object) -> int:
-    return COLOR_1_DEFAULT.get(obj.get(obj_prop.ID,0))
+def _get_base_color(intf:I.BaseObject) -> int:
+    return COLOR_1_DEFAULT.get(intf.obj_id)
  
 def _special_color(color_id:int) -> bool:
     if color_id is None:
@@ -30,8 +30,8 @@ def _special_color(color_id:int) -> bool:
         return False
     return not (1 <= color_id <= 999)
  
-def _get_secondary_color(obj:Object) -> int:
-    return COLOR_2_DEFAULT.get(obj.get(obj_prop.ID,0))
+def _get_secondary_color(intf:I.BaseObject) -> int:
+    return COLOR_2_DEFAULT.get(intf.obj_id)
  
 def _remap(remappable:Any, kvm:dict[int,int]):
     remappable.remap(kvm)
@@ -114,9 +114,9 @@ register(LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True
  
  
 # VolumeInterface
-def _has_default_volume_group(view) -> bool:
+def _has_default_volume_group(intf) -> bool:
     # VolumeInterface (song and sfx triggers)
-    return not (view.player_1 or view.player_2 or view.camera)
+    return not (intf.player_1 or intf.player_2 or intf.camera)
  
 register(VolumeInterface, 'group_id_1', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 register(VolumeInterface, 'group_id_2', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_volume_group, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
@@ -165,8 +165,8 @@ register(I.AnimateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True
  
  
 # BulgeShader
-def _has_default_bulge_target(view) -> bool:
-    return bool(view.target) and not (view.player_1 or view.player_2)
+def _has_default_bulge_target(intf) -> bool:
+    return bool(intf.target) and not (intf.player_1 or intf.player_2)
  
 register(I.BulgeShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_bulge_target, id_min=1, id_max=9999)
  
@@ -182,11 +182,11 @@ register(I.CheckpointTrigger, 'respawn_id', id_type=IDType.GROUP_ID, when_unset=
  
  
 # CollectibleObject
-def _has_collectible_default_group_id(view) -> bool:
-    return bool(view.toggle_trigger)
+def _has_collectible_default_group_id(intf) -> bool:
+    return bool(intf.toggle_trigger)
  
-def _has_collectible_default_item_id(view) -> bool:
-    return bool(view.pickup_item)
+def _has_collectible_default_item_id(intf) -> bool:
+    return bool(intf.pickup_item)
  
 register(I.CollectibleObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
 register(I.CollectibleObject, 'particle', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.PARTICLES)
@@ -198,11 +198,11 @@ register(I.CollisionBlock, 'block_id', id_type=IDType.COLLISION_ID, when_unset=T
  
  
 # CollisionTrigger
-def _has_default_collision_block_a(view) -> bool:
-    return not (view.player_1 or view.player_2 or view.between_players)
+def _has_default_collision_block_a(intf) -> bool:
+    return not (intf.player_1 or intf.player_2 or intf.between_players)
  
-def _has_default_collision_block_b(view) -> bool:
-    return not view.between_players
+def _has_default_collision_block_b(intf) -> bool:
+    return not intf.between_players
  
 register(I.CollisionTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
 register(I.CollisionTrigger, 'block_a', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_collision_block_a, id_min=0, id_max=9999, actions=IDActions.TRACK_COLLISION)
@@ -220,11 +220,11 @@ register(I.CountTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, whe
  
  
 # EditAdvancedFollowTrigger
-def _edit_adv_follow_use_group(obj:Object) -> bool:
-    return not obj.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID, False)
+def _edit_adv_follow_use_group(intf:I.EditAdvancedFollowTrigger) -> bool:
+    return not intf.use_control_id
  
-def _edit_adv_follow_use_control_id(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.edit_adv_follow.USE_CONTROL_ID, False)
+def _edit_adv_follow_use_control_id(intf:I.EditAdvancedFollowTrigger) -> bool:
+    return intf.use_control_id
  
 register(I.EditAdvancedFollowTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_edit_adv_follow_use_group, remappable=True, when_unset=True, id_min=1, id_max=9999)
 register(I.EditAdvancedFollowTrigger, 'speed_ref', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
@@ -268,8 +268,8 @@ register(I.GameplayArrow, 'target_channel', id_type=IDType.TRIGGER_CHANNEL, when
  
  
 # GradientTrigger
-def _has_default_gradient(view) -> bool:
-    return not view.disable_all
+def _has_default_gradient(intf) -> bool:
+    return not intf.disable_all
  
 register(I.GradientTrigger, 'bl_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 register(I.GradientTrigger, 'br_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
@@ -279,18 +279,18 @@ register(I.GradientTrigger, 'gradient_id', id_type=IDType.GRADIENT_ID, when_unse
  
  
 # GrayScaleShader
-def _has_gray_scale_default_color(view) -> bool:
-    return bool(view.use_tint)
+def _has_gray_scale_default_color(intf) -> bool:
+    return bool(intf.use_tint)
  
 register(I.GrayScaleShader, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=_has_gray_scale_default_color, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
  
  
 # InstantCollisionTrigger
-def _has_default_instant_coll_block_a(view) -> bool:
-    return not (view.player_1 or view.player_2 or view.between_players)
+def _has_default_instant_coll_block_a(intf) -> bool:
+    return not (intf.player_1 or intf.player_2 or intf.between_players)
  
-def _has_default_instant_coll_block_b(view) -> bool:
-    return not view.between_players
+def _has_default_instant_coll_block_b(intf) -> bool:
+    return not intf.between_players
  
 register(I.InstantCollisionTrigger, 'true_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.InstantCollisionTrigger, 'false_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
@@ -304,17 +304,17 @@ register(I.InstantCountTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=Tr
  
  
 # ItemCompareTrigger
-def _item_compare_first_is_item(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) in (0,1)
+def _item_compare_first_is_item(intf:I.ItemCompareTrigger) -> bool:
+    return intf.item_type_1 in (0,1)
  
-def _item_compare_first_is_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_1,0) == 2
+def _item_compare_first_is_timer(intf:I.ItemCompareTrigger) -> bool:
+    return intf.item_type_1 == 2
  
-def _item_compare_second_is_item(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) in (0,1)
+def _item_compare_second_is_item(intf:I.ItemCompareTrigger) -> bool:
+    return intf.item_type_2 in (0,1)
  
-def _item_compare_second_is_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_compare.ITEM_TYPE_2,0) == 2
+def _item_compare_second_is_timer(intf:I.ItemCompareTrigger) -> bool:
+    return intf.item_type_2 == 2
  
 register(I.ItemCompareTrigger, 'true_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.ItemCompareTrigger, 'false_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
@@ -325,23 +325,23 @@ register(I.ItemCompareTrigger, 'item_id_2', id_type=IDType.TIME_ID, condition=_i
  
  
 # ItemEditTrigger
-def _item_edit_target_is_item(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) in (0,1)
+def _item_edit_target_is_item(intf:I.ItemEditTrigger) -> bool:
+    return intf.target_item_type in (0,1)
  
-def _item_edit_target_is_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_3,0) == 2
+def _item_edit_target_is_timer(intf:I.ItemEditTrigger) -> bool:
+    return intf.target_item_type == 2
  
-def _item_edit_first_is_item(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) in (0,1)
+def _item_edit_first_is_item(intf:I.ItemEditTrigger) -> bool:
+    return intf.item_type_1 in (0,1)
  
-def _item_edit_first_is_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_1,0) == 2
+def _item_edit_first_is_timer(intf:I.ItemEditTrigger) -> bool:
+    return intf.item_type_1 == 2
  
-def _item_edit_second_is_item(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) in (0,1)
+def _item_edit_second_is_item(intf:I.ItemEditTrigger) -> bool:
+    return intf.item_type_2 in (0,1)
  
-def _item_edit_second_is_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_edit.ITEM_TYPE_2,0) == 2
+def _item_edit_second_is_timer(intf:I.ItemEditTrigger) -> bool:
+    return intf.item_type_2 == 2
  
 register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.ITEM_ID, condition=_item_edit_target_is_item, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
 register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.TIME_ID, condition=_item_edit_target_is_timer, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
@@ -352,30 +352,30 @@ register(I.ItemEditTrigger, 'item_id_2', id_type=IDType.TIME_ID, condition=_item
  
  
 # ItemLabel
-def _item_label_display_item(obj:Object) -> bool:
-    return not obj.get(obj_prop.item_label.TIME_COUNTER, False)
+def _item_label_display_item(intf:I.ItemLabel) -> bool:
+    return not intf.time_counter
  
-def _item_label_display_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.item_label.TIME_COUNTER, False)
+def _item_label_display_timer(intf:I.ItemLabel) -> bool:
+    return intf.time_counter
  
 register(I.ItemLabel, 'item_id', id_type=IDType.ITEM_ID, condition=_item_label_display_item, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
 register(I.ItemLabel, 'item_id', id_type=IDType.TIME_ID, condition=_item_label_display_timer, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
  
  
 # ItemPersistTrigger
-def _item_persist_item(obj:Object) -> bool:
-    return not obj.get(obj_prop.trigger.item_persist.TIMER, False)
+def _item_persist_item(intf:I.ItemPersistTrigger) -> bool:
+    return not intf.timer
  
-def _item_persist_timer(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.item_persist.TIMER, False)
+def _item_persist_timer(intf:I.ItemPersistTrigger) -> bool:
+    return intf.timer
  
 register(I.ItemPersistTrigger, 'item_id', id_type=IDType.ITEM_ID, condition=_item_persist_item, remappable=True, when_unset=True, id_min=0, id_max=9999, actions=IDActions.PERSIST_ITEM)
 register(I.ItemPersistTrigger, 'item_id', id_type=IDType.TIME_ID, condition=_item_persist_timer, remappable=True, when_unset=True, actions=IDActions.PERSIST_ITEM)
  
  
 # KeyframeObject
-def _has_default_keyframe_group(view) -> bool:
-    return view.index == 1
+def _has_default_keyframe_group(intf) -> bool:
+    return intf.index == 1
  
 register(I.KeyframeObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_default_keyframe_group, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE,))
 register(I.KeyframeObject, 'spawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
@@ -383,8 +383,8 @@ register(I.KeyframeObject, 'key_id', id_type=IDType.KEYFRAME_ID, when_unset=True
  
  
 # LensCircleShader
-def _has_default_lens_circle_target(view) -> bool:
-    return not (view.player_1 or view.player_2)
+def _has_default_lens_circle_target(intf) -> bool:
+    return not (intf.player_1 or intf.player_2)
  
 register(I.LensCircleShader, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
 register(I.LensCircleShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_lens_circle_target, id_min=1, id_max=9999)
@@ -395,16 +395,16 @@ register(I.LinkVisibleTrigger, 'group_id', id_type=IDType.GROUP_ID, when_unset=T
  
  
 # MotionBlurShader
-def _has_default_motion_blur_target(view) -> bool:
-    return not (view.player_1 or view.player_2 or view.center)
+def _has_default_motion_blur_target(intf) -> bool:
+    return not (intf.player_1 or intf.player_2 or intf.center)
  
 register(I.MotionBlurShader, 'ref_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
 register(I.MotionBlurShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_motion_blur_target, id_min=1, id_max=9999)
  
  
 # MoveTrigger
-def _has_move_default_target(view) -> bool:
-    return bool(view.direction_mode or view.target_mode)
+def _has_move_default_target(intf) -> bool:
+    return bool(intf.direction_mode or intf.target_mode)
  
 register(I.MoveTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_POSITION, IDActions.MOVE,))
 register(I.MoveTrigger, 'target_pos', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_move_default_target, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
@@ -424,18 +424,18 @@ register(I.PickupTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, wh
  
  
 # PinchShader
-def _has_default_pinch_target(view) -> bool:
-    return bool(view.target) and not (view.player_1 or view.player_2)
+def _has_default_pinch_target(intf) -> bool:
+    return bool(intf.target) and not (intf.player_1 or intf.player_2)
  
 register(I.PinchShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_pinch_target, id_min=1, id_max=9999)
  
  
 # PulseTrigger
-def _pulse_target_channel(obj:Object) -> bool:
-    return not obj.get(obj_prop.trigger.pulse.TARGET_TYPE, False)
+def _pulse_target_channel(intf:I.PulseTrigger) -> bool:
+    return not intf.target_type
  
-def _pulse_target_group(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.pulse.TARGET_TYPE, False)
+def _pulse_target_group(intf:I.PulseTrigger) -> bool:
+    return intf.target_type
  
 register(I.PulseTrigger, 'copy_id', id_type=IDType.COLOR_ID, fixed=_special_color, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
 register(I.PulseTrigger, 'target_id', id_type=IDType.COLOR_ID, condition=_pulse_target_channel, fixed=_special_color, remappable=True, when_unset=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_COLOR)
@@ -443,8 +443,8 @@ register(I.PulseTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_pulse_
  
  
 # RadialBlurShader
-def _has_default_radial_blur_target(view) -> bool:
-    return bool(view.target) and not (view.player_1 or view.player_2)
+def _has_default_radial_blur_target(intf) -> bool:
+    return bool(intf.target) and not (intf.player_1 or intf.player_2)
  
 register(I.RadialBlurShader, 'ref_channel', id_type=IDType.COLOR_ID, fixed=_special_color, remappable=True, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.COLOR)
 register(I.RadialBlurShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_radial_blur_target, id_min=1, id_max=9999)
@@ -466,11 +466,11 @@ register(I.RetargetAdvancedFollowTrigger, 'target_id', id_type=IDType.CONTROL_ID
  
  
 # RotateTrigger
-def _has_rotate_default_aim_target(view) -> bool:
-    return bool(view.aim_mode or view.follow_mode)
+def _has_rotate_default_aim_target(intf) -> bool:
+    return bool(intf.aim_mode or intf.follow_mode)
  
-def _has_rotate_default_aim(view) -> bool:
-    return bool(view.aim_mode)
+def _has_rotate_default_aim(intf) -> bool:
+    return bool(intf.aim_mode)
  
 register(I.RotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_POSITION, IDActions.ROTATE, IDActions.MOVE,))
 register(I.RotateTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
@@ -491,15 +491,15 @@ register(I.SequenceTrigger, 'sequence', id_type=IDType.GROUP_ID, function=_get_k
  
  
 # ShockLineShader
-def _has_default_shockline_target(view) -> bool:
-    return bool(view.target) and not (view.player_1 or view.player_2)
+def _has_default_shockline_target(intf) -> bool:
+    return bool(intf.target) and not (intf.player_1 or intf.player_2)
  
 register(I.ShockLineShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_shockline_target, id_min=1, id_max=9999)
  
  
 # ShockwaveShader
-def _has_default_shockwave_target(view) -> bool:
-    return bool(view.target) and not (view.player_1 or view.player_2)
+def _has_default_shockwave_target(intf) -> bool:
+    return bool(intf.target) and not (intf.player_1 or intf.player_2)
  
 register(I.ShockwaveShader, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_shockwave_target, id_min=1, id_max=9999)
  
@@ -522,8 +522,8 @@ def _remap_pairs_vals(pairs:IntPairList, kvm:dict[int,int]):
     pairs.remap_vals(kvm)
     return pairs
  
-def _spawn_keep_remap(obj:Object) -> bool:
-    return not obj.get(obj_prop.trigger.spawn.RESET_REMAP, False)
+def _spawn_keep_remap(intf:I.SpawnTrigger) -> bool:
+    return not intf.reset_remap
  
 register(I.SpawnTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.SpawnTrigger, 'remaps', id_type=IDType.REMAP_BASE, function=_get_keys, replace=_remap_pairs_keys, iterable=True)
@@ -549,11 +549,11 @@ register(I.StopEnterTrigger, 'enter_channel', id_type=IDType.ENTER_CHANNEL, rema
  
  
 # StopTrigger
-def _stop_use_group(obj:Object) -> bool:
-    return not obj.get(obj_prop.trigger.stop.USE_CONTROL_ID, False)
+def _stop_use_group(intf:I.StopTrigger) -> bool:
+    return not intf.use_control_id
  
-def _stop_use_control_id(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.stop.USE_CONTROL_ID, False)
+def _stop_use_control_id(intf:I.StopTrigger) -> bool:
+    return intf.use_control_id
  
 register(I.StopTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_stop_use_group, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.STOP)
 register(I.StopTrigger, 'target_id', id_type=IDType.CONTROL_ID, condition=_stop_use_control_id, remappable=True, when_unset=True, actions=IDActions.STOP)
@@ -591,22 +591,22 @@ register(I.UITrigger, 'ui_target', id_type=IDType.GROUP_ID, when_unset=True, id_
  
  
 # AreaTrigger
-def _has_area_default_center(view) -> bool:
-    return not view.special_center
+def _has_area_default_center(intf:I.area.AreaTrigger) -> bool:
+    return not intf.special_center
  
-register(AreaTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_area_default_center, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
-register(AreaTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, reference=True)
+register(I.area.AreaTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_area_default_center, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.area.AreaTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, reference=True)
  
  
 # EditAreaTrigger
-def _area_use_group_id(obj:Object) -> bool:
-    return not obj.get(obj_prop.trigger.effect.USE_EFFECT_ID, False)
+def _area_use_group_id(intf:I.area.EditAreaTrigger) -> bool:
+    return not intf.use_effect_id
  
-def _area_use_effect_id(obj:Object) -> bool:
-    return obj.get(obj_prop.trigger.effect.USE_EFFECT_ID, False)
+def _area_use_effect_id(intf:I.area.EditAreaTrigger) -> bool:
+    return intf.use_effect_id
  
-register(EditAreaTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_area_use_group_id, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.EDIT_EFFECT)
-register(EditAreaTrigger, 'target_id', id_type=IDType.EFFECT_ID, condition=_area_use_effect_id, remappable=True, when_unset=True, actions=IDActions.EDIT_EFFECT)
+register(I.area.EditAreaTrigger, 'target_id', id_type=IDType.GROUP_ID, condition=_area_use_group_id, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.EDIT_EFFECT)
+register(I.area.EditAreaTrigger, 'target_id', id_type=IDType.EFFECT_ID, condition=_area_use_effect_id, remappable=True, when_unset=True, actions=IDActions.EDIT_EFFECT)
  
  
 # EditSFXTrigger
@@ -633,8 +633,8 @@ register(I.TeleportTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=Tru
  
  
 # EnterTintTrigger
-def _has_effect_tint_channel(view) -> bool:
-    return bool(view.enable_hsv)
+def _has_effect_tint_channel(intf) -> bool:
+    return bool(intf.enable_hsv)
  
 register(I.EnterTintTrigger, 'tint_channel', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=_has_effect_tint_channel, reference=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_COLOR)
  

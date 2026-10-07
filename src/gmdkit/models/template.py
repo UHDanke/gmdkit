@@ -16,11 +16,11 @@ from gmdkit.serialization.functions import (
     kv_wrap, args_wrap,
     set_field, get_field
 )
-from gmdkit.mappings import obj_prop
 from gmdkit.models.object import Object, ObjectGroup
 from gmdkit.utils.enums import ArrowDir
 from gmdkit.utils.functions import get_enum_values, normalize_orientation, typed_cache
 from gmdkit.serialization.classes import FieldMetaclass, DictField
+from gmdkit.models import interfaces
 
 
 class TemplatePosition(IntEnum):
@@ -61,154 +61,127 @@ class TemplateType(Enum):
 
     def to_object(self):
         cls = type(self)
-
+        obj = Object()
+        intf = interfaces.Template(obj)
+        intf.x = 0
+        intf.y = 0
+    
         match self:
-
             case cls.NONE:
                 return None
-
             case cls.SQUARE:
-                obj = Object.default(2895)
-
+                intf.obj_id = 2895
             case cls.SLOPE_BOTTOM_RIGHT:
-                obj = Object.default(2896)
-
+                intf.obj_id = 2896
             case cls.SLOPE_BOTTOM_LEFT:
-                obj = Object.default(2896)
-                obj[obj_prop.ROTATION] = 90
-
+                intf.obj_id = 2896
+                intf.rotation = 90
             case cls.SLOPE_TOP_RIGHT:
-                obj = Object.default(2896)
-                obj[obj_prop.ROTATION] = 270
-
+                intf.obj_id = 2896
+                intf.rotation = 270
             case cls.SLOPE_TOP_LEFT:
-                obj = Object.default(2896)
-                obj[obj_prop.ROTATION] = 180
-
+                intf.obj_id = 2896
+                intf.rotation = 180
             case cls.LONG_SLOPE_CENTER_BOTTOM_RIGHT:
-                obj = Object.default(2897)
-
+                intf.obj_id = 2897
             case cls.LONG_SLOPE_SIDE_BOTTOM_RIGHT:
-                obj = Object.default(2897)
-                obj[obj_prop.X] = -30
-
+                intf.obj_id = 2897
+                intf.x = -30
             case cls.LONG_SLOPE_CENTER_BOTTOM_LEFT:
-                obj = Object.default(2896)
-                obj[obj_prop.FLIP_X] = True
-
+                intf.obj_id = 2896
+                intf.flip_x = True
             case cls.LONG_SLOPE_SIDE_BOTTOM_LEFT:
-                obj = Object.default(2896)
-                obj[obj_prop.FLIP_X] = True
-                obj[obj_prop.X] = 30
-
+                intf.obj_id = 2896
+                intf.flip_x = True
+                intf.x = 30
             case cls.LONG_SLOPE_CENTER_TOP_RIGHT:
-                obj = Object.default(2897)
-                obj[obj_prop.FLIP_Y] = True
-
+                intf.obj_id = 2897
+                intf.flip_y = True
             case cls.LONG_SLOPE_SIDE_TOP_RIGHT:
-                obj = Object.default(2897)
-                obj[obj_prop.FLIP_Y] = True
-                obj[obj_prop.X] = -30
-
+                intf.obj_id = 2897
+                intf.flip_y = True
+                intf.x = -30
             case cls.LONG_SLOPE_CENTER_TOP_LEFT:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 180
-
+                intf.obj_id = 2897
+                intf.rotation = 180
             case cls.LONG_SLOPE_SIDE_TOP_LEFT:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 180
-                obj[obj_prop.X] = 30
-
+                intf.obj_id = 2897
+                intf.rotation = 180
+                intf.x = 30
             case cls.LONG_SLOPE_CENTER_RIGHT_TOP:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 270
-
+                intf.obj_id = 2897
+                intf.rotation = 270
             case cls.LONG_SLOPE_SIDE_RIGHT_TOP:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 270
-                obj[obj_prop.Y] = -30
-
+                intf.obj_id = 2897
+                intf.rotation = 270
+                intf.y = -30
             case cls.LONG_SLOPE_CENTER_RIGHT_BOTTOM:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 270
-                obj[obj_prop.FLIP_Y] = True
-
+                intf.obj_id = 2897
+                intf.rotation = 270
+                intf.flip_y = True
             case cls.LONG_SLOPE_SIDE_RIGHT_BOTTOM:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 270
-                obj[obj_prop.FLIP_Y] = True
-                obj[obj_prop.Y] = 30
-
+                intf.obj_id = 2897
+                intf.rotation = 270
+                intf.flip_y = True
+                intf.y = 30
             case cls.LONG_SLOPE_CENTER_LEFT_BOTTOM:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 90
-
+                intf.obj_id = 2897
+                intf.rotation = 90
             case cls.LONG_SLOPE_SIDE_LEFT_BOTTOM:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 90
-                obj[obj_prop.Y] = 30
-
+                intf.obj_id = 2897
+                intf.rotation = 90
+                intf.y = 30
             case cls.LONG_SLOPE_CENTER_LEFT_TOP:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 90
-                obj[obj_prop.FLIP_Y] = True
-
+                intf.obj_id = 2897
+                intf.rotation = 90
+                intf.flip_y = True
             case cls.LONG_SLOPE_SIDE_LEFT_TOP:
-                obj = Object.default(2897)
-                obj[obj_prop.ROTATION] = 90
-                obj[obj_prop.FLIP_Y] = True
-                obj[obj_prop.Y] = -30
-
+                intf.obj_id = 2897
+                intf.rotation = 90
+                intf.flip_y = True
+                intf.y = -30
+    
         return obj
 
     @classmethod
     def from_object(cls, obj:Object) -> Self | tuple[Self, Self]:
+        
+        intf = obj.require_interface(interfaces.Template)
+        obj_id = intf.obj_id
+        
+        if obj_id == 2895: return cls.SQUARE
+        
+        x_dir,y_dir = normalize_orientation(intf.rotation,intf.flip_x,intf.flip_y)
 
-        obj_id = obj.get(obj_prop.ID)
+        if obj_id == 2896:
+            match (x_dir,y_dir):
+                case (ArrowDir.RIGHT,ArrowDir.DOWN)|(ArrowDir.DOWN,ArrowDir.RIGHT):
+                    return cls.SLOPE_BOTTOM_RIGHT
+                case (ArrowDir.LEFT,ArrowDir.DOWN)|(ArrowDir.DOWN,ArrowDir.LEFT):
+                    return cls.SLOPE_BOTTOM_LEFT
+                case (ArrowDir.RIGHT,ArrowDir.UP)|(ArrowDir.UP,ArrowDir.RIGHT):
+                    return cls.SLOPE_TOP_RIGHT
+                case (ArrowDir.LEFT,ArrowDir.UP)|(ArrowDir.UP,ArrowDir.LEFT):
+                    return cls.SLOPE_TOP_LEFT
 
-        match obj_id:
-            case 2895:
-                return cls.SQUARE
-
-            case 2896:
-                rotation = obj.get(obj_prop.ROTATION)
-                flip_x = obj.get(obj_prop.FLIP_X)
-                flip_y = obj.get(obj_prop.FLIP_Y)
-                x_dir, y_dir = normalize_orientation(rotation,flip_x,flip_y)
-
-                match (x_dir,y_dir):
-                    case (ArrowDir.RIGHT,ArrowDir.DOWN)|(ArrowDir.DOWN,ArrowDir.RIGHT):
-                        return cls.SLOPE_BOTTOM_RIGHT
-                    case (ArrowDir.LEFT,ArrowDir.DOWN)|(ArrowDir.DOWN,ArrowDir.LEFT):
-                        return cls.SLOPE_BOTTOM_LEFT
-                    case (ArrowDir.RIGHT,ArrowDir.UP)|(ArrowDir.UP,ArrowDir.RIGHT):
-                        return cls.SLOPE_TOP_RIGHT
-                    case (ArrowDir.LEFT,ArrowDir.UP)|(ArrowDir.UP,ArrowDir.LEFT):
-                        return cls.SLOPE_TOP_LEFT
-
-            case 2897:
-                rotation = obj.get(obj_prop.ROTATION)
-                flip_x = obj.get(obj_prop.FLIP_X)
-                flip_y = obj.get(obj_prop.FLIP_Y)
-                x_dir, y_dir = normalize_orientation(rotation,flip_x,flip_y)
-
-                match (x_dir, y_dir):
-                    case (ArrowDir.RIGHT, ArrowDir.DOWN):
-                        return (cls.LONG_SLOPE_CENTER_BOTTOM_RIGHT, cls.LONG_SLOPE_SIDE_BOTTOM_RIGHT)
-                    case (ArrowDir.LEFT, ArrowDir.DOWN):
-                        return (cls.LONG_SLOPE_CENTER_BOTTOM_LEFT, cls.LONG_SLOPE_SIDE_BOTTOM_LEFT)
-                    case (ArrowDir.RIGHT, ArrowDir.UP):
-                        return (cls.LONG_SLOPE_CENTER_TOP_RIGHT, cls.LONG_SLOPE_SIDE_TOP_RIGHT)
-                    case (ArrowDir.LEFT, ArrowDir.UP):
-                        return (cls.LONG_SLOPE_CENTER_TOP_LEFT, cls.LONG_SLOPE_SIDE_TOP_LEFT)
-                    case (ArrowDir.UP, ArrowDir.RIGHT):
-                        return (cls.LONG_SLOPE_CENTER_RIGHT_TOP, cls.LONG_SLOPE_SIDE_RIGHT_TOP)
-                    case (ArrowDir.DOWN, ArrowDir.RIGHT):
-                        return (cls.LONG_SLOPE_CENTER_RIGHT_BOTTOM, cls.LONG_SLOPE_SIDE_RIGHT_BOTTOM)
-                    case (ArrowDir.UP, ArrowDir.LEFT):
-                        return (cls.LONG_SLOPE_CENTER_LEFT_TOP, cls.LONG_SLOPE_SIDE_LEFT_TOP)
-                    case (ArrowDir.DOWN, ArrowDir.LEFT):
-                        return (cls.LONG_SLOPE_CENTER_LEFT_BOTTOM, cls.LONG_SLOPE_SIDE_LEFT_BOTTOM)
+        elif obj_id == 2897:
+            match (x_dir, y_dir):
+                case (ArrowDir.RIGHT, ArrowDir.DOWN):
+                    return (cls.LONG_SLOPE_CENTER_BOTTOM_RIGHT, cls.LONG_SLOPE_SIDE_BOTTOM_RIGHT)
+                case (ArrowDir.LEFT, ArrowDir.DOWN):
+                    return (cls.LONG_SLOPE_CENTER_BOTTOM_LEFT, cls.LONG_SLOPE_SIDE_BOTTOM_LEFT)
+                case (ArrowDir.RIGHT, ArrowDir.UP):
+                    return (cls.LONG_SLOPE_CENTER_TOP_RIGHT, cls.LONG_SLOPE_SIDE_TOP_RIGHT)
+                case (ArrowDir.LEFT, ArrowDir.UP):
+                    return (cls.LONG_SLOPE_CENTER_TOP_LEFT, cls.LONG_SLOPE_SIDE_TOP_LEFT)
+                case (ArrowDir.UP, ArrowDir.RIGHT):
+                    return (cls.LONG_SLOPE_CENTER_RIGHT_TOP, cls.LONG_SLOPE_SIDE_RIGHT_TOP)
+                case (ArrowDir.DOWN, ArrowDir.RIGHT):
+                    return (cls.LONG_SLOPE_CENTER_RIGHT_BOTTOM, cls.LONG_SLOPE_SIDE_RIGHT_BOTTOM)
+                case (ArrowDir.UP, ArrowDir.LEFT):
+                    return (cls.LONG_SLOPE_CENTER_LEFT_TOP, cls.LONG_SLOPE_SIDE_LEFT_TOP)
+                case (ArrowDir.DOWN, ArrowDir.LEFT):
+                    return (cls.LONG_SLOPE_CENTER_LEFT_BOTTOM, cls.LONG_SLOPE_SIDE_LEFT_BOTTOM)
 
 
 @dataclass_decoder(slots=True, separator='', from_array=True)
@@ -277,12 +250,10 @@ class SmartLayout(DataclassDecoderMixin):
         get_field(self, self.get_slot_name(slot,offset))
 
     def add_smart_object(self, slot:str|int, obj:Object):
-
-        obj_id = obj.get(obj_prop.ID)
-
+        intf = obj.require_interface(interfaces.Template)
         key = TemplateType.from_object(obj)
 
-        match obj_id:
+        match intf.obj_id:
             case 2895|2896:
                 self.set_slot(slot, key)
             case 2897:
@@ -301,8 +272,6 @@ class SmartLayout(DataclassDecoderMixin):
 
                 if self.get_slot(slot, offset) is TemplateType.NONE:
                     self.set_slot(slot, side, offset)
-            case _:
-                raise ValueError("object is not a smart template")
 
 
 def layout_string(layout:Any) -> str:

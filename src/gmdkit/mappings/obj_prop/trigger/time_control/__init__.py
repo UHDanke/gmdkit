@@ -1,2 +1,0 @@
-ITEM_ID = 80
-STOP = 472

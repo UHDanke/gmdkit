@@ -1,3 +1,0 @@
-CHANCE = 10
-TRUE_ID = 51
-FALSE_ID = 71

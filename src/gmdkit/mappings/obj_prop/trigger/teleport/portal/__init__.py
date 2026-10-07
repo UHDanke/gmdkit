@@ -1,1 +1,0 @@
-DISTANCE = 54

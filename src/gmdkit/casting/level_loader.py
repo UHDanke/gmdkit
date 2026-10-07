@@ -73,7 +73,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     practice_mode_best: int = DictField(key="k20", default=0)
 
-    list_type: enums.LevelType = DictField(
+    level_type: enums.LevelType = DictField(
         key="k21",
         decoder=enums.LevelType,
         default=enums.LevelType.LOCAL,

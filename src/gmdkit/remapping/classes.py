@@ -212,27 +212,11 @@ class IdentifierList:
 
 @lru_cache(maxsize=None)
 def _property_key(schema: type[BaseInterface], name: str) -> int | str:
-    """The property key behind an interface field name (resolved once per class)."""
     return getattr(schema, name).canonical
 
 
 @dataclass(slots=True, frozen=True)
 class IDRule:
-    """
-    Describes one ID held by an interface field.
-
-    field       name of the interface field, e.g. "color_1" (the owning class is the
-                key the rule is stored under in RuleHandler)
-    when_unset  what an unset field (value equal to the interface default, 0 / empty)
-                means. False: no identifier. True: a default-valued identifier.
-                A callable(view) decides per object, e.g. "only while mode X is on".
-                It is evaluated only for unset fields: set values always count.
-    condition   callable(view); a falsy result drops the identifier, set or not.
-
-    Callables (condition, when_unset, fallback, remappable) receive the interface view
-    of the object, so they can use fields (view.x). `function`, `fixed` and `replace`
-    receive the field value, as before.
-    """
     field: str
     id_type: IDType
     condition: Optional[Callable] = None
@@ -249,7 +233,6 @@ class IDRule:
     actions: Optional[tuple] = None
 
     def key_for(self, schema: type[BaseInterface]) -> int | str:
-        """The property key of the field on the given interface class."""
         return _property_key(schema, self.field)
 
     def is_matched(
@@ -268,24 +251,24 @@ class IDRule:
                 return False
         return True
 
-    def get_id(self, iface: BaseInterface) -> Optional[Identifier]:
-        schema = type(iface)
-        val = getattr(iface, self.field)
+    def get_id(self, intf: BaseInterface) -> Optional[Identifier]:
+        schema = type(intf)
+        val = getattr(intf, self.field)
         has_default = bool(self.when_unset)
 
-        if not val:  # unset: the interface hands out its default (0 / empty)
+        if not val:
             if callable(self.fallback):
-                fb = self.fallback(iface)
+                fb = self.fallback(intf)
                 if fb is not None:
                     val = fb
             if not val:
                 unset = self.when_unset
                 if callable(unset):
-                    unset = unset(iface)
+                    unset = unset(intf)
                 if not unset:
                     return
 
-        if callable(self.condition) and not self.condition(iface):
+        if callable(self.condition) and not self.condition(intf):
             return
 
         if callable(self.function):
@@ -301,8 +284,8 @@ class IDRule:
         else:
             fixed = self.fixed(val) if callable(self.fixed) else self.fixed
 
-        remappable = self.remappable(iface) if callable(self.remappable) else self.remappable
-        obj = iface.obj
+        remappable = self.remappable(intf) if callable(self.remappable) else self.remappable
+        obj = intf.obj
 
         return Identifier(
             obj=obj,
@@ -311,7 +294,7 @@ class IDRule:
             id_type=self.id_type,
             default=0 if has_default else None,
             fixed=bool(fixed),
-            remappable=bool(remappable) and bool(getattr(iface, "spawn_trigger", False)),
+            remappable=bool(remappable) and bool(getattr(intf, "spawn_trigger", False)),
             reference=self.reference,
             iterable=self.iterable,
             id_min=self.id_min,
@@ -323,24 +306,11 @@ class IDRule:
 
 @dataclass(slots=True)
 class RuleHandler:
-    """
-    ID rules per interface class, resolved through ChainMaps.
-
-    Every interface class owns a dict of its rules. The rules of a class are the
-    ChainMap over the own-dicts of its MRO, so an object gets the rules of its interface
-    class plus those of every base class and mixin (rules for BaseObject apply to every
-    object interface, not to unrelated ones such as LevelSettings).
-
-    The chains are live views over the own-dicts: registering a rule on a base class is
-    seen by every chain already built, so nothing has to be invalidated.
-    Iterating a chain yields base classes first, then more specific ones.
-    """
     rules: dict[type[BaseInterface], dict[IDRule, None]] = dc_field(default_factory=dict)
     groups: Optional[list[Sequence]] = None
     _chains: dict = dc_field(default_factory=dict, repr=False, compare=False)
 
     def __post_init__(self):
-        # accept {class: (rule, ...)} and keep dicts (ordered sets) internally
         self.rules = {k: dict.fromkeys(v) for k, v in self.rules.items()}
 
     def _own(self, klass: type[BaseInterface]) -> dict[IDRule, None]:
@@ -350,7 +320,6 @@ class RuleHandler:
         return own
 
     def chain_for(self, schema: type[BaseInterface]) -> ChainMap:
-        """Live ChainMap over the own-rules of `schema` and its interface base classes."""
         chain = self._chains.get(schema)
         if chain is None:
             chain = self._chains[schema] = ChainMap(
@@ -358,11 +327,9 @@ class RuleHandler:
         return chain
 
     def rules_for(self, schema: type[BaseInterface]) -> tuple[IDRule, ...]:
-        """Rules for an interface class: base classes first, own rules last."""
         return tuple(self.chain_for(schema))
 
     def register(self, interface: type[BaseInterface], rule: IDRule) -> IDRule:
-        """Attach an existing rule to an interface class (checked against its fields)."""
         try:
             rule.key_for(interface)
         except AttributeError:
@@ -389,12 +356,6 @@ class RuleHandler:
             id_max: int = ID_MAX,
             actions: Optional[tuple] = None
             ) -> IDRule:
-        """
-        Build an IDRule for `field` and register it on `interface` (a class, or several).
-
-        Interfaces inheriting from `interface` get the rule too. The field is checked
-        right away, so a renamed or mistyped field fails at registration.
-        """
         rule = IDRule(
             field=field, id_type=id_type, condition=condition, function=function,
             fallback=fallback, replace=replace, fixed=fixed, remappable=remappable,
@@ -407,7 +368,6 @@ class RuleHandler:
         return rule
 
     def compile_rules(self, **kwargs) -> Self:
-        """A new handler holding only the rules that match the given filters."""
         filtered = {}
         for klass, own in self.rules.items():
             kept = tuple(r for r in own if r.is_matched(**kwargs))
@@ -425,7 +385,6 @@ class RuleHandler:
         self.groups = current
 
     def add_rules(self, *handlers: Self) -> Self:
-        """A new handler combining this one with the given handlers."""
         new = self.__class__()
 
         for h in (self, *handlers):
@@ -440,8 +399,8 @@ class RuleHandler:
         rules = self.rules_for(schema)
         if not rules:
             return ()
-        iface = schema(obj)
-        return tuple(i for r in rules if (i := r.get_id(iface)) is not None)
+        intf = schema(obj)
+        return tuple(i for r in rules if (i := r.get_id(intf)) is not None)
 
     def compile_ids(
             self,

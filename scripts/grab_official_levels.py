@@ -2,8 +2,7 @@
 from pathlib import Path
 
 # Package Imports
-from gmdkit import GameSave, ObjectString
-from gmdkit.mappings import lvl_prop
+from gmdkit import Level, GameSave, ObjectString
 from gmdkit.functions.object import to_user_coins
 
 save_path = Path("data/dat/")
@@ -30,16 +29,13 @@ for folder in common:
         print(f"Processing level with ID {data['k1']}...")
             
         try:
-            
-            data[lvl_prop.OBJECT_STRING] = ObjectString.from_file(level_file,encoding="latin-1")
-            
+            data: Level
+            data.object_string = ObjectString.from_file(level_file,encoding="latin-1")
             data.objects.apply(to_user_coins)
-            
-            data[lvl_prop.TYPE] = 2
-            
+            data.level_type = 2
             data.to_file(output_path)
         except FileNotFoundError:
             print("No object string file found, skipping.")
             continue
         
-        print(f"Saved {data[lvl_prop.NAME]}.gmd")
+        print(f"Saved {data.name}.gmd")

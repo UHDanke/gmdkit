@@ -11,9 +11,7 @@ from gmdkit.remapping.rules import (
 from gmdkit.remapping.utils import next_free
 from gmdkit.models.level import Level
 from gmdkit.models.object import ObjectList
-from gmdkit.models.prop.color import ColorList
-from gmdkit.mappings import obj_prop
-
+from gmdkit.models import interfaces
 
 IDGroup = IDType|Sequence[IDType]
 IDRemaps = dict[IDGroup,dict[int,int]]
@@ -388,7 +386,8 @@ def combine_objects(
 
     if main_level:
         objects = result.objects
-        colors = result.start.get(obj_prop.level.COLORS, ColorList())
+        start_intf = result.start.require_interface(interfaces.LevelSettings)
+        colors = start_intf.colors
     else:
         objects = result
 
@@ -398,7 +397,8 @@ def combine_objects(
         else:
             objects.extend(i.objects)
             if main_level:
-                col = i.start.get(obj_prop.level.COLORS)
+                iintf = i.start.require_interface(interfaces.LevelSettings)
+                col = iintf.colors
                 if col is not None:
                     colors.add_colors(col)
 

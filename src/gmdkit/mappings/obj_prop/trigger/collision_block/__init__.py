@@ -1,2 +1,0 @@
-BLOCK_ID = 80
-DYNAMIC = 94
