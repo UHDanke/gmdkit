@@ -9,7 +9,7 @@ level_paths = (ONLINE_LEVELS + OFFLINE_LEVELS)[:10]
 @pytest.mark.parametrize("level_file", level_paths, ids=lambda p: p.name)
 def test_roundtrip(level_file: Path, tmp_path: Path) -> None:
     """Loads, modifies, saves, and reloads a level, verifying all serialization steps."""
-    level = Level.from_file(level_file, load=True)
+    level = Level.from_gmd(level_file, load=True)
     initial_count = len(level.objects)
     
     for i, obj in enumerate(level.objects):
@@ -30,11 +30,11 @@ def test_roundtrip(level_file: Path, tmp_path: Path) -> None:
     )
     
     out_file = tmp_path / level_file.name
-    level.to_file(out_file, save=True)
+    level.to_gmd(out_file, save=True)
     
     assert out_file.exists(), "Export should have created the output file"
     
-    reloaded = Level.from_file(out_file, load=True)
+    reloaded = Level.from_gmd(out_file, load=True)
 
     for i, obj in enumerate(reloaded.objects):
         assert len(obj) > 0, f"Object {i} is empty after round-trip"

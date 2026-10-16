@@ -1,12 +1,14 @@
 # Imports
-from typing import Any
+from typing import Any, Self
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.serialization.mixins import (
     FilePathMixin,
     FolderLoaderMixin,
-    PlistLoaderMixin
+    PlistLoaderMixin,
+    CompressFileMixin,
+    PathString
 )
 from gmdkit.serialization.functions import (
     kv_wrap, args_wrap
@@ -15,10 +17,12 @@ from gmdkit.defaults.level import LEVEL_DEFAULT
 from gmdkit.casting.level_loader import FieldLoaderMixin
 
 
-class Level(FilePathMixin,FieldLoaderMixin,DictClass[str,Any]):
-
+class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any]):
+    
     ENCODER_KEY = 4
-    EXTENSION = "gmd"
+    EXTENSION = "gdlvl"
+    COMPRESSED = True
+    COMPRESSION = "gzip"
     SELECTORS = {"k4", "k34", "k119", "k120"}
 
 
@@ -32,6 +36,13 @@ class Level(FilePathMixin,FieldLoaderMixin,DictClass[str,Any]):
         new.name = name
 
         return new
+    
+    @classmethod
+    def from_gmd(cls,path:PathString,extension="gmd",compressed=False,**kwargs) -> Self:
+        return super().from_file(path=path,extension=extension,compressed=compressed, **kwargs)
+
+    def to_gmd(self,path:PathString,extension="gmd",compressed=False,**kwargs):
+        return super().to_file(path=path,extension=extension,compressed=compressed, **kwargs)
 
 
 class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass[Level]):

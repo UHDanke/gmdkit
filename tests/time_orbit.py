@@ -2,7 +2,7 @@ from gmdkit import Level
 import time
 
 _start = time.perf_counter()
-lvl = Level.from_file("data/gmd/online/ORBIT.gmd",load_content=False)
+lvl = Level.from_gmd("data/gmd/online/ORBIT.gmd",load_content=False)
 _end = time.perf_counter()
 print(f"File load took {_end - _start:.6f} seconds")
 _start = time.perf_counter()
