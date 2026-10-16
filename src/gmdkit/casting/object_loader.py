@@ -16,6 +16,7 @@ from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.particle import Particle
 from gmdkit.models.prop.color import Color, ColorList
+from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
 
 
 class FieldLoaderMixin(DictDecoderMixin, FieldInterface):
@@ -624,8 +625,8 @@ field(key="kA51", decoder=int, default=0)
 field(key="kA52", decoder=float, encoder=from_float, default=0.0)
 field(key="kA53", decoder=decode_text, encoder=encode_text, default=0)
 field(key="kA54", decoder=int, default=0)
-# kA55 named groups string?
-# kA56 bool?
+field(key="kA55", decoder=NamedGroupsDict.from_string, encoder=NamedGroupsDict.to_string, default_factory=NamedGroupsDict)
+field(key="kA56", decoder=NamedGroupsList.from_string, encoder=NamedGroupsList.to_string, default_factory=NamedGroupsList)
 field(key="kA57", decoder=to_bool, encoder=from_bool, default=False)
 field(key="kA58", decoder=to_bool, encoder=from_bool, default=False)
 # kA59

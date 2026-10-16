@@ -28,8 +28,6 @@ class EnumClass(IntEnum):
             cls._value2member_map_[v] = member
         return member
 
-from enum import IntEnum
-
 
 class ObjectID(IntEnum):
     LEVEL_SETTINGS = 0
@@ -871,3 +869,7 @@ class DisplayIcon(EnumClass):
     SPIDER = 6
     SWING = 7
     JETPACK = 8
+    
+class NamedGroupsType(EnumClass):
+    GROUP_ID = 1
+    ITEM_ID = 2

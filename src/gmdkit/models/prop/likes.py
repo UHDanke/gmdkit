@@ -3,7 +3,7 @@ from gmdkit.utils.types import DictClass
 from gmdkit.serialization.functions import kv_wrap, from_node_wrap, to_node_wrap
 from gmdkit.serialization.type_cast import to_bool, from_bool
 from gmdkit.serialization.mixins import PlistDecoderMixin, DataclassDecoderMixin, DelimiterMixin
-from gmdkit.serialization.functions import dataclass_decoder, field_decoder
+from gmdkit.serialization.functions import dataclass_decoder
 
 
 @dataclass_decoder(slots=True, frozen=True, separator="_", from_array=True)

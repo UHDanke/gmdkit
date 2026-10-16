@@ -6,6 +6,7 @@ from gmdkit.models.prop.groups import IDList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.color import Color, ColorList
+from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
 
 Field = AliasField
 register_id = FieldLoaderMixin.register_id
@@ -52,6 +53,8 @@ class LevelSettings(BaseInterface):
     song_dont_reset: bool = Field("kA46")
     group_offset: int = Field("kA47")
     enable_impulse_fix: bool = Field("kA48")
+    named_groups: NamedGroupsDict = Field('kA55')
+    named_groups_order: NamedGroupsList = Field('kA56')
  
     # pre 1.9 legacy colors
     background_red: int = Field("kS1")

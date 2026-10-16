@@ -464,6 +464,7 @@ class DictDecoderMixin:
     CONTAINER: ClassVar[Optional[str]] = None
     CONDITION: ClassVar[Optional[KeyValueCondition]] = None
     SEPARATOR: ClassVar[str] = ','
+    PAIR_SEPARATOR: ClassVar[Optional[str]] = None
 
     @classmethod
     def from_tokens(
@@ -544,12 +545,16 @@ class DictDecoderMixin:
             ) -> Self:
 
         separator = cls.SEPARATOR
-
+        pair_separator = cls.PAIR_SEPARATOR
+    
         if string == "":
             return cls()
-
+    
+        if pair_separator:
+            string = string.replace(pair_separator, separator)
+    
         tokens = list(string) if not separator else string.split(separator)
-
+    
         return cls.from_tokens(tokens,**kwargs)
 
 
@@ -557,8 +562,15 @@ class DictDecoderMixin:
             self,
             **kwargs
             ) -> str:
-        return type(self).SEPARATOR.join(self.to_tokens(**kwargs))
-
+        cls = type(self)
+        tokens = self.to_tokens(**kwargs)
+        pair_separator = cls.PAIR_SEPARATOR
+    
+        if pair_separator:
+            it = iter(tokens)
+            tokens = map(pair_separator.join, zip(it, it))
+    
+        return cls.SEPARATOR.join(tokens)
 
 class ArrayDecoderMixin:
 
