@@ -69,7 +69,14 @@ class PlayerControlTrigger(TriggerObject):
     stop_move: bool = Field(541)
     stop_rotation: bool = Field(542)
     stop_slide: bool = Field(543)
+
     
+class ProgressTrigger(TriggerObject):
+    target_item_id: int = Field(86)
+    item_id: int = Field(95)
+    progress: float = Field(602)
+    add_progress: bool = Field(603)
+    item_input: bool = Field(605)
     
 # CheckpointTrigger
 register_id(2063, CheckpointTrigger)  # Checkpoint
@@ -91,3 +98,6 @@ register_id(2899, OptionsTrigger)  # Options Trigger
 
 # PlayerControlTrigger
 register_id(1932, PlayerControlTrigger)  # Player Control Trigger
+
+# ProgressTrigger
+register_id(3663, ProgressTrigger)

@@ -60,13 +60,19 @@ class StartPosition(EffectObject):
     flip_gravity: bool = Field('kA11')
     target_order: int = Field('kA19')
     reverse_mode: bool = Field('kA20')
-    disable: bool = Field('kA21')
+    inactive: bool = Field('kA21')
     target_channel: int = Field('kA26')
     mirror_mode: bool = Field('kA28')
     rotate_mode: bool = Field('kA29')
     reset_camera: bool = Field('kA35')
-    
-    
+    free_mode: bool = Field('kA49')
+    online: bool = Field('kA50')
+    p2_group_id: bool = Field('kA51')
+    y_velocity: float = Field('kA52')
+    name: str = Field('kA53')
+    spawn_group_id: int = Field('kA54')
+
+
 # DashOrbObject
 register_id(1704, DashOrbObject)  # Green Dash Orb
 register_id(1751, DashOrbObject)  # Pink Gravity Dash Orb

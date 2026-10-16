@@ -489,13 +489,15 @@ class DictDecoderMixin:
         if decoder:
             try:
                 for k, v in zip(it, it):
-                    dk, dv = decoder(k, v)
-                    data[dk] = dv
+                    if k:
+                        dk, dv = decoder(k, v)
+                        data[dk] = dv
             except Exception as e:
                 raise ValueError(f"[{cls.__name__}] failed to decode") from e
         else:
             data.update(zip(it, it))
-
+            data.pop("", None)
+            
         return result
 
 
