@@ -411,7 +411,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         is_node=True,
     )
 
-    unused_8: dict = DictField(
+    unk_gs_8: dict = DictField(
         key="GS_8",
         default_factory=dict,
         is_node=True,
@@ -542,3 +542,31 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default_factory=dict,
         is_node=True,
     )
+    
+    username: str = DictField(key="GJA_001")
+
+    account_id: int = DictField(key="GJA_003")
+
+    password_gjp2: str = DictField(key="GJA_005")
+    
+    song_priority: int = DictField(key="MDLM_002")
+    
+    unk_mdlm_003: dict = DictField(
+        key="MDLM_003",
+        default_factory=dict,
+        is_node=True,
+    )
+    
+    news_last_read_id: int = DictField(key="newsLastReadID", default=0)
+    
+    editor_sfx_volume: float = DictField(key="editorSFXGlobalVolume", default=1.0)
+    
+    scroll_sensitivity: float = DictField(key="scrollSensitivity")
+    
+    special_perm_key: int = DictField(key="specialPermKey")
+    
+    latest_daily_id: int = DictField(key="GLM_24")
+    
+    latest_weekly_id: int = DictField(key="GLM_25")
+    
+    latest_event_id: int = DictField(key="GLM_26")
