@@ -7,7 +7,7 @@ from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.gzip import ObjectString, ReplayString
 from gmdkit.serialization.classes import DictField, FieldMetaclass
 from gmdkit.serialization.mixins import PlistLoaderMixin
-
+from gmdkit.serialization.functions import decompress_string, compress_string
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
@@ -291,7 +291,42 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         decoder=enums.ToggleCBS,
         default=enums.ToggleCBS.DEFAULT,
     )
-
+    # k126 - snowflake ID (base64 len 12)
+    snowflake_id: str = DictField(key="k126")
+    # k127
+    # k128 - gzipped string, platformer save
+    platformer_save: str = DictField(key="k128",decoder=decompress_string,encoder=compress_string)
+    # k129 - enable platformer saves (bool)
+    enable_platformer_save: bool = DictField("k129", default=False)
+    # k130 - int? plat save related
+    # k131 - gzipped string, plat save related?
+    m_k131: str = DictField(key="k131",decoder=decompress_string,encoder=compress_string)
+    # k132 - int? plat save related
+    # k133 - int?
+    # k134
+    # k135
+    # k136 - int?
+    # k137
+    # k138 - int timestamp
+    # k139 - int timestamp
+    # k140 - string tuple of 4 ints
+    # k141 - bool
+    # k142 - int
+    # k143 - int
+    # k144
+    # k145 - int
+    # k146
+    # k147
+    # k148
+    # k149
+    # k150
+    # k151
+    # k152
+    # k153
+    # k154
+    # k155
+    # k156 - string tuple of 23 ints, array of editor stats?
+    
     editor_camera_x: float = DictField(key="kI1", default=0.0)
 
     editor_camera_y: float = DictField(key="kI2", default=0.0)

@@ -63,29 +63,31 @@ class CreditList(ArrayDecoderMixin, ListClass[Credits]):
     ENCODER = Credits.to_string
 
 @dataclass_decoder(slots=True,from_array=True,separator="~")
-class ChangeEntry(DataclassDecoderMixin):
+class SFXChange(DataclassDecoderMixin):
     path: str
-    changed: int
+    count: int
 
-
-class ChangeList(ArrayDecoderMixin, ListClass[ChangeEntry]):
+class SFXChangeList(ArrayDecoderMixin, ListClass[SFXChange]):
     SEPARATOR = ";"
-    DECODER = ChangeEntry.from_string
-    ENCODER = ChangeEntry.to_string
-
+    DECODER = SFXChange.from_string
+    ENCODER = SFXChange.to_string
 
 @dataclass_decoder(slots=True,from_array=True,separator=":")
-class ChangeFiles(DataclassDecoderMixin):
-    file_count: int
-    change_list: ChangeList = field_decoder(decoder=ChangeList.from_string, encoder=ChangeList.to_string)
+class SFXChangeFiles(DataclassDecoderMixin):
+    last_id: int
+    change_list: SFXChangeList = field_decoder(decoder=SFXChangeList.from_string, encoder=SFXChangeList.to_string)
     
-
 @dataclass_decoder(slots=True,from_array=True,separator=",")
-class Changelog(DataclassDecoderMixin):
+class SFXChangelog(DataclassDecoderMixin):
     version: int
     timestamp: int
-    changes: ChangeList = field_decoder(decoder=ChangeFiles.from_string, encoder=ChangeFiles.to_string)
-    
+    changes: SFXChangeFiles = field_decoder(decoder=SFXChangeFiles.from_string, encoder=SFXChangeFiles.to_string)
+
+class SFXChangelogList(ArrayDecoderMixin, ListClass[SFXChangelog]):
+    SEPARATOR = "$"
+    DECODER = SFXChangelog.from_string
+    ENCODER = SFXChangelog.to_string
+
     @classmethod
     def from_base64(cls, string:str, **kwargs) -> Self:
         decoded = decode_text(string)
@@ -94,13 +96,12 @@ class Changelog(DataclassDecoderMixin):
     def to_base64(self, **kwargs) -> str:
         string = self.to_string(**kwargs)
         return encode_text(string)
-        
 
 @dataclass_decoder(slots=True,from_array=True,separator="|")
 class SFXLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     files: SFXList = field_decoder(decoder=SFXList.from_string, encoder=SFXList.to_string)
     sfx_credits: CreditList = field_decoder(decoder=CreditList.from_string, encoder=CreditList.to_string)
-    changelog: Changelog = field_decoder(decoder=Changelog.from_base64, encoder=Changelog.to_base64)
+    changelog: SFXChangelogList = field_decoder(decoder=SFXChangelogList.from_base64, encoder=SFXChangelogList.to_base64)
     
     def _name_fallback_(self):
         return "sfxlibrary"

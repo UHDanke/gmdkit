@@ -16,6 +16,7 @@ from gmdkit.serialization.mixins import (
     )
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
+from gmdkit.serialization.type_cast import decode_text, encode_text
 
 
 @dataclass_decoder(slots=True, from_array=True, separator=",")
@@ -105,20 +106,70 @@ class TagList(DelimiterMixin, ArrayDecoderMixin, ListClass[Tag]):
     DECODER = Tag.from_string
     ENCODER = Tag.to_string
 
-from gmdkit.serialization.type_cast import decode_text, encode_text
+
+@dataclass_decoder(slots=True,from_array=True,separator="~")
+class SongChange(DataclassDecoderMixin):
+    artist_id: int
+    tags: SongTagList = field_decoder(decoder=SongTagList.from_string,encoder=SongTagList.to_string)
+    count: int
+    
+class SongChangeList(ArrayDecoderMixin, ListClass[SongChange]):
+    SEPARATOR = ";"
+    DECODER = SongChange.from_string
+    ENCODER = SongChange.to_string
+
+@dataclass_decoder(slots=True,from_array=True,separator=":")
+class SongChangeFiles(DataclassDecoderMixin):
+    last_id: int
+    change_list: SongChangeList = field_decoder(decoder=SongChangeList.from_string, encoder=SongChangeList.to_string)
+    
+@dataclass_decoder(slots=True,from_array=True,separator=",")
+class SongChangelog(DataclassDecoderMixin):
+    version: int
+    timestamp: int
+    changes: SongChangeFiles = field_decoder(decoder=SongChangeFiles.from_string, encoder=SongChangeFiles.to_string)
+
+class SongChangelogList(ArrayDecoderMixin, ListClass[SongChangelog]):
+    SEPARATOR = "$"
+    DECODER = SongChangelog.from_string
+    ENCODER = SongChangelog.to_string
+
+    @classmethod
+    def from_base64(cls, string:str, **kwargs) -> Self:
+        decoded = decode_text(string)
+        return cls.from_string(decoded, **kwargs)
+    
+    def to_base64(self, **kwargs) -> str:
+        string = self.to_string(**kwargs)
+        return encode_text(string)
+
+@dataclass_decoder(slots=True, from_array=True, separator=",")
+class Link(DelimiterMixin,DataclassDecoderMixin):
+    source_id: int
+    platform: int
+    unknown: str
+    url: str = field_decoder(decoder=unquote,encoder=lambda x: quote(x,safe=""))
+
+Link.END_DELIMITER = ":"
+
+class LinkList(DelimiterMixin,ArrayDecoderMixin, ListClass[Link]):
+    SEPARATOR = ";"
+    KEEP_SEPARATOR = True
+    DECODER = Link.from_string
+    ENCODER = Link.to_string
+
 @dataclass_decoder(slots=True, separator="|")
 class MusicLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     version: int
     artists: ArtistList = field_decoder(decoder=ArtistList.from_string, encoder=ArtistList.to_string)
     songs: SongList = field_decoder(decoder=SongList.from_string, encoder=SongList.to_string)
     tags: TagList = field_decoder(decoder=TagList.from_string, encoder=TagList.to_string)
-    #changelog: Changelog = field_decoder(decoder=Changelog.from_base64, encoder=Changelog.to_base64)
-    m_5: str = field_decoder(decoder=decode_text,encoder=encode_text)
-    m_6: str
-    m_7: str
+    changelog: SongChangelogList = field_decoder(decoder=SongChangelogList.from_base64, encoder=SongChangelogList.to_base64)
+    song_links: LinkList = field_decoder(decoder=LinkList.from_string, encoder=LinkList.to_string)
+    artist_links: LinkList = field_decoder(decoder=LinkList.from_string, encoder=LinkList.to_string)
+    
     def _name_fallback_(self):
         return "musiclibrary"
-
 
 MusicLibrary.COMPRESSED =  True
 MusicLibrary.COMPRESSION = "zlib"
