@@ -8,6 +8,7 @@ class CheckpointTrigger(TriggerObject):
     target_pos: int = Field(71)
     player_pos: bool = Field(138)
     respawn_id: int = Field(448)
+    prespawn_id: int = Field(604)
 
 
 class EndTrigger(TriggerObject):

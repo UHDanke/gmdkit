@@ -88,6 +88,7 @@ class SFXTrigger(VolumeInterface,TriggerObject):
     pitch_rand: int = Field(597)
     volume_rand: float = Field(598)
     pitch_steps: bool = Field(599)
+    custom_library_id: int = Field(601)
 
 
 class EditSFXTrigger(VolumeInterface,TriggerObject):

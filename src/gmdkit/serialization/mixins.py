@@ -845,7 +845,7 @@ class FilePathMixin(FileStringMixin):
 
         elif extension is not None and path_ext != extension:
             raise ValueError(
-                "file has invalid extension, expected '{extension}', got '{path_ext}' instead"
+                f"file has invalid extension, expected '{extension}', got '{path_ext}' instead"
                 )
 
         super().to_file(path=path,**kwargs)

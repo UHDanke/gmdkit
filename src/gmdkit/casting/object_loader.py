@@ -7,7 +7,7 @@ from gmdkit.serialization.type_cast import (
     )
 from gmdkit.serialization.classes import FieldInterface
 from gmdkit.serialization.mixins import DictDecoderMixin
-from gmdkit.models.prop.groups import IDList
+from gmdkit.models.prop.groups import IDList, ParentIDList
 from gmdkit.models.prop.events import EventList
 from gmdkit.models.prop.sequence import SequenceList
 from gmdkit.models.prop.random import RandomWeightsList
@@ -255,7 +255,7 @@ field(key=264, decoder=float, encoder=from_float, default=0.0)
 field(key=265, decoder=float, encoder=from_float, default=0.0)
 field(key=270, decoder=float, encoder=from_float, default=0.0)
 field(key=271, decoder=float, encoder=from_float, default=0.0)
-field(key=274, decoder=IDList.from_string, encoder=IDList.to_string, default_factory=IDList)
+field(key=274, decoder=ParentIDList.from_string, encoder=ParentIDList.to_string, default_factory=ParentIDList)
 field(key=275, decoder=float, encoder=from_float, default=0.0)
 field(key=276, decoder=to_bool, encoder=from_bool, default=False)
 field(key=278, decoder=to_bool, encoder=from_bool, default=False)
@@ -566,10 +566,10 @@ field(key=597, decoder=int, default=0)
 field(key=598, decoder=float, encoder=from_float, default=0.0)
 field(key=599, decoder=to_bool, encoder=from_bool, default=False)
 field(key=600, decoder=to_bool, encoder=from_bool, default=False)
-# 601 ?
+field(key=601, decoder=int, default=0)
 field(key=602, decoder=float, encoder=from_float, default=0.0)
 field(key=603, decoder=to_bool, encoder=from_bool, default=False)
-# 604 ?
+field(key=604, decoder=int, default=0)
 field(key=605, decoder=to_bool, encoder=from_bool, default=False)
 
 field(key="kA1", decoder=int, default=0)

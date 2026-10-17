@@ -11,6 +11,7 @@ from gmdkit.serialization.mixins import (
     DefaultPathMixin
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
+from gmdkit.serialization.type_cast import decode_text, encode_text
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import SFX_LIBRARY_PATH
 
@@ -60,12 +61,46 @@ class CreditList(ArrayDecoderMixin, ListClass[Credits]):
     KEEP_SEPARATOR = True
     DECODER = Credits.from_string
     ENCODER = Credits.to_string
+
+@dataclass_decoder(slots=True,from_array=True,separator="~")
+class ChangeEntry(DataclassDecoderMixin):
+    path: str
+    changed: int
+
+
+class ChangeList(ArrayDecoderMixin, ListClass[ChangeEntry]):
+    SEPARATOR = ";"
+    DECODER = ChangeEntry.from_string
+    ENCODER = ChangeEntry.to_string
+
+
+@dataclass_decoder(slots=True,from_array=True,separator=":")
+class ChangeFiles(DataclassDecoderMixin):
+    file_count: int
+    change_list: ChangeList = field_decoder(decoder=ChangeList.from_string, encoder=ChangeList.to_string)
     
+
+@dataclass_decoder(slots=True,from_array=True,separator=",")
+class Changelog(DataclassDecoderMixin):
+    version: int
+    timestamp: int
+    changes: ChangeList = field_decoder(decoder=ChangeFiles.from_string, encoder=ChangeFiles.to_string)
+    
+    @classmethod
+    def from_base64(cls, string:str, **kwargs) -> Self:
+        decoded = decode_text(string)
+        return cls.from_string(decoded, **kwargs)
+    
+    def to_base64(self, **kwargs) -> str:
+        string = self.to_string(**kwargs)
+        return encode_text(string)
+        
 
 @dataclass_decoder(slots=True,from_array=True,separator="|")
 class SFXLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     files: SFXList = field_decoder(decoder=SFXList.from_string, encoder=SFXList.to_string)
     sfx_credits: CreditList = field_decoder(decoder=CreditList.from_string, encoder=CreditList.to_string)
+    changelog: Changelog = field_decoder(decoder=Changelog.from_base64, encoder=Changelog.to_base64)
     
     def _name_fallback_(self):
         return "sfxlibrary"

@@ -16,7 +16,7 @@ from gmdkit.serialization.mixins import (
     )
 from gmdkit.utils.types import ListClass
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
- 
+
 
 @dataclass_decoder(slots=True, from_array=True, separator=",")
 class Artist(DelimiterMixin, DataclassDecoderMixin):
@@ -105,14 +105,17 @@ class TagList(DelimiterMixin, ArrayDecoderMixin, ListClass[Tag]):
     DECODER = Tag.from_string
     ENCODER = Tag.to_string
 
-
+from gmdkit.serialization.type_cast import decode_text, encode_text
 @dataclass_decoder(slots=True, separator="|")
 class MusicLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMixin,DataclassDecoderMixin):
     version: int
     artists: ArtistList = field_decoder(decoder=ArtistList.from_string, encoder=ArtistList.to_string)
     songs: SongList = field_decoder(decoder=SongList.from_string, encoder=SongList.to_string)
     tags: TagList = field_decoder(decoder=TagList.from_string, encoder=TagList.to_string)
-    
+    #changelog: Changelog = field_decoder(decoder=Changelog.from_base64, encoder=Changelog.to_base64)
+    m_5: str = field_decoder(decoder=decode_text,encoder=encode_text)
+    m_6: str
+    m_7: str
     def _name_fallback_(self):
         return "musiclibrary"
 
