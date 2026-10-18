@@ -21,11 +21,11 @@ from gmdkit.models.prop.checkpoint import CheckpointData
 @dataclass_decoder(slots=True, separator=',', from_array=True)
 class ReplayInfo(DataclassDecoderMixin):
     
-    timestamp: int
-    players: int
+    seed: int
+    attempt: int
     game_version: int
     game_binary: int
-    version: int
+    level_version: int
     persistent_data: PersistentData = field_decoder(decoder=PersistentData.from_string,encoder=PersistentData.to_string)
 
 
@@ -48,7 +48,7 @@ def process_events(string:str):
         return ReplayEvent()
     
     match tokens[0]:
-        case "99":
+        case "98"|"99":
             return CheckpointEvent.from_tokens(tokens)
         case _:
             return ReplayEvent.from_tokens(tokens)
@@ -58,9 +58,16 @@ def process_events(string:str):
 class ReplayInput(DataclassDecoderMixin):
     
     delta_step : int
-    event: Any = field_decoder(default_factory=ReplayEvent,optional=True,decoder=process_events,encoder=to_string)
+    event: ReplayEvent|CheckpointEvent = field_decoder(default_factory=ReplayEvent,optional=True,decoder=process_events,encoder=to_string)
 
-# Checkpoint data also uses commas so maxsplit needs to be specified here
+    @property
+    def step(self) -> int:
+        return abs(self.delta_step)
+    
+    @property
+    def pressed(self) -> bool:
+        return self.delta_step >= 0
+
 ReplayInput.MAX_SPLIT = 1
 
 

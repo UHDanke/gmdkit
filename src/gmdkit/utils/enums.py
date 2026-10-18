@@ -793,13 +793,18 @@ class LevelRating(EnumClass):
     INSANE = 50
 
 class ReplayEventID(EnumClass):
-    JUMP_P1 = 0
+    JUMP_P1 = 0 
     LEFT_P1 = 2
     RIGHT_P1 = 3
+    BUTTON_4_P1 = 4
+    BUTTON_5_P1 = 5
     JUMP_P2 = 6
     LEFT_P2 = 7
     RIGHT_P2 = 8
-    CHECKPOINT = 99
+    BUTTON_4_P2 = 9
+    BUTTON_5_P2 = 10
+    CHECKPOINT_ADD = 98
+    CHECKPOINT = 99  
 
 class ToggleCBS(EnumClass):
     DEFAULT = 0
@@ -873,3 +878,13 @@ class DisplayIcon(EnumClass):
 class NamedGroupsType(EnumClass):
     GROUP_ID = 1
     ITEM_ID = 2
+
+class ControlSource(EnumClass):
+    CREATOR = 0
+    CUSTOM = 1
+
+class ControlType(EnumClass):
+    NONE = 0
+    KEYBOARD = 1
+    TOUCH = 2
+    CONTROLLER = 4

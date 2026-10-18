@@ -7,7 +7,7 @@ from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.death_markers import (
     DeathMarkerList, DeathCounts, AttemptHistory, SessionStringLazy,
-    StartPosDeathCounts, StartPosAttemptHistory
+    StartPosDeathCounts, StartPosAttemptHistory, GlobalDeathDataLazy
     )
 from gmdkit.models.prop.editor_stats import EditorStats
 from gmdkit.serialization.classes import DictField, FieldMetaclass, AliasAttr
@@ -306,20 +306,24 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
     snowflake_id: str = DictField(key="k126")
     
-    # k127
+    last_autobackup_time: int = DictField(key="k127", default=0)
     
-    platformer_save: str = DictField(key="k128",decoder=decompress_string,encoder=compress_string)
+    platformer_save: str = DictField(key="k128",decoder=decompress_string,encoder=compress_string) # TODO format
     
     enable_platformer_save: bool = DictField("k129", default=False)
     
-    # k130 - int? plat save related
+    platformer_save_level_version: int = DictField(key="k130", default=0)
     
-    # k131 - gzipped string, plat save related?
-    m_k131: str = DictField(key="k131",decoder=decompress_string,encoder=compress_string)
+    platformer_save_replay: ReplayStringLazy = DictField(
+        key="k131",
+        decoder=ReplayStringLazy.load_string,
+        encoder=ReplayStringLazy.save_string,
+        default_factory=ReplayStringLazy,
+    )
     
-    # k132 - int? plat save related
+    platformer_save_format_version: int = DictField(key="k132", default=0)
     
-    # k133 - int?
+    death_tracker_format_version: int = DictField(key="k133", default=0)
     
     death_counts: DeathCounts = DictField(key="k134",decoder=DeathCounts.from_string, encoder=DeathCounts.to_string, default_factory=DeathCounts)
     
@@ -335,35 +339,51 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
     death_markers: DeathMarkerList = DictField(key="k140",decoder=DeathMarkerList.from_string, encoder=DeathMarkerList.to_string, default_factory=DeathMarkerList)
     
-    # k141 - bool
+    death_data_pending_upload: bool = DictField(key="k141", default=False)
     
     session_play_time: int = DictField(key="k142")
     
     total_play_time: int = DictField(key="k143")
     
-    # k144
-    
     completions: int = DictField(key="k145")
     
     archived_sessions: SessionStringLazy = DictField(key="k146",decoder=SessionStringLazy.load_string, encoder=SessionStringLazy.save_string)
     
-    # k147
+    # k147 base64 str, creator controls layout
     
-    # k148
+    creator_controls_version: int = DictField(key="k148")
     
-    # k149
+    # k149 base64 str, custom controls layout
     
-    # k150
+    custom_controls_source: int = DictField(
+        key="k150",
+        decoder=enums.ControlSource,
+        default=enums.ControlSource.CREATOR,
+        )
     
-    # k151
+    death_upload_rate: float = DictField(
+        key="k151",
+        decoder=lambda s: 1-int(s)/1000,
+        encoder=lambda x: str(max(0, min(1000, round(x*1000)))),
+        default=0.0
+        )
     
-    death_stats: str = DictField(key="k152")
+    global_death_stats: GlobalDeathDataLazy = DictField(
+        key="k152",
+        decoder=GlobalDeathDataLazy.load_string,
+        encoder=GlobalDeathDataLazy.save_string,
+        default_factory=GlobalDeathDataLazy,
+    )
     
-    # k153
+    edited_custom_controls: bool = DictField(key="k153", default=False)
     
-    # k154
+    practice_attempts: int = DictField(key="k154", default=0)
     
-    # k155
+    custom_controls_type: int = DictField(
+        key="k155",
+        decoder=enums.ControlType,
+        default=enums.ControlType.NONE,
+        )
     
     editor_stats: EditorStats = DictField(key="k156",decoder=EditorStats.from_string, encoder=EditorStats.to_string)
     

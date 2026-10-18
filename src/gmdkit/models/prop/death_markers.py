@@ -97,3 +97,75 @@ class SessionStringLazy(LazyString):
     PARSER = SessionString
     
     sessions: SessionString = LazyAttr("data")
+    
+@dataclass_decoder(slots=True, separator=",", from_array=True)
+class GlobalDeathMarker(DataclassDecoderMixin):
+    x: int = field_decoder(
+        decoder=lambda s: int(s)*10,
+        encoder=lambda x: str(round(x/10)),
+        default=0
+        )
+    y: int = field_decoder(
+        decoder=lambda s: int(s)*10,
+        encoder=lambda x: str(round(x/10)),
+        default=0
+        )
+    count: int = 0
+    death_share: int = 0
+    wall_share: int = 0
+    unk_5: int = 0
+    stars: int = 0
+    death_glow: int = 0
+    wall_glow: int = 0
+    
+
+class GlobalDeathMarkerList(ArrayDecoderMixin,ListClass[GlobalDeathMarker]):
+
+    __slots__ = ()
+
+    SEPARATOR = ","
+    GROUP_SIZE = 9
+    DECODER = DeathMarker.from_tokens
+    ENCODER = DeathMarker.to_tokens
+    
+@dataclass_decoder(slots=True, separator="|", from_array=True, default_optional=True)
+class GlobalDeathString(CompressFileMixin, DataclassDecoderMixin):
+    markers: GlobalDeathMarkerList = field_decoder(
+        default_factory=GlobalDeathMarkerList,
+        decoder=GlobalDeathMarkerList.from_string,
+        encoder=GlobalDeathMarkerList.to_string
+        )
+    flag: int | None = field_decoder(
+        default=None,
+        decoder=int,
+        encoder=str
+        )
+ 
+    @property
+    def enabled(self) -> bool:
+        return self.flag is None or self.flag > 0
+ 
+GlobalDeathString.MAX_SPLIT = 1
+GlobalDeathString.COMPRESSED = True
+GlobalDeathString.COMPRESSION = "gzip"
+
+
+@dataclass_decoder(slots=True, separator=",", from_array=True, default_optional=True)
+class GlobalDeathData(DataclassDecoderMixin):
+    level_id: int = 0
+    data_version: int = 0
+    data: GlobalDeathString = field_decoder(
+        default_factory=GlobalDeathString,
+        decoder=GlobalDeathString.from_string,
+        encoder=GlobalDeathString.to_string
+        )
+ 
+GlobalDeathData.MAX_SPLIT = 2
+
+class GlobalDeathDataLazy(LazyString):
+    PARSER = GlobalDeathData
+    
+    level_id: int = LazyAttr()
+    data_version: int = LazyAttr()
+    data: GlobalDeathString = LazyAttr()
+    

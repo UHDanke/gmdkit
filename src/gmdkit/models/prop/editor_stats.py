@@ -5,26 +5,34 @@ from gmdkit.serialization.mixins import DataclassDecoderMixin
 
 @dataclass_decoder(slots=True, separator=",", from_array=True)
 class EditorStats(DataclassDecoderMixin):
-    unk_1: int = 0
-    objects_placed: int = 0
-    unk_3: int = 0
+    format_version: int = 0
+    objects_created: int = 0
+    objects_pasted: int = 0
     objects_deleted: int = 0
-    unk_5: int = 0
-    unk_6: int = 0
-    unk_7: int = 0
-    unk_8: int = 0
-    unk_9: int = 0
-    active_edit_time_ms: int = 0
-    unk_11: int = 0
-    unk_12: int = 0
-    unk_13: int = 0
-    unk_14: int = 0
-    unk_15: int = 0
-    unk_16: int = 0
-    unk_17: int = 0
-    unk_18: int = 0
-    inputs: int = 0
-    saves: int = 0
-    time_created: int = 0
-    unk_22: int = 0
-    unk_23: int = 0
+    transform_actions: int = 0
+    edit_popups_opened: int = 0
+    undo_redo: int = 0
+    playtest_count: int = 0
+    playtest_time: int = 0          # seconds (float in memory, saved as int)
+    editor_frames: int = 0
+    action_gap_0_1: int = 0
+    action_gap_2_3: int = 0
+    action_gap_4_7: int = 0
+    action_gap_8_15: int = 0
+    action_gap_16_31: int = 0
+    action_gap_32_63: int = 0
+    action_gap_64_127: int = 0
+    action_gap_128_plus: int = 0
+    editor_inputs: int = 0
+    editor_sessions: int = 0
+    first_open: int = 0             # unix timestamp (uint64)
+    original_level_id: int = 0
+    original_level_version: int = 0
+
+    @property
+    def action_gap_histogram(self) -> list[int]:
+        return [
+            self.action_gap_0_1, self.action_gap_2_3, self.action_gap_4_7,
+            self.action_gap_8_15, self.action_gap_16_31, self.action_gap_32_63,
+            self.action_gap_64_127, self.action_gap_128_plus,
+        ]
