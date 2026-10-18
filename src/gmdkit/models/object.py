@@ -6,12 +6,17 @@ from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.utils.typing import NumKey
 from gmdkit.serialization.mixins import ( 
     ArrayDecoderMixin,
+    DataclassDecoderMixin,
     FilePathMixin,
     DelimiterMixin,
     FileStringMixin,
+    CompressFileMixin,
     PlistLoaderMixin
     )
-from gmdkit.serialization.functions import write_plist, kv_wrap
+from gmdkit.serialization.functions import (
+    write_plist, kv_wrap, dataclass_decoder, field_decoder
+    )
+from gmdkit.serialization.classes import LazyString, LazyAttr
 from gmdkit.defaults.objects import OBJECT_DEFAULT
 from gmdkit.casting.object_loader import FieldLoaderMixin
 
@@ -103,3 +108,28 @@ class ObjectGroupDict(FilePathMixin,PlistLoaderMixin,DictClass[int,ObjectGroup])
     
     def _name_fallback_(self):
         return "objectgroup"
+
+
+@dataclass_decoder(slots=True, separator=";", from_array=True)
+class ObjectString(FilePathMixin,CompressFileMixin,DataclassDecoderMixin):
+    start: Object = field_decoder(
+        default_factory=Object,
+        decoder=Object.from_string,
+        encoder=lambda obj: obj.to_string(skip_delimiter=True),
+        )
+    objects: ObjectList = field_decoder(
+        default_factory=ObjectList,
+        decoder=ObjectList.from_string,
+        encoder=ObjectList.to_string,
+        )
+
+ObjectString.MAX_SPLIT = 1
+ObjectString.EXTENSION = "txt"
+ObjectString.COMPRESSED = True
+ObjectString.COMPRESSION = "gzip"
+
+class ObjectStringLazy(LazyString):
+    PARSER = ObjectString
+    
+    start: Object = LazyAttr()
+    objects: ObjectList = LazyAttr()

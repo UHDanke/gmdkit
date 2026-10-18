@@ -4,8 +4,7 @@ import json
 from typing import Any, Optional
 
 # Package Imports
-from gmdkit.models.prop.gzip import ObjectString, LevelObjects
-from gmdkit.models.object import ObjectList
+from gmdkit.models.object import ObjectList, ObjectString, ObjectStringLazy
 from gmdkit.serialization.functions import compress_string
 
 # Support for iAndyHD3's WSLiveEditor Geode Mod
@@ -13,7 +12,7 @@ from gmdkit.serialization.functions import compress_string
 
 WEBSOCKET_URL = "ws://127.0.0.1:1313"
 
-class LiveEditor(ObjectString):
+class LiveEditor(ObjectStringLazy):
     """
     A websocket client for editing a level live.
     
@@ -141,7 +140,7 @@ class LiveEditor(ObjectString):
         
         return response.get("response")
             
-    def get_level(self) -> LevelObjects:
+    def get_level(self) -> ObjectString:
         """
         Fetch the current level string from the editor and load it.
         

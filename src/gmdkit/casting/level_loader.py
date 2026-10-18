@@ -1,13 +1,19 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.serialization.type_cast import decode_text, encode_text, get_string
-from gmdkit.models.object import Object, ObjectList
+from gmdkit.serialization.type_cast import decode_text, encode_text
+from gmdkit.models.object import Object, ObjectList, ObjectStringLazy
+from gmdkit.models.prop.replay import ReplayStringLazy
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.pos_list import PositionList
-from gmdkit.models.prop.gzip import ObjectString, ReplayString
-from gmdkit.serialization.classes import DictField, FieldMetaclass
+from gmdkit.models.prop.death_markers import (
+    DeathMarkerList, DeathCounts, AttemptHistory, SessionStringLazy,
+    StartPosDeathCounts, StartPosAttemptHistory
+    )
+from gmdkit.models.prop.editor_stats import EditorStats
+from gmdkit.serialization.classes import DictField, FieldMetaclass, AliasAttr
 from gmdkit.serialization.mixins import PlistLoaderMixin
 from gmdkit.serialization.functions import decompress_string, compress_string
+
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
@@ -24,12 +30,16 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default="",
     )
 
-    object_string: ObjectString = DictField(
+    object_string: ObjectStringLazy = DictField(
         key="k4",
-        decoder=ObjectString,
-        encoder=get_string,
-        default_factory=ObjectString,
+        decoder=ObjectStringLazy.load_string,
+        encoder=ObjectStringLazy.save_string,
+        default_factory=ObjectStringLazy,
     )
+    
+    start: Object = AliasAttr("object_string.start")
+    
+    objects: ObjectList = AliasAttr("object_string.objects")
 
     creator: str = DictField(key="k5")
 
@@ -95,11 +105,11 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     is_auto: bool = DictField(key="k33", default=False)
 
-    replay_data: ReplayString = DictField(
+    replay_data: ReplayStringLazy = DictField(
         key="k34",
-        decoder=ReplayString,
-        encoder=get_string,
-        default_factory=ReplayString,
+        decoder=ReplayStringLazy.load_string,
+        encoder=ReplayStringLazy.save_string,
+        default_factory=ReplayStringLazy,
     )
 
     not_downloaded: bool = DictField(key="k35", default=False)
@@ -266,16 +276,18 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     clicks_best_points: int = DictField(key="k118")
 
-    replay_best_time: ReplayString = DictField(
+    replay_best_time: ReplayStringLazy = DictField(
         key="k119",
-        decoder=ReplayString,
-        default_factory=ReplayString,
+        decoder=ReplayStringLazy.load_string,
+        encoder=ReplayStringLazy.save_string,
+        default_factory=ReplayStringLazy,
     )
 
-    replay_best_points: ReplayString = DictField(
+    replay_best_points: ReplayStringLazy = DictField(
         key="k120",
-        decoder=ReplayString,
-        default_factory=ReplayString,
+        decoder=ReplayStringLazy.load_string,
+        encoder=ReplayStringLazy.save_string,
+        default_factory=ReplayStringLazy,
     )
 
     coins_best_time: int = DictField(key="k121")
@@ -291,41 +303,69 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         decoder=enums.ToggleCBS,
         default=enums.ToggleCBS.DEFAULT,
     )
-    # k126 - snowflake ID (base64 len 12)
+    
     snowflake_id: str = DictField(key="k126")
+    
     # k127
-    # k128 - gzipped string, platformer save
+    
     platformer_save: str = DictField(key="k128",decoder=decompress_string,encoder=compress_string)
-    # k129 - enable platformer saves (bool)
+    
     enable_platformer_save: bool = DictField("k129", default=False)
+    
     # k130 - int? plat save related
+    
     # k131 - gzipped string, plat save related?
     m_k131: str = DictField(key="k131",decoder=decompress_string,encoder=compress_string)
+    
     # k132 - int? plat save related
+    
     # k133 - int?
-    # k134
-    # k135
-    # k136 - int?
-    # k137
-    # k138 - int timestamp
-    # k139 - int timestamp
-    # k140 - string tuple of 4 ints
+    
+    death_counts: DeathCounts = DictField(key="k134",decoder=DeathCounts.from_string, encoder=DeathCounts.to_string, default_factory=DeathCounts)
+    
+    start_pos_death_counts: StartPosDeathCounts = DictField(key="k135",decoder=StartPosDeathCounts.from_string, encoder=StartPosDeathCounts.to_string, default_factory=StartPosDeathCounts)
+    
+    attempt_history: AttemptHistory = DictField(key="k136",decoder=AttemptHistory.from_string, encoder=AttemptHistory.to_string, default_factory=AttemptHistory)
+    
+    start_pos_attempt_history: StartPosAttemptHistory = DictField(key="k137",decoder=StartPosAttemptHistory.from_string, encoder=StartPosAttemptHistory.to_string, default_factory=StartPosAttemptHistory)
+    
+    session_start: int = DictField(key="k138")
+    
+    session_last_played: int = DictField(key="k139")
+    
+    death_markers: DeathMarkerList = DictField(key="k140",decoder=DeathMarkerList.from_string, encoder=DeathMarkerList.to_string, default_factory=DeathMarkerList)
+    
     # k141 - bool
-    # k142 - int
-    # k143 - int
+    
+    session_play_time: int = DictField(key="k142")
+    
+    total_play_time: int = DictField(key="k143")
+    
     # k144
-    # k145 - int
-    # k146
+    
+    completions: int = DictField(key="k145")
+    
+    archived_sessions: SessionStringLazy = DictField(key="k146",decoder=SessionStringLazy.load_string, encoder=SessionStringLazy.save_string)
+    
     # k147
+    
     # k148
+    
     # k149
+    
     # k150
+    
     # k151
-    # k152
+    
+    death_stats: str = DictField(key="k152")
+    
     # k153
+    
     # k154
+    
     # k155
-    # k156 - string tuple of 23 ints, array of editor stats?
+    
+    editor_stats: EditorStats = DictField(key="k156",decoder=EditorStats.from_string, encoder=EditorStats.to_string)
     
     editor_camera_x: float = DictField(key="kI1", default=0.0)
 
@@ -340,43 +380,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     editor_build_tab_pages: dict = DictField(key="kI6", default_factory=dict, is_node=True)
 
     editor_layer: int = DictField(key="kI7", default=0)
-    
-    @property
-    def start(self) -> Object:
-        objstr = self.object_string
-
-        if not hasattr(objstr, "start"):
-            objstr.load()
-
-        return getattr(objstr, "start")
-
-    @start.setter
-    def start(self, value: Object):
-        objstr = self.object_string
-
-        if not hasattr(objstr, "start"):
-            objstr.load()
-
-        setattr(objstr, "start", value)
-
-    @property
-    def objects(self) -> ObjectList:
-        objstr = self.object_string
-
-        if not hasattr(objstr, "objects"):
-            objstr.load()
-
-        return getattr(objstr, "objects")
-
-    @objects.setter
-    def objects(self, value: ObjectList):
-        objstr = self.object_string
-
-        if not hasattr(objstr, "objects"):
-            objstr.load()
-
-        setattr(objstr, "objects", value)
-    
+        
     @property
     def difficulty(self) -> enums.LevelDifficulty:
         """

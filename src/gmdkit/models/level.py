@@ -23,7 +23,7 @@ class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any])
     EXTENSION = "gdlvl"
     COMPRESSED = True
     COMPRESSION = "gzip"
-    SELECTORS = {"k4", "k34", "k119", "k120"}
+    #SELECTORS = {"k4", "k34", "k119", "k120"}
 
 
     def _name_fallback_(self):

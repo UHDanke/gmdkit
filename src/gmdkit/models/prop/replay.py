@@ -6,10 +6,13 @@ from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import (
     DelimiterMixin,
     ArrayDecoderMixin,
-    DataclassDecoderMixin
+    DataclassDecoderMixin,
+    FilePathMixin,
+    CompressFileMixin
     )
 from gmdkit.utils.enums import ReplayEventID
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
+from gmdkit.serialization.classes import LazyString
 from gmdkit.serialization.type_cast import to_string
 from gmdkit.models.prop.persistent import PersistentData
 from gmdkit.models.prop.checkpoint import CheckpointData
@@ -67,3 +70,17 @@ class ReplayEvents(DelimiterMixin, ArrayDecoderMixin, ListClass):
     DECODER = ReplayInput.from_string  
     ENCODER = ReplayInput.to_string
 
+@dataclass_decoder(slots=True, separator="#", from_array=True)
+class ReplayString(FilePathMixin,CompressFileMixin,DataclassDecoderMixin):
+    events: ReplayEvents = field_decoder(default_factory=ReplayEvents,
+        decoder=ReplayEvents.from_string, encoder=ReplayEvents.to_string)
+    metadata: ReplayInfo = field_decoder(default_factory=ReplayInfo,
+        decoder=ReplayInfo.from_string, encoder=ReplayInfo.to_string)
+
+ReplayString.MAX_SPLIT = 1
+ReplayString.EXTENSION = "txt"
+ReplayString.COMPRESSED = True
+ReplayString.COMPRESSION = "gzip"
+
+class ReplayStringLazy(LazyString):
+    PARSER = ReplayString

@@ -1,6 +1,7 @@
 # Imports
-from typing import Callable, Any, Optional, TypeVar, overload, Type, Union
+from typing import Callable, Any, Optional, TypeVar, overload, Type, Union, ClassVar, Self
 from collections import ChainMap
+from operator import attrgetter
 
 # Package Imports
 from gmdkit.utils.typing import MISSING
@@ -9,7 +10,78 @@ from gmdkit.serialization.functions import (
     read_plist, write_plist, codec_cast
     )
 
+ 
+class LazyString:
+    
+    __slots__ = ("string", "data")
+ 
+    PARSER: ClassVar[type]
+ 
+    def __init__(self, string: str = "", data: Optional[Any] = None):
+        self.string = string
+        self.data = data
+ 
+    @property
+    def loaded(self) -> bool:
+        return self.data is not None
+ 
+    def load(self) -> Any:
+        """Parse the string into data and return it."""
+        self.data = self.PARSER.from_string(self.string)
+        return self.data
+ 
+    def save(self) -> str:
+        if self.data is not None:
+            self.string = self.data.to_string()
+        return self.string
+ 
+    @classmethod
+    def load_string(cls, string: str) -> Self:
+        return cls(string)
+ 
+    def save_string(self) -> str:
+        return self.save()
+    
+    def __repr__(self) -> str:
+        string = self.string if len(self.string) <= 40 else self.string[:37] + "..."
+        state = f"<{type(self.data).__name__}>" if self.loaded else "<unloaded>"
+        return f"{type(self).__name__}({string!r}, {state})"
+ 
+class LazyAttr:
+    
+    def __init__(self, name: str = None):
+        self.name = name
 
+    def __set_name__(self, owner, name):
+        self.name = self.name or name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        if instance.data is None:
+            instance.load()
+        return getattr(instance.data, self.name)
+
+    def __set__(self, instance, value):
+        if instance.data is None:
+            instance.load()
+        setattr(instance.data, self.name, value)
+
+class AliasAttr:
+    
+    def __init__(self, path: str):
+        self.path = path
+        *parent, self.attr = path.split(".")
+        self.parent = attrgetter(".".join(parent)) if parent else (lambda obj: obj)
+
+    def __get__(self, instance: Any, owner: type) -> Any:
+        if instance is None:
+            return self
+        return getattr(self.parent(instance), self.attr)
+
+    def __set__(self, instance: Any, value: Any) -> None:
+        setattr(self.parent(instance), self.attr, value)
+        
 class BaseInterface:
     CONTAINER = "obj"
 

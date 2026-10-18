@@ -45,7 +45,7 @@ from .dpad import MoveButton, JumpButton, SingleLayout, DualLayout
 from .events import EventList
 from .groups import IDList
 from .guideline import Guideline, GuidelineList
-from .gzip import GzipString, ObjectString, ReplayString
+from .gzip import GzipString
 from .hsv import HSV
 from .list import IntList, IntPair, IntPairList
 from .particle import Particle

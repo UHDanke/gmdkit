@@ -62,15 +62,15 @@ class StartPosition(EffectObject):
     reverse_mode: bool = Field('kA20')
     inactive: bool = Field('kA21')
     target_channel: int = Field('kA26')
-    mirror_mode: bool = Field('kA28')
     rotate_mode: bool = Field('kA29')
     reset_camera: bool = Field('kA35')
     free_mode: bool = Field('kA49')
     online: bool = Field('kA50')
-    p2_group_id: bool = Field('kA51')
+    p2_group_id: int = Field('kA51')
     y_velocity: float = Field('kA52')
     name: str = Field('kA53')
     spawn_group_id: int = Field('kA54')
+    mirror_mode: bool = Field('kA63')
 
 
 # DashOrbObject

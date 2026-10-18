@@ -714,18 +714,19 @@ class DelimiterMixin:
 
     def to_string(
             self,
+            skip_delimiter:bool=False,
             **kwargs
             ) -> str:
 
         string = super().to_string(**kwargs)
 
-        if not string:
+        if skip_delimiter or not string:
             return string
 
         cls = type(self)
         start_delim = cls.START_DELIMITER
         end_delim = cls.END_DELIMITER
-
+        
         if start_delim and end_delim:
             string = f"{start_delim}{string}{end_delim}"
         elif start_delim:
