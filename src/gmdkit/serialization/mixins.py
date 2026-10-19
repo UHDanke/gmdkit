@@ -313,14 +313,16 @@ class PlistDecoderMixin(FileStringMixin):
 
 
 class DataclassDecoderMixin:
-
+ 
     ENCODER: ClassVar[Optional[StringDictEncoder]] = staticmethod(dict_serializer)
     DECODER: ClassVar[Optional[StringDictDecoder]] = None
     CONDITION: ClassVar[Optional[KeyValueCondition]] = None
     FROM_ARRAY: ClassVar[bool] = True
     SEPARATOR: ClassVar[str] = ','
+    PAIR_SEPARATOR: ClassVar[Optional[str]] = None
+    SINGLE_SPLIT: ClassVar[bool] = False
     MAX_SPLIT: ClassVar[Optional[int]] = None
-
+ 
     @classmethod
     def from_tokens(
             cls,
@@ -328,21 +330,21 @@ class DataclassDecoderMixin:
             decoder:Optional[StringDictDecoder]=None,
             **kwargs
             ) -> Self:
-
+ 
         from_array = cls.FROM_ARRAY
         decoder = cls.DECODER if decoder is None else decoder
-
+ 
         f = get_fields(cls)
         length = len(tokens)
         f_len = len(f) if from_array else len(f) * 2
-
+ 
         if length > f_len:
             raise ValueError(
                 f"[{cls.__name__}] expected at most {f_len} tokens, got {length}"
             )
-
+ 
         class_args = {}
-
+ 
         if from_array:
             if decoder is None:
                 class_args = {field.name: token for field, token in zip(f, tokens)}
@@ -363,7 +365,7 @@ class DataclassDecoderMixin:
                 )
             field_names = get_field_names(cls)
             it = iter(tokens)
-
+ 
             if decoder is None:
                 for key, value in zip(it, it):
                     if key not in field_names:
@@ -378,27 +380,27 @@ class DataclassDecoderMixin:
                             f"[{cls.__name__}] failed to decode key '{raw_key}'"
                         ) from e
                     if key not in field_names:
-                        raise ValueError(f"[{cls.__name__}] got unexpected field '{key}'")
+                        raise ValueError(f"[{cls.__name__}] got unexpected field '{raw_key}'")
                     class_args[key] = value
-
+ 
         return cls(**class_args)
-
-
+ 
+ 
     def to_tokens(
             self,
             condition:Optional[Callable]=None,
             encoder:Optional[StringDictEncoder]=None
             ) -> Sequence[str]:
-
+ 
         cls = type(self)
         from_array = cls.FROM_ARRAY
         condition = cls.CONDITION if condition is None else condition
         encoder = cls.ENCODER if encoder is None else encoder
-
+ 
         field_data = [
             (key, getattr(self, key)) for key in get_field_names_ordered(cls)
             ]
-
+ 
         if condition is not None:
             if from_array:
                 end = len(field_data)
@@ -410,7 +412,7 @@ class DataclassDecoderMixin:
                 field_data = field_data[:end]
             else:
                 field_data = [(k, v) for k, v in field_data if not condition(k, v)]
-
+ 
         parts = []
         if encoder is None:
             for key, value in field_data:
@@ -428,33 +430,68 @@ class DataclassDecoderMixin:
                 if not from_array:
                     parts.append(ek)
                 parts.append(ev)
-
+ 
         return parts
-
-
+ 
+ 
     @classmethod
     def from_string(
             cls,
             string:str,
             **kwargs
             ) -> Self:
-
+ 
         separator = cls.SEPARATOR
+        pair_separator = cls.PAIR_SEPARATOR
         max_split = cls.MAX_SPLIT
-
+ 
         if not string:
             return cls()
-
+ 
+        if pair_separator:
+            if cls.SINGLE_SPLIT:
+                entries = string.split(separator, -1 if max_split is None else max_split)
+                keys, seps, values = zip(*[e.partition(pair_separator) for e in entries])
+ 
+                if "" in seps:
+                    for i, (k, sep) in enumerate(zip(keys, seps)):
+                        if not sep and k:
+                            raise ValueError(
+                                f"[{cls.__name__}] entry {i} {k!r} has no pair separator {pair_separator!r}"
+                            )
+                    pairs = [(k, v) for k, sep, v in zip(keys, seps, values) if sep]
+                    keys = [k for k, _ in pairs]
+                    values = [v for _, v in pairs]
+ 
+                tokens = [None] * (2 * len(keys))
+                tokens[0::2] = keys
+                tokens[1::2] = values
+            else:
+                if max_split is not None:
+                    raise TypeError(f"[{cls.__name__}] MAX_SPLIT with PAIR_SEPARATOR requires SINGLE_SPLIT")
+                tokens = string.replace(pair_separator, separator).split(separator)
+ 
+            return cls.from_tokens(tokens, **kwargs)
+ 
         if not separator:
             tokens = [*string[:max_split], string[max_split:]] if max_split is not None else list(string)
         else:
             tokens = string.split(separator, -1 if max_split is None else max_split)
-
+ 
         return cls.from_tokens(tokens,**kwargs)
-
-
+ 
+ 
     def to_string(self,**kwargs) -> str:
-        return type(self).SEPARATOR.join(self.to_tokens(**kwargs))
+        cls = type(self)
+        tokens = self.to_tokens(**kwargs)
+        pair_separator = cls.PAIR_SEPARATOR
+ 
+        if pair_separator:
+            it = iter(tokens)
+            return cls.SEPARATOR.join(map(pair_separator.join, zip(it, it)))
+ 
+        return cls.SEPARATOR.join(tokens)
+ 
 
 
 class DictDecoderMixin:
@@ -465,6 +502,8 @@ class DictDecoderMixin:
     CONDITION: ClassVar[Optional[KeyValueCondition]] = None
     SEPARATOR: ClassVar[str] = ','
     PAIR_SEPARATOR: ClassVar[Optional[str]] = None
+    SINGLE_SPLIT: ClassVar[Optional[bool]] = None
+    SORT_KEYS: ClassVar[bool] = False
 
     @classmethod
     def from_tokens(
@@ -514,6 +553,7 @@ class DictDecoderMixin:
         encoder = cls.ENCODER if encoder is None else encoder
         condition = cls.CONDITION if condition is None else condition
         container = cls.CONTAINER if container is None else container
+        sort_keys = cls.SORT_KEYS if sort_keys is None else sort_keys
         data = self if container is None else getattr(self, container)
 
         result = []
@@ -546,10 +586,25 @@ class DictDecoderMixin:
 
         separator = cls.SEPARATOR
         pair_separator = cls.PAIR_SEPARATOR
+        single_split = cls.SINGLE_SPLIT
     
         if string == "":
             return cls()
     
+        if pair_separator and single_split:
+            keys, seps, values = zip(*[e.partition(pair_separator) for e in string.split(separator)])
+
+            if "" in seps:
+                for i, (k, s) in enumerate(zip(keys, seps)):
+                    if not s and k:
+                        raise ValueError(
+                            f"[{cls.__name__}] entry {i} {k!r} has no pair separator {pair_separator!r}"
+                        )
+            tokens = [None] * (2 * len(keys))
+            tokens[0::2] = keys
+            tokens[1::2] = values
+            return cls.from_tokens(tokens, **kwargs)
+
         if pair_separator:
             string = string.replace(pair_separator, separator)
     

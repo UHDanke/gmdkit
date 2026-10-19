@@ -322,13 +322,16 @@ def dataclass_decoder(
     condition: Optional[Callable] = ...,
     separator: Optional[str] = ...,
     from_array: Optional[bool] = ...,
+    pair_separator: Optional[str] = ...,
+    single_split: Optional[bool] = ...,
+    max_split: Optional[int] = ...,
     auto_key: Optional[Callable] = ...,
     default_optional: bool = ...,
     default_kwargs: bool = ...,
     **kwargs,
 ) -> type[_T]: ...
-
-
+ 
+ 
 @overload
 def dataclass_decoder(
     cls: None = None,
@@ -338,13 +341,16 @@ def dataclass_decoder(
     condition: Optional[Callable] = ...,
     separator: Optional[str] = ...,
     from_array: Optional[bool] = ...,
+    pair_separator: Optional[str] = ...,
+    single_split: Optional[bool] = ...,
+    max_split: Optional[int] = ...,
     auto_key: Optional[Callable] = ...,
     default_optional: bool = ...,
     default_kwargs: bool = ...,
     **kwargs,
 ) -> Callable[[type[_T]], type[_T]]: ...
-
-
+ 
+ 
 def dataclass_decoder(
         cls=None,
         decoder:Optional[StringDictDecoder]=None,
@@ -352,30 +358,50 @@ def dataclass_decoder(
         condition:Optional[Callable]=None,
         separator:Optional[str]=None,
         from_array:Optional[bool]=None,
+        pair_separator:Optional[str]=None,
+        single_split:Optional[bool]=None,
+        max_split:Optional[int]=None,
         auto_key: Optional[Callable] = None,
         default_optional: bool = False,
         default_kwargs: bool = False,
         *args,
         **kwargs
         ):
-
+ 
     def wrap(cls):
         cls = dataclass(cls, *args, **kwargs)
         hints = get_type_hints(cls, globalns=vars(sys.modules[cls.__module__]))
-
+ 
         if separator is not None:
             cls.SEPARATOR = separator
-
+ 
         if from_array is not None:
             cls.FROM_ARRAY = from_array
-
+ 
+        if pair_separator is not None:
+            cls.PAIR_SEPARATOR = pair_separator
+ 
+        if single_split is not None:
+            cls.SINGLE_SPLIT = single_split
+ 
+        if max_split is not None:
+            cls.MAX_SPLIT = max_split
+ 
+        if getattr(cls, "PAIR_SEPARATOR", None):
+            if getattr(cls, "FROM_ARRAY", True):
+                raise TypeError(f"{cls.__name__}: pair_separator requires from_array=False")
+            if getattr(cls, "MAX_SPLIT", None) is not None and not getattr(cls, "SINGLE_SPLIT", False):
+                raise TypeError(f"{cls.__name__}: pair_separator with max_split requires single_split=True")
+            if cls.PAIR_SEPARATOR == getattr(cls, "SEPARATOR", None):
+                raise TypeError(f"{cls.__name__}: pair_separator must differ from separator")
+ 
         dkey_dict = {}
         ekey_dict = {}
         cond_dict = {}
         decoders = {}
         encoders = {}
         has_kwargs = set()
-
+ 
         fields = get_fields(cls)
         for i, f in enumerate(fields,start=1):
             meta = f.metadata
@@ -383,28 +409,28 @@ def dataclass_decoder(
             key = meta.get("key")
             if key is None and auto_key is not None:
                 key = auto_key(i)
-
+ 
             ft = hints[f.name]
-
+ 
             if key is not None and name != key:
                 if key in dkey_dict:
                     raise ValueError(f"duplicate serialization key: {key!r}")
                 dkey_dict[key] = name
                 ekey_dict[name] = key
-
+ 
             decoders[name] = meta.get("decoder") or decoder_from_type(ft)
             encoders[name] = meta.get("encoder") or encoder_from_type(ft)
-
-
+ 
+ 
             allow_kwargs = meta.get("allow_kwargs")
             allow_kwargs = default_kwargs if allow_kwargs is None else allow_kwargs
-
+ 
             if allow_kwargs:
                 has_kwargs.add(name)
-
+ 
             optional = meta.get("optional")
             optional = default_optional if optional is None else optional
-
+ 
             if optional:
                 if f.default_factory is not MISSING:
                     default = f.default_factory()
@@ -413,7 +439,7 @@ def dataclass_decoder(
                 else:
                     default = None
                 cond_dict[name] = default
-
+ 
         cls.DECODER = staticmethod(
             decoder or dict_cast(
                 decoders,
@@ -421,7 +447,7 @@ def dataclass_decoder(
                 allow_kwargs=has_kwargs
                 )
             )
-
+ 
         cls.ENCODER = staticmethod(
             encoder or dict_cast(
                 encoders,
@@ -429,17 +455,17 @@ def dataclass_decoder(
                 allow_kwargs=has_kwargs
         		)
             )
-
+ 
         if cond_dict:
             def is_default(key, value):
                 return key in cond_dict and cond_dict[key] == value
         else:
             is_default = None
-
+ 
         cls.CONDITION = staticmethod(condition or is_default)
-
+ 
         return cls
-
+ 
     return wrap if cls is None else wrap(cls)
 
 

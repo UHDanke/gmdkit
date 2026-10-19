@@ -11,7 +11,7 @@ from gmdkit.utils.typing import NumKey
 get_string = attrgetter("string")
 
 def to_bool(string:str) -> bool:
-    return string == "1"
+    return int(string or 0) != 0
 
 def from_bool(obj:bool) -> str:
     return "1" if obj else "0"

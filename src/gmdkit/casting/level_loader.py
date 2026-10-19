@@ -9,6 +9,7 @@ from gmdkit.models.prop.death_markers import (
     DeathMarkerList, DeathCounts, AttemptHistory, SessionStringLazy,
     StartPosDeathCounts, StartPosAttemptHistory, GlobalDeathDataLazy
     )
+from gmdkit.models.prop.controls import LevelControls
 from gmdkit.models.prop.editor_stats import EditorStats
 from gmdkit.serialization.classes import DictField, FieldMetaclass, AliasAttr
 from gmdkit.serialization.mixins import PlistLoaderMixin
@@ -349,11 +350,19 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     archived_sessions: SessionStringLazy = DictField(key="k146",decoder=SessionStringLazy.load_string, encoder=SessionStringLazy.save_string)
     
-    # TODO k147 base64 str, creator controls layout
-    
+    creator_controls: LevelControls = DictField(
+        key="k147",
+        decoder=LevelControls.from_base64,
+        encoder=LevelControls.to_base64,
+        )
+
     creator_controls_version: int = DictField(key="k148")
-    
-    # TODO k149 base64 str, custom controls layout
+
+    custom_controls: LevelControls = DictField(
+        key="k149",
+        decoder=LevelControls.from_base64,
+        encoder=LevelControls.to_base64,
+        )
 
     custom_controls_source: int = DictField(
         key="k150",

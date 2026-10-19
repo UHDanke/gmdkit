@@ -1,5 +1,5 @@
 # Package Imports
-from enum import IntEnum
+from enum import IntEnum, IntFlag
 
 
 class EnumClass(IntEnum):
@@ -28,6 +28,11 @@ class EnumClass(IntEnum):
             cls._value2member_map_[v] = member
         return member
 
+class FlagClass(IntFlag):
+
+    @classmethod
+    def from_string(cls, string: str):
+        return cls(int(string))
 
 class ObjectID(IntEnum):
     LEVEL_SETTINGS = 0
@@ -883,7 +888,7 @@ class ControlSource(EnumClass):
     CREATOR = 0
     CUSTOM = 1
 
-class ControlType(EnumClass):
+class ControlType(FlagClass):
     NONE = 0
     KEYBOARD = 1
     TOUCH = 2
