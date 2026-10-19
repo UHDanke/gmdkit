@@ -20,6 +20,18 @@ class LazyString:
     def __init__(self, string: str = "", data: Optional[Any] = None):
         self.string = string
         self.data = data
+    
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        
+        reserved = {name for klass in LazyString.__mro__ for name in vars(klass)
+                    if not name.startswith("__")} - {"PARSER"}
+        clashes = sorted(reserved & vars(cls).keys())
+        if clashes:
+            raise TypeError(
+                f"{cls.__name__} redefines reserved LazyString attribute(s) {clashes}; "
+                f"use another name, e.g. `my_{clashes[0]} = LazyAttr({clashes[0]!r})`"
+            )
  
     @property
     def loaded(self) -> bool:

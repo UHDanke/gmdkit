@@ -118,15 +118,20 @@ class GlobalDeathMarker(DataclassDecoderMixin):
     death_glow: int = 0
     wall_glow: int = 0
     
-
-class GlobalDeathMarkerList(ArrayDecoderMixin,ListClass[GlobalDeathMarker]):
-
+class GlobalDeathMarkerList(ArrayDecoderMixin, ListClass[GlobalDeathMarker]):
     __slots__ = ()
-
-    SEPARATOR = ","
+    SEPARATOR = ";"
     GROUP_SIZE = 9
-    DECODER = DeathMarker.from_tokens
-    ENCODER = DeathMarker.to_tokens
+    DECODER = GlobalDeathMarker.from_tokens
+    ENCODER = GlobalDeathMarker.to_tokens
+
+    @classmethod
+    def from_string(cls, string, **kwargs):
+        # the game also accepts ',' between values
+        new = super().from_string(string.replace(",", ";"), **kwargs)
+        assert type(new) is cls
+        return new
+    
     
 @dataclass_decoder(slots=True, separator="|", from_array=True, default_optional=True)
 class GlobalDeathString(CompressFileMixin, DataclassDecoderMixin):
@@ -154,7 +159,7 @@ GlobalDeathString.COMPRESSION = "gzip"
 class GlobalDeathData(DataclassDecoderMixin):
     level_id: int = 0
     data_version: int = 0
-    data: GlobalDeathString = field_decoder(
+    death_string: GlobalDeathString = field_decoder(
         default_factory=GlobalDeathString,
         decoder=GlobalDeathString.from_string,
         encoder=GlobalDeathString.to_string
@@ -167,5 +172,5 @@ class GlobalDeathDataLazy(LazyString):
     
     level_id: int = LazyAttr()
     data_version: int = LazyAttr()
-    data: GlobalDeathString = LazyAttr()
+    death_string: GlobalDeathString = LazyAttr()
     

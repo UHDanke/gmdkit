@@ -13,7 +13,7 @@ class EditorStats(DataclassDecoderMixin):
     edit_popups_opened: int = 0
     undo_redo: int = 0
     playtest_count: int = 0
-    playtest_time: int = 0          # seconds (float in memory, saved as int)
+    playtest_time: int = 0
     editor_frames: int = 0
     action_gap_0_1: int = 0
     action_gap_2_3: int = 0
@@ -25,7 +25,7 @@ class EditorStats(DataclassDecoderMixin):
     action_gap_128_plus: int = 0
     editor_inputs: int = 0
     editor_sessions: int = 0
-    first_open: int = 0             # unix timestamp (uint64)
+    first_open: int = 0
     original_level_id: int = 0
     original_level_version: int = 0
 
