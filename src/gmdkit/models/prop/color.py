@@ -7,15 +7,60 @@ from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.defaults.color_ids import default_color
 from gmdkit.utils.enums import TargetPlayer
-from gmdkit.models.prop.hsv import HSV
 
+@dataclass_decoder(slots=True, separator='a', from_array=True)
+class HSV(DataclassDecoderMixin):
+    
+    hue: float = 0
+    saturation: float = 1
+    value: float = 1
+    saturation_add: bool = False
+    value_add: bool = False
+    
 
 @dataclass_decoder(slots=True, from_array=False, separator="_", auto_key=str)
-class Color(DataclassDecoderMixin):
-
+class RGB(DataclassDecoderMixin):
     red: int = 0
     green: int = 0
     blue: int = 0
+    
+    def set_rgb(
+            self,
+            red:Optional[int]=None,
+            green:Optional[int]=None,
+            blue:Optional[int]=None
+            ):
+        if red is not None:
+            self.red = red
+
+        if green is not None:
+            self.green = green
+
+        if blue is not None:
+            self.blue = blue
+            
+    def get_rgb(self) -> tuple[int,int,int]:
+        return tuple(self.red,self.green,self.blue)
+
+    def set_hex(self, hex_string):
+        hex_string = hex_string.lstrip("#")
+        if len(hex_string) != 6:
+            raise ValueError("Invalid hex string.")
+
+        r = int(hex_string[0:2], 16)
+        g = int(hex_string[2:4], 16)
+        b = int(hex_string[4:6], 16)
+        self.set_rgb(r, g, b)
+
+    def get_hex(self) -> tuple[int,int,int]:
+        r, g, b, _ = self.get_rgb()
+        return "#{:02X}{:02X}{:02X}".format(r, g, b)
+    
+
+
+@dataclass_decoder(slots=True, from_array=False, separator="_", auto_key=str)
+class Color(RGB):
+
     player: TargetPlayer = field_decoder(default=TargetPlayer.NONE,decoder=TargetPlayer.from_string,encoder=str)
     blending: bool = field_decoder(default=False,optional=True)
     channel: int = 0
@@ -57,46 +102,6 @@ class Color(DataclassDecoderMixin):
         elif channel in {1005,1006,1008}:
             return True
 
-    def set_rgba(
-            self,
-            red:Optional[int]=None,
-            green:Optional[int]=None,
-            blue:Optional[int]=None,
-            alpha:Optional[float]=None
-            ):
-        if red is not None:
-            self.red = red
-
-        if green is not None:
-            self.green = green
-
-        if blue is not None:
-            self.blue = blue
-
-        if alpha is not None:
-            self.opacity = alpha
-
-    def get_rgba(self) -> tuple[int,int,int,float]:
-        r = self.red
-        g = self.green
-        b = self.blue
-        a = self.opacity
-        return (r,g,b,a)
-
-    def set_hex(self, hex_string):
-        hex_string = hex_string.lstrip("#")
-        if len(hex_string) != 6:
-            raise ValueError("Invalid hex string.")
-
-        r = int(hex_string[0:2], 16)
-        g = int(hex_string[2:4], 16)
-        b = int(hex_string[4:6], 16)
-        self.set_rgba(r, g, b)
-
-    def get_hex(self) -> tuple[int,int,int]:
-        r, g, b, _ = self.get_rgba()
-        return "#{:02X}{:02X}{:02X}".format(r, g, b)
-    
     def has_hsv(self) -> bool:
         return not type(self).CONDITION("hsv",v=self.hsv)
 

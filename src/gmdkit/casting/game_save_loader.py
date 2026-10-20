@@ -7,7 +7,7 @@ from gmdkit.models.prop.dpad import (
     MoveButton, JumpButton,
     SingleLayout, DualLayout
 )
-from gmdkit.models.prop.song_info import SongInfoList
+from gmdkit.models.prop.audio_info import SongInfoList, RecentSFXList, UseCountDict
 from gmdkit.models.custom_sfx import CustomSFXLibrary
 from gmdkit.serialization.classes import DictField, FieldMetaclass
 from gmdkit.serialization.mixins import PlistLoaderMixin
@@ -17,6 +17,9 @@ from gmdkit.models.prop.plist import (
     PlistDict
 )
 from gmdkit.models.prop.likes import LikeDict
+from gmdkit.models.prop.list import StrList, IntList
+from gmdkit.models.keybinds import KeybindDict
+from gmdkit.models.prop.editor_sfx import EditorSFXString
 from gmdkit.utils import enums
 
 
@@ -164,7 +167,6 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default_factory=CustomSFXLibrary,
         decoder=CustomSFXLibrary.from_string,
         encoder=CustomSFXLibrary.to_string,
-        is_node=True,
     )
 
     custom_objects: ObjectGroupDict = DictField(
@@ -518,8 +520,6 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         is_node=True,
     )
 
-    active_path: str = DictField(key="GS_26", default="")
-
     list_rewards: dict = DictField(
         key="GS_27",
         default_factory=dict,
@@ -579,3 +579,128 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     latest_weekly_id: int = DictField(key="GLM_25")
     
     latest_event_id: int = DictField(key="GLM_26")
+    
+    show_bpm_markers: bool = DictField(key="showBPMMarkers", default=False)
+ 
+    record_gameplay: bool = DictField(key="recordGameplay", default=False)
+ 
+    opened_name: bool = DictField(key="clickedName", default=False)
+ 
+    showed_diff_rate_dialog: bool = DictField(key="showedRateDiffDialog", default=False)
+ 
+    id_name_sort_mode: int = DictField(key="idNameSortMode", default=0)
+ 
+    # emote names, newest first, max 15 (GameManager::addRecentEmote)
+    recent_emotes: StrList = DictField(
+        key="recentEmotes",
+        default_factory=StrList,
+        decoder=StrList.from_string,
+        encoder=StrList.to_string,
+    )
+ 
+    # device-local value keeper (e.g. autoBackupDir); not synced with the account
+    local_keeper: dict = DictField(
+        key="localKeeper",
+        default_factory=dict,
+        is_node=True,
+    )
+ 
+    # editor window states: ws_<i>_k / _cx / _cy / _w / _h / _s / _so / _v, i < winStateCount.
+    # The ws_ keys are numbered flat keys, so only the count is a field.
+    window_state_count: int = DictField(key="winStateCount", default=0)
+ 
+    # ------------------------------------------------------------------ GameLevelManager
+ 
+    # last seen gauntlet count ("new gauntlets" badge)
+    latest_gauntlet_count: int = DictField(key="GLM_27")
+ 
+    # GLM_24-27 initialized from the first content-status response
+    latest_ids_initialized: bool = DictField(key="GLM_28", default=False)
+ 
+    # ------------------------------------------------------------------ GameStatsManager
+ 
+    daily_recall_unlocks: dict = DictField(
+        key="GS_33",
+        default_factory=dict,
+        is_node=True,
+    )
+ 
+    # ------------------------------------------------------------------ MusicDownloadManager
+ 
+    favorite_sfx: IntList = DictField(
+        key="MDLM_004",
+        default_factory=IntList,
+        decoder=IntList.from_string,
+        encoder=IntList.to_string,
+    )
+ 
+    favorite_songs: IntList = DictField(
+        key="MDLM_005",
+        default_factory=IntList,
+        decoder=IntList.from_string,
+        encoder=IntList.to_string,
+    )
+ 
+    recent_sfx: RecentSFXList = DictField(
+        key="MDLM_006",
+        default_factory=RecentSFXList,
+        decoder=RecentSFXList.from_string,
+        encoder=RecentSFXList.to_string,
+    )
+ 
+    # newest first, max 20
+    recent_songs: IntList = DictField(
+        key="MDLM_007",
+        default_factory=IntList,
+        decoder=IntList.from_string,
+        encoder=IntList.to_string,
+    )
+ 
+    sfx_use_counts: UseCountDict = DictField(
+        key="MDLM_008",
+        default_factory=UseCountDict,
+        decoder=UseCountDict.from_string,
+        encoder=UseCountDict.to_string,
+    )
+ 
+    song_use_counts: UseCountDict = DictField(
+        key="MDLM_009",
+        default_factory=UseCountDict,
+        decoder=UseCountDict.from_string,
+        encoder=UseCountDict.to_string,
+    )
+ 
+    # custom SFX library node IDs
+    favorite_custom_sfx: IntList = DictField(
+        key="MDLM_011",
+        default_factory=IntList,
+        decoder=IntList.from_string,
+        encoder=IntList.to_string,
+    )
+ 
+    keybinds_version: int = DictField(key="GJKB_Version", default=2)
+ 
+    keybinds: KeybindDict = DictField(
+        key="GJKB_Binds",
+        default_factory=KeybindDict,
+        decoder=KeybindDict.from_string,
+        encoder=KeybindDict.to_string,
+    )
+ 
+    editor_sfx_version: int = DictField(key="editorSFXVersion", default=1)
+ 
+    editor_sfx: EditorSFXString = DictField(
+        key="editorSFX",
+        default_factory=EditorSFXString,
+        decoder=EditorSFXString.from_string,
+        encoder=EditorSFXString.to_string,
+    )
+ 
+    editor_sfx_favorite_count: int = DictField(key="editorSFXFavoriteCount", default=0)
+ 
+    editor_sfx_my_count: int = DictField(key="editorSFXMyCount", default=0)
+ 
+    editor_sfx_next_local_id: int = DictField(key="editorSFXNextLocalID", default=0)
+    
+    active_path: int = DictField(key="GS_26", default=0)
+ 

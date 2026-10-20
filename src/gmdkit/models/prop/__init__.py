@@ -11,7 +11,6 @@ __all__ = (
     "IDList",
     "Guideline",
     "GuidelineList",
-    "GzipString",
     "ObjectString",
     "ReplayString",
     "HSV",
@@ -40,13 +39,11 @@ __all__ = (
 )
 
 from .checkpoint import CheckpointData
-from .color import Color, ColorList
+from .color import HSV, Color, ColorList
 from .dpad import MoveButton, JumpButton, SingleLayout, DualLayout
 from .events import EventList
 from .groups import IDList
 from .guideline import Guideline, GuidelineList
-from .gzip import GzipString
-from .hsv import HSV
 from .list import IntList, IntPair, IntPairList
 from .particle import Particle
 from .persistent import ItemDict, TimerDict, PersistentData
@@ -55,5 +52,5 @@ from .random import RandomWeightsList
 from .remaps import RemapChain, RemapData, RemapList
 from .replay import ReplayInfo, ReplayEvent, CheckpointEvent, ReplayInput, ReplayEvents
 from .sequence import SequenceList
-from .song_info import SongInfo, SongInfoList
+from .audio_info import SongInfo, SongInfoList
 from .timer import TimerData

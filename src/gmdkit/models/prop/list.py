@@ -14,6 +14,13 @@ class IntList(ArrayDecoderMixin,ListClass[int]):
     ENCODER = str
 
 
+class StrList(ArrayDecoderMixin, ListClass[str]):
+ 
+    __slots__ = ()
+ 
+    SEPARATOR = ","
+
+
 @dataclass_decoder(slots=True, separator="~", from_array=True)
 class IntPair(DataclassDecoderMixin):
     key: int = 0

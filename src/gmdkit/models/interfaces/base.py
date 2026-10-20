@@ -4,7 +4,7 @@ from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.casting.object_loader import FieldLoaderMixin
 from gmdkit.models.prop.groups import IDList
 from gmdkit.models.prop.guideline import GuidelineList
-from gmdkit.models.prop.hsv import HSV
+from gmdkit.models.prop.color import HSV
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
 from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary, CustomSFXFolderIDList

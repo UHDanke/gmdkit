@@ -9,8 +9,8 @@ from gmdkit.serialization.mixins import (
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.serialization.classes import FieldMetaclass, DictField
-from gmdkit.serialization.type_cast import to_bool, from_bool, from_float, serialize, to_string
-from gmdkit.models.prop.custom_sfx import CustomSFXMappingList
+from gmdkit.serialization.type_cast import to_bool, from_bool, from_float, serialize
+from gmdkit.models.custom_sfx import CustomSFXMappingList
 
 
 class EditorSFXAction(EnumClass):
@@ -113,14 +113,6 @@ class EditorSFXPlayMode(EnumClass):
     IN_ORDER = 1
 
 
-class EditorSFXDict(DictDecoderMixin, DictClass[int, Any], metaclass=FieldMetaclass):
-    SEPARATOR = ","
-    KEY_DECODER = int
-    KEY_ENCODER = str
-    DEFAULT_DECODER = None
-    DEFAULT_ENCODER = staticmethod(serialize)
-
-
 class EditorSFXSound(DictDecoderMixin, DictClass[int, Any], metaclass=FieldMetaclass):
     SEPARATOR = ","
     KEY_DECODER = int
@@ -168,81 +160,54 @@ class EditorSFXBinding(DictDecoderMixin, DictClass[int, Any], metaclass=FieldMet
     play_mode: EditorSFXPlayMode = DictField(
         key=2, decoder=EditorSFXPlayMode.from_string, default=EditorSFXPlayMode.RANDOM
         )
-    min_interval: float = DictField(key=3, decoder=float, encoder=from_float, default=0.0)   # s
+    min_interval: float = DictField(key=3, decoder=float, encoder=from_float, default=0.0)
+    
 
-    def __init__(self, *args, sounds=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.sounds = EditorSFXSoundList() if sounds is None else EditorSFXSoundList(sounds)
+@dataclass_decoder(slots=True, from_array=True, separator=";")
+class EditorSFXSoundBinding(DataclassDecoderMixin):
+    binding: EditorSFXBinding = field_decoder(decoder=EditorSFXBinding.from_string,encoder=EditorSFXBinding.to_string,default_factory=EditorSFXBinding)
+    sounds: EditorSFXSoundList = field_decoder(
+        decoder=EditorSFXSoundList.from_string,
+        encoder=EditorSFXSoundList.to_string,
+        default_factory=EditorSFXSoundList,
+        )
 
-    @classmethod
-    def from_group(cls, tokens) -> "EditorSFXBinding":
-        header, sounds = tokens
-        result = cls.from_string(header)
-        result.sounds = EditorSFXSoundList.from_string(sounds)
-        return result
-
-    def to_group(self) -> list[str]:
-        return [self.to_string(), self.sounds.to_string()]
-
-    def __eq__(self, other):
-        return dict.__eq__(self, other) and getattr(other, "sounds", None) == self.sounds
-
-    __hash__ = None
-
-
-class EditorSFXBindingList(DelimiterMixin, ArrayDecoderMixin, ListClass[EditorSFXBinding]):
+class EditorSFXSoundBindingList(DelimiterMixin, ArrayDecoderMixin, ListClass[EditorSFXBinding]):
     __slots__ = ()
 
     SEPARATOR = ";"
     END_DELIMITER = ";"
     GROUP_SIZE = 2
-    DECODER = EditorSFXBinding.from_group
-    ENCODER = EditorSFXBinding.to_group
+    DECODER = EditorSFXSoundBinding.from_tokens
+    ENCODER = EditorSFXSoundBinding.to_tokens
 
     def get_action(self, action: int):
         for b in self:
-            if b.action == action:
+            if b.binding.action == action:
                 return b
         return None
 
 
 @dataclass_decoder(slots=True, from_array=True, separator="M|")
-class EditorSFXBindingsMappings(DataclassDecoderMixin):
+class EditorSFXBindingMapping(DataclassDecoderMixin):
 
-    bindings: EditorSFXBindingList = field_decoder(
-        default_factory=EditorSFXBindingList,
-        decoder=EditorSFXBindingList.from_string, encoder=EditorSFXBindingList.to_string
+    bindings: EditorSFXSoundBindingList = field_decoder(
+        default_factory=EditorSFXSoundBindingList,
+        decoder=EditorSFXSoundBindingList.from_string, encoder=EditorSFXSoundBindingList.to_string
         )
     mappings: CustomSFXMappingList = field_decoder(
         default_factory=CustomSFXMappingList,
-        decoder=CustomSFXMappingList.from_string, encoder=CustomSFXMappingList.to_string
+        decoder=CustomSFXMappingList.from_string, encoder=CustomSFXMappingList.to_string,
+        optional=True
         )
 
-EditorSFXBindingsMappings.MAX_SPLIT = 1
 
-
-def process_sfx_data(string: str):
-    if EditorSFXBindingsMappings.SEPARATOR in string:
-        return EditorSFXBindingsMappings.from_string(string)
-    return EditorSFXBindingList.from_string(string)
-
-
-@dataclass_decoder(slots=True, from_array=True, separator=";")
-class EditorSFX(DataclassDecoderMixin):
+@dataclass_decoder(slots=True, from_array=True, separator=";",max_split=1)
+class EditorSFXString(DataclassDecoderMixin):
 
     version: int = 1
-    sfx_data: EditorSFXBindingList | EditorSFXBindingsMappings = field_decoder(
-        default_factory=EditorSFXBindingList, decoder=process_sfx_data, encoder=to_string
+    sfx_data: EditorSFXBindingMapping = field_decoder(
+        default_factory=EditorSFXBindingMapping, 
+        decoder=EditorSFXBindingMapping.from_string, 
+        encoder=EditorSFXBindingMapping.to_string
         )
-
-    @property
-    def bindings(self) -> EditorSFXBindingList:
-        data = self.sfx_data
-        return data.bindings if isinstance(data, EditorSFXBindingsMappings) else data
-
-    @property
-    def mappings(self) -> CustomSFXMappingList | None:
-        data = self.sfx_data
-        return data.mappings if isinstance(data, EditorSFXBindingsMappings) else None
-
-EditorSFX.MAX_SPLIT = 1

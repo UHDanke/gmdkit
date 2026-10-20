@@ -13,9 +13,8 @@ from gmdkit.models.prop.sequence import SequenceList
 from gmdkit.models.prop.random import RandomWeightsList
 from gmdkit.models.prop.remaps import RemapList
 from gmdkit.models.prop.guideline import GuidelineList
-from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.particle import Particle
-from gmdkit.models.prop.color import Color, ColorList
+from gmdkit.models.prop.color import HSV, Color, ColorList
 from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
 from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary, CustomSFXFolderIDList
 

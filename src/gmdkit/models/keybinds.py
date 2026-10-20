@@ -1,13 +1,10 @@
-# Imports
-from typing import Self
-
 # Package Imports
 from gmdkit.utils.types import DictClass
 from gmdkit.serialization.mixins import (
     DictDecoderMixin, DataclassDecoderMixin, FilePathMixin
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.models.pro.controls import InputKeyList
+from gmdkit.models.prop.controls import InputKeyList
 
 
 class KeybindDict(DictDecoderMixin, DictClass[int, InputKeyList]):

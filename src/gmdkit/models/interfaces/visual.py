@@ -3,9 +3,8 @@ from typing import Self
 
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.models.prop.color import Color
+from gmdkit.models.prop.color import HSV, Color
 from gmdkit.models.object import Object
-from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
 

@@ -588,7 +588,7 @@ class DictDecoderMixin:
         pair_separator = cls.PAIR_SEPARATOR
         single_split = cls.SINGLE_SPLIT
     
-        if string == "":
+        if not string:
             return cls()
     
         if pair_separator and single_split:
