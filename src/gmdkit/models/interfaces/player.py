@@ -73,9 +73,9 @@ class PlayerControlTrigger(TriggerObject):
 
     
 class ProgressTrigger(TriggerObject):
-    target_item_id: int = Field(86)
+    target_item_id: int = Field(80)
     item_id: int = Field(95)
-    progress: float = Field(602)
+    progress: int = Field(602)
     add_progress: bool = Field(603)
     item_input: bool = Field(605)
     

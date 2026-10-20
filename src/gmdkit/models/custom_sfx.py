@@ -66,7 +66,6 @@ class CustomSFXLibrary(FilePathMixin, DataclassDecoderMixin):
         return encode_text(self.to_string(**kwargs))
 
     def path(self, node_id: int) -> list[str]:
-        """Folder names from the root down to node_id (inclusive)."""
         parents = {f.id: f for f in self.folders}
         parents.update({s.id: s for s in self.sounds})
         names = []
