@@ -7,6 +7,8 @@ from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
+from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary, CustomSFXFolderIDList
+
 
 Field = AliasField
 register_id = FieldLoaderMixin.register_id
@@ -33,6 +35,8 @@ class LevelSettings(BaseInterface):
     font: int = Field("kA18")
     reverse_mode: bool = Field("kA20")
     platformer_mode: bool = Field("kA22")
+    force_first_attempt_screen_edge: bool = Field("kA23")
+    disable_first_attempt_screen_edge: bool = Field("kA24")
     middleground: int = Field("kA25")
     allow_multi_rotate: bool = Field("kA27")
     mirror_mode: bool = Field("kA28")
@@ -55,6 +59,10 @@ class LevelSettings(BaseInterface):
     enable_impulse_fix: bool = Field("kA48")
     named_groups: NamedGroupsDict = Field('kA55')
     named_groups_order: NamedGroupsList = Field('kA56')
+    custom_sfx_mapping: CustomSFXMapString = Field('kA59')
+    custom_sfx_library: CustomSFXLibrary = Field('kA60')
+    custom_sfx_mapping_creator: int = Field('kA61')
+    custom_sfx_shared_folders: CustomSFXFolderIDList = Field('kA62')
  
     # pre 1.9 legacy colors
     background_red: int = Field("kS1")

@@ -17,6 +17,7 @@ from gmdkit.models.prop.hsv import HSV
 from gmdkit.models.prop.particle import Particle
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
+from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary, CustomSFXFolderIDList
 
 
 class FieldLoaderMixin(DictDecoderMixin, FieldInterface):
@@ -628,10 +629,10 @@ field(key="kA55", decoder=NamedGroupsDict.from_string, encoder=NamedGroupsDict.t
 field(key="kA56", decoder=NamedGroupsList.from_string, encoder=NamedGroupsList.to_string, default_factory=NamedGroupsList)
 field(key="kA57", decoder=to_bool, encoder=from_bool, default=False)
 field(key="kA58", decoder=to_bool, encoder=from_bool, default=False)
-# kA59
-# kA60
-# kA61
-# kA62
+field('kA59', decoder=CustomSFXMapString.from_string, encoder=CustomSFXMapString.to_string)
+field('kA60', decoder=CustomSFXLibrary.from_base64, encoder=CustomSFXLibrary.to_base64)
+field('kA61', decoder=int)
+field('kA62', decoder=CustomSFXFolderIDList.from_string, encoder=CustomSFXFolderIDList.to_string)
 field(key="kA63", decoder=to_bool, encoder=from_bool, default=False)
 
 field(key="kS1", decoder=int, default=0)

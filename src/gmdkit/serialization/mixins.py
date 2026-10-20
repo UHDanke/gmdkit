@@ -905,6 +905,12 @@ class FilePathMixin(FileStringMixin):
                 )
 
         super().to_file(path=path,**kwargs)
+        
+        @classmethod
+        def from_string(cls, string:str, **kwargs) -> Self:
+            new = super().from_string(string.rstrip("\r\n"), **kwargs)
+            assert type(new) is cls
+            return new
 
 
 class PlistLoaderMixin(PlistDecoderMixin):

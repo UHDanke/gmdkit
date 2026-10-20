@@ -8,6 +8,7 @@ from gmdkit.models.prop.dpad import (
     SingleLayout, DualLayout
 )
 from gmdkit.models.prop.song_info import SongInfoList
+from gmdkit.models.custom_sfx import CustomSFXLibrary
 from gmdkit.serialization.classes import DictField, FieldMetaclass
 from gmdkit.serialization.mixins import PlistLoaderMixin
 from gmdkit.models.prop.plist import (
@@ -155,6 +156,14 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default_factory=SongInfoList,
         decoder=SongInfoList.from_node,
         encoder=SongInfoList.to_node,
+        is_node=True,
+    )
+    
+    custom_sfx_library: CustomSFXLibrary = DictField(
+        key="MDLM_010",
+        default_factory=CustomSFXLibrary,
+        decoder=CustomSFXLibrary.from_string,
+        encoder=CustomSFXLibrary.to_string,
         is_node=True,
     )
 

@@ -28,11 +28,5 @@ class KeybindFile(FilePathMixin, DataclassDecoderMixin):
         )
     binds_version: int = 2
 
-    @classmethod
-    def from_string(cls, string:str, **kwargs) -> Self:
-        new = super().from_string(string.rstrip("\r\n"), **kwargs)
-        assert type(new) is cls
-        return new
-
 KeybindFile.MAX_SPLIT = 2
 KeybindFile.EXTENSION = "gdkb"
