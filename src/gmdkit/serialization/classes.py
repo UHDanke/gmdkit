@@ -129,10 +129,8 @@ class BaseInterface:
     def __repr__(self):
         return f"{type(self).__name__}({self.obj!r})"
 
-
 V = TypeVar("V", bound=BaseInterface)
 T = TypeVar("T")
-
 
 class Default:
     __slots__ = ("value", "factory")
