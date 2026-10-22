@@ -5,7 +5,6 @@ from gmdkit.utils import enums
 from gmdkit.serialization.functions import kv_wrap
 from gmdkit.serialization.mixins import PlistDecoderMixin, PlistLoaderMixin
 from gmdkit.serialization.classes import DictField, FieldMetaclass
-from gmdkit.models.prop.plist import StrBoolDict
 
 
 class RewardObject(PlistLoaderMixin, DictClass[int, Any], metaclass=FieldMetaclass):
@@ -14,11 +13,11 @@ class RewardObject(PlistLoaderMixin, DictClass[int, Any], metaclass=FieldMetacla
     KEY_ENCODER = str
     ENCODER_KEY = 9
 
-    item: SpecialRewardItem = DictField(key=1, decoder=SpecialRewardItem.from_string, encoder=int)
+    item: enums.SpecialRewardItem = DictField(key=1, decoder=enums.SpecialRewardItem.from_string, encoder=int)
     item_id: int = DictField(key=2, default=0)
     amount: int = DictField(key=3, default=0)
-    unlock_type: UnlockType = DictField(
-        key=4, decoder=UnlockType.from_string, encoder=int, default=UnlockType.NONE
+    unlock_type: enums.UnlockType = DictField(
+        key=4, decoder=enums.UnlockType.from_string, encoder=int, default=enums.UnlockType.NONE
         )
 
 
@@ -35,8 +34,8 @@ class RewardItem(PlistLoaderMixin, DictClass[int, Any], metaclass=FieldMetaclass
     ENCODER_KEY = 8
 
     chest_id: int = DictField(key=1, default=0)
-    reward_type: RewardType = DictField(
-        key=2, decoder=RewardType.from_string, encoder=int, default=RewardType.UNKNOWN
+    reward_type: enums.RewardType = DictField(
+        key=2, decoder=enums.RewardType.from_string, encoder=int, default=enums.RewardType.UNKNOWN
         )
     rewards: RewardObjectList = DictField(
         key=3,
@@ -63,8 +62,8 @@ class ChallengeItem(PlistLoaderMixin, DictClass[int, Any], metaclass=FieldMetacl
     KEY_ENCODER = str
     ENCODER_KEY = 7
 
-    challenge_type: ChallengeType = DictField(
-        key=1, decoder=ChallengeType.from_string, encoder=int, default=ChallengeType.UNKNOWN
+    challenge_type: enums.ChallengeType = DictField(
+        key=1, decoder=enums.ChallengeType.from_string, encoder=int, default=enums.ChallengeType.UNKNOWN
         )
     progress: int = DictField(key=2, default=0)
     goal: int = DictField(key=3, default=0)

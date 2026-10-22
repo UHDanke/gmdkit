@@ -23,6 +23,7 @@ class LikeData(DelimiterMixin, DataclassDecoderMixin):
     START_DELIMITER = "like_"
     DEFAULT_SCHEMA: ClassVar[Type[BaseInterface]] = BaseInterface
     _VIEW_REGISTRY: ClassVar[dict] = {}
+    _ID_REGISTRY: ClassVar[dict] = {}
  
     item_type: enums.LikeItemType = field_decoder(decoder=enums.LikeItemType.from_string)
     item_id: int
@@ -40,7 +41,11 @@ class LikeData(DelimiterMixin, DataclassDecoderMixin):
  
     @classmethod
     def register_type(cls, item_type: enums.LikeItemType, schema: BaseInterface):
-        cls._VIEW_REGISTRY[enums.LikeItemType(item_type)] = schema
+        if not (isinstance(schema, type) and issubclass(schema, BaseInterface)):
+            raise TypeError(f"{schema!r} must be a subclass of BaseInterface")
+        item_type = enums.LikeItemType(item_type)
+        cls._VIEW_REGISTRY[item_type] = schema
+        cls._ID_REGISTRY.setdefault(schema, set()).add(item_type)
  
     @classmethod
     def get_schema(cls, item_type=None) -> Type["LikeInterface"]:
@@ -81,10 +86,18 @@ class LikeInterface(BaseInterface):
         self.like = not value
 
     @classmethod
-    def new(cls, item_id: int, like: bool = True, special: int = 0) -> LikeData:
-        if cls.ITEM_TYPE is None:
-            raise TypeError(f"{cls.__name__} has no item type")
-        return LikeData(cls.ITEM_TYPE, item_id, like, special)
+    def item_types(cls) -> set:
+        return LikeData._ID_REGISTRY.get(cls, set())
+
+    @classmethod
+    def new(cls, item_id: int, like: bool = True, special: int = 0,
+            item_type: Optional[enums.LikeItemType] = None) -> LikeData:
+        if item_type is None:
+            types = cls.item_types()
+            if len(types) != 1:
+                raise TypeError(f"{cls.__name__} is registered for {len(types)} item types, pass item_type")
+            (item_type,) = types
+        return LikeData(enums.LikeItemType(item_type), item_id, like, special)
 
 
 class LevelLike(LikeInterface):
@@ -109,23 +122,19 @@ class LevelCommentLike(LikeInterface):
 
 
 class AccountCommentLike(LikeInterface):
-    ITEM_TYPE = enums.LikeItemType.ACCOUNT_COMMENT
     comment_id: int = Field("item_id")
     account_id: int = Field("special")
 
 
 class ListLike(LikeInterface):
-    ITEM_TYPE = enums.LikeItemType.LIST
     list_id: int = Field("item_id")
 
 
 class SoundPackLike(LikeInterface):
-    ITEM_TYPE = enums.LikeItemType.SOUND_PACK
     sound_pack_id: int = Field("item_id")
 
 
 class SoundPackCommentLike(LikeInterface):
-    ITEM_TYPE = enums.LikeItemType.SOUND_PACK_COMMENT
     comment_id: int = Field("item_id")
 
 
@@ -133,13 +142,6 @@ class ModRoomCommentLike(LikeInterface):
     comment_id: int = Field("item_id")
     level_id: int = Field("special")
 
-
-class ModRoomLevelCommentLike(ModRoomCommentLike):
-    ITEM_TYPE = enums.LikeItemType.MOD_ROOM_LEVEL_COMMENT
-
-
-class ModRoomUserCommentLike(ModRoomCommentLike):
-    ITEM_TYPE = enums.LikeItemType.MOD_ROOM_USER_COMMENT
 
 
 LikeData.DEFAULT_SCHEMA = LikeInterface
