@@ -305,7 +305,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.ToggleCBS.DEFAULT,
     )
     
-    snowflake_id: str = DictField(key="k126")
+    autobackup_id: str = DictField(key="k126")
     
     last_autobackup_time: int = DictField(key="k127", default=0)
     
