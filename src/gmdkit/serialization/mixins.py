@@ -1,6 +1,7 @@
 # Imports
 from pathlib import Path
 import xml.etree.ElementTree as ET
+import re
 from contextlib import contextmanager
 from typing import (
     Any, Self, Literal,
@@ -107,8 +108,33 @@ class PlistDecoderMixin(FileStringMixin):
     CONTAINER: ClassVar[Optional[str]] = None
     ENCODER_KEY: ClassVar[Optional[int]] = None
     IS_ARRAY: ClassVar[bool] = False
+    CLEANUP_ROOT: ClassVar[bool] = False
     path: PathString
+    
+    
+    @classmethod
+    def to_root(cls, string:str) -> ET.Element:
+        if cls.CLEANUP_ROOT:
+            string = re.compile(r"<plist\b[^>]*>").sub("<plist>", string, count=1)
+        node = ET.fromstring(string)
+        return get_plist_root(node)
 
+    @classmethod
+    def from_root(cls, node:ET.Element, xml_declaration:bool=True) -> str:
+        tag = node.tag
+        node.tag = "dict"
+
+        root = ET.Element("plist", version="1.0", gjver="2.0")
+        root.append(node)
+
+        try:
+            return ET.tostring(
+                root,
+                encoding="unicode",
+                xml_declaration=xml_declaration
+            )
+        finally:
+            node.tag = tag
 
     def load_data(
             self,
@@ -242,9 +268,7 @@ class PlistDecoderMixin(FileStringMixin):
     @classmethod
     def from_string(cls, string:str, **kwargs) -> Self:
         try:
-            node = ET.fromstring(string)
-
-            root = get_plist_root(node)
+            root = cls.to_root(string)
         except Exception as e:
             raise RuntimeError(f"[{cls.__name__}] failed to load string") from e
 
@@ -253,22 +277,7 @@ class PlistDecoderMixin(FileStringMixin):
 
     def to_string(self, xml_declaration:bool=True, **kwargs):
         node = self.to_node(**kwargs)
-
-        tag = node.tag
-        node.tag = "dict"
-
-        root = ET.Element("plist", version="1.0", gjver="2.0")
-        root.append(node)
-
-        string = ET.tostring(
-            root,
-            encoding="unicode",
-            xml_declaration=xml_declaration
-        )
-
-        node.tag = tag
-
-        return string
+        return type(self).from_root(node, xml_declaration=xml_declaration)
 
 
     def update_file(self, **kwargs):
@@ -281,8 +290,7 @@ class PlistDecoderMixin(FileStringMixin):
             with open(self.path, "r", encoding=encoding) as file:
                 string = file.read()
 
-            node = ET.fromstring(string)
-            root = get_plist_root(node)
+            root = type(self).to_root(string)
         except Exception as e:
             raise RuntimeError(f"[{type(self).__name__}] failed to reload plist") from e
 

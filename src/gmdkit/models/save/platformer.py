@@ -91,9 +91,9 @@ class PlatformerSave(
  
     COMPRESSED = True
     COMPRESSION = "gzip"
-    CYPHER = bytes([11])
     EXTENSION = "dat"
     DEFAULT_PATH = PLATFORMER_SAVE_PATH
+    CLEANUP_ROOT = True
  
     DECODER = staticmethod(kv_wrap(None, PlatformerSaveEntry.from_node))
     ENCODER = staticmethod(kv_wrap(None, PlatformerSaveEntry.to_node))
