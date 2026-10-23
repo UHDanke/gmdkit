@@ -1,4 +1,3 @@
-# --- Object interface logic ---
 # Don't use these as object class reference for Geometry Dash, they don't match.
 # GD's object classes are a disaster and should have been split into subclasses.
 # Game class references are kept purely for mapping objects to gmdkit classes.
@@ -143,6 +142,9 @@ __all__ = [
     "MiddlegroundTrigger",
     "PulseTrigger",
     "SpawnParticleTrigger",
+    "VolumeInterface",
+    "EnterTrigger",
+    "ProgressTrigger"
 ]
 
 from .animated import (
@@ -174,7 +176,8 @@ from .audio import (
     EditSFXTrigger,
     EditSongTrigger,
     SFXTrigger,
-    SongTrigger
+    SongTrigger,
+    VolumeInterface
 )
 from .base import (
     LevelSettings,
@@ -209,6 +212,7 @@ from .enter import (
     EnterFadeTrigger,
     EnterMoveTrigger,
     EnterPreset,
+    EnterTrigger,
     EnterRotateTrigger,
     EnterScaleTrigger,
     EnterTintTrigger,
@@ -269,7 +273,8 @@ from .player import (
     GameplayArrow,
     GravityTrigger,
     OptionsTrigger,
-    PlayerControlTrigger
+    PlayerControlTrigger,
+    ProgressTrigger
 )
 from .shaders import (
     BulgeShader,

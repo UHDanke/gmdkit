@@ -882,6 +882,12 @@ class DisplayIcon(EnumClass):
 class NamedGroupsType(EnumClass):
     GROUP_ID = 1
     ITEM_ID = 2
+    COLLISION_ID = 3
+    TIMER_ID = 4
+    EFFECT_ID = 5
+    CONTROL_ID = 6
+    GRADIENT_ID = 7
+    ENTER_CHANNEL = 8
 
 class ControlSource(EnumClass):
     CREATOR = 0

@@ -11,8 +11,8 @@ from gmdkit.models.prop.audio_info import SongInfoList, RecentSFXList, UseCountD
 from gmdkit.models.custom_sfx import CustomSFXLibrary
 from gmdkit.serialization.classes import DictField, FieldMetaclass
 from gmdkit.serialization.mixins import PlistLoaderMixin
-from gmdkit.models.prop.loaders import (
-    StrBoolDict, IntBoolDict, IntStrDict, IntIntDict, StrIntDict, node_field
+from gmdkit.serialization.helpers import (
+    StrBoolDict, IntBoolDict, IntStrDict, IntIntDict, StrIntDict, node_field, serial_field
 )
 from gmdkit.models.prop.likes import LikeList
 from gmdkit.models.prop.rewards import RewardItemDict, IntRewardItemDict, ChallengeDict
@@ -35,126 +35,43 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     password_gjp2: str = DictField(key="GJA_005")
 
-    keybinds: KeybindDict = DictField(
-        key="GJKB_Binds",
-        default_factory=KeybindDict,
-        decoder=KeybindDict.from_string,
-        encoder=KeybindDict.to_string,
-    )
+    keybinds: KeybindDict = serial_field("GJKB_Binds", KeybindDict)
 
     keybinds_version: int = DictField(key="GJKB_Version", default=2)
 
-    official_levels: LevelMapping = DictField(
-        key="GLM_01",
-        default_factory=LevelMapping,
-        decoder=LevelMapping.from_node,
-        encoder=LevelMapping.to_node,
-        is_node=True,
-    )
+    official_levels: LevelMapping = node_field("GLM_01", LevelMapping)
 
-    online_levels: LevelMapping = DictField(
-        key="GLM_03",
-        default_factory=LevelMapping,
-        decoder=LevelMapping.from_node,
-        encoder=LevelMapping.to_node,
-        is_node=True,
-    )
+    online_levels: LevelMapping = node_field("GLM_03", LevelMapping)
 
-    followed_accounts: IntBoolDict = DictField(
-        key="GLM_06",
-        default_factory=IntBoolDict,
-        decoder=IntBoolDict.from_node,
-        encoder=IntBoolDict.to_node,
-        is_node=True,
-    )
+    followed_accounts: IntBoolDict = node_field("GLM_06", IntBoolDict)
 
-    last_sessions_levels: IntBoolDict = DictField(
-        key="GLM_07",
-        default_factory=IntBoolDict,
-        decoder=IntBoolDict.from_node,
-        encoder=IntBoolDict.to_node,
-        is_node=True,
-    )
+    last_sessions_levels: IntBoolDict = node_field("GLM_07", IntBoolDict)
 
     search_filters: SearchFilters = node_field("GLM_09", SearchFilters)
 
-    timely_levels: LevelMapping = DictField(
-        key="GLM_10",
-        default_factory=LevelMapping,
-        decoder=LevelMapping.from_node,
-        encoder=LevelMapping.to_node,
-        is_node=True,
-    )
+    timely_levels: LevelMapping = node_field("GLM_10", LevelMapping)
 
     daily_level_id: int = DictField(key="GLM_11")
 
     liked_items: LikeList = node_field("GLM_12", LikeList)
 
-    rated_levels: IntBoolDict = DictField(
-        key="GLM_13",
-        default_factory=IntBoolDict,
-        decoder=IntBoolDict.from_node,
-        encoder=IntBoolDict.to_node,
-        is_node=True,
-    )
+    rated_levels: IntBoolDict = node_field("GLM_13", IntBoolDict)
 
-    reported_levels: IntBoolDict = DictField(
-        key="GLM_14",
-        default_factory=IntBoolDict,
-        decoder=IntBoolDict.from_node,
-        encoder=IntBoolDict.to_node,
-        is_node=True,
-    )
+    reported_levels: IntBoolDict = node_field("GLM_14", IntBoolDict)
 
-    rated_demons: IntBoolDict = DictField(
-        key="GLM_15",
-        default_factory=IntBoolDict,
-        decoder=IntBoolDict.from_node,
-        encoder=IntBoolDict.to_node,
-        is_node=True,
-    )
+    rated_demons: IntBoolDict = node_field("GLM_15", IntBoolDict)
 
-    gauntlet_levels: LevelMapping = DictField(
-        key="GLM_16",
-        default_factory=LevelMapping,
-        decoder=LevelMapping.from_node,
-        encoder=LevelMapping.to_node,
-        is_node=True,
-    )
+    gauntlet_levels: LevelMapping = node_field("GLM_16", LevelMapping)
 
     weekly_level_id: int = DictField(key="GLM_17")
 
-    online_folder_names: IntStrDict = DictField(
-        key="GLM_18",
-        default_factory=IntStrDict,
-        decoder=IntStrDict.from_node,
-        encoder=IntStrDict.to_node,
-        is_node=True,
-    )
+    online_folder_names: IntStrDict = node_field("GLM_18", IntStrDict)
 
-    offline_folder_names: IntStrDict = DictField(
-        key="GLM_19",
-        default_factory=IntStrDict,
-        decoder=IntStrDict.from_node,
-        encoder=IntStrDict.to_node,
-        is_node=True,
-    )
+    offline_folder_names: IntStrDict = node_field("GLM_19", IntStrDict)
 
-    smart_templates: SmartTemplateList = DictField(
-        key="GLM_20",
-        default_factory=SmartTemplateList,
-        decoder=SmartTemplateList.from_node,
-        encoder=SmartTemplateList.to_node,
-        is_node=True,
-    )
+    smart_templates: SmartTemplateList = node_field("GLM_20", SmartTemplateList)
 
-    favorite_lists: LevelPackList = DictField(
-        key="GLM_22",
-        default_factory=LevelPackList,
-        decoder=LevelPackList.from_node,
-        encoder=LevelPackList.to_node,
-        is_node=True,
-    )
+    favorite_lists: LevelPackList = node_field("GLM_22", LevelPackList)
 
     event_level_id: int = DictField(key="GLM_23")
 
@@ -232,13 +149,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     player_stats: PlayerStats = node_field("GS_value", PlayerStats)
 
-    song_info: SongInfoList = DictField(
-        key="MDLM_001",
-        default_factory=SongInfoList,
-        decoder=SongInfoList.from_node,
-        encoder=SongInfoList.to_node,
-        is_node=True,
-    )
+    song_info: SongInfoList = node_field("MDLM_001", SongInfoList)
 
     song_priority: int = DictField(key="MDLM_002")
 
@@ -248,61 +159,21 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         is_node=True,
     )
 
-    favorite_sfx: IntList = DictField(
-        key="MDLM_004",
-        default_factory=IntList,
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-    )
+    favorite_sfx: IntList = serial_field("MDLM_004", IntList)
 
-    favorite_songs: IntList = DictField(
-        key="MDLM_005",
-        default_factory=IntList,
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-    )
+    favorite_songs: IntList = serial_field("MDLM_005", IntList)
 
-    recent_sfx: RecentSFXList = DictField(
-        key="MDLM_006",
-        default_factory=RecentSFXList,
-        decoder=RecentSFXList.from_string,
-        encoder=RecentSFXList.to_string,
-    )
+    recent_sfx: RecentSFXList = serial_field("MDLM_006", RecentSFXList)
 
-    recent_songs: IntList = DictField(
-        key="MDLM_007",
-        default_factory=IntList,
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-    )
+    recent_songs: IntList = serial_field("MDLM_007", IntList)
 
-    sfx_use_counts: UseCountDict = DictField(
-        key="MDLM_008",
-        default_factory=UseCountDict,
-        decoder=UseCountDict.from_string,
-        encoder=UseCountDict.to_string,
-    )
+    sfx_use_counts: UseCountDict = serial_field("MDLM_008", UseCountDict)
 
-    song_use_counts: UseCountDict = DictField(
-        key="MDLM_009",
-        default_factory=UseCountDict,
-        decoder=UseCountDict.from_string,
-        encoder=UseCountDict.to_string,
-    )
+    song_use_counts: UseCountDict = serial_field("MDLM_009", UseCountDict)
 
-    custom_sfx_library: CustomSFXLibrary = DictField(
-        key="MDLM_010",
-        default_factory=CustomSFXLibrary,
-        decoder=CustomSFXLibrary.from_string,
-        encoder=CustomSFXLibrary.to_string,
-    )
+    custom_sfx_library: CustomSFXLibrary = serial_field("MDLM_010", CustomSFXLibrary)
 
-    favorite_custom_sfx: IntList = DictField(
-        key="MDLM_011",
-        default_factory=IntList,
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-    )
+    favorite_custom_sfx: IntList = serial_field("MDLM_011", IntList)
 
     bg_volume: float = DictField(key="bgVolume", default=1.0)
 
@@ -322,13 +193,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     custom_menu_song_id: int = DictField(key="customMenuSongID", default=0)
 
-    custom_objects: ObjectGroupDict = DictField(
-        key="customObjectDict",
-        default_factory=ObjectGroupDict,
-        decoder=ObjectGroupDict.from_node,
-        encoder=ObjectGroupDict.to_node,
-        is_node=True,
-    )
+    custom_objects: ObjectGroupDict = node_field("customObjectDict", ObjectGroupDict)
 
     custom_practice_song_id: int = DictField(key="customPracticeSongID", default=0)
 
@@ -398,12 +263,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         encoder=DualLayout.to_string,
     )
 
-    editor_sfx: EditorSFXString = DictField(
-        key="editorSFX",
-        default_factory=EditorSFXString,
-        decoder=EditorSFXString.from_string,
-        encoder=EditorSFXString.to_string,
-    )
+    editor_sfx: EditorSFXString = serial_field("editorSFX", EditorSFXString)
 
     editor_sfx_favorite_count: int = DictField(key="editorSFXFavoriteCount", default=0)
 
@@ -483,12 +343,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     practice_icon_y_pos: float = DictField(key="practicePosY", default=40.0)
 
-    recent_emotes: StrList = DictField(
-        key="recentEmotes",
-        default_factory=StrList,
-        decoder=StrList.from_string,
-        encoder=StrList.to_string,
-    )
+    recent_emotes: StrList = serial_field("recentEmotes", StrList)
 
     record_gameplay: bool = DictField(key="recordGameplay", default=False)
 

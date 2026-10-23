@@ -1,7 +1,16 @@
+# Imports
+from typing import Any
+
 # Package Imports
-from gmdkit.serialization.classes import DictField
+from gmdkit.utils.types import DictClass
+from gmdkit.serialization.classes import DictField, FieldMetaclass
 from gmdkit.models.prop.rewards import RewardItem
-from gmdkit.models.prop.loaders import str_field, int_field, bool_field, KeeperDict
+from gmdkit.serialization.helpers import str_field, int_field, bool_field, node_field
+from gmdkit.serialization.mixins import PlistLoaderMixin
+
+
+class KeeperDict(PlistLoaderMixin, DictClass[str, Any], metaclass=FieldMetaclass):
+    HAS_NODES = True
 
 
 class ValueKeeper(KeeperDict):
@@ -336,31 +345,31 @@ class SpecialChests(KeeperDict):
     DEFAULT_DECODER = staticmethod(RewardItem.from_node)
     DEFAULT_ENCODER = staticmethod(RewardItem.to_node)
 
-    the_challenge: RewardItem = DictField(key="0001", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    demon_guardian: RewardItem = DictField(key="0002", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    chamber_of_time: RewardItem = DictField(key="0003", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    treasure_50_keys: RewardItem = DictField(key="0004", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    treasure_100_keys: RewardItem = DictField(key="0005", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    treasure_200_keys: RewardItem = DictField(key="0006", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    youtube: RewardItem = DictField(key="0007", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    twitter: RewardItem = DictField(key="0008", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    facebook: RewardItem = DictField(key="0009", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    twitch: RewardItem = DictField(key="0010", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    discord: RewardItem = DictField(key="0011", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0012: RewardItem = DictField(key="0012", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0013: RewardItem = DictField(key="0013", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0014: RewardItem = DictField(key="0014", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0015: RewardItem = DictField(key="0015", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0016: RewardItem = DictField(key="0016", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0017: RewardItem = DictField(key="0017", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0018: RewardItem = DictField(key="0018", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0019: RewardItem = DictField(key="0019", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0020: RewardItem = DictField(key="0020", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    ad_0021: RewardItem = DictField(key="0021", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    zolguroth: RewardItem = DictField(key="0022", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    help_button: RewardItem = DictField(key="0023", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    reddit: RewardItem = DictField(key="0024", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
-    spotlight: RewardItem = DictField(key="0025", decoder=RewardItem.from_node, encoder=RewardItem.to_node, is_node=True)
+    the_challenge: RewardItem = node_field("0001", RewardItem)
+    demon_guardian: RewardItem = node_field("0002", RewardItem)
+    chamber_of_time: RewardItem = node_field("0003", RewardItem)
+    treasure_50_keys: RewardItem = node_field("0004", RewardItem)
+    treasure_100_keys: RewardItem = node_field("0005", RewardItem)
+    treasure_200_keys: RewardItem = node_field("0006", RewardItem)
+    youtube: RewardItem = node_field("0007", RewardItem)
+    twitter: RewardItem = node_field("0008", RewardItem)
+    facebook: RewardItem = node_field("0009", RewardItem)
+    twitch: RewardItem = node_field("0010", RewardItem)
+    discord: RewardItem = node_field("0011", RewardItem)
+    ad_0012: RewardItem = node_field("0012", RewardItem)
+    ad_0013: RewardItem = node_field("0013", RewardItem)
+    ad_0014: RewardItem = node_field("0014", RewardItem)
+    ad_0015: RewardItem = node_field("0015", RewardItem)
+    ad_0016: RewardItem = node_field("0016", RewardItem)
+    ad_0017: RewardItem = node_field("0017", RewardItem)
+    ad_0018: RewardItem = node_field("0018", RewardItem)
+    ad_0019: RewardItem = node_field("0019", RewardItem)
+    ad_0020: RewardItem = node_field("0020", RewardItem)
+    ad_0021: RewardItem = node_field("0021", RewardItem)
+    zolguroth: RewardItem = node_field("0022", RewardItem)
+    help_button: RewardItem = node_field("0023", RewardItem)
+    reddit: RewardItem = node_field("0024", RewardItem)
+    spotlight: RewardItem = node_field("0025", RewardItem)
 
 
 class ReportedAchievements(KeeperDict):

@@ -1,6 +1,5 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.serialization.type_cast import decode_text, encode_text
 from gmdkit.models.object import Object, ObjectList, ObjectStringLazy
 from gmdkit.models.prop.replay import ReplayStringLazy
 from gmdkit.models.prop.list import IntList
@@ -14,7 +13,7 @@ from gmdkit.models.prop.editor_stats import EditorStats
 from gmdkit.serialization.classes import DictField, FieldMetaclass, AliasAttr
 from gmdkit.serialization.mixins import PlistLoaderMixin
 from gmdkit.serialization.functions import decompress_string, compress_string
-
+from gmdkit.serialization.helpers import serial_field, lazy_field, base64_field, encoded_field
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
@@ -24,19 +23,9 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     name: str = DictField(key="k2", default="Unnamed")
 
-    description: str = DictField(
-        key="k3",
-        decoder=decode_text,
-        encoder=encode_text,
-        default="",
-    )
+    description: str = encoded_field(key="k3")
 
-    object_string: ObjectStringLazy = DictField(
-        key="k4",
-        decoder=ObjectStringLazy.load_string,
-        encoder=ObjectStringLazy.save_string,
-        default_factory=ObjectStringLazy,
-    )
+    object_string: ObjectStringLazy = lazy_field("k4", ObjectStringLazy)
     
     start: Object = AliasAttr("object_string.start")
     
@@ -106,12 +95,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     is_auto: bool = DictField(key="k33", default=False)
 
-    replay_data: ReplayStringLazy = DictField(
-        key="k34",
-        decoder=ReplayStringLazy.load_string,
-        encoder=ReplayStringLazy.save_string,
-        default_factory=ReplayStringLazy,
-    )
+    replay_data: ReplayStringLazy = lazy_field("k34", ReplayStringLazy)
 
     not_downloaded: bool = DictField(key="k35", default=False)
 
@@ -198,23 +182,13 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     score_seed: int = DictField(key="k87")
 
-    level_progress: IntList = DictField(
-        key="k88",
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-        default_factory=IntList,
-    )
+    level_progress: IntList = serial_field("k88", IntList)
 
     verified_check: bool = DictField(key="k89", default=False)
 
     leaderboard_percentage: int = DictField(key="k90")
 
-    locked_layers: IntList = DictField(
-        key="k91",
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-        default_factory=IntList,
-    )
+    locked_layers: IntList = serial_field("k91", IntList)
 
     bypass_unlimited_objs: bool = DictField(key="k93", default=False)
 
@@ -222,48 +196,23 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     verification_time: int = DictField(key="k95", default=0)
 
-    saved_camera_positions: PositionList = DictField(
-        key="k101",
-        decoder=PositionList.from_string,
-        encoder=PositionList.to_string,
-        default_factory=PositionList,
-    )
+    saved_camera_positions: PositionList = serial_field("k101", PositionList)
 
     preview_lock_x: int = DictField(key="k102", default=0)
 
     preview_lock_y: int = DictField(key="k103", default=0)
 
-    songs: IntList = DictField(
-        key="k104",
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-        default_factory=IntList,
-    )
+    songs: IntList = serial_field("k104", IntList)
 
-    sfx: IntList = DictField(
-        key="k105",
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-        default_factory=IntList,
-    )
+    sfx: IntList = serial_field("k105", IntList)
 
     best_time: int = DictField(key="k107")
 
     best_points: int = DictField(key="k108")
 
-    local_best_time: IntList = DictField(
-        key="k109",
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-        default_factory=IntList,
-    )
+    local_best_time: IntList = serial_field("k109", IntList)
 
-    local_best_points: IntList = DictField(
-        key="k110",
-        decoder=IntList.from_string,
-        encoder=IntList.to_string,
-        default_factory=IntList,
-    )
+    local_best_points: IntList = serial_field("k110", IntList)
 
     platformer_seed: int = DictField(key="k111")
 
@@ -277,19 +226,9 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     clicks_best_points: int = DictField(key="k118")
 
-    replay_best_time: ReplayStringLazy = DictField(
-        key="k119",
-        decoder=ReplayStringLazy.load_string,
-        encoder=ReplayStringLazy.save_string,
-        default_factory=ReplayStringLazy,
-    )
+    replay_best_time: ReplayStringLazy = lazy_field("k119", ReplayStringLazy)
 
-    replay_best_points: ReplayStringLazy = DictField(
-        key="k120",
-        decoder=ReplayStringLazy.load_string,
-        encoder=ReplayStringLazy.save_string,
-        default_factory=ReplayStringLazy,
-    )
+    replay_best_points: ReplayStringLazy = lazy_field("k120", ReplayStringLazy)
 
     coins_best_time: int = DictField(key="k121")
 
@@ -315,30 +254,25 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
     platformer_save_level_version: int = DictField(key="k130", default=0)
     
-    platformer_save_replay: ReplayStringLazy = DictField(
-        key="k131",
-        decoder=ReplayStringLazy.load_string,
-        encoder=ReplayStringLazy.save_string,
-        default_factory=ReplayStringLazy,
-    )
+    platformer_save_replay: ReplayStringLazy = lazy_field("k131", ReplayStringLazy)
     
     platformer_save_format_version: int = DictField(key="k132", default=0)
     
     death_tracker_format_version: int = DictField(key="k133", default=0)
     
-    death_counts: DeathCounts = DictField(key="k134",decoder=DeathCounts.from_string, encoder=DeathCounts.to_string, default_factory=DeathCounts)
+    death_counts: DeathCounts = serial_field("k134", DeathCounts)
     
-    startpos_death_counts: StartPosDeathCounts = DictField(key="k135",decoder=StartPosDeathCounts.from_string, encoder=StartPosDeathCounts.to_string, default_factory=StartPosDeathCounts)
+    startpos_death_counts: StartPosDeathCounts = serial_field("k135", StartPosDeathCounts)
     
-    attempt_history: AttemptHistory = DictField(key="k136",decoder=AttemptHistory.from_string, encoder=AttemptHistory.to_string, default_factory=AttemptHistory)
+    attempt_history: AttemptHistory = serial_field("k136", AttemptHistory)
     
-    startpos_attempt_history: StartPosAttemptHistory = DictField(key="k137",decoder=StartPosAttemptHistory.from_string, encoder=StartPosAttemptHistory.to_string, default_factory=StartPosAttemptHistory)
+    startpos_attempt_history: StartPosAttemptHistory = serial_field("k137", StartPosAttemptHistory)
     
     session_start: int = DictField(key="k138")
     
     session_last_played: int = DictField(key="k139")
     
-    death_markers: DeathMarkerList = DictField(key="k140",decoder=DeathMarkerList.from_string, encoder=DeathMarkerList.to_string, default_factory=DeathMarkerList)
+    death_markers: DeathMarkerList = serial_field("k140", DeathMarkerList)
     
     death_data_pending_upload: bool = DictField(key="k141", default=False)
     
@@ -348,21 +282,13 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
     completions: int = DictField(key="k145")
 
-    archived_sessions: SessionStringLazy = DictField(key="k146",decoder=SessionStringLazy.load_string, encoder=SessionStringLazy.save_string)
+    archived_sessions: SessionStringLazy = lazy_field("k146", SessionStringLazy)
     
-    creator_controls: LevelControls = DictField(
-        key="k147",
-        decoder=LevelControls.from_base64,
-        encoder=LevelControls.to_base64,
-        )
+    creator_controls: LevelControls = base64_field("k147",LevelControls)
 
     creator_controls_version: int = DictField(key="k148")
 
-    custom_controls: LevelControls = DictField(
-        key="k149",
-        decoder=LevelControls.from_base64,
-        encoder=LevelControls.to_base64,
-        )
+    custom_controls: LevelControls = base64_field("k149",LevelControls)
 
     custom_controls_source: int = DictField(
         key="k150",
@@ -370,19 +296,9 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.ControlSource.CREATOR,
         )
     
-    death_upload_rate: float = DictField(
-        key="k151",
-        decoder=lambda s: 1-int(s)/1000,
-        encoder=lambda x: str(max(0, min(1000, round(x*1000)))),
-        default=0.0
-        )
+    death_upload_rate: int = DictField(key="k151", default=0)
     
-    global_death_stats: GlobalDeathDataLazy = DictField(
-        key="k152",
-        decoder=GlobalDeathDataLazy.load_string,
-        encoder=GlobalDeathDataLazy.save_string,
-        default_factory=GlobalDeathDataLazy,
-    )
+    global_death_stats: GlobalDeathDataLazy = lazy_field("k152", GlobalDeathDataLazy)
     
     edited_custom_controls: bool = DictField(key="k153", default=False)
     
@@ -394,7 +310,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.ControlType.NONE,
         )
     
-    editor_stats: EditorStats = DictField(key="k156",decoder=EditorStats.from_string, encoder=EditorStats.to_string)
+    editor_stats: EditorStats = serial_field("k156", EditorStats)
     
     editor_camera_x: float = DictField(key="kI1", default=0.0)
 
@@ -509,15 +425,15 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
                 
                 match value:
                     case enums.LevelDifficulty.EASY_DEMON: 
-                        self.demon_type = enums.DemonRating.EASY,
+                        self.demon_type = enums.DemonRating.EASY
                     case enums.LevelDifficulty.MEDIUM_DEMON: 
-                        self.demon_type = enums.DemonRating.MEDIUM,
+                        self.demon_type = enums.DemonRating.MEDIUM
                     case enums.LevelDifficulty.HARD_DEMON: 
-                        self.demon_type = enums.DemonRating.HARD,
+                        self.demon_type = enums.DemonRating.HARD
                     case enums.LevelDifficulty.INSANE_DEMON: 
-                        self.demon_type = enums.DemonRating.INSANE,
+                        self.demon_type = enums.DemonRating.INSANE
                     case enums.LevelDifficulty.EXTREME_DEMON: 
-                        self.demon_type = enums.DemonRating.EXTREME,
+                        self.demon_type = enums.DemonRating.EXTREME
                         
             case _:
                 raise ValueError(f"Unsupported level difficulty: {value!r}")

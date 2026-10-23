@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.utils import enums
-from gmdkit.serialization.type_cast import decode_text, encode_text
+from gmdkit.serialization.type_cast import decode_text, encode_text, to_bool
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.level import LevelMapping
 from gmdkit.serialization.classes import DictField, FieldMetaclass
@@ -30,12 +30,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     downloads: int = DictField(key="k11", default=0)
 
-    uploaded: bool = DictField(
-        key="k15",
-        decoder=bool,
-        encoder=int,
-        default=False,
-    )
+    uploaded: bool = DictField(key="k15", decoder=to_bool, encoder=int, default=False)
 
     version: int = DictField(key="k16", default=0)
 
@@ -52,6 +47,8 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     original_id: int = DictField(key="k42")
 
     revision: int = DictField(key="k46", default=0)
+    
+    levels_modified: bool = DictField(key="k47", default=False)
 
     account_id: int = DictField(key="k60")
 
@@ -60,6 +57,8 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     favorite: bool = DictField(key="k82", default=False)
 
     index: int = DictField(key="k83", default=0)
+    
+    folder: int = DictField(key="k84", default=0)  # lost on save
 
     friends_only: bool = DictField(key="k94", default=False)
 
@@ -88,6 +87,6 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     levels_to_claim: int = DictField(key="k114")
 
+        
 
-FieldLoaderMixin.add_field(key="k47")
-FieldLoaderMixin.add_field(key="k84")
+    

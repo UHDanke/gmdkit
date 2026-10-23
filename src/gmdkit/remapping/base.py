@@ -3,9 +3,6 @@ from typing import Optional, Any
 
 # Package Imports
 from gmdkit.models import interfaces as I
-from gmdkit.models.interfaces.enter import EnterTrigger
-from gmdkit.models.interfaces.base import LevelSettings
-from gmdkit.models.interfaces.audio import VolumeInterface
 from gmdkit.remapping.classes import RuleHandler
 from gmdkit.remapping.types import IDType, IDActions
 from gmdkit.models.object import Object
@@ -106,20 +103,23 @@ def _remap_special_base_color_copies(color_list:ColorList, kvm:dict[int,int]):
             color.copy_id = kvm.get(i,i)
     return color_list
  
-register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_channels, replace=_remap_custom_color_channels, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_copies, replace=_remap_custom_color_copies, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
-register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_channels, replace=_remap_special_color_channels, fixed=True, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_copies, replace=_remap_special_base_color_copies, fixed=True, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
-register(LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
- 
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_channels, replace=_remap_custom_color_channels, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_copies, replace=_remap_custom_color_copies, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_channels, replace=_remap_special_color_channels, fixed=True, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_copies, replace=_remap_special_base_color_copies, fixed=True, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
+register(I.LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+# TODO named_groups: NamedGroupsDict 
+# TODO named_groups_order: NamedGroupsList
+# TODO custom_sfx_mapping: CustomSFXMapString = Field('kA59')
+# TODO custom_sfx_library: CustomSFXLibrary = Field('kA60')
+  
  
 # VolumeInterface
 def _has_default_volume_group(intf) -> bool:
-    # VolumeInterface (song and sfx triggers)
     return not (intf.player_1 or intf.player_2 or intf.camera)
  
-register(VolumeInterface, 'group_id_1', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
-register(VolumeInterface, 'group_id_2', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_volume_group, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.VolumeInterface, 'group_id_1', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
+register(I.VolumeInterface, 'group_id_2', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_default_volume_group, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
  
  
 # EffectObject
@@ -129,7 +129,9 @@ register(I.EffectObject, 'control_id', id_type=IDType.CONTROL_ID, remappable=Tru
  
 # StartPosition
 register(I.StartPosition, 'target_channel', id_type=IDType.TRIGGER_CHANNEL, when_unset=True, actions=IDActions.SET_ITEM)
- 
+register(I.StartPosition, 'p2_group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.StartPosition, 'spawn_group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+
  
 # AdvancedFollowTrigger
 register(I.AdvancedFollowTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.MOVE)
@@ -620,7 +622,7 @@ register(I.EditSongTrigger, 'channel', id_type=IDType.SONG_CHANNEL, remappable=T
  
  
 # EnterTrigger
-register(EnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, reference=True)
+register(I.EnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, reference=True)
  
  
 # SFXTrigger
@@ -672,3 +674,11 @@ register(I.AreaRotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=T
  
 # AreaScaleTrigger
 register(I.AreaScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SCALE, IDActions.MOVE,))
+
+# ProgressTrigger
+
+def _has_item_input(intf) -> bool:
+    return bool(intf.item_input)
+
+register(I.ProgressTrigger, 'target_item_id', id_type=IDType.ITEM_ID, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
+register(I.ProgressTrigger, 'item_id', id_type=IDType.ITEM_ID, when_unset=_has_item_input, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
