@@ -8,7 +8,7 @@ from gmdkit.remapping.utils import create_text_rule, create_label_rule
 ALL_IDS = (
     IDType.GROUP_ID,
     IDType.ITEM_ID,
-    IDType.TIME_ID,
+    IDType.TIMER_ID,
     IDType.COLLISION_ID,
     IDType.COLOR_ID,
     IDType.CONTROL_ID,
@@ -37,7 +37,7 @@ COPY_IDS = (
 GROUP_IDS = (
     IDType.GROUP_ID,
     IDType.ITEM_ID,
-    IDType.TIME_ID,
+    IDType.TIMER_ID,
     IDType.COLLISION_ID
     )
 

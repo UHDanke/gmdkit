@@ -15,6 +15,7 @@ from gmdkit.serialization.mixins import (
     DefaultPathMixin
     )
 from gmdkit.utils.types import ListClass
+from gmdkit.utils import enums
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
 from gmdkit.serialization.type_cast import decode_text, encode_text
 
@@ -146,11 +147,11 @@ class SongChangelogList(ArrayDecoderMixin, ListClass[SongChangelog]):
 @dataclass_decoder(slots=True, from_array=True, separator=",")
 class Link(DelimiterMixin,DataclassDecoderMixin):
     source_id: int
-    platform: int
-    unknown: str
+    link_type: enums.LinkType = field_decoder(decoder=enums.LinkType.from_string, encoder=int)
+    custom_title: str
     url: str = field_decoder(decoder=unquote,encoder=lambda x: quote(x,safe=""))
 
-Link.END_DELIMITER = ":"
+Link.END_DELIMITER = ";"
 
 class LinkList(DelimiterMixin,ArrayDecoderMixin, ListClass[Link]):
     SEPARATOR = ";"
@@ -165,6 +166,7 @@ class MusicLibrary(DefaultPathMixin,FilePathMixin,FileStringMixin,CompressFileMi
     songs: SongList = field_decoder(decoder=SongList.from_string, encoder=SongList.to_string)
     tags: TagList = field_decoder(decoder=TagList.from_string, encoder=TagList.to_string)
     changelog: SongChangelogList = field_decoder(decoder=SongChangelogList.from_base64, encoder=SongChangelogList.to_base64)
+    test: str
     song_links: LinkList = field_decoder(decoder=LinkList.from_string, encoder=LinkList.to_string)
     artist_links: LinkList = field_decoder(decoder=LinkList.from_string, encoder=LinkList.to_string)
     

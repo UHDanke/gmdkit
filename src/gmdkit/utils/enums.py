@@ -1059,3 +1059,19 @@ class LikeItemType(EnumClass):
     SOUND_PACK_COMMENT = 6 
     MOD_ROOM_LEVEL_COMMENT = 7 
     MOD_ROOM_USER_COMMENT = 8 
+    
+class LinkType(EnumClass):
+    YOUTUBE = 1
+    NEWGROUNDS = 2
+    SOUNDCLOUD = 3
+    SPOTIFY = 4
+    BANDCAMP = 5
+    NCS = 6
+    WEBSITE = 7
+    INSTAGRAM = 8
+    TWITTER = 9
+    FACEBOOK = 10
+    TWITCH = 11
+    DISCORD = 12
+    TIKTOK = 13
+    ITCH_IO = 14

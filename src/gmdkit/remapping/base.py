@@ -321,9 +321,9 @@ def _item_compare_second_is_timer(intf:I.ItemCompareTrigger) -> bool:
 register(I.ItemCompareTrigger, 'true_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.ItemCompareTrigger, 'false_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.ItemCompareTrigger, 'item_id_1', id_type=IDType.ITEM_ID, condition=_item_compare_first_is_item, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
-register(I.ItemCompareTrigger, 'item_id_1', id_type=IDType.TIME_ID, condition=_item_compare_first_is_timer, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemCompareTrigger, 'item_id_1', id_type=IDType.TIMER_ID, condition=_item_compare_first_is_timer, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
 register(I.ItemCompareTrigger, 'item_id_2', id_type=IDType.ITEM_ID, condition=_item_compare_second_is_item, remappable=True, when_unset=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
-register(I.ItemCompareTrigger, 'item_id_2', id_type=IDType.TIME_ID, condition=_item_compare_second_is_timer, remappable=True, when_unset=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemCompareTrigger, 'item_id_2', id_type=IDType.TIMER_ID, condition=_item_compare_second_is_timer, remappable=True, when_unset=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
  
  
 # ItemEditTrigger
@@ -346,11 +346,11 @@ def _item_edit_second_is_timer(intf:I.ItemEditTrigger) -> bool:
     return intf.item_type_2 == 2
  
 register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.ITEM_ID, condition=_item_edit_target_is_item, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
-register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.TIME_ID, condition=_item_edit_target_is_timer, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
+register(I.ItemEditTrigger, 'target_item_id', id_type=IDType.TIMER_ID, condition=_item_edit_target_is_timer, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
 register(I.ItemEditTrigger, 'item_id_1', id_type=IDType.ITEM_ID, condition=_item_edit_first_is_item, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
-register(I.ItemEditTrigger, 'item_id_1', id_type=IDType.TIME_ID, condition=_item_edit_first_is_timer, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemEditTrigger, 'item_id_1', id_type=IDType.TIMER_ID, condition=_item_edit_first_is_timer, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
 register(I.ItemEditTrigger, 'item_id_2', id_type=IDType.ITEM_ID, condition=_item_edit_second_is_item, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
-register(I.ItemEditTrigger, 'item_id_2', id_type=IDType.TIME_ID, condition=_item_edit_second_is_timer, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ItemEditTrigger, 'item_id_2', id_type=IDType.TIMER_ID, condition=_item_edit_second_is_timer, remappable=True, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
  
  
 # ItemLabel
@@ -361,7 +361,7 @@ def _item_label_display_timer(intf:I.ItemLabel) -> bool:
     return intf.time_counter
  
 register(I.ItemLabel, 'item_id', id_type=IDType.ITEM_ID, condition=_item_label_display_item, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
-register(I.ItemLabel, 'item_id', id_type=IDType.TIME_ID, condition=_item_label_display_timer, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
+register(I.ItemLabel, 'item_id', id_type=IDType.TIMER_ID, condition=_item_label_display_timer, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
  
  
 # ItemPersistTrigger
@@ -372,7 +372,7 @@ def _item_persist_timer(intf:I.ItemPersistTrigger) -> bool:
     return intf.timer
  
 register(I.ItemPersistTrigger, 'item_id', id_type=IDType.ITEM_ID, condition=_item_persist_item, remappable=True, when_unset=True, id_min=0, id_max=9999, actions=IDActions.PERSIST_ITEM)
-register(I.ItemPersistTrigger, 'item_id', id_type=IDType.TIME_ID, condition=_item_persist_timer, remappable=True, when_unset=True, actions=IDActions.PERSIST_ITEM)
+register(I.ItemPersistTrigger, 'item_id', id_type=IDType.TIMER_ID, condition=_item_persist_timer, remappable=True, when_unset=True, actions=IDActions.PERSIST_ITEM)
  
  
 # KeyframeObject
@@ -562,17 +562,17 @@ register(I.StopTrigger, 'target_id', id_type=IDType.CONTROL_ID, condition=_stop_
  
  
 # TimerControlTrigger
-register(I.TimerControlTrigger, 'item_id', id_type=IDType.TIME_ID, remappable=True, when_unset=True)
+register(I.TimerControlTrigger, 'item_id', id_type=IDType.TIMER_ID, remappable=True, when_unset=True)
  
  
 # TimerEventTrigger
 register(I.TimerEventTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
-register(I.TimerEventTrigger, 'item_id', id_type=IDType.TIME_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.TRACK_ITEM)
+register(I.TimerEventTrigger, 'item_id', id_type=IDType.TIMER_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.TRACK_ITEM)
  
  
 # TimerTrigger
 register(I.TimerTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
-register(I.TimerTrigger, 'item_id', id_type=IDType.TIME_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.SET_ITEM)
+register(I.TimerTrigger, 'item_id', id_type=IDType.TIMER_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.SET_ITEM)
  
  
 # ToggleBlock
@@ -628,6 +628,7 @@ register(I.EnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True,
 # SFXTrigger
 register(I.SFXTrigger, 'sfx_id', id_type=IDType.SFX_ID, remappable=True, when_unset=True, reference=True)
 register(I.SFXTrigger, 'unique_id', id_type=IDType.UNIQUE_SFX_ID, remappable=True, when_unset=True, reference=True)
+register(I.SFXTrigger, 'custom_library_id', id_type=IDType.CUSTOM_SFX_ID, when_unset=True, reference=True)
  
  
 # TeleportTrigger

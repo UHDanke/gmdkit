@@ -87,30 +87,34 @@ class LabelID:
 
 
 class IDType(IntEnum):
-    LABEL = -2
-    GENERIC = -1
     ANY = 0
-    GROUP_ID = 1  
+    # in-game types
+    GROUP_ID = 1
     ITEM_ID = 2
-    TIME_ID = 3
-    COLLISION_ID = 4
-    COLOR_ID = 5
+    COLLISION_ID = 3
+    TIMER_ID = 4
+    EFFECT_ID = 5
     CONTROL_ID = 6
-    LINK_ID = 7
-    TRIGGER_CHANNEL = 8
-    ENTER_CHANNEL = 9
-    MATERIAL_ID = 10
-    EFFECT_ID = 11
-    GRADIENT_ID = 12
-    FORCE_ID = 13
-    KEYFRAME_ID = 14
-    SFX_ID = 15
-    SONG_ID = 16
-    UNIQUE_SFX_ID = 17
-    SFX_GROUP = 18
-    SONG_CHANNEL = 19
-    REMAP_BASE = 20
-    REMAP_TARGET = 21
+    GRADIENT_ID = 7
+    ENTER_CHANNEL = 8
+    # unmapped game types
+    COLOR_ID = 1001
+    LINK_ID = 1002
+    TRIGGER_CHANNEL = 1003
+    MATERIAL_ID = 1004
+    FORCE_ID = 1005
+    KEYFRAME_ID = 1006
+    SFX_ID = 1007
+    CUSTOM_SFX_ID = 1008
+    SONG_ID = 1009
+    UNIQUE_SFX_ID = 1010
+    SFX_GROUP = 1011
+    SONG_CHANNEL = 1012
+    REMAP_BASE = 1013
+    REMAP_TARGET = 1014
+    # gmdkit types
+    LABEL = 2002
+    GENERIC = 2001
 
 
 class IDActions(IntEnum):
