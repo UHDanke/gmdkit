@@ -147,7 +147,7 @@ class GlobedScript:
             tail:bytes|None=None
             ):
         
-        self.object = text_object or Object.default(enums.ObjectID.OBJECT_TEXT)
+        self.object = text_object or Object.from_editor(enums.ObjectID.OBJECT_TEXT)
         self.prefix = prefix
         self.main = main
         self.filename = filename

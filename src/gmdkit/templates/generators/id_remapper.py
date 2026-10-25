@@ -25,7 +25,7 @@ def generate_id_remapper(
     Y = 0
  
     # assign item value to counter
-    obj = Object.default(enums.ObjectID.TRIGGER_ITEM_EDIT)
+    obj = Object.from_editor(enums.ObjectID.TRIGGER_ITEM_EDIT)
     intf = obj.require_interface(interfaces.ItemEditTrigger)
     intf.groups.append(target_id)
     intf.set_spawn_trigger(multi_trigger=True)
@@ -41,7 +41,7 @@ def generate_id_remapper(
  
     if id_mapping:
         # remap to id mappings
-        obj = Object.default(enums.ObjectID.TRIGGER_SPAWN)
+        obj = Object.from_editor(enums.ObjectID.TRIGGER_SPAWN)
         intf = obj.require_interface(interfaces.SpawnTrigger)
         intf.groups.append(target_id)
         intf.set_spawn_trigger(multi_trigger=True)
@@ -62,7 +62,7 @@ def generate_id_remapper(
         kv_map = dict(zip(values[:v],values[v:]))
  
         # bit comparer
-        obj = Object.default(enums.ObjectID.TRIGGER_ITEM_COMPARE)
+        obj = Object.from_editor(enums.ObjectID.TRIGGER_ITEM_COMPARE)
         intf = obj.require_interface(interfaces.ItemCompareTrigger)
         intf.groups.append(this_group)
         intf.set_spawn_trigger(multi_trigger=True)
@@ -78,7 +78,7 @@ def generate_id_remapper(
         Y -= 30
  
         # bit shift
-        obj = Object.default(enums.ObjectID.TRIGGER_ITEM_EDIT)
+        obj = Object.from_editor(enums.ObjectID.TRIGGER_ITEM_EDIT)
         intf = obj.require_interface(interfaces.ItemEditTrigger)
         intf.groups.append(remap_target)
         intf.set_spawn_trigger(multi_trigger=True)
@@ -89,7 +89,7 @@ def generate_id_remapper(
         result.append(obj)
  
         # remapper
-        obj = Object.default(enums.ObjectID.TRIGGER_SPAWN)
+        obj = Object.from_editor(enums.ObjectID.TRIGGER_SPAWN)
         intf = obj.require_interface(interfaces.SpawnTrigger)
         intf.groups.append(remap_target)
         intf.set_spawn_trigger(multi_trigger=True)
@@ -108,7 +108,7 @@ def generate_id_remapper(
     Y -= 30
  
     # spawn trigger
-    obj = Object.default(enums.ObjectID.TRIGGER_SPAWN)
+    obj = Object.from_editor(enums.ObjectID.TRIGGER_SPAWN)
     intf = obj.require_interface(interfaces.SpawnTrigger)
     intf.groups.append(this_group)
     intf.set_spawn_trigger(multi_trigger=True)

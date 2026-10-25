@@ -12,7 +12,7 @@ def objs_from_key(object_ids:Sequence):
     obj_list = ObjectList()
     
     for i in object_ids:
-        obj_list.append(Object.default(i))
+        obj_list.append(Object.from_editor(i))
     
     return obj_list
 

@@ -32,7 +32,7 @@ class ColorTrigger(TriggerObject):
 
     @classmethod
     def from_color(cls, color:Color) -> Self:
-        new = cls(Object.default(899))
+        new = cls(Object.from_editor(enums.ObjectID.TRIGGER_COLOR))
         new.red = color.red
         new.green = color.green
         new.blue = color.blue

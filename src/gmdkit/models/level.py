@@ -14,10 +14,8 @@ from gmdkit.serialization.functions import (
     kv_wrap, args_wrap
 )
 from gmdkit.utils import enums
-from gmdkit.models.object import Object, ObjectList, ObjectString, ObjectStringLazy
-from gmdkit.models.prop.color import Color, ColorList
-from gmdkit.models.prop.pos_list import Position, PositionList
 from gmdkit.casting.level_loader import FieldLoaderMixin
+from gmdkit.models.interfaces import LevelSettings
 
 
 class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any]):
@@ -33,19 +31,28 @@ class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any])
 
     @classmethod
     def from_editor(cls, name:str="Unnamed") -> Self:
-        from gmdkit.models.interfaces import LevelSettings
- 
-        start = Object()
+        new = cls()
+        new.name = name
+        obj_str = new.object_string
+        new.saved_camera_positions
+        new.editable = True
+        new.level_type = enums.LevelType.LOCAL
+        new.binary_version = 51
+        new.editor_camera_zoom = 1.0
+        new.editor_build_tab_pages = {str(tab): "0" for tab in range(14)}
+        
+        start = obj_str.start
         settings = start.require_interface(LevelSettings)
-        colors = settings.colors = ColorList()
-        colors.append(Color.default(enums.ColorID.BACKGROUND))
-        colors.append(Color.default(enums.ColorID.GROUND))
-        colors.append(Color.default(enums.ColorID.GROUND_2))
-        colors.append(Color.default(enums.ColorID.LINE))
-        colors.append(Color.default(enums.ColorID.MIDDLEGROUND))
-        colors.append(Color.default(enums.ColorID.MIDDLEGROUND_2))
-        colors.append(Color.default(enums.ColorID.PLAYER_1))
-        colors.append(Color.default(enums.ColorID.PLAYER_2))
+        colors = settings.colors
+        colors.set_defaults(
+            enums.ColorID.BACKGROUND,
+            enums.ColorID.GROUND,
+            enums.ColorID.GROUND_2,
+            enums.ColorID.LINE,
+            enums.ColorID.MIDDLEGROUND,
+            enums.ColorID.MIDDLEGROUND_2,
+            enums.ColorID.PLAYER_1,
+            enums.ColorID.PLAYER_2)
         settings.allow_multi_rotate = True
         settings.enable_2_2_changes = True
         settings.track_edit_time = True
@@ -62,15 +69,8 @@ class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any])
         settings.sort_groups = True
         settings.fix_radius_collision = True
  
-        new = cls()
-        new.name = name
-        new.object_string = ObjectStringLazy(data=ObjectString(start=start, objects=ObjectList()))
-        new.saved_camera_positions = PositionList(Position() for _ in range(10))
-        new.editable = True
-        new.level_type = enums.LevelType.LOCAL
-        new.binary_version = 51
-        new.editor_camera_zoom = 1.0
-        new.editor_build_tab_pages = {str(tab): "0" for tab in range(14)}
+
+        return new
 
     def clean_export(self) -> Self:
         del self.level_id

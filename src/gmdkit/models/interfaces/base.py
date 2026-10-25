@@ -7,7 +7,6 @@ from gmdkit.utils import enums
 from gmdkit.utils.functions import node_matrix, transform_corners, bounds
 from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.casting.object_loader import FieldLoaderMixin
-from gmdkit.casting.frame_loader import FrameLoaderMixin, ObjectProperties
 from gmdkit.models.prop.groups import IDList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.color import HSV
@@ -271,117 +270,113 @@ class BaseObject(BaseInterface):
         return (self.x,self.y)
 
     @property
-    def frame_properties(self) -> Optional[ObjectProperties]:
-        return FrameLoaderMixin.get_frame(self.obj_id)
-
-    @property
     def default_color_1(self) -> Optional[int]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.main_color
 
     @property
     def default_color_2(self) -> Optional[int]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.detail_color
 
     @property
     def default_z_layer(self) -> Optional[enums.ZLayer]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.z_layer
 
     @property
     def default_z_order(self) -> Optional[int]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.z_order
 
     @property
     def frame(self) -> Optional[str]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.frame
 
     @property
     def object_type(self) -> Optional[enums.GameObjectType]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.object_type
 
     @property
     def property_flags(self) -> Optional[enums.ObjectPropertyFlag]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.flags
 
     @property
     def sprite_width(self) -> Optional[float]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.sprite_width
 
     @property
     def sprite_height(self) -> Optional[float]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.sprite_height
 
     @property
     def editor_keys(self) -> Optional[str]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.editor_keys
 
     @property
     def is_trigger(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.is_trigger
 
     @property
     def can_be_controlled(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.can_be_controlled
 
     @property
     def is_start_pos(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.is_start_pos
 
     @property
     def is_invisible(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.is_invisible
 
     @property
     def intrinsic_dont_fade(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.intrinsic_dont_fade
 
     @property
     def solid_color_block(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.solid_color_block
 
     @property
     def invisible_block(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.invisible_block
 
     @property
     def slope_is_hazard(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.slope_is_hazard
 
     @property
     def use_object_rect(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.use_object_rect
 
     @property
     def uses_audio_scale(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.uses_audio_scale
 
     @property
     def fixed_z_layer(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.fixed_z_layer
 
     @property
     def not_colorable(self) -> Optional[bool]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         return None if props is None else props.not_colorable
 
     @property
@@ -391,7 +386,7 @@ class BaseObject(BaseInterface):
             return None
         if self.no_touch:
             return enums.CollisionType.NONE
-        collision = enums.COLLISION_TYPES.get(props.object_type, enums.CollisionType.NONE)
+        collision = props.object_type.collision_type()
         if collision in (enums.CollisionType.SOLID, enums.CollisionType.BREAKABLE) and self.passable:
             return enums.CollisionType.PASSABLE
         if collision == enums.CollisionType.SLOPE and props.slope_is_hazard:
@@ -413,7 +408,7 @@ class BaseObject(BaseInterface):
 
     @property
     def hitbox_center(self) -> Optional[tuple[float, float]]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         if props is None:
             return None
         a, b, c, d = self.node_matrix
@@ -422,7 +417,7 @@ class BaseObject(BaseInterface):
 
     @property
     def hitbox_size(self) -> Optional[tuple[float, float]]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         if props is None or props.hitbox_width is None or props.hitbox_height is None:
             return None
         scale_x, scale_y = self.node_transform[:2]
@@ -444,7 +439,7 @@ class BaseObject(BaseInterface):
 
     @property
     def hitbox_radius(self) -> Optional[float]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         if props is None or props.hitbox_radius is None:
             return None
         scale_x, scale_y = self.node_transform[:2]
@@ -454,7 +449,7 @@ class BaseObject(BaseInterface):
 
     @property
     def sprite_corners(self) -> Optional[list[tuple[float, float]]]:
-        props = self.frame_properties
+        props = self.obj.frame_properties
         if props is None or props.sprite_width is None or props.sprite_height is None:
             return None
         return transform_corners(props.sprite_width / 2, props.sprite_height / 2,

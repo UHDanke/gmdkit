@@ -156,7 +156,7 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
         existing = self.get_channels()
         ids = set(color_ids)
         if override:
-            self[:] = [c for c in self if c.id not in ids]
+            self[:] = [c for c in self if c.channel not in ids]
         else:
             ids -= existing
         for i in ids:

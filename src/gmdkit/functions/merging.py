@@ -21,7 +21,7 @@ def add_toggles(
         min_x, min_y, center_x, center_y, max_x, max_y = boundaries(obj_list)
         g = remapping.AutoID()
 
-        init_toggle = Object.default(enums.ObjectID.TRIGGER_TOGGLE)
+        init_toggle = Object.from_editor(enums.ObjectID.TRIGGER_TOGGLE)
         intf_it = init_toggle.require_interface(interfaces.ToggleTrigger)
         intf_it.x = 0
         intf_it.y = 15+Y
@@ -29,7 +29,7 @@ def add_toggles(
         obj_list.append(init_toggle)
         init_toggles.append(init_toggle)
 
-        start_toggle = Object.default(enums.ObjectID.TRIGGER_TOGGLE)
+        start_toggle = Object.from_editor(enums.ObjectID.TRIGGER_TOGGLE)
         intf_st = init_toggle.require_interface(interfaces.ToggleTrigger)
         intf_st.x = min_x
         intf_st.y = 15
@@ -37,7 +37,7 @@ def add_toggles(
         intf_st.activate_group = True
         obj_list.append(start_toggle)
 
-        end_toggle = Object.default(enums.ObjectID.TRIGGER_TOGGLE)
+        end_toggle = Object.from_editor(enums.ObjectID.TRIGGER_TOGGLE)
         intf_et = init_toggle.require_interface(interfaces.ToggleTrigger)
         intf_et.x = max_x
         intf_et.y = 15
@@ -63,7 +63,7 @@ def start_pos_fix(
     for x, objs in obj_groups.items():
         i = remapping.AutoID()
 
-        event = Object.default(enums.ObjectID.TRIGGER_TIMER_EVENT)
+        event = Object.from_editor(enums.ObjectID.TRIGGER_TIMER_EVENT)
         intf_ev = event.require_interface(interfaces.TimerEventTrigger)
         intf_ev.x = x
         intf_ev.y = -15
@@ -73,7 +73,7 @@ def start_pos_fix(
         result.append(event)
 
         if include_stop:
-            stop = Object.default(enums.ObjectID.TRIGGER_STOP)
+            stop = Object.from_editor(enums.ObjectID.TRIGGER_STOP)
             intf_stp = stop.require_interface(interfaces.StopTrigger)
             intf_stp.x = x + stop_offset
             intf_stp.y = -45
@@ -94,7 +94,7 @@ def create_start_pos_fix_activator(
      new = ObjectList()
      group = remapping.AutoID()
      
-     advf = Object.default(enums.ObjectID.TRIGGER_ADV_FOLLOW)
+     advf = Object.from_editor(enums.ObjectID.TRIGGER_ADV_FOLLOW)
      intf_advf = advf.require_interface(interfaces.AdvancedFollowTrigger)
      intf_advf.x = pos_x
      intf_advf.y = pos_y
@@ -102,7 +102,7 @@ def create_start_pos_fix_activator(
      intf_advf.player_1 = True
      new.append(advf)
 
-     iedit = Object.default(enums.ObjectID.TRIGGER_ITEM_EDIT)
+     iedit = Object.from_editor(enums.ObjectID.TRIGGER_ITEM_EDIT)
      intf_edit = iedit.require_interface(interfaces.ItemEditTrigger)
      intf_edit.groups.append(group)
      intf_edit.x = pos_x+45

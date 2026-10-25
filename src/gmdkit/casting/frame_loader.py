@@ -134,7 +134,7 @@ class FrameLoaderMetaclass(InterfaceMetaclass):
         return set(cls._FRAME_CHAIN)
 
 
-class FrameLoaderMixin(FieldInterface, metaclass=FrameLoaderMetaclass):
+class FrameInterface(FieldInterface, metaclass=FrameLoaderMetaclass):
 
     @property
     def frame_properties(self) -> Optional[ObjectProperties]:
@@ -149,7 +149,7 @@ def frame_default(attribute: str, fallback=0):
     def factory(owner=None):
         if owner is None:
             return fallback
-        props = FrameLoaderMixin.get_frame(owner.current_id)
+        props = FrameInterface.get_frame(owner.current_id)
         value = None if props is None else getattr(props, attribute)
         return fallback if value is None else value
     return factory
@@ -179,7 +179,7 @@ def register(
         sprite_height: Optional[float] = None,
         editor_keys: str = "",
         ) -> ObjectProperties:
-    return FrameLoaderMixin.register_frame(object_id, ObjectProperties(
+    return FrameInterface.register_frame(object_id, ObjectProperties(
         object_id=object_id,
         frame=frame,
         object_type=object_type,

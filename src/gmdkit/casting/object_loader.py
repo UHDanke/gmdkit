@@ -7,8 +7,7 @@ from gmdkit.serialization.type_cast import (
     decode_text, encode_text,
     to_numkey, serialize
     )
-from gmdkit.serialization.classes import FieldInterface
-from gmdkit.casting.frame_loader import frame_default
+from gmdkit.casting.frame_loader import frame_default, FrameInterface
 from gmdkit.serialization.mixins import DictDecoderMixin
 from gmdkit.models.prop.groups import IDList, ParentIDList
 from gmdkit.models.prop.events import EventList
@@ -22,7 +21,7 @@ from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
 from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary, CustomSFXFolderIDList
 
 
-class FieldLoaderMixin(DictDecoderMixin, FieldInterface):
+class FieldLoaderMixin(DictDecoderMixin, FrameInterface):
     DEFAULT_DECODER = None
     DEFAULT_ENCODER = serialize
     KEY_DECODER = to_numkey

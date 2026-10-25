@@ -27,7 +27,7 @@ class Object(DelimiterMixin,FieldLoaderMixin,DictClass[NumKey,Any]):
     
     @classmethod
     def from_editor(cls, object_id:int, x:float=0, y:float=0) -> Self:
-        props = FieldLoaderMixin.get_frame(object_id)
+        props = cls.get_frame(object_id)
         extra = props.editor_keys if props is not None else ""
         obj = cls.from_string(f"1,{object_id},2,{x},3,{y}" + (f",{extra}" if extra else "") + ";")
         return obj

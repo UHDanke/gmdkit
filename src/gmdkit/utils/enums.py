@@ -1125,6 +1125,40 @@ class GameObjectType(EnumClass):
     ENTER_EFFECT_OBJECT = 45
     TELEPORT_ORB = 46
     ANIMATED_HAZARD = 47
+    
+    def collision_type(self) -> "CollisionType":
+        T = GameObjectType
+        match self:
+            case T.SOLID:
+                return CollisionType.SOLID
+            case T.BREAKABLE:
+                return CollisionType.BREAKABLE
+            case T.SLOPE:
+                return CollisionType.SLOPE
+            case T.HAZARD | T.ANIMATED_HAZARD:
+                return CollisionType.HAZARD
+            case T.MODIFIER | T.ENTER_EFFECT_OBJECT:
+                return CollisionType.TRIGGER
+            case T.SPECIAL:
+                return CollisionType.SPECIAL
+            case (T.YELLOW_JUMP_PAD | T.PINK_JUMP_PAD | T.GRAVITY_PAD | T.RED_JUMP_PAD
+                  | T.SPIDER_PAD):
+                return CollisionType.PAD
+            case (T.YELLOW_JUMP_RING | T.PINK_JUMP_RING | T.GRAVITY_RING | T.GREEN_RING
+                  | T.DROP_RING | T.RED_JUMP_RING | T.CUSTOM_RING | T.DASH_RING
+                  | T.GRAVITY_DASH_RING | T.SPIDER_ORB | T.TELEPORT_ORB):
+                return CollisionType.ORB
+            case (T.INVERSE_GRAVITY_PORTAL | T.NORMAL_GRAVITY_PORTAL | T.SHIP_PORTAL
+                  | T.CUBE_PORTAL | T.INVERSE_MIRROR_PORTAL | T.NORMAL_MIRROR_PORTAL
+                  | T.BALL_PORTAL | T.REGULAR_SIZE_PORTAL | T.MINI_SIZE_PORTAL | T.UFO_PORTAL
+                  | T.DUAL_PORTAL | T.SOLO_PORTAL | T.WAVE_PORTAL | T.ROBOT_PORTAL
+                  | T.TELEPORT_PORTAL | T.SPIDER_PORTAL | T.SWING_PORTAL
+                  | T.GRAVITY_TOGGLE_PORTAL):
+                return CollisionType.PORTAL
+            case T.SECRET_COIN | T.USER_COIN | T.COLLECTIBLE:
+                return CollisionType.COLLECTIBLE
+            case _:
+                return CollisionType.NONE
 
 
 class ObjectPropertyFlag(FlagClass):
