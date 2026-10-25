@@ -47,7 +47,7 @@ class ColorTrigger(TriggerObject):
         new.opacity = color.opacity
         new.copy_id = color.copy_id
         if color.has_hsv(): new.hsv = color.hsv
-        if color.copy_opacity: color.copy_opacity = True
+        if color.copy_opacity: new.copy_opacity = True
 
         return new
 
@@ -66,7 +66,7 @@ class ColorTrigger(TriggerObject):
         if self.player_1:
             color.player = enums.TargetPlayer.P1
         elif self.player_2:
-            color.player = enums.TargetPlayer.P1
+            color.player = enums.TargetPlayer.P2
         else:
             color.player = enums.TargetPlayer.NONE
 

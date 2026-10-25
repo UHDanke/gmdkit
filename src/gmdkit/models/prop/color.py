@@ -122,7 +122,7 @@ class Color(RGB):
             return True
 
     def has_hsv(self) -> bool:
-        return not type(self).CONDITION("hsv",v=self.hsv)
+        return not type(self).CONDITION("hsv", self.hsv)
 
 
 class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
