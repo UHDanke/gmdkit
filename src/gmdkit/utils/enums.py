@@ -305,6 +305,7 @@ class ZLayer(EnumClass):
     DEFAULT = 0
     B2 = 1
     B1 = 3
+    PORTAL_BACK = 4
     T1 = 5
     T2 = 7
     T3 = 9
@@ -1075,3 +1076,81 @@ class LinkType(EnumClass):
     DISCORD = 12
     TIKTOK = 13
     ITCH_IO = 14
+
+class GameObjectType(EnumClass):
+    SOLID = 0
+    HAZARD = 2
+    INVERSE_GRAVITY_PORTAL = 3
+    NORMAL_GRAVITY_PORTAL = 4
+    SHIP_PORTAL = 5
+    CUBE_PORTAL = 6
+    DECORATION = 7
+    YELLOW_JUMP_PAD = 8
+    PINK_JUMP_PAD = 9
+    GRAVITY_PAD = 10
+    YELLOW_JUMP_RING = 11
+    PINK_JUMP_RING = 12
+    GRAVITY_RING = 13
+    INVERSE_MIRROR_PORTAL = 14
+    NORMAL_MIRROR_PORTAL = 15
+    BALL_PORTAL = 16
+    REGULAR_SIZE_PORTAL = 17
+    MINI_SIZE_PORTAL = 18
+    UFO_PORTAL = 19
+    MODIFIER = 20
+    BREAKABLE = 21
+    SECRET_COIN = 22
+    DUAL_PORTAL = 23
+    SOLO_PORTAL = 24
+    SLOPE = 25
+    WAVE_PORTAL = 26
+    ROBOT_PORTAL = 27
+    TELEPORT_PORTAL = 28
+    GREEN_RING = 29
+    COLLECTIBLE = 30
+    USER_COIN = 31
+    DROP_RING = 32
+    SPIDER_PORTAL = 33
+    RED_JUMP_PAD = 34
+    RED_JUMP_RING = 35
+    CUSTOM_RING = 36
+    DASH_RING = 37
+    GRAVITY_DASH_RING = 38
+    COLLISION_OBJECT = 39
+    SPECIAL = 40
+    SWING_PORTAL = 41
+    GRAVITY_TOGGLE_PORTAL = 42
+    SPIDER_ORB = 43
+    SPIDER_PAD = 44
+    ENTER_EFFECT_OBJECT = 45
+    TELEPORT_ORB = 46
+    ANIMATED_HAZARD = 47
+
+
+class ObjectPropertyFlag(FlagClass):
+    IS_TRIGGER = 1 << 0
+    CAN_BE_CONTROLLED = 1 << 1
+    IS_START_POS = 1 << 2
+    IS_INVISIBLE = 1 << 3
+    INTRINSIC_DONT_FADE = 1 << 4
+    SOLID_COLOR_BLOCK = 1 << 5
+    INVISIBLE_BLOCK = 1 << 6
+    SLOPE_IS_HAZARD = 1 << 7
+    USE_OBJECT_RECT = 1 << 8
+    USES_AUDIO_SCALE = 1 << 9
+    FIXED_Z_LAYER = 1 << 10
+    NOT_COLORABLE = 1 << 11
+    
+class CollisionType(EnumClass):
+    NONE = 0
+    SOLID = 1
+    PASSABLE = 2
+    BREAKABLE = 3
+    SLOPE = 4
+    HAZARD = 5
+    PAD = 6
+    ORB = 7
+    PORTAL = 8
+    TRIGGER = 9
+    COLLECTIBLE = 10
+    SPECIAL = 11

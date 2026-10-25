@@ -107,6 +107,12 @@ class BaseInterface:
             raise AttributeError(name)
 
         return getattr(d["obj"], name)
+    
+    def has_field(self, name: str) -> bool:
+        field = getattr(type(self), name, None)
+        if not isinstance(field, AliasField):
+            raise AttributeError(f"{type(self).__name__} has no field {name!r}")
+        return field.canonical in self.obj
 
     def __getitem__(self, key):
         return self.obj[key]
@@ -333,7 +339,7 @@ class FieldMetaclass(type):
         if default is None:
             raise KeyError(f"{key!r} is missing and has no default or default_factory")
             
-        value = default(key=key)
+        value = default(owner=self)
         if default.stored:
             dict.__setitem__(self, key, value)
         return value

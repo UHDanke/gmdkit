@@ -1,4 +1,5 @@
 # Imports
+import math
 from typing import Callable, ParamSpec, TypeVar, get_type_hints
 from enum import Enum
 from functools import lru_cache, partial
@@ -85,3 +86,33 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
             result.append(fn)
     
     return result
+
+
+def node_matrix(scale_x: float, scale_y: float, rotation_x: float, rotation_y: float,
+                flip_x: bool = False, flip_y: bool = False) -> tuple[float, float, float, float]:
+    if flip_x:
+        scale_x = -scale_x
+    if flip_y:
+        scale_y = -scale_y
+    radians_x = -math.radians(rotation_x)
+    radians_y = -math.radians(rotation_y)
+    return (
+        math.cos(radians_y) * scale_x,
+        math.sin(radians_y) * scale_x,
+        -math.sin(radians_x) * scale_y,
+        math.cos(radians_x) * scale_y,
+    )
+
+
+def transform_corners(half_w: float, half_h: float, center: tuple[float, float],
+                      matrix: tuple[float, float, float, float]) -> list[tuple[float, float]]:
+    a, b, c, d = matrix
+    cx, cy = center
+    return [(cx + a * px + c * py, cy + b * px + d * py)
+            for px, py in ((-half_w, -half_h), (half_w, -half_h), (half_w, half_h), (-half_w, half_h))]
+
+
+def bounds(points: list[tuple[float, float]]) -> tuple[float, float, float, float]:
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    return min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)

@@ -1,7 +1,13 @@
+# Imports
+import math
+from typing import Optional
+
 # Package Imports
 from gmdkit.utils import enums
+from gmdkit.utils.functions import node_matrix, transform_corners, bounds
 from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.casting.object_loader import FieldLoaderMixin
+from gmdkit.casting.frame_loader import FrameLoaderMixin, ObjectProperties
 from gmdkit.models.prop.groups import IDList
 from gmdkit.models.prop.guideline import GuidelineList
 from gmdkit.models.prop.color import HSV
@@ -114,6 +120,7 @@ class BaseObject(BaseInterface):
     color_2: int = Field(22)
     z_layer: int = Field(24)
     z_order: int = Field(25)
+    legacy_scale: float = Field(32)
     group_parent: bool = Field(34)
     hsv_enabled_1: bool = Field(41)
     hsv_enabled_2: bool = Field(42)
@@ -185,6 +192,13 @@ class BaseObject(BaseInterface):
         del self.color_2_index
         
     def fix_transform(self):
+        if self.has_field("legacy_scale"):
+            scale_x_unset = not self.has_field("scale_x") or not self.scale_x
+            scale_y_unset = not self.has_field("scale_y") or not self.scale_y
+            if scale_x_unset and scale_y_unset and self.legacy_scale:
+                self.scale_x = self.scale_y = self.legacy_scale
+            del self.legacy_scale
+
         if self.scale_x < -1:
             self.scale_x *= -1
             
@@ -243,6 +257,201 @@ class BaseObject(BaseInterface):
     
     def get_positions(self):
         return (self.x,self.y)
+
+    @property
+    def frame_properties(self) -> Optional[ObjectProperties]:
+        return FrameLoaderMixin.get_frame(self.obj_id)
+
+    @property
+    def default_color_1(self) -> Optional[int]:
+        props = self.frame_properties
+        return None if props is None else props.main_color
+
+    @property
+    def default_color_2(self) -> Optional[int]:
+        props = self.frame_properties
+        return None if props is None else props.detail_color
+
+    @property
+    def default_z_layer(self) -> Optional[enums.ZLayer]:
+        props = self.frame_properties
+        return None if props is None else props.z_layer
+
+    @property
+    def default_z_order(self) -> Optional[int]:
+        props = self.frame_properties
+        return None if props is None else props.z_order
+
+    @property
+    def frame(self) -> Optional[str]:
+        props = self.frame_properties
+        return None if props is None else props.frame
+
+    @property
+    def object_type(self) -> Optional[enums.GameObjectType]:
+        props = self.frame_properties
+        return None if props is None else props.object_type
+
+    @property
+    def property_flags(self) -> Optional[enums.ObjectPropertyFlag]:
+        props = self.frame_properties
+        return None if props is None else props.flags
+
+    @property
+    def sprite_width(self) -> Optional[float]:
+        props = self.frame_properties
+        return None if props is None else props.sprite_width
+
+    @property
+    def sprite_height(self) -> Optional[float]:
+        props = self.frame_properties
+        return None if props is None else props.sprite_height
+
+    @property
+    def editor_keys(self) -> Optional[str]:
+        props = self.frame_properties
+        return None if props is None else props.editor_keys
+
+    @property
+    def is_trigger(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.is_trigger
+
+    @property
+    def can_be_controlled(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.can_be_controlled
+
+    @property
+    def is_start_pos(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.is_start_pos
+
+    @property
+    def is_invisible(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.is_invisible
+
+    @property
+    def intrinsic_dont_fade(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.intrinsic_dont_fade
+
+    @property
+    def solid_color_block(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.solid_color_block
+
+    @property
+    def invisible_block(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.invisible_block
+
+    @property
+    def slope_is_hazard(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.slope_is_hazard
+
+    @property
+    def use_object_rect(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.use_object_rect
+
+    @property
+    def uses_audio_scale(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.uses_audio_scale
+
+    @property
+    def fixed_z_layer(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.fixed_z_layer
+
+    @property
+    def not_colorable(self) -> Optional[bool]:
+        props = self.frame_properties
+        return None if props is None else props.not_colorable
+
+    @property
+    def collision_type(self) -> Optional[enums.CollisionType]:
+        props = self.frame_properties
+        if props is None:
+            return None
+        if self.no_touch:
+            return enums.CollisionType.NONE
+        collision = enums.COLLISION_TYPES.get(props.object_type, enums.CollisionType.NONE)
+        if collision in (enums.CollisionType.SOLID, enums.CollisionType.BREAKABLE) and self.passable:
+            return enums.CollisionType.PASSABLE
+        if collision == enums.CollisionType.SLOPE and props.slope_is_hazard:
+            return enums.CollisionType.HAZARD
+        return collision
+
+    @property
+    def node_transform(self) -> tuple[float, float, float, float]:
+        scale_x = int(self.scale_x * 1000) / 1000 or 1.0
+        scale_y = int(self.scale_y * 1000) / 1000 or 1.0
+        rotation_x = rotation_y = self.rotation
+        if self.skew_x != self.skew_y:
+            rotation_x, rotation_y = self.skew_x, self.skew_y
+        return scale_x, scale_y, rotation_x, rotation_y
+
+    @property
+    def node_matrix(self) -> tuple[float, float, float, float]:
+        return node_matrix(*self.node_transform, self.flip_x, self.flip_y)
+
+    @property
+    def hitbox_center(self) -> Optional[tuple[float, float]]:
+        props = self.frame_properties
+        if props is None:
+            return None
+        a, b, c, d = self.node_matrix
+        ox, oy = props.box_offset_x, props.box_offset_y
+        return self.x + a * ox + c * oy, self.y + b * ox + d * oy
+
+    @property
+    def hitbox_size(self) -> Optional[tuple[float, float]]:
+        props = self.frame_properties
+        if props is None or props.hitbox_width is None or props.hitbox_height is None:
+            return None
+        scale_x, scale_y = self.node_transform[:2]
+        return abs(scale_x) * props.hitbox_width, abs(scale_y) * props.hitbox_height
+
+    @property
+    def hitbox_corners(self) -> Optional[list[tuple[float, float]]]:
+        size = self.hitbox_size
+        if size is None:
+            return None
+        angle = -math.radians(self.node_transform[2])
+        cos, sin = math.cos(angle), math.sin(angle)
+        return transform_corners(size[0] / 2, size[1] / 2, self.hitbox_center, (cos, sin, -sin, cos))
+
+    @property
+    def hitbox_rect(self) -> Optional[tuple[float, float, float, float]]:
+        corners = self.hitbox_corners
+        return None if corners is None else bounds(corners)
+
+    @property
+    def hitbox_radius(self) -> Optional[float]:
+        props = self.frame_properties
+        if props is None or props.hitbox_radius is None:
+            return None
+        scale_x, scale_y = self.node_transform[:2]
+        if scale_x == 1 and scale_y == 1:
+            return props.hitbox_radius
+        return props.hitbox_radius * max(scale_x, scale_y)
+
+    @property
+    def sprite_corners(self) -> Optional[list[tuple[float, float]]]:
+        props = self.frame_properties
+        if props is None or props.sprite_width is None or props.sprite_height is None:
+            return None
+        return transform_corners(props.sprite_width / 2, props.sprite_height / 2,
+                                       (self.x, self.y), self.node_matrix)
+
+    @property
+    def sprite_rect(self) -> Optional[tuple[float, float, float, float]]:
+        corners = self.sprite_corners
+        return None if corners is None else bounds(corners)
 
 
 class EffectObject(BaseObject):

@@ -8,6 +8,7 @@ from gmdkit.serialization.type_cast import (
     to_numkey, serialize
     )
 from gmdkit.serialization.classes import FieldInterface
+from gmdkit.casting.frame_loader import frame_default
 from gmdkit.serialization.mixins import DictDecoderMixin
 from gmdkit.models.prop.groups import IDList, ParentIDList
 from gmdkit.models.prop.events import EventList
@@ -70,11 +71,11 @@ bool_field(16)
 bool_field(17)
 enum_field(19, enums.OldColor, 0)
 int_field(20)
-int_field(21)
-int_field(22)
+field(key=21, decoder=int, default_callable=frame_default("main_color"))
+field(key=22, decoder=int, default_callable=frame_default("detail_color"))
 int_field(23)
-int_field(24)
-int_field(25)
+field(key=24, decoder=int, default_callable=frame_default("z_layer"))
+field(key=25, decoder=int, default_callable=frame_default("z_order"))
 float_field(28)
 float_field(29)
 enum_field(30, enums.Easing, enums.Easing.NONE)
