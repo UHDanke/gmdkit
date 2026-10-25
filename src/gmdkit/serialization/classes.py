@@ -133,21 +133,24 @@ V = TypeVar("V", bound=BaseInterface)
 T = TypeVar("T")
 
 class Default:
-    __slots__ = ("value", "factory")
+    __slots__ = ("value", "factory","pass_kwargs")
 
-    def __init__(self, value=MISSING, factory=None):
+    def __init__(self, value=MISSING, factory=None, pass_kwargs:bool=False):
         if factory is not None and value is not MISSING:
             raise ValueError("pass either default or default_factory, not both")
         self.value = value
         self.factory = factory
+        self.pass_kwargs = pass_kwargs
 
     @property
     def stored(self):
         return self.factory is not None
 
-    def __call__(self):
-        return self.factory() if self.factory is not None else self.value
-
+    def __call__(self, **kwargs):
+        if self.factory is not None:
+            return self.factory(**kwargs) if self.pass_kwargs else self.factory()
+        else:
+            return self.value
 
 class Codec:
 
@@ -177,8 +180,9 @@ class EncoderCodec(Codec):
 
 
 class AliasField:
-    def __init__(self, canonical: str = None):
+    def __init__(self, canonical: str = None, read_only: bool = False):
         self.canonical = canonical
+        self.read_only = read_only
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -200,18 +204,22 @@ class AliasField:
         return self._target(instance)[self.canonical]
 
     def __set__(self, instance, value):
+        if self.read_only:
+            raise AttributeError(f"{type(instance).__name__}.{self.name} is read-only")
         self._target(instance)[self.canonical] = value
 
     def __delete__(self, instance):
+        if self.read_only:
+            raise AttributeError(f"{type(instance).__name__}.{self.name} is read-only")
         del self._target(instance)[self.canonical]
 
-
 class DictField(AliasField):
-    def __init__(self, key=None, default=MISSING, default_factory=None,
+    def __init__(self, key=None, default=MISSING, default_factory=None, default_callable=None,
                  encoder=None, decoder=None, is_node=False, pass_kwargs=False):
         super().__init__(key)
         self.default = default
         self.default_factory = default_factory
+        self.default_callable = default_callable
         self.encoder = encoder
         self.decoder = decoder
         self.is_node = is_node
@@ -227,6 +235,7 @@ class DictField(AliasField):
             pass_kwargs=self.pass_kwargs,
             default=self.default,
             default_factory=self.default_factory,
+            default_callable=self.default_callable
         )
 
 
@@ -250,7 +259,7 @@ class FieldMetaclass(type):
     _KEY_CHAIN: ChainMap
 
     def add_field(cls, key, *, encoder=None, decoder=None, is_node=False,
-                  pass_kwargs=False, default=MISSING, default_factory=None):
+                  pass_kwargs=False, default=MISSING, default_factory=None, default_callable=None):
         if "_KEYS" not in cls.__dict__:
             cls._KEYS = set()
         if key in cls._KEYS:
@@ -266,10 +275,14 @@ class FieldMetaclass(type):
                 cls._DECODER_MAP = {}
             codec_cls = DecoderCodec if (cls.HAS_NODES and not is_node) else Codec
             cls._DECODER_MAP[key] = codec_cls(decoder, allow_kwargs=pass_kwargs)
-        if default_factory is not None or default is not MISSING:
+        if default_callable is not None or default_factory is not None or default is not MISSING:
             if "_DEFAULT_MAP" not in cls.__dict__:
                 cls._DEFAULT_MAP = {}
-            cls._DEFAULT_MAP[key] = Default(default, default_factory)
+            cls._DEFAULT_MAP[key] = Default(
+                default, 
+                default_callable or default_factory, 
+                default_callable is not None
+                )
 
     def __new__(mcls, name, bases, namespace, **kwargs):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
@@ -320,7 +333,7 @@ class FieldMetaclass(type):
         if default is None:
             raise KeyError(f"{key!r} is missing and has no default or default_factory")
             
-        value = default()
+        value = default(key=key)
         if default.stored:
             dict.__setitem__(self, key, value)
         return value
