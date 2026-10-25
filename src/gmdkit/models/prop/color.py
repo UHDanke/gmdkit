@@ -65,7 +65,7 @@ class Color(RGB):
     blending: bool = field_decoder(default=False,optional=True)
     channel: int = 0
     opacity: float = 0.0
-    disable_opacity: bool = field_decoder(default=False,optional=True)
+    use_opacity: bool = field_decoder(default=False,optional=True)
     copy_id: int = field_decoder(default=0,optional=True)
     hsv: HSV = field_decoder(default_factory=HSV,optional=True,decoder=HSV.from_string,encoder=HSV.to_string)
     to_red: int = 0
@@ -75,7 +75,8 @@ class Color(RGB):
     to_opacity: float = 0.0
     duration: float = field_decoder(default=0.0,optional=True)
     copy_opacity: bool = field_decoder(default=False,optional=True)
-    disable_legacy_hsv: bool = False
+    runtime_trigger_id: int = 0
+    paused: bool = False
 
 
     @classmethod

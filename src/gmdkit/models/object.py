@@ -17,7 +17,6 @@ from gmdkit.serialization.functions import (
     write_plist, kv_wrap, dataclass_decoder, field_decoder
     )
 from gmdkit.serialization.classes import LazyString, LazyAttr
-from gmdkit.defaults.objects import OBJECT_DEFAULT
 from gmdkit.casting.object_loader import FieldLoaderMixin
 
 
@@ -27,11 +26,11 @@ class Object(DelimiterMixin,FieldLoaderMixin,DictClass[NumKey,Any]):
     END_DELIMITER = ";"
     
     @classmethod
-    def default(cls, object_id:int) -> Self:
-                
-        string = OBJECT_DEFAULT.get(object_id, f"1,{object_id},2,0,3,0;")
-        
-        return cls.from_string(string)
+    def from_editor(cls, object_id:int, x:float=0, y:float=0) -> Self:
+        props = FieldLoaderMixin.get_frame(object_id)
+        extra = props.editor_keys if props is not None else ""
+        obj = cls.from_string(f"1,{object_id},2,{x},3,{y}" + (f",{extra}" if extra else "") + ";")
+        return obj
 
     
 class ObjectList(ArrayDecoderMixin,ListClass[Object]):

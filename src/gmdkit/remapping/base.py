@@ -8,8 +8,10 @@ from gmdkit.remapping.types import IDType, IDActions
 from gmdkit.models.object import Object
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.models.prop.list import IntPairList
-from gmdkit.defaults.color_default import COLOR_1_DEFAULT, COLOR_2_DEFAULT
 from gmdkit.remapping.types import AutoID
+from gmdkit.utils import enums
+from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
+from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary
  
 
 ID_RULES = RuleHandler()
@@ -17,9 +19,6 @@ register = ID_RULES.register_rule
  
  
 # BaseObject
-def _get_base_color(intf:I.BaseObject) -> int:
-    return COLOR_1_DEFAULT.get(intf.obj_id)
- 
 def _special_color(color_id:int) -> bool:
     if color_id is None:
         return False
@@ -27,15 +26,12 @@ def _special_color(color_id:int) -> bool:
         return False
     return not (1 <= color_id <= 999)
  
-def _get_secondary_color(intf:I.BaseObject) -> int:
-    return COLOR_2_DEFAULT.get(intf.obj_id)
- 
 def _remap(remappable:Any, kvm:dict[int,int]):
     remappable.remap(kvm)
     return remappable
  
-register(I.BaseObject, 'color_1', id_type=IDType.COLOR_ID, fallback=_get_base_color, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(I.BaseObject, 'color_2', id_type=IDType.COLOR_ID, fallback=_get_secondary_color, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.BaseObject, 'color_1', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.BaseObject, 'color_2', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
 register(I.BaseObject, 'groups', id_type=IDType.GROUP_ID, replace=_remap, iterable=True, reference=True, id_min=1, id_max=9999)
 register(I.BaseObject, 'parent_groups', id_type=IDType.GROUP_ID, replace=_remap, iterable=True, reference=True, id_min=1, id_max=9999)
 register(I.BaseObject, 'linked_group', id_type=IDType.LINK_ID, reference=True, id_min=1)
@@ -108,10 +104,106 @@ register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custo
 register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_channels, replace=_remap_special_color_channels, fixed=True, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
 register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_copies, replace=_remap_special_base_color_copies, fixed=True, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
 register(I.LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
-# TODO named_groups: NamedGroupsDict 
-# TODO named_groups_order: NamedGroupsList
-# TODO custom_sfx_mapping: CustomSFXMapString = Field('kA59')
-# TODO custom_sfx_library: CustomSFXLibrary = Field('kA60')
+
+def _get_named_ids(id_type:IDType):
+    key = enums.NamedGroupsType(int(id_type))
+    def get(named:NamedGroupsDict) -> set[int]:
+        names = named.get(key)
+        return set(names.keys()) if names else set()
+    return get
+
+def _remap_named_ids(id_type:IDType):
+    key = enums.NamedGroupsType(int(id_type))
+    def remap(named:NamedGroupsDict, kvm:dict[int,int]):
+        names = named.get(key)
+        if names:
+            remapped = {kvm.get(k, k): v for k, v in names.items()}
+            names.clear()
+            names.update(remapped)
+        return named
+    return remap
+
+def _get_named_order(id_type:IDType):
+    key = enums.NamedGroupsType(int(id_type))
+    def get(order:NamedGroupsList) -> set[int]:
+        ids = order.get(key)
+        return set(ids) if ids else set()
+    return get
+
+def _remap_named_order(id_type:IDType):
+    key = enums.NamedGroupsType(int(id_type))
+    def remap(order:NamedGroupsList, kvm:dict[int,int]):
+        ids = order.get(key)
+        if ids:
+            ids.remap(kvm)
+        return order
+    return remap
+
+register(I.LevelSettings, 'named_groups', id_type=IDType.GROUP_ID, function=_get_named_ids(IDType.GROUP_ID), replace=_remap_named_ids(IDType.GROUP_ID), iterable=True, reference=True, id_min=1, id_max=9999)
+register(I.LevelSettings, 'named_groups', id_type=IDType.ITEM_ID, function=_get_named_ids(IDType.ITEM_ID), replace=_remap_named_ids(IDType.ITEM_ID), iterable=True, reference=True, id_min=0, id_max=9999)
+register(I.LevelSettings, 'named_groups', id_type=IDType.COLLISION_ID, function=_get_named_ids(IDType.COLLISION_ID), replace=_remap_named_ids(IDType.COLLISION_ID), iterable=True, reference=True, id_min=0, id_max=9999)
+register(I.LevelSettings, 'named_groups', id_type=IDType.TIMER_ID, function=_get_named_ids(IDType.TIMER_ID), replace=_remap_named_ids(IDType.TIMER_ID), iterable=True, reference=True, id_min=0, id_max=9999)
+register(I.LevelSettings, 'named_groups', id_type=IDType.EFFECT_ID, function=_get_named_ids(IDType.EFFECT_ID), replace=_remap_named_ids(IDType.EFFECT_ID), iterable=True, reference=True)
+register(I.LevelSettings, 'named_groups', id_type=IDType.CONTROL_ID, function=_get_named_ids(IDType.CONTROL_ID), replace=_remap_named_ids(IDType.CONTROL_ID), iterable=True, reference=True)
+register(I.LevelSettings, 'named_groups', id_type=IDType.GRADIENT_ID, function=_get_named_ids(IDType.GRADIENT_ID), replace=_remap_named_ids(IDType.GRADIENT_ID), iterable=True, reference=True, id_min=0, id_max=1000)
+register(I.LevelSettings, 'named_groups', id_type=IDType.ENTER_CHANNEL, function=_get_named_ids(IDType.ENTER_CHANNEL), replace=_remap_named_ids(IDType.ENTER_CHANNEL), iterable=True, reference=True, id_min=-32768, id_max=32767)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.GROUP_ID, function=_get_named_order(IDType.GROUP_ID), replace=_remap_named_order(IDType.GROUP_ID), iterable=True, reference=True, id_min=1, id_max=9999)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.ITEM_ID, function=_get_named_order(IDType.ITEM_ID), replace=_remap_named_order(IDType.ITEM_ID), iterable=True, reference=True, id_min=0, id_max=9999)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.COLLISION_ID, function=_get_named_order(IDType.COLLISION_ID), replace=_remap_named_order(IDType.COLLISION_ID), iterable=True, reference=True, id_min=0, id_max=9999)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.TIMER_ID, function=_get_named_order(IDType.TIMER_ID), replace=_remap_named_order(IDType.TIMER_ID), iterable=True, reference=True, id_min=0, id_max=9999)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.EFFECT_ID, function=_get_named_order(IDType.EFFECT_ID), replace=_remap_named_order(IDType.EFFECT_ID), iterable=True, reference=True)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.CONTROL_ID, function=_get_named_order(IDType.CONTROL_ID), replace=_remap_named_order(IDType.CONTROL_ID), iterable=True, reference=True)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.GRADIENT_ID, function=_get_named_order(IDType.GRADIENT_ID), replace=_remap_named_order(IDType.GRADIENT_ID), iterable=True, reference=True, id_min=0, id_max=1000)
+register(I.LevelSettings, 'named_groups_order', id_type=IDType.ENTER_CHANNEL, function=_get_named_order(IDType.ENTER_CHANNEL), replace=_remap_named_order(IDType.ENTER_CHANNEL), iterable=True, reference=True, id_min=-32768, id_max=32767)
+
+def _get_mapping_sfx_ids(mapping:CustomSFXMapString) -> set[int]:
+    return {m.sfx_id for m in mapping.mappings}
+
+def _remap_mapping_sfx_ids(mapping:CustomSFXMapString, kvm:dict[int,int]):
+    for m in mapping.mappings:
+        m.sfx_id = kvm.get(m.sfx_id, m.sfx_id)
+    return mapping
+
+def _get_mapping_custom_ids(mapping:CustomSFXMapString) -> set[int]:
+    return {m.custom_id for m in mapping.mappings}
+
+def _remap_mapping_custom_ids(mapping:CustomSFXMapString, kvm:dict[int,int]):
+    for m in mapping.mappings:
+        m.custom_id = kvm.get(m.custom_id, m.custom_id)
+    return mapping
+
+register(I.LevelSettings, 'custom_sfx_mapping', id_type=IDType.SFX_ID, function=_get_mapping_sfx_ids, replace=_remap_mapping_sfx_ids, iterable=True, reference=True)
+register(I.LevelSettings, 'custom_sfx_mapping', id_type=IDType.CUSTOM_SFX_ID, function=_get_mapping_custom_ids, replace=_remap_mapping_custom_ids, iterable=True, reference=True)
+
+_SFX_ROOT = 1
+
+def _library_nodes(library:CustomSFXLibrary):
+    return (*library.folders, *library.sounds)
+
+def _get_library_ids(library:CustomSFXLibrary) -> set[int]:
+    return {n.custom_id for n in _library_nodes(library)}
+
+def _remap_library_ids(library:CustomSFXLibrary, kvm:dict[int,int]):
+    for n in _library_nodes(library):
+        n.custom_id = kvm.get(n.custom_id, n.custom_id)
+    library.next_id = max((n.custom_id for n in _library_nodes(library)), default=_SFX_ROOT) + 1
+    return library
+
+def _get_library_parents(library:CustomSFXLibrary) -> set[int]:
+    return {n.parent_id for n in _library_nodes(library) if n.parent_id != _SFX_ROOT}
+
+def _remap_library_parents(library:CustomSFXLibrary, kvm:dict[int,int]):
+    for n in _library_nodes(library):
+        if n.parent_id != _SFX_ROOT:
+            n.parent_id = kvm.get(n.parent_id, n.parent_id)
+    return library
+
+def _get_library_sfx_ids(library:CustomSFXLibrary) -> set[int]:
+    return {s.sfx_id for s in library.sounds}
+
+register(I.LevelSettings, 'custom_sfx_library', id_type=IDType.CUSTOM_SFX_ID, function=_get_library_ids, replace=_remap_library_ids, iterable=True, id_min=_SFX_ROOT + 1)
+register(I.LevelSettings, 'custom_sfx_library', id_type=IDType.CUSTOM_SFX_ID, function=_get_library_parents, replace=_remap_library_parents, iterable=True, reference=True, id_min=_SFX_ROOT + 1)
+register(I.LevelSettings, 'custom_sfx_library', id_type=IDType.SFX_ID, function=_get_library_sfx_ids, fixed=True, iterable=True, reference=True)
   
  
 # VolumeInterface

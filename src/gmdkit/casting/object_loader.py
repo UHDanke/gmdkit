@@ -46,6 +46,9 @@ def encoded_field(key, default=""):
 def serial_field(key, cls):
     field(key=key, decoder=cls.from_string, encoder=cls.to_string, default_factory=cls)
 
+def base64_field(key, cls):
+    field(key=key, decoder=cls.from_base64, encoder=cls.to_base64, default_factory=cls)
+    
 def enum_field(key, enum, default=MISSING):
     if default is MISSING:
         field(key=key, decoder=enum)
@@ -652,8 +655,8 @@ serial_field("kA55", NamedGroupsDict)
 serial_field("kA56", NamedGroupsList)
 bool_field("kA57")
 bool_field("kA58")
-field('kA59', decoder=CustomSFXMapString.from_string, encoder=CustomSFXMapString.to_string)
-field('kA60', decoder=CustomSFXLibrary.from_base64, encoder=CustomSFXLibrary.to_base64)
+serial_field('kA59', CustomSFXMapString)
+base64_field('kA60', CustomSFXLibrary)
 field('kA61', decoder=int)
 field('kA62', decoder=CustomSFXFolderIDList.from_string, encoder=CustomSFXFolderIDList.to_string)
 bool_field("kA63")
