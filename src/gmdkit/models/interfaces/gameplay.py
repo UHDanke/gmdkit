@@ -1,6 +1,5 @@
 # Package Imports
-from gmdkit.utils import enums
-from gmdkit.models.interfaces.base import EffectObject, Field, register_id
+from gmdkit.models.interfaces.base import EffectObject, StartSettings, Field, register_id
 from gmdkit.models.interfaces.animated import SpinningObject
 
 
@@ -52,17 +51,10 @@ class ForceBlock(GameplayObject):
     force_id: int = Field(530)
 
 
-class StartPosition(EffectObject):
-    gamemode: enums.Gamemode = Field('kA2')
-    mini_mode: bool = Field('kA3')
-    speed: enums.Speed = Field('kA4')
-    dual_mode: bool = Field('kA8')
-    flip_gravity: bool = Field('kA11')
+class StartPosition(EffectObject, StartSettings):
     target_order: int = Field('kA19')
-    reverse_mode: bool = Field('kA20')
     inactive: bool = Field('kA21')
     target_channel: int = Field('kA26')
-    rotate_mode: bool = Field('kA29')
     reset_camera: bool = Field('kA35')
     free_mode: bool = Field('kA49')
     online: bool = Field('kA50')
@@ -70,7 +62,6 @@ class StartPosition(EffectObject):
     y_velocity: float = Field('kA52')
     name: str = Field('kA53')
     spawn_group_id: int = Field('kA54')
-    mirror_mode: bool = Field('kA63')
 
 
 # DashOrbObject

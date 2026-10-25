@@ -20,30 +20,18 @@ Field = AliasField
 register_id = FieldLoaderMixin.register_id
 
 
-class LevelSettings(BaseInterface):
-    audio_track: enums.OfficialSongs = Field("kA1")
+class StartSettings(BaseInterface):
     gamemode: enums.Gamemode = Field("kA2")
     mini_mode: bool = Field("kA3")
     speed: enums.Speed = Field("kA4")
-    object_2_blending: bool = Field("kA5")
-    background: int = Field("kA6")
-    ground: int = Field("kA7")
     dual_mode: bool = Field("kA8")
     is_start_pos: bool = Field("kA9")
     input_2p: bool = Field("kA10")
     flip_gravity: bool = Field("kA11")
-    color_3_blending: bool = Field("kA12")
-    song_offset: float = Field("kA13")
-    song_guidelines: GuidelineList = Field("kA14")
-    song_fade_in: bool = Field("kA15")
-    song_fade_out: bool = Field("kA16")
-    ground_line: int = Field("kA17")
-    font: int = Field("kA18")
     reverse_mode: bool = Field("kA20")
     platformer_mode: bool = Field("kA22")
     force_first_attempt_screen_edge: bool = Field("kA23")
     disable_first_attempt_screen_edge: bool = Field("kA24")
-    middleground: int = Field("kA25")
     allow_multi_rotate: bool = Field("kA27")
     rotate_mode: bool = Field("kA29")
     enable_player_squeeze: bool = Field("kA31")
@@ -58,6 +46,7 @@ class LevelSettings(BaseInterface):
     allow_static_object_rotate: bool = Field("kA41")
     reverse_sync: bool = Field("kA42")
     disable_time_point_penalty: bool = Field("kA43")
+    verification_time: int = Field("kA44")
     decrease_boost_slide: bool = Field("kA45")
     song_dont_reset: bool = Field("kA46")
     group_offset: int = Field("kA47")
@@ -72,6 +61,20 @@ class LevelSettings(BaseInterface):
     custom_sfx_shared_folders: CustomSFXFolderIDList = Field('kA62')
     mirror_mode: bool = Field("kA63")
  
+class LevelSettings(StartSettings):
+    legacy_audio_track: enums.OfficialSongs = Field("kA1")
+    object_2_blending: bool = Field("kA5")
+    background: int = Field("kA6")
+    ground: int = Field("kA7")
+    color_3_blending: bool = Field("kA12")
+    song_offset: float = Field("kA13")
+    song_guidelines: GuidelineList = Field("kA14")
+    song_fade_in: bool = Field("kA15")
+    song_fade_out: bool = Field("kA16")
+    ground_line: int = Field("kA17")
+    font: int = Field("kA18")
+    middleground: int = Field("kA25")
+    
     # pre 1.9 legacy colors
     background_red: int = Field("kS1")
     background_green: int = Field("kS2")
@@ -93,6 +96,13 @@ class LevelSettings(BaseInterface):
     groundline_player_color: int = Field("kS18")
     object_player_color: int = Field("kS19")
     object_2_player_color: int = Field("kS20")
+    color_2_red: int = Field("kS21")
+    color_2_green: int = Field("kS22")
+    color_2_blue: int = Field("kS23")
+    color_3_red: int = Field("kS24")
+    color_3_green: int = Field("kS25")
+    color_3_blue: int = Field("kS26")
+    color_2_player_color: int = Field("kS28")
  
     # 1.9 legacy colors
     background_color: Color = Field("kS29")
