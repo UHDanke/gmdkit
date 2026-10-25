@@ -45,7 +45,6 @@ class LevelSettings(BaseInterface):
     disable_first_attempt_screen_edge: bool = Field("kA24")
     middleground: int = Field("kA25")
     allow_multi_rotate: bool = Field("kA27")
-    mirror_mode: bool = Field("kA28")
     rotate_mode: bool = Field("kA29")
     enable_player_squeeze: bool = Field("kA31")
     fix_gravity_bug: bool = Field("kA32")
@@ -65,10 +64,13 @@ class LevelSettings(BaseInterface):
     enable_impulse_fix: bool = Field("kA48")
     named_groups: NamedGroupsDict = Field('kA55')
     named_groups_order: NamedGroupsList = Field('kA56')
+    track_edit_time: bool = Field("kA57")
+    track_edit_time_copies: bool = Field("kA58")
     custom_sfx_mapping: CustomSFXMapString = Field('kA59')
     custom_sfx_library: CustomSFXLibrary = Field('kA60')
     custom_sfx_mapping_creator: int = Field('kA61')
     custom_sfx_shared_folders: CustomSFXFolderIDList = Field('kA62')
+    mirror_mode: bool = Field("kA63")
  
     # pre 1.9 legacy colors
     background_red: int = Field("kS1")

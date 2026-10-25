@@ -217,7 +217,7 @@ class AliasField:
     def __delete__(self, instance):
         if self.read_only:
             raise AttributeError(f"{type(instance).__name__}.{self.name} is read-only")
-        del self._target(instance)[self.canonical]
+        self._target(instance).pop(self.canonical, None)
 
 class DictField(AliasField):
     def __init__(self, key=None, default=MISSING, default_factory=None, default_callable=None,

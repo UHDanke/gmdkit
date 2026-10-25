@@ -1,11 +1,10 @@
 # Imports
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Self
 
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.defaults.color_ids import default_color
 from gmdkit.utils.enums import TargetPlayer
 
 @dataclass_decoder(slots=True, separator='a', from_array=True)
@@ -55,8 +54,17 @@ class RGB(DataclassDecoderMixin):
     def get_hex(self) -> tuple[int,int,int]:
         r, g, b, _ = self.get_rgb()
         return "#{:02X}{:02X}{:02X}".format(r, g, b)
-    
 
+DEFAULT_LEVEL_COLORS = {
+    1000: (40, 125, 255, False),
+    1001: (0, 102, 255, False),
+    1002: (255, 255, 255, True),
+    1005: (192, 255, 224, True),
+    1006: (255, 185, 0, True),
+    1009: (0, 102, 255, False),
+    1013: (40, 125, 255, False),
+    1014: (40, 125, 255, False),
+    }
 
 @dataclass_decoder(slots=True, from_array=False, separator="_", auto_key=str)
 class Color(RGB):
@@ -65,7 +73,7 @@ class Color(RGB):
     blending: bool = field_decoder(default=False,optional=True)
     channel: int = 0
     opacity: float = 0.0
-    use_opacity: bool = field_decoder(default=False,optional=True)
+    use_opacity: bool = True
     copy_id: int = field_decoder(default=0,optional=True)
     hsv: HSV = field_decoder(default_factory=HSV,optional=True,decoder=HSV.from_string,encoder=HSV.to_string)
     to_red: int = 0
@@ -76,13 +84,23 @@ class Color(RGB):
     duration: float = field_decoder(default=0.0,optional=True)
     copy_opacity: bool = field_decoder(default=False,optional=True)
     runtime_trigger_id: int = 0
-    paused: bool = False
+    paused: bool = field_decoder(default=False,optional=True)
 
 
     @classmethod
-    def default(cls, color_id:int):
-        string = default_color(color_id)
-        return cls.from_string(string)
+    def default(cls, channel:int) -> Self:
+        channel = min(max(int(channel), 0), 1101)
+        red, green, blue, blending = DEFAULT_LEVEL_COLORS.get(channel, (255, 255, 255, False))
+        return cls(
+            red=red, green=green, blue=blue,
+            player=TargetPlayer.NONE,
+            blending=blending,
+            channel=channel,
+            opacity=1.0,
+            use_opacity=True,
+            to_red=255, to_green=255, to_blue=255,
+            to_opacity=1.0,
+            )
 
     def is_default(self):
         channel = self.channel
@@ -143,7 +161,6 @@ class ColorList(DelimiterMixin,ArrayDecoderMixin,ListClass[Color]):
             ids -= existing
         for i in ids:
             self.append(Color.default(i))
-        print(self.get_channels())
 
     def clear_defaults(self):
         self[:] = [i for i in self if not i.is_default()]

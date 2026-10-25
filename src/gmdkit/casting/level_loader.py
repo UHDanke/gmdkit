@@ -81,6 +81,8 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     like_rating: int = DictField(key="k22", default=0)
 
+    dislikes: int = DictField(key="k24", default=0)
+
     length_type: enums.LevelLength = DictField(
         key="k23",
         decoder=enums.LevelLength,
@@ -195,6 +197,10 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     friends_only: bool = DictField(key="k94", default=False)
 
     verification_time: int = DictField(key="k95", default=0)
+
+    upload_date: int = DictField(key="k98")
+
+    update_date: int = DictField(key="k99")
 
     saved_camera_positions: PositionList = serial_field("k101", PositionList)
 
@@ -513,5 +519,4 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
             return enums.TimelyType.NONE
     
 
-FieldLoaderMixin.add_field(key="k24") # dislikes, unused
 FieldLoaderMixin.add_field(key="k106") # unknown
