@@ -4,6 +4,8 @@ from xml.etree.ElementTree import Element
 from os import PathLike
 
 MISSING = object()
+ANY = object()
+NEWLINE = object()
 
 PathString = str|PathLike
 PlistStruct = dict|list|tuple

@@ -1,5 +1,6 @@
 # Package Imports
 from gmdkit.utils import enums
+from gmdkit.utils.typing import ANY
 from gmdkit.models.interfaces.base import (
     TriggerObject, BaseObject, Field, register_id
     )
@@ -101,6 +102,14 @@ class Template(BaseObject):
 class Text(BaseObject):
     data: str = Field(31)
     kerning: int = Field(488)
+
+    def glyphs(self, font, quality:int=4):
+        from gmdkit.extensions.text import text_object_glyphs
+        return text_object_glyphs(self.obj, font, quality)
+
+    def split(self, font, quality:int=4, split:str|object|None=ANY, portable:bool=True):
+        from gmdkit.extensions.text import split_text_object
+        return split_text_object(self.obj, font, quality, split, portable)
 
 
 # AdvancedRandomTrigger
