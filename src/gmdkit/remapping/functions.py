@@ -99,6 +99,7 @@ def reassign_object_ids(
 
             if not reassign_all and not range_search:
                 sr = used_ints
+                old = set()
                 range_min, range_max = v.vmin, v.vmax
             else:
                 sr = ir - used_ints
@@ -264,7 +265,6 @@ def remap_objects(
         ic_dict[k] = v | ic_all | ig_dict.get(k, set())
         ia_dict[k] = {x for x in ic_dict[k] if type(x) is AutoID}
 
-    groups = () if groups is None else groups
     ref_groups = () if ref_groups is None else ref_groups
     result = []
     last_ids = {}
@@ -275,9 +275,9 @@ def remap_objects(
         ids = rules.compile_ids(s, by_type=True, type_groups=groups)
 
         for k, v in ids.items():
-            ic = ic_dict.setdefault(k, set())
-            ia = ia_dict.setdefault(k, set())
-            ig = ig_dict.setdefault(k, set())
+            ig = ig_dict.setdefault(k, set(ig_all))
+            ic = ic_dict.setdefault(k, ic_all | ig)
+            ia = ia_dict.setdefault(k, {x for x in ic if type(x) is AutoID})
 
             used = v.get_ids()
             used_auto = {x for x in used if type(x) is AutoID}
@@ -313,7 +313,6 @@ def remap_objects(
             new_auto = [AutoID() for _ in coll_auto]
 
             kv_map = {**dict(zip(sorted(coll_ints), new_ints)), **dict(zip(sorted(coll_auto), new_auto))}
-            print(k, kv_map)
             v.remap_objects(kv_map, override=override_fixed)
             ic.update(new_ints)
             ic.update(new_auto)
@@ -335,7 +334,7 @@ def remap_objects_copy(
 
 def remap_objects_regroup(
         *sources:ObjectList|Level,
-        exclude_ids:Optional[dict]=None,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=REGROUP_ID_HANDLER,
@@ -356,7 +355,7 @@ def remap_objects_regroup(
 
 def remap_objects_build_helper(
         *sources:ObjectList|Level,
-        exclude_ids:Optional[dict]=None,
+        exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         include_ids:Optional[dict]=None,
         override_fixed:bool=False,
         rules:RuleHandler=REGROUP_ID_HANDLER,
@@ -364,7 +363,8 @@ def remap_objects_build_helper(
         ref_groups:Optional[Sequence[Sequence[IDType]]]=None
         ) -> list[ObjectList|Level]:
 
-    ref_groups = groups if ref_groups is None else ref_groups
+    if ref_groups is None:
+        ref_groups = rules.groups if groups is None else groups
 
     return remap_objects(
         *sources,

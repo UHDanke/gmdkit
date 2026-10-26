@@ -331,8 +331,8 @@ class AliasField:
 
 class DictField(AliasField):
     def __init__(self, key=None, default=MISSING, default_factory=None, default_callable=None,
-                 encoder=None, decoder=None, is_node=False, pass_kwargs=False):
-        super().__init__(key)
+                 encoder=None, decoder=None, is_node=False, pass_kwargs=False, read_only=False):
+        super().__init__(key, read_only)
         self.default = default
         self.default_factory = default_factory
         self.default_callable = default_callable

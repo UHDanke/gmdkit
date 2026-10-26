@@ -26,11 +26,15 @@ def create_text_rule(
             return None
         return int(match.group(1) if match.lastindex else match.group(0))
     
-    def replace(text: str, new_id: int):
+    def replace(text: str, kv_map: dict[int, int]):
         match = pattern.search(text)
         if not match:
             return text
-        return text[:match.start(1)] + str(new_id) + text[match.end(1):] if match.lastindex else str(new_id)
+        group = 1 if match.lastindex else 0
+        new_id = kv_map.get(int(match.group(group)))
+        if new_id is None:
+            return text
+        return text[:match.start(group)] + str(new_id) + text[match.end(group):]
     
     optionals = {}
     if condition is not None:
@@ -62,9 +66,10 @@ def create_label_rule(
         if isinstance(text, LabelID):
             return text.value
 
-    def replace(text: LabelID, new_id: int):
+    def replace(text: LabelID, kv_map: dict[int, int]):
         if isinstance(text, LabelID):
-            text.value = new_id
+            text.value = kv_map.get(text.value, text.value)
+        return text
 
     optionals = {}
     if condition is not None:

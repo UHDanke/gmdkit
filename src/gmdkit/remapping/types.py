@@ -1,6 +1,6 @@
 # Imports
 import re
-from enum import IntEnum
+from enum import IntEnum, IntFlag
 from dataclasses import dataclass
 from typing import ClassVar, get_type_hints, Optional, Self
 
@@ -112,45 +112,47 @@ class IDType(IntEnum):
     SONG_CHANNEL = 1012
     REMAP_BASE = 1013
     REMAP_TARGET = 1014
+    ANIMATION_ID = 1015
+    PLAYER_ID = 1016
     # gmdkit types
     LABEL = 2002
     GENERIC = 2001
 
 
-class IDActions(IntEnum):
-    SINGLE = 0
-    ACTIVE = 1
-    SPAWN = 2
-    TOGGLE = 3
-    FOLLOW_POSITION = 4 
-    COLOR = 5
-    FOLLOW_COLOR = 6
-    ALPHA = 7
-    FOLLOW_ALPHA = 8
-    MOVE = 9
-    FOLLOW_MOVE = 10
-    ROTATE = 11
-    FOLLOW_ROTATE = 12
-    SCALE = 13
-    FOLLOW_SCALE = 14
-    ANIMATE = 15
-    KEYFRAME = 16
-    PARTICLES = 17
-    UI = 18
-    RESET = 19
-    STOP = 20
-    PAUSE = 21
-    RESUME = 22
-    EDIT_EFFECT = 23
-    STOP_EFFECT = 24
-    SET_ITEM = 25
-    GET_ITEM = 26
-    TRACK_ITEM = 27
-    PERSIST_ITEM = 28
-    TRACK_COLLISION = 29
-    CHECK_COLLISION = 30
-    LINKED_OBJECTS = 31
-    
+class IDActions(IntFlag):
+    NONE = 0
+    ACTIVE = 1 << 0
+    SPAWN = 1 << 1
+    TOGGLE = 1 << 2
+    FOLLOW_POSITION = 1 << 3
+    COLOR = 1 << 4
+    FOLLOW_COLOR = 1 << 5
+    ALPHA = 1 << 6
+    FOLLOW_ALPHA = 1 << 7
+    MOVE = 1 << 8
+    FOLLOW_MOVE = 1 << 9
+    ROTATE = 1 << 10
+    FOLLOW_ROTATE = 1 << 11
+    SCALE = 1 << 12
+    FOLLOW_SCALE = 1 << 13
+    ANIMATE = 1 << 14
+    KEYFRAME = 1 << 15
+    PARTICLES = 1 << 16
+    UI = 1 << 17
+    RESET = 1 << 18
+    STOP = 1 << 19
+    PAUSE = 1 << 20
+    RESUME = 1 << 21
+    EDIT_EFFECT = 1 << 22
+    STOP_EFFECT = 1 << 23
+    SET_ITEM = 1 << 24
+    GET_ITEM = 1 << 25
+    TRACK_ITEM = 1 << 26
+    PERSIST_ITEM = 1 << 27
+    TRACK_COLLISION = 1 << 28
+    CHECK_COLLISION = 1 << 29
+    LINKED_OBJECTS = 1 << 30
+
 
 class IDGroup:
     def __init__(self, name: str, *members: IDType):
@@ -165,3 +167,15 @@ class IDGroup:
 
     def __contains__(self, item):
         return item in self.members
+
+
+SPAWNABLE_TRIGGERS = frozenset((
+    29, 30, 32, 33, 105, 744, 899, 900, 901, 915, 1006, 1007, 1049, 1268, 1346, 1347, 1520, 1585,
+    1595, 1611, 1612, 1613, 1616, 1811, 1812, 1814, 1815, 1817, 1818, 1819, 1912, 1913, 1914, 1916,
+    1917, 1931, 1932, 1934, 1935, 2015, 2062, 2063, 2066, 2067, 2068, 2899, 2900, 2901, 2903, 2904,
+    2905, 2907, 2909, 2910, 2911, 2912, 2913, 2914, 2915, 2916, 2917, 2919, 2920, 2921, 2922, 2923,
+    2924, 2925, 2999, 3006, 3007, 3008, 3009, 3010, 3011, 3012, 3013, 3014, 3015, 3016, 3017, 3018,
+    3019, 3020, 3021, 3022, 3023, 3024, 3029, 3030, 3031, 3033, 3600, 3602, 3603, 3604, 3605, 3606,
+    3607, 3608, 3609, 3612, 3613, 3614, 3615, 3617, 3618, 3619, 3620, 3640, 3641, 3655, 3660, 3661,
+    3662, 3663,
+    ))

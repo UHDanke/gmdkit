@@ -26,7 +26,9 @@ ALL_IDS = (
     IDType.SFX_GROUP,
     IDType.SONG_CHANNEL,
     IDType.REMAP_BASE,
-    IDType.REMAP_TARGET
+    IDType.REMAP_TARGET,
+    IDType.ANIMATION_ID,
+    IDType.PLAYER_ID
     )
 
 COPY_IDS = (

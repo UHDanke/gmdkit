@@ -30,8 +30,8 @@ def _remap(remappable:Any, kvm:dict[int,int]):
     remappable.remap(kvm)
     return remappable
  
-register(I.BaseObject, 'color_1', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(I.BaseObject, 'color_2', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.BaseObject, 'color_1', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.ALPHA | IDActions.COLOR)
+register(I.BaseObject, 'color_2', id_type=IDType.COLOR_ID, fixed=_special_color, when_unset=True, reference=True, id_min=1, id_max=1101, actions=IDActions.ALPHA | IDActions.COLOR)
 register(I.BaseObject, 'groups', id_type=IDType.GROUP_ID, replace=_remap, iterable=True, reference=True, id_min=1, id_max=9999)
 register(I.BaseObject, 'parent_groups', id_type=IDType.GROUP_ID, replace=_remap, iterable=True, reference=True, id_min=1, id_max=9999)
 register(I.BaseObject, 'linked_group', id_type=IDType.LINK_ID, reference=True, id_min=1)
@@ -90,7 +90,7 @@ def _remap_special_color_channels(color_list:ColorList, kvm:dict[int,int]):
     return color_list
  
 def _get_special_color_copies(color_list:ColorList) -> set[int]:
-    return {i for i in _get_color_channels(color_list) if _special_color(i)}
+    return {i for i in _get_color_copies(color_list) if _special_color(i)}
  
 def _remap_special_base_color_copies(color_list:ColorList, kvm:dict[int,int]):
     for color in color_list:
@@ -99,10 +99,10 @@ def _remap_special_base_color_copies(color_list:ColorList, kvm:dict[int,int]):
             color.copy_id = kvm.get(i,i)
     return color_list
  
-register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_channels, replace=_remap_custom_color_channels, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_copies, replace=_remap_custom_color_copies, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
-register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_channels, replace=_remap_special_color_channels, fixed=True, iterable=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_copies, replace=_remap_special_base_color_copies, fixed=True, iterable=True, reference=True, id_min=1, id_max=1101, actions=(IDActions.FOLLOW_ALPHA, IDActions.FOLLOW_COLOR,))
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_channels, replace=_remap_custom_color_channels, iterable=True, id_min=1, id_max=1101, actions=IDActions.ALPHA | IDActions.COLOR)
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_custom_color_copies, replace=_remap_custom_color_copies, iterable=True, reference=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_ALPHA | IDActions.FOLLOW_COLOR)
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_channels, replace=_remap_special_color_channels, fixed=True, iterable=True, id_min=1, id_max=1101, actions=IDActions.ALPHA | IDActions.COLOR)
+register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_special_color_copies, replace=_remap_special_base_color_copies, fixed=True, iterable=True, reference=True, id_min=1, id_max=1101, actions=IDActions.FOLLOW_ALPHA | IDActions.FOLLOW_COLOR)
 register(I.LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 
 def _get_named_ids(id_type:IDType):
@@ -241,7 +241,7 @@ def _remap_pairs_keys(pairs:IntPairList, kvm:dict[int,int]):
     pairs.remap_keys(kvm)
     return pairs
  
-register(I.AdvancedRandomTrigger, 'group_weights', id_type=IDType.GROUP_ID, function=_get_keys, replace=_remap_pairs_keys, iterable=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.AdvancedRandomTrigger, 'group_weights', id_type=IDType.GROUP_ID, function=_get_keys, replace=_remap_pairs_keys, remappable=True, iterable=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
  
  
 # AlphaTrigger
@@ -249,13 +249,14 @@ register(I.AlphaTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, w
  
  
 # AnimateKeyframeTrigger
-register(I.AnimateKeyframeTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE,))
-register(I.AnimateKeyframeTrigger, 'parent_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_SCALE, IDActions.FOLLOW_ROTATE,))
+register(I.AnimateKeyframeTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.ROTATE | IDActions.SCALE | IDActions.MOVE)
+register(I.AnimateKeyframeTrigger, 'parent_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_SCALE | IDActions.FOLLOW_ROTATE)
 register(I.AnimateKeyframeTrigger, 'animation_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.KEYFRAME)
  
  
 # AnimateTrigger
 register(I.AnimateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.ANIMATE)
+register(I.AnimateTrigger, 'animation_id', id_type=IDType.ANIMATION_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.ANIMATE)
  
  
 # BulgeShader
@@ -273,6 +274,7 @@ register(I.CameraEdgeTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=T
 register(I.CheckpointTrigger, 'spawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.CheckpointTrigger, 'target_pos', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 register(I.CheckpointTrigger, 'respawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.CheckpointTrigger, 'prespawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
  
  
 # CollectibleObject
@@ -282,7 +284,7 @@ def _has_collectible_default_group_id(intf) -> bool:
 def _has_collectible_default_item_id(intf) -> bool:
     return bool(intf.pickup_item)
  
-register(I.CollectibleObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.CollectibleObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
 register(I.CollectibleObject, 'particle', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.PARTICLES)
 register(I.CollectibleObject, 'item_id', id_type=IDType.ITEM_ID, when_unset=_has_collectible_default_item_id, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
  
@@ -298,18 +300,18 @@ def _has_default_collision_block_a(intf) -> bool:
 def _has_default_collision_block_b(intf) -> bool:
     return not intf.between_players
  
-register(I.CollisionTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.CollisionTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
 register(I.CollisionTrigger, 'block_a', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_collision_block_a, id_min=0, id_max=9999, actions=IDActions.TRACK_COLLISION)
 register(I.CollisionTrigger, 'block_b', id_type=IDType.COLLISION_ID, remappable=True, when_unset=_has_default_collision_block_b, id_min=0, id_max=9999, actions=IDActions.TRACK_COLLISION)
  
  
 # ColorTrigger
-register(I.ColorTrigger, 'color_channel', id_type=IDType.COLOR_ID, fixed=_special_color, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
-register(I.ColorTrigger, 'copy_id', id_type=IDType.COLOR_ID, fixed=_special_color, reference=True, id_min=1, id_max=1101, actions=(IDActions.ALPHA, IDActions.COLOR,))
+register(I.ColorTrigger, 'color_channel', id_type=IDType.COLOR_ID, fixed=_special_color, id_min=1, id_max=1101, actions=IDActions.ALPHA | IDActions.COLOR)
+register(I.ColorTrigger, 'copy_id', id_type=IDType.COLOR_ID, fixed=_special_color, reference=True, id_min=1, id_max=1101, actions=IDActions.ALPHA | IDActions.COLOR)
  
  
 # CountTrigger
-register(I.CountTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.CountTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
 register(I.CountTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, when_unset=True, id_min=0, id_max=9999, actions=IDActions.TRACK_ITEM)
  
  
@@ -336,12 +338,13 @@ register(I.EndWallTrigger, 'group_id', id_type=IDType.GROUP_ID, when_unset=True,
  
  
 # EnterPreset
-register(I.EnterPreset, 'enter_channel', id_type=IDType.ENTER_CHANNEL, remappable=True, when_unset=True, id_min=-32768, id_max=32767)
+register(I.EnterPreset, 'target_enter_channel', id_type=IDType.ENTER_CHANNEL, remappable=True, when_unset=True, reference=True, id_min=-32768, id_max=32767)
  
  
 # EventTrigger
 register(I.EventTrigger, 'spawn_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.EventTrigger, 'extra_id_1', id_type=IDType.MATERIAL_ID, remappable=True, when_unset=True)
+register(I.EventTrigger, 'extra_id_2', id_type=IDType.PLAYER_ID, remappable=True, when_unset=True, reference=True, id_min=-1, id_max=2)
  
  
 # FollowPlayerYTrigger
@@ -393,7 +396,7 @@ register(I.InstantCollisionTrigger, 'block_b', id_type=IDType.COLLISION_ID, rema
  
  
 # InstantCountTrigger
-register(I.InstantCountTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.InstantCountTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
 register(I.InstantCountTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, when_unset=True, reference=True, id_min=0, id_max=9999, actions=IDActions.GET_ITEM)
  
  
@@ -471,7 +474,7 @@ register(I.ItemPersistTrigger, 'item_id', id_type=IDType.TIMER_ID, condition=_it
 def _has_default_keyframe_group(intf) -> bool:
     return intf.index == 1
  
-register(I.KeyframeObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_default_keyframe_group, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.SCALE, IDActions.MOVE,))
+register(I.KeyframeObject, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_default_keyframe_group, id_min=1, id_max=9999, actions=IDActions.ROTATE | IDActions.SCALE | IDActions.MOVE)
 register(I.KeyframeObject, 'spawn_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
 register(I.KeyframeObject, 'key_id', id_type=IDType.KEYFRAME_ID, when_unset=True, reference=True, id_min=0)
  
@@ -500,7 +503,7 @@ register(I.MotionBlurShader, 'center_id', id_type=IDType.GROUP_ID, remappable=Tr
 def _has_move_default_target(intf) -> bool:
     return bool(intf.direction_mode or intf.target_mode)
  
-register(I.MoveTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_POSITION, IDActions.MOVE,))
+register(I.MoveTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION | IDActions.MOVE)
 register(I.MoveTrigger, 'target_pos', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_move_default_target, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 register(I.MoveTrigger, 'target_center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_move_default_target, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
  
@@ -510,7 +513,7 @@ register(I.ObjectControlTrigger, 'target_id', id_type=IDType.GROUP_ID, when_unse
  
  
 # OnDeathTrigger
-register(I.OnDeathTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.OnDeathTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
  
  
 # PickupTrigger
@@ -566,7 +569,7 @@ def _has_rotate_default_aim_target(intf) -> bool:
 def _has_rotate_default_aim(intf) -> bool:
     return bool(intf.aim_mode)
  
-register(I.RotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.FOLLOW_POSITION, IDActions.ROTATE, IDActions.MOVE,))
+register(I.RotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION | IDActions.ROTATE | IDActions.MOVE)
 register(I.RotateTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 register(I.RotateTrigger, 'aim_target', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim_target, id_min=1, id_max=9999)
 register(I.RotateTrigger, 'min_x_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=_has_rotate_default_aim, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
@@ -576,12 +579,12 @@ register(I.RotateTrigger, 'max_y_id', id_type=IDType.GROUP_ID, remappable=True, 
  
  
 # ScaleTrigger
-register(I.ScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SCALE, IDActions.MOVE,))
+register(I.ScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SCALE | IDActions.MOVE)
 register(I.ScaleTrigger, 'center_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
  
  
 # SequenceTrigger
-register(I.SequenceTrigger, 'sequence', id_type=IDType.GROUP_ID, function=_get_keys, replace=_remap_pairs_keys, iterable=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
+register(I.SequenceTrigger, 'sequence', id_type=IDType.GROUP_ID, function=_get_keys, replace=_remap_pairs_keys, remappable=True, iterable=True, id_min=1, id_max=9999, actions=IDActions.SPAWN)
  
  
 # ShockLineShader
@@ -600,7 +603,7 @@ register(I.ShockwaveShader, 'center_id', id_type=IDType.GROUP_ID, remappable=Tru
  
 # SongTrigger
 register(I.SongTrigger, 'song_id', id_type=IDType.SONG_ID, remappable=True, when_unset=True, reference=True)
-register(I.SongTrigger, 'channel', id_type=IDType.SONG_CHANNEL, remappable=True, when_unset=True, reference=True, id_min=0, id_max=4)
+register(I.SongTrigger, 'song_channel', id_type=IDType.SONG_CHANNEL, remappable=True, when_unset=True, reference=True, id_min=0, id_max=4)
  
  
 # SpawnParticleTrigger
@@ -638,7 +641,7 @@ register(I.StopAreaTrigger, 'effect_id', id_type=IDType.EFFECT_ID, remappable=Tr
  
  
 # StopEnterTrigger
-register(I.StopEnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True, actions=IDActions.STOP_EFFECT)
+register(I.StopEnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, remappable=True, when_unset=True, reference=True, actions=IDActions.STOP_EFFECT)
 register(I.StopEnterTrigger, 'enter_channel', id_type=IDType.ENTER_CHANNEL, remappable=True, when_unset=True, id_min=-32768, id_max=32767)
  
  
@@ -668,7 +671,7 @@ register(I.TimerTrigger, 'item_id', id_type=IDType.TIMER_ID, remappable=True, wh
  
  
 # ToggleBlock
-register(I.ToggleBlock, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.ToggleBlock, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
  
  
 # ToggleTrigger
@@ -676,12 +679,12 @@ register(I.ToggleTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, 
  
  
 # TouchTrigger
-register(I.TouchTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.TouchTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
  
  
 # UITrigger
 register(I.UITrigger, 'group_id', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
-register(I.UITrigger, 'ui_target', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.UI, IDActions.MOVE,))
+register(I.UITrigger, 'ui_target', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.UI | IDActions.MOVE)
  
  
 # AreaTrigger
@@ -704,13 +707,13 @@ register(I.area.EditAreaTrigger, 'target_id', id_type=IDType.EFFECT_ID, conditio
  
  
 # EditSFXTrigger
-register(I.EditSFXTrigger, 'sfx_group', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
+register(I.EditSFXTrigger, 'sfx_group', id_type=IDType.SFX_GROUP, remappable=True, when_unset=True, reference=True)
 register(I.EditSFXTrigger, 'unique_id', id_type=IDType.UNIQUE_SFX_ID, remappable=True, when_unset=True)
-register(I.EditSFXTrigger, 'group_id', id_type=IDType.SFX_GROUP, remappable=True, when_unset=True)
+register(I.EditSFXTrigger, 'group_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999)
  
  
 # EditSongTrigger
-register(I.EditSongTrigger, 'channel', id_type=IDType.SONG_CHANNEL, remappable=True, when_unset=True, id_min=0, id_max=4)
+register(I.EditSongTrigger, 'song_channel', id_type=IDType.SONG_CHANNEL, remappable=True, when_unset=True, id_min=0, id_max=4)
  
  
 # EnterTrigger
@@ -721,6 +724,7 @@ register(I.EnterTrigger, 'effect_id', id_type=IDType.EFFECT_ID, when_unset=True,
 register(I.SFXTrigger, 'sfx_id', id_type=IDType.SFX_ID, remappable=True, when_unset=True, reference=True)
 register(I.SFXTrigger, 'unique_id', id_type=IDType.UNIQUE_SFX_ID, remappable=True, when_unset=True, reference=True)
 register(I.SFXTrigger, 'custom_library_id', id_type=IDType.CUSTOM_SFX_ID, when_unset=True, reference=True)
+register(I.SFXTrigger, 'sfx_group', id_type=IDType.SFX_GROUP, remappable=True, when_unset=True)
  
  
 # TeleportTrigger
@@ -752,7 +756,7 @@ register(I.AreaTintTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=Tru
  
  
 # SmallCoin
-register(I.SmallCoin, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=(IDActions.SPAWN, IDActions.TOGGLE,))
+register(I.SmallCoin, 'group_id', id_type=IDType.GROUP_ID, when_unset=_has_collectible_default_group_id, id_min=1, id_max=9999, actions=IDActions.SPAWN | IDActions.TOGGLE)
 register(I.SmallCoin, 'particle', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.PARTICLES)
 register(I.SmallCoin, 'item_id', id_type=IDType.ITEM_ID, when_unset=_has_collectible_default_item_id, id_min=0, id_max=9999, actions=IDActions.SET_ITEM)
  
@@ -762,11 +766,11 @@ register(I.AreaMoveTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=Tru
  
  
 # AreaRotateTrigger
-register(I.AreaRotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.ROTATE, IDActions.MOVE,))
+register(I.AreaRotateTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.ROTATE | IDActions.MOVE)
  
  
 # AreaScaleTrigger
-register(I.AreaScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=(IDActions.SCALE, IDActions.MOVE,))
+register(I.AreaScaleTrigger, 'target_id', id_type=IDType.GROUP_ID, remappable=True, when_unset=True, id_min=1, id_max=9999, actions=IDActions.SCALE | IDActions.MOVE)
 
 # ProgressTrigger
 
@@ -774,4 +778,4 @@ def _has_item_input(intf) -> bool:
     return bool(intf.item_input)
 
 register(I.ProgressTrigger, 'target_item_id', id_type=IDType.ITEM_ID, remappable=True, id_min=1, id_max=9999, actions=IDActions.SET_ITEM)
-register(I.ProgressTrigger, 'item_id', id_type=IDType.ITEM_ID, when_unset=_has_item_input, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)
+register(I.ProgressTrigger, 'item_id', id_type=IDType.ITEM_ID, remappable=True, when_unset=_has_item_input, reference=True, id_min=1, id_max=9999, actions=IDActions.GET_ITEM)

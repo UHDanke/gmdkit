@@ -8,7 +8,7 @@ from functools import lru_cache
 from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.classes import BaseInterface
-from gmdkit.remapping.types import IDType, IDActions, AutoID
+from gmdkit.remapping.types import IDType, IDActions, AutoID, SPAWNABLE_TRIGGERS
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
@@ -29,7 +29,7 @@ class Identifier:
     iterable: bool = False
     id_min: int = ID_MIN
     id_max: int = ID_MAX
-    actions: tuple[IDActions] = ()
+    actions: IDActions = IDActions.NONE
     replaceable: bool = True
     replace: Optional[Callable] = None
     # derived
@@ -86,7 +86,7 @@ class IdentifierList:
             remappable:Optional[bool] = None,
             reference:Optional[bool] = None,
             condition:Optional[Callable]=None,
-            has_tags:Optional[Sequence[IDActions]]=None,
+            has_tags:Optional[IDActions]=None,
             has_types:Optional[Sequence[IDType]]=None
             ) -> Self:
 
@@ -113,10 +113,8 @@ class IdentifierList:
             if has_cond and not condition(i):
                 continue
 
-            if has_tags:
-                own = i.actions if isinstance(i.actions, tuple) else (i.actions,)
-                if not any(t in own for t in has_tags):
-                    continue
+            if has_tags and not (i.actions & has_tags):
+                continue
 
             result.append(i)
 
@@ -230,7 +228,7 @@ class IDRule:
     reference: bool = False
     id_min: int = ID_MIN
     id_max: int = ID_MAX
-    actions: Optional[tuple] = None
+    actions: IDActions = IDActions.NONE
 
     def key_for(self, schema: type[BaseInterface]) -> int | str:
         return _property_key(schema, self.field)
@@ -239,16 +237,14 @@ class IDRule:
             self,
             id_types: Optional[Sequence[IDType]] = None,
             reference: Optional[bool] = None,
-            actions: Optional[Sequence[IDActions]] = None
+            actions: Optional[IDActions] = None
             ) -> bool:
         if id_types and self.id_type not in id_types:
             return False
         if reference is not None and self.reference != reference:
             return False
-        if actions:
-            own = self.actions if isinstance(self.actions, tuple) else (self.actions,)
-            if not any(a in own for a in actions):
-                return False
+        if actions and not (self.actions & actions):
+            return False
         return True
 
     def get_id(self, intf: BaseInterface) -> Optional[Identifier]:
@@ -294,7 +290,11 @@ class IDRule:
             id_type=self.id_type,
             default=0 if has_default else None,
             fixed=bool(fixed),
-            remappable=bool(remappable) and bool(getattr(intf, "spawn_trigger", False)),
+            remappable=(
+                bool(remappable)
+                and obj.current_id in SPAWNABLE_TRIGGERS
+                and bool(getattr(intf, "spawn_trigger", False))
+                ),
             reference=self.reference,
             iterable=self.iterable,
             id_min=self.id_min,
@@ -354,7 +354,7 @@ class RuleHandler:
             reference: bool = False,
             id_min: int = ID_MIN,
             id_max: int = ID_MAX,
-            actions: Optional[tuple] = None
+            actions: IDActions = IDActions.NONE
             ) -> IDRule:
         rule = IDRule(
             field=field, id_type=id_type, condition=condition, function=function,
