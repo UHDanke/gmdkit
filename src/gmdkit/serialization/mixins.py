@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import re
 from contextlib import contextmanager
 from typing import (
-    Any, Self, Literal,
+    Any, Self, Literal, Union,
     Optional,
     Callable, Sequence,
     ClassVar, 
@@ -21,6 +21,7 @@ from gmdkit.utils.typing import (
     KeyValueCondition,
     PlistDecoder,PlistEncoder
 )
+from gmdkit.serialization.classes import TokenStream
 from gmdkit.serialization.functions import (
     decompress_string, compress_string,
     read_plist, write_plist,
@@ -380,7 +381,6 @@ class PlistBoolMapMixin(PlistDecoderMixin):
 
 
 class DataclassDecoderMixin:
- 
     ENCODER: ClassVar[Optional[StringDictEncoder]] = staticmethod(dict_serializer)
     DECODER: ClassVar[Optional[StringDictDecoder]] = None
     CONDITION: ClassVar[Optional[KeyValueCondition]] = None
@@ -389,34 +389,99 @@ class DataclassDecoderMixin:
     PAIR_SEPARATOR: ClassVar[Optional[str]] = None
     SINGLE_SPLIT: ClassVar[bool] = False
     MAX_SPLIT: ClassVar[Optional[int]] = None
- 
+    GROUP_SIZES: ClassVar[tuple[int, ...]] = ()
+    GROUPED: ClassVar[bool] = False
+    STREAM_FIELDS: ClassVar[tuple] = ()
+
+
     @classmethod
     def from_tokens(
             cls,
-            tokens:Sequence[str],
+            tokens:Union[Sequence[str], TokenStream],
             decoder:Optional[StringDictDecoder]=None,
+            partial:Optional[bool]=None,
             **kwargs
             ) -> Self:
- 
+
         from_array = cls.FROM_ARRAY
         decoder = cls.DECODER if decoder is None else decoder
- 
         f = get_fields(cls)
+        stream_fields = cls.STREAM_FIELDS
+
+        if isinstance(tokens, TokenStream):
+            stream = tokens
+            partial = bool(partial)
+            if not stream_fields:
+                if from_array:
+                    width = sum(cls.GROUP_SIZES) if cls.GROUPED else len(f)
+                    left = len(stream)
+                    tokens = stream.read(width if not partial or left >= width else left)
+                else:
+                    tokens = stream.rest()
+                partial = True
+        elif stream_fields:
+            stream = TokenStream(list(tokens))
+            partial = True if partial is None else partial
+        else:
+            stream = None
+
+        class_args = {}
+
+        if stream_fields:
+            sizes = cls.GROUP_SIZES
+            for i, field in enumerate(f):
+                if partial and not stream:
+                    break
+                name = field.name
+                try:
+                    coders = stream_fields[i]
+                    if coders is not None:
+                        class_args[name] = coders[0](stream)
+                        continue
+                    size = sizes[i]
+                    token = stream.pop() if size == 1 else stream.read(size)
+                    if decoder is None:
+                        class_args[name] = token
+                    else:
+                        key, value = decoder(name, token)
+                        class_args[key] = value
+                except Exception as e:
+                    raise ValueError(
+                        f"[{cls.__name__}] failed to decode field '{name}' at token {stream.position}"
+                    ) from e
+            if not isinstance(tokens, TokenStream):
+                stream.expect_end(cls)
+            return cls(**class_args)
+
         length = len(tokens)
-        f_len = len(f) if from_array else len(f) * 2
+        grouped = from_array and cls.GROUPED
+        f_len = (sum(cls.GROUP_SIZES) if grouped else len(f)) if from_array else len(f) * 2
  
         if length > f_len:
             raise ValueError(
                 f"[{cls.__name__}] expected at most {f_len} tokens, got {length}"
             )
  
-        class_args = {}
- 
         if from_array:
+            if grouped:
+                groups = []
+                i = 0
+                for size in cls.GROUP_SIZES:
+                    if i >= length:
+                        break
+                    if size == 1:
+                        groups.append(tokens[i])
+                    else:
+                        if i + size > length:
+                            raise ValueError(
+                                f"[{cls.__name__}] field {len(groups)} needs {size} tokens, got {length - i}"
+                            )
+                        groups.append(list(tokens[i:i + size]))
+                    i += size
+                tokens = groups
             if decoder is None:
                 class_args = {field.name: token for field, token in zip(f, tokens)}
             else:
-                class_args = {}
                 for field, token in zip(f, tokens):
                     try:
                         key, value = decoder(field.name, token)
@@ -455,14 +520,16 @@ class DataclassDecoderMixin:
  
     def to_tokens(
             self,
+            out:Optional[list]=None,
             condition:Optional[Callable]=None,
             encoder:Optional[StringDictEncoder]=None
-            ) -> Sequence[str]:
+            ) -> list:
  
         cls = type(self)
         from_array = cls.FROM_ARRAY
         condition = cls.CONDITION if condition is None else condition
         encoder = cls.ENCODER if encoder is None else encoder
+        out = [] if out is None else out
  
         field_data = [
             (key, getattr(self, key)) for key in get_field_names_ordered(cls)
@@ -479,13 +546,35 @@ class DataclassDecoderMixin:
                 field_data = field_data[:end]
             else:
                 field_data = [(k, v) for k, v in field_data if not condition(k, v)]
+
+        if from_array and (cls.GROUPED or cls.STREAM_FIELDS):
+            sizes = cls.GROUP_SIZES
+            stream_fields = cls.STREAM_FIELDS
+            for i, (key, value) in enumerate(field_data):
+                try:
+                    coders = stream_fields[i] if stream_fields else None
+                    if coders is not None:
+                        coders[1](value, out)
+                        continue
+                    if encoder is not None:
+                        _, value = encoder(key, value)
+                    if sizes[i] == 1:
+                        out.append(value)
+                        continue
+                    value = list(value)
+                    if len(value) != sizes[i]:
+                        raise ValueError(f"expected {sizes[i]} tokens from encoder, got {len(value)}")
+                    out.extend(value)
+                except Exception as e:
+                    raise ValueError(f"[{cls.__name__}] failed to encode field '{key}'") from e
+            return out
  
-        parts = []
+        append = out.append
         if encoder is None:
             for key, value in field_data:
                 if not from_array:
-                    parts.append(key)
-                parts.append(value)
+                    append(key)
+                append(value)
         else:
             for key, value in field_data:
                 try:
@@ -495,10 +584,10 @@ class DataclassDecoderMixin:
                         f"[{cls.__name__}] failed to encode field '{key}'"
                     ) from e
                 if not from_array:
-                    parts.append(ek)
-                parts.append(ev)
+                    append(ek)
+                append(ev)
  
-        return parts
+        return out
  
  
     @classmethod
@@ -560,9 +649,7 @@ class DataclassDecoderMixin:
         return cls.SEPARATOR.join(tokens)
  
 
-
 class DictDecoderMixin:
-
     ENCODER: ClassVar[Optional[StringDictEncoder]] = staticmethod(dict_serializer)
     DECODER: ClassVar[Optional[StringDictDecoder]] = None
     CONTAINER: ClassVar[Optional[str]] = None
@@ -571,26 +658,66 @@ class DictDecoderMixin:
     PAIR_SEPARATOR: ClassVar[Optional[str]] = None
     SINGLE_SPLIT: ClassVar[Optional[bool]] = None
     SORT_KEYS: ClassVar[bool] = False
+    USE_STREAMS: ClassVar[bool] = False
+    COUNTED: ClassVar[bool] = False
 
     @classmethod
     def from_tokens(
             cls,
-            tokens:Sequence[str],
+            tokens:Union[Sequence[str], TokenStream],
             decoder:Optional[StringDictDecoder]=None,
-            container:Optional[str]=None
+            container:Optional[str]=None,
+            **kwargs
             ) -> Self:
 
         decoder = cls.DECODER if decoder is None else decoder
         container = cls.CONTAINER if container is None else container
+
+        result = cls()
+        data = result if container is None else getattr(result, container)
+        counted = cls.COUNTED
+        stream = None
+
+        if counted or cls.USE_STREAMS:
+            stream = tokens if isinstance(tokens, TokenStream) else TokenStream(list(tokens))
+            if counted:
+                if not stream:
+                    return result
+                count = int(stream.pop())
+
+        if cls.USE_STREAMS:
+            n = 0
+            while (n < count) if counted else stream:
+                if not stream:
+                    raise ValueError(f"[{cls.__name__}] count is {count}, decoded {n} entries")
+                try:
+                    key, value = decoder(stream)
+                except Exception as e:
+                    raise ValueError(
+                        f"[{cls.__name__}] failed to decode entry {n} at token {stream.position}"
+                    ) from e
+                data[key] = value
+                n += 1
+            if counted and stream is not tokens:
+                stream.expect_end(cls)
+            return result
+
+        if counted:
+            try:
+                read = stream.read(2 * count)
+            except ValueError as e:
+                raise ValueError(f"[{cls.__name__}] count is {count}, {e}") from None
+            if stream is not tokens:
+                stream.expect_end(cls)
+            tokens = read
+        elif isinstance(tokens, TokenStream):
+            tokens = tokens.rest()
 
         length = len(tokens)
         if length % 2 != 0:
             raise ValueError(
                 f"[{cls.__name__}] expected an even number of key-value tokens, got {length}"
                 )
-
-        result = cls()
-        data = result if container is None else getattr(result, container)
 
         it = iter(tokens)
         if decoder:
@@ -610,11 +737,12 @@ class DictDecoderMixin:
 
     def to_tokens(
             self,
+            out:Optional[list]=None,
             encoder:Optional[StringDictEncoder]=None,
             condition:Optional[KeyValueCondition]=None,
             container:Optional[str]=None,
-            sort_keys:bool=False
-            ) -> Sequence[str]:
+            sort_keys:Optional[bool]=None
+            ) -> list:
 
         cls = type(self)
         encoder = cls.ENCODER if encoder is None else encoder
@@ -622,26 +750,41 @@ class DictDecoderMixin:
         container = cls.CONTAINER if container is None else container
         sort_keys = cls.SORT_KEYS if sort_keys is None else sort_keys
         data = self if container is None else getattr(self, container)
+        out = [] if out is None else out
 
-        result = []
-        result_extend = result.extend
         items = data.items()
         if sort_keys:
             items = sorted(items)
 
+        if cls.COUNTED:
+            if condition is not None:
+                items = [(k, v) for k, v in items if condition(k, v)]
+                condition = None
+            out.append(str(len(items)))
+
+        if cls.USE_STREAMS:
+            try:
+                for key, value in items:
+                    if condition is None or condition(key, value):
+                        encoder(key, value, out)
+            except Exception as e:
+                raise ValueError(f"[{cls.__name__}] failed to encode") from e
+            return out
+
+        extend = out.extend
         if encoder:
             try:
                 for key, value in items:
                     if condition is None or condition(key, value):
-                        result_extend(encoder(key, value))
+                        extend(encoder(key, value))
             except Exception as e:
                 raise ValueError(f"[{cls.__name__}] failed to encode") from e
         else:
-            for key, value in data.items():
+            for key, value in items:
                 if condition is None or condition(key, value):
-                    result_extend((key, value))
+                    extend((key, value))
 
-        return result
+        return out
 
 
     @classmethod
@@ -695,20 +838,22 @@ class DictDecoderMixin:
         return cls.SEPARATOR.join(tokens)
 
 class ArrayDecoderMixin:
-
     ENCODER: ClassVar[Optional[StringEncoder]] = staticmethod(serialize)
     DECODER: ClassVar[Optional[StringDecoder]] = None
     CONTAINER: ClassVar[Optional[str]] = None
     GROUP_SIZE: ClassVar[int] = 1
     SEPARATOR: ClassVar[str] = ','
     KEEP_SEPARATOR: ClassVar[bool] = False
+    USE_STREAMS: ClassVar[bool] = False
+    COUNTED: ClassVar[bool] = False
 
     @classmethod
     def from_tokens(
             cls,
-            tokens:Sequence[str],
+            tokens:Union[Sequence[str], TokenStream],
             decoder:Optional[StringDecoder]=None,
-            container:Optional[str]=None
+            container:Optional[str]=None,
+            **kwargs
             ) -> Self:
 
         decoder = cls.DECODER if decoder is None else decoder
@@ -718,6 +863,43 @@ class ArrayDecoderMixin:
         result = cls()
         data = result if container is None else getattr(result, container)
         append = data.append
+        counted = cls.COUNTED
+        stream = None
+
+        if counted or cls.USE_STREAMS:
+            stream = tokens if isinstance(tokens, TokenStream) else TokenStream(list(tokens))
+            if counted:
+                if not stream:
+                    return result
+                count = int(stream.pop())
+
+        if cls.USE_STREAMS:
+            n = 0
+            while (n < count) if counted else stream:
+                if not stream:
+                    raise ValueError(f"[{cls.__name__}] count is {count}, decoded {n} items")
+                try:
+                    append(decoder(stream))
+                except Exception as e:
+                    raise ValueError(
+                        f"[{cls.__name__}] failed to decode item {n} at token {stream.position}"
+                    ) from e
+                n += 1
+            if counted and stream is not tokens:
+                stream.expect_end(cls)
+            return result
+
+        if counted:
+            try:
+                read = stream.read(count * group_size)
+            except ValueError as e:
+                raise ValueError(f"[{cls.__name__}] count is {count}, {e}") from None
+            if stream is not tokens:
+                stream.expect_end(cls)
+            tokens = read
+        elif isinstance(tokens, TokenStream):
+            tokens = tokens.rest()
+
         extend = data.extend
         try:
             if group_size > 1:
@@ -737,34 +919,41 @@ class ArrayDecoderMixin:
 
     def to_tokens(
             self,
+            out:Optional[list]=None,
             encoder:Optional[StringEncoder]=None,
             container:Optional[str]=None
-            ) -> Sequence[str]:
+            ) -> list:
 
         cls = type(self)
         encoder = cls.ENCODER if encoder is None else encoder
         container = cls.CONTAINER if container is None else container
         data = self if container is None else getattr(self, container)
         group_size = cls.GROUP_SIZE
+        out = [] if out is None else out
+
+        if cls.COUNTED:
+            out.append(str(len(data)))
 
         try:
-            if group_size > 1:
-                tokens = []
+            if cls.USE_STREAMS:
+                for x in data:
+                    encoder(x, out)
+            elif group_size > 1:
                 for x in data:
                     group = encoder(x) if encoder else x
                     if len(group) != group_size:
                         raise ValueError(
                             f"[{cls.__name__}] expected {group_size} tokens from encoder, got {len(group)}"
                             )
-                    tokens.extend(group)
-                return tokens
+                    out.extend(group)
             elif encoder:
-                return [encoder(x) for x in data]
+                out.extend([encoder(x) for x in data])
             else:
-                return list(data)
-
+                out.extend(data)
         except Exception as e:
             raise ValueError(f"[{cls.__name__}] failed to encode") from e
+
+        return out
 
 
     @classmethod
@@ -841,6 +1030,7 @@ class DelimiterMixin:
             ) -> str:
 
         string = super().to_string(**kwargs)
+        assert isinstance(string, str)
 
         if skip_delimiter or not string:
             return string
@@ -900,7 +1090,7 @@ class CompressFileMixin:
         cypher = cls.CYPHER
 
         string = super().to_string(**kwargs)
-
+        assert isinstance(string, str)
 
         if compressed:
             kw = {}
@@ -976,7 +1166,7 @@ class FilePathMixin(FileStringMixin):
         @classmethod
         def from_string(cls, string:str, **kwargs) -> Self:
             new = super().from_string(string.rstrip("\r\n"), **kwargs)
-            assert type(new) is cls
+            assert isinstance(new, cls)
             return new
 
 
@@ -1000,7 +1190,9 @@ class PlistLoaderMixin(PlistDecoderMixin):
         if save_content if save_content is not None else type(self).SAVE_CONTENT:
             self.save(selectors=content_selectors)
 
-        return super().to_string(**kwargs)
+        string = super().to_string(**kwargs)
+        assert isinstance(string, str)
+        return string
 
 
     def load(self, selectors:Optional[set]=None,**kwargs):

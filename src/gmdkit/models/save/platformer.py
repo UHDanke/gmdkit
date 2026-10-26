@@ -14,6 +14,7 @@ from gmdkit.serialization.mixins import (
     DefaultPathMixin
     )
 from gmdkit.models.prop.replay import ReplayStringLazy
+from gmdkit.models.prop.platformer_save import PlatformerCheckpointLazy
 from gmdkit.constants.paths.save import PLATFORMER_SAVE_PATH
 
  
@@ -40,11 +41,11 @@ class PlatformerSaveEntry(PlistLoaderMixin, DictClass[str, Any], metaclass=Field
  
     autosave_uid: str = DictField(key="uid", default="")
  
-    platformer_save: str = DictField(
+    platformer_save: PlatformerCheckpointLazy = DictField(
         key="cs",
-        decoder=lambda s: decompress_string(s) if s else "",
-        encoder=lambda s: compress_string(s) if s else "",
-        default="",
+        decoder=lambda s: PlatformerCheckpointLazy.load_string(s or ""),
+        encoder=PlatformerCheckpointLazy.save_string,
+        default_factory=PlatformerCheckpointLazy,
         )
  
     platformer_save_level_version: int = DictField(key="cv", default=0)

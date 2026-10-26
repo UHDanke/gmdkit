@@ -403,6 +403,7 @@ def dataclass_decoder(
         has_kwargs = set()
  
         fields = get_fields(cls)
+        stream_fields = []
         for i, f in enumerate(fields,start=1):
             meta = f.metadata
             name = f.name
@@ -418,10 +419,39 @@ def dataclass_decoder(
                 dkey_dict[key] = name
                 ekey_dict[name] = key
  
-            decoders[name] = meta.get("decoder") or decoder_from_type(ft)
-            encoders[name] = meta.get("encoder") or encoder_from_type(ft)
- 
- 
+            group_size = meta.get("group_size", 1)
+
+            if meta.get("use_streams"):
+                if meta.get("decoder") is None or meta.get("encoder") is None:
+                    raise ValueError(f"{cls.__name__}.{name}: use_streams needs a decoder and an encoder")
+                if group_size != 1:
+                    raise ValueError(f"{cls.__name__}.{name}: use_streams fields take no group_size")
+                if not getattr(cls, "FROM_ARRAY", True):
+                    raise ValueError(f"{cls.__name__}.{name}: use_streams needs the array form")
+                stream_fields.append((meta["decoder"], meta["encoder"]))
+                decoders[name] = str
+                encoders[name] = str
+            else:
+                stream_fields.append(None)
+
+                if group_size != 1 and not (isinstance(group_size, int) and group_size > 1):
+                    raise ValueError(f"{cls.__name__}.{name}: group_size must be an int above 0")
+                if group_size > 1 and not getattr(cls, "FROM_ARRAY", True):
+                    raise ValueError(f"{cls.__name__}.{name}: group_size needs the array form")
+
+                if group_size > 1:
+                    decoders[name] = meta.get("decoder") or getattr(ft, "from_tokens", None)
+                    encoders[name] = meta.get("encoder") or getattr(ft, "to_tokens", None)
+                    if decoders[name] is None or encoders[name] is None:
+                        raise ValueError(
+                            f"{cls.__name__}.{name}: group_size {group_size} needs a decoder / encoder "
+                            "taking / returning a list of tokens"
+                        )
+                else:
+                    decoders[name] = meta.get("decoder") or decoder_from_type(ft)
+                    encoders[name] = meta.get("encoder") or encoder_from_type(ft)
+
+
             allow_kwargs = meta.get("allow_kwargs")
             allow_kwargs = default_kwargs if allow_kwargs is None else allow_kwargs
  
@@ -440,6 +470,11 @@ def dataclass_decoder(
                     default = None
                 cond_dict[name] = default
  
+        group_sizes = tuple(f.metadata.get("group_size", 1) for f in fields)
+        cls.GROUP_SIZES = group_sizes
+        cls.GROUPED = any(size != 1 for size in group_sizes)
+        cls.STREAM_FIELDS = tuple(stream_fields) if any(c is not None for c in stream_fields) else ()
+
         cls.DECODER = staticmethod(
             decoder or dict_cast(
                 decoders,
@@ -476,6 +511,8 @@ def field_decoder(
         encoder:Optional[Callable]=None,
         optional:Optional[bool]=None,
         allow_kwargs:Optional[bool]=None,
+        group_size:Optional[int]=None,
+        use_streams:Optional[bool]=None,
         **kwargs
         ):
 
@@ -501,6 +538,12 @@ def field_decoder(
 
     if "allow_kwargs" not in md and allow_kwargs is not None:
         md["allow_kwargs"] = allow_kwargs
+
+    if "group_size" not in md and group_size is not None:
+        md["group_size"] = group_size
+
+    if "use_streams" not in md and use_streams is not None:
+        md["use_streams"] = use_streams
 
     if md:
         d["metadata"] = md
@@ -616,4 +659,3 @@ def codec_cast(
         return key, value
 
     return cast_func
-

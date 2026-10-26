@@ -11,6 +11,56 @@ from gmdkit.serialization.functions import (
     )
 
  
+class TokenStream:
+    __slots__ = ("tokens", "position", "end")
+
+    def __init__(self, tokens: list, start: int = 0, end: Optional[int] = None):
+        self.tokens = tokens
+        self.position = start
+        self.end = len(tokens) if end is None else end
+
+    def __bool__(self) -> bool:
+        return self.position < self.end
+
+    def __len__(self) -> int:
+        return self.end - self.position
+
+    def pop(self) -> str:
+        i = self.position
+        if i >= self.end:
+            raise ValueError(f"ran out of tokens at token {i}")
+        self.position = i + 1
+        return self.tokens[i]
+
+    def read(self, n: int) -> list:
+        i = self.position
+        end = i + n
+        if end > self.end:
+            raise ValueError(f"needed {n} tokens at token {i}, got {self.end - i}")
+        self.position = end
+        return self.tokens[i:end]
+
+    def rest(self) -> list:
+        i, end = self.position, self.end
+        self.position = end
+        return self.tokens if i == 0 and end == len(self.tokens) else self.tokens[i:end]
+
+    def take(self, n: int) -> "TokenStream":
+        i = self.position
+        end = i + n
+        if end > self.end:
+            raise ValueError(f"needed {n} tokens at token {i}, got {self.end - i}")
+        self.position = end
+        return TokenStream(self.tokens, i, end)
+
+    def expect_end(self, owner: type):
+        if self.position < self.end:
+            raise ValueError(f"[{owner.__name__}] {self.end - self.position} unread tokens")
+
+    def __repr__(self) -> str:
+        return f"TokenStream({self.tokens[self.position:self.end]!r})"
+
+
 class LazyString:
     
     __slots__ = ("string", "data")

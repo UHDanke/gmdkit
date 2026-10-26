@@ -2,6 +2,7 @@
 from gmdkit.utils import enums
 from gmdkit.models.object import Object, ObjectList, ObjectStringLazy
 from gmdkit.models.prop.replay import ReplayStringLazy
+from gmdkit.models.prop.platformer_save import PlatformerCheckpointLazy
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.prop.pos_list import PositionList
 from gmdkit.models.prop.death_markers import (
@@ -254,7 +255,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
     last_autobackup_time: int = DictField(key="k127", default=0)
     
-    platformer_save: str = DictField(key="k128",decoder=decompress_string,encoder=compress_string) # TODO format
+    platformer_save: PlatformerCheckpointLazy = lazy_field("k128", PlatformerCheckpointLazy)
     
     enable_platformer_save: bool = DictField("k129", default=False)
     
