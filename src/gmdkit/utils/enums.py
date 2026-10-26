@@ -1184,6 +1184,7 @@ class ObjectPropertyFlag(FlagClass):
     USES_AUDIO_SCALE = 1 << 9
     FIXED_Z_LAYER = 1 << 10
     NOT_COLORABLE = 1 << 11
+    SPAWNABLE = 1 << 12
     
 class CollisionType(EnumClass):
     NONE = 0

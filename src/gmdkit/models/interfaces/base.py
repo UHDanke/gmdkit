@@ -358,6 +358,11 @@ class BaseObject(BaseInterface):
     def slope_is_hazard(self) -> Optional[bool]:
         props = self.obj.frame_properties
         return None if props is None else props.slope_is_hazard
+    
+    @property
+    def spawnable(self) -> Optional[bool]:
+        props = self.obj.frame_properties       
+        return None if props is None else props.spawnable
 
     @property
     def use_object_rect(self) -> Optional[bool]:
@@ -493,7 +498,12 @@ class TriggerObject(EffectObject):
     def set_touch_trigger(self, multi_trigger:bool=False):
         self.spawn_trigger = False
         self.touch_trigger = True
-        self.multi_trigger = multi_trigger   
+        self.multi_trigger = multi_trigger
+        
+    @property
+    def can_be_spawned(self):
+        return self.spawnable and self.spawn_trigger
+        
 
 
 # LevelSettings

@@ -8,7 +8,7 @@ from functools import lru_cache
 from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.classes import BaseInterface
-from gmdkit.remapping.types import IDType, IDActions, AutoID, SPAWNABLE_TRIGGERS
+from gmdkit.remapping.types import IDType, IDActions, AutoID
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
@@ -292,8 +292,7 @@ class IDRule:
             fixed=bool(fixed),
             remappable=(
                 bool(remappable)
-                and obj.current_id in SPAWNABLE_TRIGGERS
-                and bool(getattr(intf, "spawn_trigger", False))
+                and bool(getattr(intf, "can_be_spawned", False))
                 ),
             reference=self.reference,
             iterable=self.iterable,
