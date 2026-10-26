@@ -185,6 +185,66 @@ class BaseInterface:
     def __repr__(self):
         return f"{type(self).__name__}({self.obj!r})"
 
+class RootList:
+    COUNT_KEY: ClassVar[str]
+    ITEM_KEYS: ClassVar[tuple[str, ...]]
+
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __len__(self) -> int:
+        return self.obj.get(type(self).COUNT_KEY, 0)
+
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self.get(i)
+
+    def __getitem__(self, index: int):
+        return self.get(self.check_index(index))
+
+    def __delitem__(self, index: int):
+        index = self.check_index(index)
+        count = len(self)
+        for i in range(index + 1, count):
+            self.move(i, i - 1)
+        self.remove_keys(count - 1)
+        self.obj[type(self).COUNT_KEY] = count - 1
+
+    def check_index(self, index: int) -> int:
+        count = len(self)
+        if index < 0:
+            index += count
+        if not 0 <= index < count:
+            raise IndexError(f"{type(self).__name__} index {index} out of range")
+        return index
+
+    def get(self, index: int):
+        raise NotImplementedError
+
+    def keys_at(self, index: int) -> list[str]:
+        return [key.format(index) for key in type(self).ITEM_KEYS]
+
+    def move(self, source: int, target: int):
+        obj = self.obj
+        for old, new in zip(self.keys_at(source), self.keys_at(target)):
+            if old in obj:
+                obj[new] = obj.pop(old)
+            else:
+                obj.pop(new, None)
+
+    def remove_keys(self, index: int):
+        for key in self.keys_at(index):
+            self.obj.pop(key, None)
+
+    def clear(self):
+        for i in range(len(self)):
+            self.remove_keys(i)
+        self.obj[type(self).COUNT_KEY] = 0
+
+    def __repr__(self):
+        return f"{type(self).__name__}({list(self)!r})"
+
+
 V = TypeVar("V", bound=BaseInterface)
 T = TypeVar("T")
 
@@ -295,6 +355,34 @@ class DictField(AliasField):
         )
 
 
+class PrefixField:
+    def __init__(self, prefix: str, encoder=None, decoder=None, is_node=False, pass_kwargs=False, view=None):
+        self.prefix = prefix
+        self.encoder = encoder
+        self.decoder = decoder
+        self.is_node = is_node
+        self.pass_kwargs = pass_kwargs
+        self.view = view
+
+    def __set_name__(self, owner, name):
+        self.name = name
+        owner.add_prefix_field(
+            self.prefix,
+            encoder=self.encoder,
+            decoder=self.decoder,
+            is_node=self.is_node,
+            pass_kwargs=self.pass_kwargs
+        )
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        if self.view is not None:
+            return self.view(instance)
+        prefix = self.prefix
+        return {k: v for k, v in instance.items() if isinstance(k, str) and k.startswith(prefix)}
+
+
 class FieldMetaclass(type):
     KEY_DECODER: Optional[Callable] = None
     KEY_ENCODER: Optional[Callable] = None
@@ -313,6 +401,20 @@ class FieldMetaclass(type):
     _DECODER_CHAIN: ChainMap
     _DEFAULT_CHAIN: ChainMap
     _KEY_CHAIN: ChainMap
+    _PREFIX_ENCODER_MAP: dict
+    _PREFIX_DECODER_MAP: dict
+
+    def add_prefix_field(cls, prefix, *, encoder=None, decoder=None, is_node=False, pass_kwargs=False):
+        if encoder is not None:
+            if "_PREFIX_ENCODER_MAP" not in cls.__dict__:
+                cls._PREFIX_ENCODER_MAP = {}
+            codec_cls = EncoderCodec if (cls.HAS_NODES and not is_node) else Codec
+            cls._PREFIX_ENCODER_MAP[prefix] = codec_cls(encoder, allow_kwargs=pass_kwargs)
+        if decoder is not None:
+            if "_PREFIX_DECODER_MAP" not in cls.__dict__:
+                cls._PREFIX_DECODER_MAP = {}
+            codec_cls = DecoderCodec if (cls.HAS_NODES and not is_node) else Codec
+            cls._PREFIX_DECODER_MAP[prefix] = codec_cls(decoder, allow_kwargs=pass_kwargs)
 
     def add_field(cls, key, *, encoder=None, decoder=None, is_node=False,
                   pass_kwargs=False, default=MISSING, default_factory=None, default_callable=None):
@@ -369,13 +471,26 @@ class FieldMetaclass(type):
             if "_KEYS" in klass.__dict__
         ))
 
+        prefix_decoders = ChainMap(*(
+            klass.__dict__["_PREFIX_DECODER_MAP"]
+            for klass in cls.__mro__
+            if "_PREFIX_DECODER_MAP" in klass.__dict__
+        ))
+        prefix_encoders = ChainMap(*(
+            klass.__dict__["_PREFIX_ENCODER_MAP"]
+            for klass in cls.__mro__
+            if "_PREFIX_ENCODER_MAP" in klass.__dict__
+        ))
+
         cls.DECODER = staticmethod(codec_cast(
             cls._DECODER_CHAIN,
+            prefixes=prefix_decoders,
             default=cls.DEFAULT_DECODER,
             key_start=cls.KEY_DECODER,
         ))
         cls.ENCODER = staticmethod(codec_cast(
             cls._ENCODER_CHAIN,
+            prefixes=prefix_encoders,
             default=cls.DEFAULT_ENCODER,
             key_end=cls.KEY_ENCODER,
         ))

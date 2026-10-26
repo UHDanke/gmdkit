@@ -879,6 +879,16 @@ class DisplayIcon(EnumClass):
     SPIDER = 6
     SWING = 7
     JETPACK = 8
+
+
+class EditorWindow(EnumClass):
+    EMOTE_PICKER_KEYBOARD = 0
+    EDITOR_COMMANDS = 1
+    EMOTE_PICKER = 2
+    FIND_OBJECT = 3
+    GRID_SETTINGS = 4
+    MOVE_STEP = 5
+
     
 class NamedGroupsType(EnumClass):
     GROUP_ID = 1

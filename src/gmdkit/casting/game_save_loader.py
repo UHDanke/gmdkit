@@ -9,7 +9,7 @@ from gmdkit.models.prop.dpad import (
 )
 from gmdkit.models.prop.audio_info import SongInfoList, RecentSFXList, UseCountDict
 from gmdkit.models.custom_sfx import CustomSFXLibrary
-from gmdkit.serialization.classes import DictField, FieldMetaclass
+from gmdkit.serialization.classes import DictField, FieldMetaclass, PrefixField
 from gmdkit.serialization.mixins import PlistLoaderMixin
 from gmdkit.serialization.helpers import (
     StrBoolDict, IntBoolDict, IntStrDict, IntIntDict, StrIntDict, node_field, serial_field
@@ -22,7 +22,8 @@ from gmdkit.models.prop.value_keepers import (
 )
 from gmdkit.models.prop.list import StrList, IntList
 from gmdkit.models.keybinds import KeybindDict
-from gmdkit.models.prop.editor_sfx import EditorSFXString
+from gmdkit.models.prop.window_state import WindowState
+from gmdkit.models.prop.editor_sfx import EditorSFXString, EditorSoundConfig, FavoriteSoundConfigs, MySoundConfigs
 from gmdkit.utils import enums
 
 
@@ -390,3 +391,35 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     value_keeper: ValueKeeper = node_field("valueKeeper", ValueKeeper)
 
     window_state_count: int = DictField(key="winStateCount", default=0)
+
+    editor_sfx_favorite_configs: FavoriteSoundConfigs = PrefixField(
+        "editorSFXFavorite_",
+        decoder=EditorSoundConfig.from_node,
+        encoder=EditorSoundConfig.to_node,
+        is_node=True,
+        view=FavoriteSoundConfigs,
+    )
+
+    editor_sfx_my_configs: MySoundConfigs = PrefixField(
+        "editorSFXMy_",
+        decoder=EditorSoundConfig.from_node,
+        encoder=EditorSoundConfig.to_node,
+        is_node=True,
+        view=MySoundConfigs,
+    )
+
+    @property
+    def editor_commands_window(self) -> WindowState:
+        return WindowState(self, enums.EditorWindow.EDITOR_COMMANDS)
+
+    @property
+    def find_object_window(self) -> WindowState:
+        return WindowState(self, enums.EditorWindow.FIND_OBJECT)
+
+    @property
+    def grid_settings_window(self) -> WindowState:
+        return WindowState(self, enums.EditorWindow.GRID_SETTINGS)
+
+    @property
+    def move_step_window(self) -> WindowState:
+        return WindowState(self, enums.EditorWindow.MOVE_STEP)

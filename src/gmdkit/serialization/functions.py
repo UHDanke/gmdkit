@@ -637,17 +637,25 @@ def codec_cast(
     key_start=None,
     key_end=None,
     default=None,
+    prefixes=None,
 ):
     c_get = codecs.get
     has_default = callable(default)
     use_start = callable(key_start)
     use_end = callable(key_end)
+    prefix_codecs = tuple(sorted(prefixes.items(), key=lambda item: -len(item[0]))) if prefixes else ()
 
     def cast_func(key, value, **kwargs):
         if use_start:
             key = key_start(key)
 
         codec = c_get(key)
+        if codec is None and prefix_codecs and isinstance(key, str):
+            for prefix, prefix_codec in prefix_codecs:
+                if key.startswith(prefix):
+                    codec = prefix_codec
+                    break
+
         if codec is None:
             value = default(value) if has_default else value
         else:
