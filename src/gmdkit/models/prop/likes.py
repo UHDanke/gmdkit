@@ -1,16 +1,14 @@
 # Imports
 from typing import Any, ClassVar, Iterator, Optional, Type, TypeVar, Union, overload
 from dataclasses import MISSING
-import xml.etree.ElementTree as ET
 
 
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.utils import enums
 from gmdkit.serialization.classes import AliasField, BaseInterface
-from gmdkit.serialization.functions import validate_dict_node
 from gmdkit.serialization.type_cast import to_bool, from_bool
-from gmdkit.serialization.mixins import PlistDecoderMixin, DataclassDecoderMixin, DelimiterMixin
+from gmdkit.serialization.mixins import PlistBoolMapMixin, DataclassDecoderMixin, DelimiterMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 
 
@@ -155,40 +153,9 @@ LikeData.register_type(enums.LikeItemType.MOD_ROOM_LEVEL_COMMENT, ModRoomComment
 LikeData.register_type(enums.LikeItemType.MOD_ROOM_USER_COMMENT, ModRoomCommentLike)
 
 
-class LikeList(PlistDecoderMixin, ListClass[LikeData]):
+class LikeList(PlistBoolMapMixin, ListClass[LikeData]):
     DECODER = staticmethod(LikeData.from_string)
     ENCODER = staticmethod(LikeData.to_string)
-
-    def load_data(self, node: ET.Element, decoder=None, **kwargs):
-        decoder = type(self).DECODER if decoder is None else decoder
-
-        try:
-            validate_dict_node(node)
-        except Exception as e:
-            raise RuntimeError(f"[{type(self).__name__}] failed to validate node") from e
-
-        self.clear()
-        append = self.append
-        if kwargs:
-            for i in range(0, len(node), 2):
-                append(decoder(node[i].text, **kwargs))
-        else:
-            for i in range(0, len(node), 2):
-                append(decoder(node[i].text))
-
-    def save_data(self, encoder=None, **kwargs) -> ET.Element:
-        encoder = type(self).ENCODER if encoder is None else encoder
-        node = ET.Element("d")
-        sub = ET.SubElement
-        seen = set()
-        for item in self:
-            key = encoder(item, **kwargs)
-            if key in seen:
-                continue
-            seen.add(key)
-            sub(node, "k").text = key
-            sub(node, "s").text = "1"
-        return node
 
     def interfaces(self, cls: Type[I] = LikeInterface) -> Iterator[I]:
         for item in self:

@@ -19,9 +19,7 @@ from gmdkit.utils.typing import (
     StringDecoder, StringEncoder,
     StringDictDecoder, StringDictEncoder,
     KeyValueCondition,
-    PlistDecoder,PlistEncoder,
-    NumKey,
-    MISSING
+    PlistDecoder,PlistEncoder
 )
 from gmdkit.serialization.functions import (
     decompress_string, compress_string,
@@ -318,6 +316,67 @@ class PlistDecoderMixin(FileStringMixin):
             value_method = getattr(value, method, None)
             if callable(value_method):
                 value_method(**kwargs)
+
+
+class PlistBoolMapMixin(PlistDecoderMixin):
+
+    TRUE_TAG: ClassVar[str] = "s"
+    TRUE_TEXT: ClassVar[str] = "1"
+
+    def load_data(
+            self,
+            node:ET.Element,
+            decoder:Optional[Callable]=None,
+            container:Optional[str]=None,
+            **kwargs
+            ):
+
+        cls = type(self)
+        decoder = cls.DECODER if decoder is None else decoder
+        container = cls.CONTAINER if container is None else container
+        data = self if container is None else getattr(self, container)
+
+        try:
+            validate_dict_node(node)
+        except Exception as e:
+            raise RuntimeError(f"[{cls.__name__}] failed to validate node") from e
+
+        data.clear()
+        append = data.append
+        if decoder is None:
+            for i in range(0, len(node), 2):
+                append(node[i].text)
+        elif kwargs:
+            for i in range(0, len(node), 2):
+                append(decoder(node[i].text, **kwargs))
+        else:
+            for i in range(0, len(node), 2):
+                append(decoder(node[i].text))
+
+    def save_data(
+            self,
+            encoder:Optional[Callable]=None,
+            container:Optional[str]=None,
+            **kwargs
+            ) -> ET.Element:
+
+        cls = type(self)
+        encoder = cls.ENCODER if encoder is None else encoder
+        container = cls.CONTAINER if container is None else container
+        data = self if container is None else getattr(self, container)
+        tag, text = cls.TRUE_TAG, cls.TRUE_TEXT
+
+        node = ET.Element("d")
+        sub = ET.SubElement
+        seen = set()
+        for item in data:
+            key = item if encoder is None else encoder(item, **kwargs)
+            if key in seen:
+                continue
+            seen.add(key)
+            sub(node, "k").text = key
+            sub(node, tag).text = text
+        return node
 
 
 class DataclassDecoderMixin:
@@ -1007,45 +1066,3 @@ class FolderLoaderMixin:
 
         for item in data:
             encoder(item, folder_path)
-
-# TODO DELETE
-class DictDefaultsMixin:
-
-    TYPES: Optional[dict[NumKey, Callable]] = None
-    DEFAULTS: Optional[dict[NumKey, Any]] = None
-
-    def setdefault(self, key, default=MISSING):
-        cls = type(self)
-
-        types = cls.TYPES or {}
-        defaults = cls.DEFAULTS or {}
-
-        if key not in self:
-
-            if default is not MISSING:
-                self[key] = default
-
-            elif key in defaults:
-                self[key] = defaults[key]
-
-            elif key in types:
-                self[key] = types[key]()
-
-        return self.get(key)
-
-    def init_keys(self, *keys, override:bool=False):
-        cls = type(self)
-
-        types = cls.TYPES or {}
-        defaults = cls.DEFAULTS or {}
-
-        for key in keys:
-
-            if not override and key in self:
-                continue
-
-            if key in defaults:
-                self[key] = defaults[key]
-
-            elif key in types:
-                self[key] = types[key]()
