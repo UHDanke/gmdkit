@@ -1,15 +1,15 @@
 # Imports
-from typing import Any
+from typing import Any, Optional
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.utils import enums
 from gmdkit.serialization.mixins import (
-    ArrayDecoderMixin, DataclassDecoderMixin, DelimiterMixin, DictDecoderMixin, PlistLoaderMixin
+    ArrayDecoderMixin, CompressFileMixin, DataclassDecoderMixin, DelimiterMixin, DictDecoderMixin, PlistLoaderMixin
     )
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.serialization.classes import FieldMetaclass, DictField, RootList
-from gmdkit.serialization.type_cast import to_bool, from_bool, from_float, serialize
+from gmdkit.serialization.classes import FieldMetaclass, DictField, RootList, LazyString, LazyAttr
+from gmdkit.serialization.type_cast import to_bool, from_bool, from_float, serialize, decode_text, encode_text
 from gmdkit.models.custom_sfx import CustomSFXMappingList
 
 
@@ -113,41 +113,60 @@ class EditorSFXString(DataclassDecoderMixin):
         )
 
 
+@dataclass_decoder(slots=True, from_array=True, separator=";", max_split=1)
+class EditorSFXPackString(CompressFileMixin, EditorSFXString):
+    COMPRESSED = True
+    COMPRESSION = "gzip"
+
+
+class EditorSFXPackStringLazy(LazyString):
+    PARSER = EditorSFXPackString
+
+    version: int = LazyAttr()
+    sfx_data: EditorSFXBindingMapping = LazyAttr()
+
+
 class EditorSoundConfig(PlistLoaderMixin, DictClass[str, Any], metaclass=FieldMetaclass):
     HAS_NODES = True
 
-    config_id: int = DictField(key="k_es_id", default=0)
-    local_id: int = DictField(key="k_es_lid", default=0)
-    uploaded: bool = DictField(key="k_es_au", default=False)
-    name: str = DictField(key="k_es_name", default="")
-    description: str = DictField(key="k_es_desc", default="")
-    version: int = DictField(key="k_es_ver", default=0)
-    local_version: int = DictField(key="k_es_lver", default=0)
-    original_id: int = DictField(key="k_es_orig", default=0)
-    account_id: int = DictField(key="k_es_acc", default=0)
-    username: str = DictField(key="k_es_user", default="")
-    data: str = DictField(key="k_es_data", default="")
-    downloads: int = DictField(key="k_es_dl", default=0)
-    likes: int = DictField(key="k_es_likes", default=0)
-    rated: bool = DictField(key="k_es_feat", default=False)
-    action_count: int = DictField(key="k_es_count", default=0)
-    sound_count: int = DictField(key="k_es_sc", default=0)
-    unlisted: int = DictField(key="k_es_unl", default=0)
-    upload_date: int = DictField(key="k_es_up", default=0)
-    update_date: int = DictField(key="k_es_upd", default=0)
-    has_data: bool = DictField(key="k_es_hd", default=False)
-    liked: bool = DictField(key="k_es_liked", default=False)
-    emote: str = DictField(key="k_es_emote", default="")
+    config_id: int = DictField(key="k_es_id", encoder=int, default=0)
+    local_id: int = DictField(key="k_es_lid", encoder=int, default=0)
+    uploaded: bool = DictField(key="k_es_au", encoder=bool, default=False)
+    name: str = DictField(key="k_es_name", encoder=str, default="")
+    description: str = DictField(
+        key="k_es_desc",
+        decoder=lambda text: decode_text(text or ""),
+        encoder=lambda value: encode_text(str(value)),
+        default=""
+        )
+    version: int = DictField(key="k_es_ver", encoder=int, default=0)
+    local_version: int = DictField(key="k_es_lver", encoder=int, default=0)
+    original_id: int = DictField(key="k_es_orig", encoder=int, default=0)
+    account_id: int = DictField(key="k_es_acc", encoder=int, default=0)
+    username: str = DictField(key="k_es_user", encoder=str, default="")
+    data: EditorSFXPackStringLazy = DictField(
+        key="k_es_data",
+        decoder=lambda text: EditorSFXPackStringLazy.load_string(text or ""),
+        encoder=EditorSFXPackStringLazy.save_string,
+        default_factory=EditorSFXPackStringLazy
+        )
+    downloads: int = DictField(key="k_es_dl", encoder=int, default=0)
+    likes: int = DictField(key="k_es_likes", encoder=int, default=0)
+    rated: bool = DictField(key="k_es_feat", encoder=bool, default=False)
+    action_count: int = DictField(key="k_es_count", encoder=int, default=0)
+    sound_count: int = DictField(key="k_es_sc", encoder=int, default=0)
+    unlisted: int = DictField(key="k_es_unl", encoder=int, default=0)
+    upload_date: int = DictField(key="k_es_up", encoder=int, default=0)
+    update_date: int = DictField(key="k_es_upd", encoder=int, default=0)
+    has_data: bool = DictField(key="k_es_hd", encoder=bool, default=False)
+    liked: bool = DictField(key="k_es_liked", encoder=bool, default=False)
+    emote: str = DictField(key="k_es_emote", encoder=str, default="")
 
 
 class EditorSoundConfigList(RootList):
 
-    def get(self, index: int) -> EditorSoundConfig:
-        key = type(self).ITEM_KEYS[0].format(index)
-        value = self.obj.get(key)
-        if value is None:
-            value = self.obj[key] = EditorSoundConfig()
-        return value
+    def get(self, index: int) -> Optional[EditorSoundConfig]:
+        return self.obj.get(type(self).ITEM_KEYS[0].format(index))
 
     def append(self, config: EditorSoundConfig | None = None) -> EditorSoundConfig:
         config = EditorSoundConfig() if config is None else config

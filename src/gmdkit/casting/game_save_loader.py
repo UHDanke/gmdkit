@@ -24,21 +24,22 @@ from gmdkit.models.prop.list import StrList, IntList
 from gmdkit.models.keybinds import KeybindDict
 from gmdkit.models.prop.window_state import WindowState
 from gmdkit.models.prop.editor_sfx import EditorSFXString, EditorSoundConfig, FavoriteSoundConfigs, MySoundConfigs
+from gmdkit.serialization.type_cast import to_bool
 from gmdkit.utils import enums
 
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     HAS_NODES = True
 
-    username: str = DictField(key="GJA_001")
+    username: str = DictField(key="GJA_001", encoder=str)
 
-    account_id: int = DictField(key="GJA_003")
+    account_id: int = DictField(key="GJA_003", encoder=int)
 
-    password_gjp2: str = DictField(key="GJA_005")
+    password_gjp2: str = DictField(key="GJA_005", encoder=str)
 
     keybinds: KeybindDict = serial_field("GJKB_Binds", KeybindDict)
 
-    keybinds_version: int = DictField(key="GJKB_Version", default=2)
+    keybinds_version: int = DictField(key="GJKB_Version", encoder=int, default=2)
 
     official_levels: LevelMapping = node_field("GLM_01", LevelMapping)
 
@@ -52,7 +53,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     timely_levels: LevelMapping = node_field("GLM_10", LevelMapping)
 
-    daily_level_id: int = DictField(key="GLM_11")
+    daily_level_id: int = DictField(key="GLM_11", encoder=int)
 
     liked_items: LikeList = node_field("GLM_12", LikeList)
 
@@ -64,7 +65,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     gauntlet_levels: LevelMapping = node_field("GLM_16", LevelMapping)
 
-    weekly_level_id: int = DictField(key="GLM_17")
+    weekly_level_id: int = DictField(key="GLM_17", encoder=int)
 
     online_folder_names: IntStrDict = node_field("GLM_18", IntStrDict)
 
@@ -74,17 +75,17 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     favorite_lists: LevelPackList = node_field("GLM_22", LevelPackList)
 
-    event_level_id: int = DictField(key="GLM_23")
+    event_level_id: int = DictField(key="GLM_23", encoder=int)
 
-    latest_daily_id: int = DictField(key="GLM_24")
+    latest_daily_id: int = DictField(key="GLM_24", encoder=int)
 
-    latest_weekly_id: int = DictField(key="GLM_25")
+    latest_weekly_id: int = DictField(key="GLM_25", encoder=int)
 
-    latest_event_id: int = DictField(key="GLM_26")
+    latest_event_id: int = DictField(key="GLM_26", encoder=int)
 
-    latest_gauntlet_count: int = DictField(key="GLM_27")
+    latest_gauntlet_count: int = DictField(key="GLM_27", encoder=int)
 
-    latest_ids_initialized: bool = DictField(key="GLM_28", default=False)
+    latest_ids_initialized: bool = DictField(key="GLM_28", decoder=to_bool, encoder=int, default=False)
 
     verified_user_coins: StrBoolDict = node_field("GS_3", StrBoolDict)
 
@@ -118,7 +119,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     treasure_room_rewards: IntRewardItemDict = node_field("GS_19", IntRewardItemDict)
 
-    demon_keys: int = DictField(key="GS_20", default=0)
+    demon_keys: int = DictField(key="GS_20", encoder=int, default=0)
 
     special_chests: SpecialChests = node_field("GS_21", SpecialChests)
 
@@ -130,13 +131,13 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     weekly_demon_rewards: RewardItemDict = node_field("GS_25", RewardItemDict)
 
-    active_path: int = DictField(key="GS_26", default=0)
+    active_path: int = DictField(key="GS_26", encoder=int, default=0)
 
     list_rewards: StrIntDict = node_field("GS_27", StrIntDict)
 
     enabled_animations: StrBoolDict = node_field("GS_28", StrBoolDict)
 
-    path_fix: bool = DictField(key="GS_29", default=False)
+    path_fix: bool = DictField(key="GS_29", encoder=bool, default=False)
 
     secret_room_rewards: StrBoolDict = node_field("GS_30", StrBoolDict)
 
@@ -152,7 +153,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     song_info: SongInfoList = node_field("MDLM_001", SongInfoList)
 
-    song_priority: int = DictField(key="MDLM_002")
+    song_priority: int = DictField(key="MDLM_002", encoder=int)
 
     unk_mdlm_003: dict = DictField(
         key="MDLM_003",
@@ -176,27 +177,27 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     favorite_custom_sfx: IntList = serial_field("MDLM_011", IntList)
 
-    bg_volume: float = DictField(key="bgVolume", default=1.0)
+    bg_volume: float = DictField(key="bgVolume", encoder=float, default=1.0)
 
-    binary: int = DictField(key="binaryVersion")
+    binary: int = DictField(key="binaryVersion", encoder=int)
 
-    bootups: int = DictField(key="bootups", default=0)
+    bootups: int = DictField(key="bootups", encoder=int, default=0)
 
-    opened_editor: bool = DictField(key="clickedEditor", default=False)
+    opened_editor: bool = DictField(key="clickedEditor", encoder=bool, default=False)
 
-    opened_icon_selector: bool = DictField(key="clickedGarage", default=False)
+    opened_icon_selector: bool = DictField(key="clickedGarage", encoder=bool, default=False)
 
-    opened_name: bool = DictField(key="clickedName", default=False)
+    opened_name: bool = DictField(key="clickedName", encoder=bool, default=False)
 
-    opened_practice: bool = DictField(key="clickedPractice", default=False)
+    opened_practice: bool = DictField(key="clickedPractice", encoder=bool, default=False)
 
-    custom_fps: float = DictField(key="customFPSTarget", default=0)
+    custom_fps: float = DictField(key="customFPSTarget", encoder=float, default=0)
 
-    custom_menu_song_id: int = DictField(key="customMenuSongID", default=0)
+    custom_menu_song_id: int = DictField(key="customMenuSongID", encoder=int, default=0)
 
     custom_objects: ObjectGroupDict = node_field("customObjectDict", ObjectGroupDict)
 
-    custom_practice_song_id: int = DictField(key="customPracticeSongID", default=0)
+    custom_practice_song_id: int = DictField(key="customPracticeSongID", encoder=int, default=0)
 
     dpad_move_single: MoveButton = DictField(
         key="dpad01",
@@ -266,17 +267,17 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
 
     editor_sfx: EditorSFXString = serial_field("editorSFX", EditorSFXString)
 
-    editor_sfx_favorite_count: int = DictField(key="editorSFXFavoriteCount", default=0)
+    editor_sfx_favorite_count: int = DictField(key="editorSFXFavoriteCount", encoder=int, default=0, read_only=True)
 
-    editor_sfx_volume: float = DictField(key="editorSFXGlobalVolume", default=1.0)
+    editor_sfx_volume: float = DictField(key="editorSFXGlobalVolume", encoder=float, default=1.0)
 
-    editor_sfx_my_count: int = DictField(key="editorSFXMyCount", default=0)
+    editor_sfx_my_count: int = DictField(key="editorSFXMyCount", encoder=int, default=0, read_only=True)
 
-    editor_sfx_next_local_id: int = DictField(key="editorSFXNextLocalID", default=0)
+    editor_sfx_next_local_id: int = DictField(key="editorSFXNextLocalID", encoder=int, default=0)
 
-    editor_sfx_version: int = DictField(key="editorSFXVersion", default=1)
+    editor_sfx_version: int = DictField(key="editorSFXVersion", encoder=int, default=1)
 
-    has_leaderboard_privilege: bool = DictField(key="hasDRP", default=False)
+    has_leaderboard_privilege: bool = DictField(key="hasDRP", encoder=bool, default=False)
 
     has_rating_privilege: enums.ModStatus = DictField(
         key="hasRP",
@@ -284,33 +285,33 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.ModStatus.NONE
     )
 
-    rated_game: bool = DictField(key="hasRatedGame", default=False)
+    rated_game: bool = DictField(key="hasRatedGame", encoder=bool, default=False)
 
-    id_name_sort_mode: int = DictField(key="idNameSortMode", default=0)
+    id_name_sort_mode: int = DictField(key="idNameSortMode", encoder=int, default=0)
 
     local_keeper: LocalKeeper = node_field("localKeeper", LocalKeeper)
 
-    news_last_read_id: int = DictField(key="newsLastReadID", default=0)
+    news_last_read_id: int = DictField(key="newsLastReadID", encoder=int, default=0)
 
-    performance_mode: bool = DictField(key="performanceMode", default=False)
+    performance_mode: bool = DictField(key="performanceMode", encoder=bool, default=False)
 
-    player_ball_icon: int = DictField(key="playerBall", default=1)
+    player_ball_icon: int = DictField(key="playerBall", encoder=int, default=1)
 
-    player_ufo_icon: int = DictField(key="playerBird", default=1)
+    player_ufo_icon: int = DictField(key="playerBird", encoder=int, default=1)
 
-    player_color_1: int = DictField(key="playerColor", default=1)
+    player_color_1: int = DictField(key="playerColor", encoder=int, default=1)
 
-    player_color_2: int = DictField(key="playerColor2", default=2)
+    player_color_2: int = DictField(key="playerColor2", encoder=int, default=2)
 
-    player_glow_color: int = DictField(key="playerColor3", default=-1)
+    player_glow_color: int = DictField(key="playerColor3", encoder=int, default=-1)
 
-    player_wave_icon: int = DictField(key="playerDart", default=1)
+    player_wave_icon: int = DictField(key="playerDart", encoder=int, default=1)
 
-    player_death_effect: int = DictField(key="playerDeathEffect", default=1)
+    player_death_effect: int = DictField(key="playerDeathEffect", encoder=int, default=1)
 
-    player_cube_icon: int = DictField(key="playerFrame", default=1)
+    player_cube_icon: int = DictField(key="playerFrame", encoder=int, default=1)
 
-    player_uses_glow: bool = DictField(key="playerGlow", default=False)
+    player_uses_glow: bool = DictField(key="playerGlow", encoder=bool, default=False)
 
     player_displayed_icon: enums.DisplayIcon = DictField(
         key="playerIconType",
@@ -318,35 +319,35 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.DisplayIcon.CUBE
     )
 
-    player_jetpack_icon: int = DictField(key="playerJetpack", default=1)
+    player_jetpack_icon: int = DictField(key="playerJetpack", encoder=int, default=1)
 
-    player_username: str = DictField(key="playerName")
+    player_username: str = DictField(key="playerName", encoder=str)
 
-    player_robot_icon: int = DictField(key="playerRobot", default=1)
+    player_robot_icon: int = DictField(key="playerRobot", encoder=int, default=1)
 
-    player_ship_icon: int = DictField(key="playerShip", default=1)
+    player_ship_icon: int = DictField(key="playerShip", encoder=int, default=1)
 
-    player_ship_streak: int = DictField(key="playerShipStreak", default=1)
+    player_ship_streak: int = DictField(key="playerShipStreak", encoder=int, default=1)
 
-    player_spider_icon: int = DictField(key="playerSpider", default=1)
+    player_spider_icon: int = DictField(key="playerSpider", encoder=int, default=1)
 
-    player_streak: int = DictField(key="playerStreak", default=1)
+    player_streak: int = DictField(key="playerStreak", encoder=int, default=1)
 
-    player_swing_icon: int = DictField(key="playerSwing", default=1)
+    player_swing_icon: int = DictField(key="playerSwing", encoder=int, default=1)
 
-    player_udid: str = DictField(key="playerUDID")
+    player_udid: str = DictField(key="playerUDID", encoder=str)
 
-    player_user_id: int = DictField(key="playerUserID")
+    player_user_id: int = DictField(key="playerUserID", encoder=int)
 
-    practice_icon_opacity: float = DictField(key="practiceOpacity", default=1.0)
+    practice_icon_opacity: float = DictField(key="practiceOpacity", encoder=float, default=1.0)
 
-    practice_icon_x_pos: float = DictField(key="practicePosX", default=284.5)
+    practice_icon_x_pos: float = DictField(key="practicePosX", encoder=float, default=284.5)
 
-    practice_icon_y_pos: float = DictField(key="practicePosY", default=40.0)
+    practice_icon_y_pos: float = DictField(key="practicePosY", encoder=float, default=40.0)
 
     recent_emotes: StrList = serial_field("recentEmotes", StrList)
 
-    record_gameplay: bool = DictField(key="recordGameplay", default=False)
+    record_gameplay: bool = DictField(key="recordGameplay", encoder=bool, default=False)
 
     achievements: ReportedAchievements = node_field("reportedAchievements", ReportedAchievements)
 
@@ -356,27 +357,27 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.Resolution.AUTO
     )
 
-    scroll_sensitivity: float = DictField(key="scrollSensitivity")
+    scroll_sensitivity: float = DictField(key="scrollSensitivity", encoder=float)
 
-    secret_number: int = DictField(key="secretNumber", default=0)
+    secret_number: int = DictField(key="secretNumber", encoder=int, default=0)
 
-    sfx_volume: float = DictField(key="sfxVolume", default=1.0)
+    sfx_volume: float = DictField(key="sfxVolume", encoder=float, default=1.0)
 
-    show_bpm_markers: bool = DictField(key="showBPMMarkers", default=False)
+    show_bpm_markers: bool = DictField(key="showBPMMarkers", encoder=bool, default=False)
 
-    show_progress_bar: bool = DictField(key="showProgressBar", default=True)
+    show_progress_bar: bool = DictField(key="showProgressBar", encoder=bool, default=True)
 
-    show_song_markers: bool = DictField(key="showSongMarkers", default=True)
+    show_song_markers: bool = DictField(key="showSongMarkers", encoder=bool, default=True)
 
-    showed_editor_guide: bool = DictField(key="showedEditorGuide", default=False)
+    showed_editor_guide: bool = DictField(key="showedEditorGuide", encoder=bool, default=False)
 
-    showed_ldm_dialog: bool = DictField(key="showedLowDetailDialog", default=False)
+    showed_ldm_dialog: bool = DictField(key="showedLowDetailDialog", encoder=bool, default=False)
 
-    showed_diff_rate_dialog: bool = DictField(key="showedRateDiffDialog", default=False)
+    showed_diff_rate_dialog: bool = DictField(key="showedRateDiffDialog", encoder=bool, default=False)
 
-    showed_star_rate_dialog: bool = DictField(key="showedRateStarDialog", default=False)
+    showed_star_rate_dialog: bool = DictField(key="showedRateStarDialog", encoder=bool, default=False)
 
-    special_perm_key: int = DictField(key="specialPermKey")
+    special_perm_key: int = DictField(key="specialPermKey", encoder=int)
 
     texture_quality: enums.TextureQuality = DictField(
         key="texQuality",
@@ -384,13 +385,13 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.TextureQuality.AUTO
     )
 
-    time_offset: int = DictField(key="timeOffset", default=0)
+    time_offset: int = DictField(key="timeOffset", encoder=int, default=0)
 
     unlock_value_keeper: UnlockValueKeeper = node_field("unlockValueKeeper", UnlockValueKeeper)
 
     value_keeper: ValueKeeper = node_field("valueKeeper", ValueKeeper)
 
-    window_state_count: int = DictField(key="winStateCount", default=0)
+    window_state_count: int = DictField(key="winStateCount", encoder=int, default=0, read_only=True)
 
     editor_sfx_favorite_configs: FavoriteSoundConfigs = PrefixField(
         "editorSFXFavorite_",
