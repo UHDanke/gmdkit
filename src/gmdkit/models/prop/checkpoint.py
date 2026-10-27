@@ -8,8 +8,8 @@ from gmdkit.models.prop.persistent import PersistentData
 class CheckpointData(DelimiterMixin,DataclassDecoderMixin):
     
     seed: int
-    current_retries: int
-    total_retries: int
+    record_id: int
+    attempts: int
     time_step: int
     taps: int
     points: int
