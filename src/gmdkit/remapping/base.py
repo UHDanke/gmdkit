@@ -8,8 +8,7 @@ from gmdkit.remapping.types import IDType, IDActions
 from gmdkit.models.object import Object
 from gmdkit.models.prop.color import Color, ColorList
 from gmdkit.models.prop.list import IntPairList
-from gmdkit.remapping.types import AutoID
-from gmdkit.utils import enums
+from gmdkit.remapping.types import IDToken
 from gmdkit.models.prop.named_groups import NamedGroupsDict, NamedGroupsList
 from gmdkit.models.custom_sfx import CustomSFXMapString, CustomSFXLibrary
  
@@ -22,7 +21,7 @@ register = ID_RULES.register_rule
 def _special_color(color_id:int) -> bool:
     if color_id is None:
         return False
-    elif isinstance(color_id, AutoID):
+    elif isinstance(color_id, IDToken):
         return False
     return not (1 <= color_id <= 999)
  
@@ -43,7 +42,7 @@ register(I.BaseObject, 'material', id_type=IDType.MATERIAL_ID, when_unset=True, 
 def _custom_color(color_id:int) -> bool:
     if color_id is None:
         return False
-    elif isinstance(color_id, AutoID):
+    elif isinstance(color_id, IDToken):
         return True
     return (1 <= color_id <= 999)
  
@@ -106,14 +105,14 @@ register(I.LevelSettings, 'colors', id_type=IDType.COLOR_ID, function=_get_speci
 register(I.LevelSettings, 'player_spawn', id_type=IDType.GROUP_ID, when_unset=True, id_min=1, id_max=9999, actions=IDActions.FOLLOW_POSITION)
 
 def _get_named_ids(id_type:IDType):
-    key = enums.NamedGroupsType(int(id_type))
+    key = id_type.to_named_type()
     def get(named:NamedGroupsDict) -> set[int]:
         names = named.get(key)
         return set(names.keys()) if names else set()
     return get
 
 def _remap_named_ids(id_type:IDType):
-    key = enums.NamedGroupsType(int(id_type))
+    key = id_type.to_named_type()
     def remap(named:NamedGroupsDict, kvm:dict[int,int]):
         names = named.get(key)
         if names:
@@ -124,14 +123,14 @@ def _remap_named_ids(id_type:IDType):
     return remap
 
 def _get_named_order(id_type:IDType):
-    key = enums.NamedGroupsType(int(id_type))
+    key = id_type.to_named_type()
     def get(order:NamedGroupsList) -> set[int]:
         ids = order.get(key)
         return set(ids) if ids else set()
     return get
 
 def _remap_named_order(id_type:IDType):
-    key = enums.NamedGroupsType(int(id_type))
+    key = id_type.to_named_type()
     def remap(order:NamedGroupsList, kvm:dict[int,int]):
         ids = order.get(key)
         if ids:

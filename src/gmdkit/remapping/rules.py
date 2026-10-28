@@ -117,3 +117,8 @@ REGROUP_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=REGROUP_IDS)
 REGROUP_ID_HANDLER.groups = (REMAP_IDS,)
 
 REGROUP_COLOR_ID_HANDLER = BASE_ID_HANDLER.compile_rules(id_types=REGROUP_COLOR_IDS)
+
+NAMED_ID_HANDLER = RuleHandler({
+    klass: tuple(r for r in own if r.field not in ("named_groups", "named_groups_order"))
+    for klass, own in BASE_ID_HANDLER.rules.items()
+    })

@@ -1104,9 +1104,17 @@ class CompressFileMixin:
 class FilePathMixin(FileStringMixin):
 
     EXTENSION: ClassVar[Optional[str]] = None
+    RENAME_DUPLICATES: ClassVar[bool] = False
 
     def _name_fallback_(self):
         raise ValueError(f"[{type(self).__name__}] name fallback was not provided")
+
+    def _duplicate_file_(self, path:Path) -> Path:
+        stem, suffix, index = path.stem, path.suffix, 1
+        while path.exists():
+            path = path.with_name(f"{stem} ({index}){suffix}")
+            index += 1
+        return path
 
     @classmethod
     def from_file(
@@ -1138,10 +1146,12 @@ class FilePathMixin(FileStringMixin):
     def to_file(self,
             path:Optional[PathString]=None,
             extension:Optional[str]=None,
-            **kwargs):
+            rename_duplicates:Optional[bool]=None,
+            **kwargs) -> Path:
 
         path = Path(path or '.')
         extension = type(self).EXTENSION if extension is None else extension
+        rename_duplicates = type(self).RENAME_DUPLICATES if rename_duplicates is None else rename_duplicates
         path_ext = (path.suffix or "").removeprefix(".")
 
         if not path_ext:
@@ -1160,6 +1170,13 @@ class FilePathMixin(FileStringMixin):
             raise ValueError(
                 f"file has invalid extension, expected '{extension}', got '{path_ext}' instead"
                 )
+        
+        if rename_duplicates and path.exists():
+            path = self._duplicate_file_(path)
+            if path is None:
+                raise ValueError(
+                    "cannot resolve duplicate filename as the duplicate handler returned None"
+                    )
 
         super().to_file(path=path,**kwargs)
         

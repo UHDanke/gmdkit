@@ -4,6 +4,8 @@ from typing import Callable, ParamSpec, TypeVar, get_type_hints
 from enum import Enum
 from functools import lru_cache, partial
 from inspect import signature
+import random
+import string as strlib
 
 # Package Imports (only gmdkit.utils is allowed)
 from gmdkit.utils.enums import ArrowDir
@@ -116,3 +118,7 @@ def bounds(points: list[tuple[float, float]]) -> tuple[float, float, float, floa
     xs = [p[0] for p in points]
     ys = [p[1] for p in points]
     return min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys)
+
+def create_uid(length:int=16):
+    uid_chars = strlib.digits + strlib.ascii_uppercase + strlib.ascii_lowercase
+    return "".join(random.choices(uid_chars, k=length))

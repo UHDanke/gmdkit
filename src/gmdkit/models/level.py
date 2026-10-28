@@ -1,6 +1,9 @@
 # Imports
 from typing import Any, Self
- 
+from pathlib import Path
+from datetime import datetime
+import re
+
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.serialization.mixins import (
@@ -16,6 +19,7 @@ from gmdkit.serialization.functions import (
 from gmdkit.utils import enums
 from gmdkit.casting.level_loader import FieldLoaderMixin
 from gmdkit.models.interfaces import LevelSettings
+from gmdkit.constants.paths.save import AUTOBACKUPS_PATH
 
 
 class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any]):
@@ -25,9 +29,17 @@ class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any])
     COMPRESSED = True
     COMPRESSION = "gzip"
 
-
     def _name_fallback_(self):
-        return str(self.name)
+        name = re.sub(r"\s+", "_", str(self.name).strip())
+        name = re.sub(r"[^A-Za-z0-9_]", "", name)
+        return name or None
+    
+    def _duplicate_file_(self, path:Path) -> Path:
+        stem, suffix, index = path.stem, path.suffix, 1
+        while path.exists():
+            path = path.with_name(f"{stem}_{index}{suffix}")
+            index += 1
+        return path
 
     @classmethod
     def from_editor(cls, name:str="Unnamed") -> Self:
@@ -68,8 +80,6 @@ class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any])
         settings.dynamic_height = True
         settings.sort_groups = True
         settings.fix_radius_collision = True
- 
-
         return new
 
     def clean_export(self) -> Self:
@@ -164,12 +174,28 @@ class Level(FilePathMixin,CompressFileMixin,FieldLoaderMixin,DictClass[str,Any])
         return self
 
     @classmethod
-    def from_gmd(cls,path:PathString,extension="gmd",compressed=False,**kwargs) -> Self:
-        return super().from_file(path=path,extension=extension,compressed=compressed, **kwargs)
+    def from_gmd(cls, path:PathString, **kwargs) -> Self:
+        return super().from_file(path=path,extension="gmd",compressed=False, **kwargs)
 
-    def to_gmd(self,path:PathString,extension="gmd",compressed=False,**kwargs):
-        return super().to_file(path=path,extension=extension,compressed=compressed, **kwargs)
-
+    def to_gmd(self, path:PathString, **kwargs) -> Path:
+        path = super().to_file(path=path,extension="gmd",compressed=False, **kwargs)
+        assert isinstance(path, Path)
+        return path
+    
+    def create_backup(self, backup_folder:PathString=AUTOBACKUPS_PATH, **kwargs):
+        if backup_folder is None:
+            raise RuntimeError(f"[{type(self)}] Invalid backup folder")
+        
+        uid = self.autobackup_id
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = re.sub(r'[<>:"/\\|?*]', "_", self._name_fallback_())
+        path = backup_folder / f"{uid}_{file_name}_{timestamp}.gdlvl"        
+        path = super().to_file(path=path, **kwargs)
+        assert isinstance(path, Path)
+        return path
+    
+        
+        
 
 class LevelList(FolderLoaderMixin,FilePathMixin,PlistLoaderMixin,ListClass[Level]):
 

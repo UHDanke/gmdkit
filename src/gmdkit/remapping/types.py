@@ -6,9 +6,14 @@ from typing import ClassVar, get_type_hints, Optional, Self
 
 # Package Imports
 from gmdkit.utils.functions import typed_cache
+from gmdkit.utils.enums import NamedGroupsType
 
 
-class AutoID:
+class IDToken:
+    __slots__ = ()
+
+
+class AutoID(IDToken):
     __slots__ = ("index",)
     counter = 1
 
@@ -43,6 +48,51 @@ class AutoID:
 
     def __lt__(self, other):
         return self.index < other.index
+
+
+ID_NAME_CHARS = frozenset("0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.")
+ID_NAME_MAX = 24
+
+def sanitize_id_name(name:str) -> str:
+    name = "".join(c for c in str(name) if c in ID_NAME_CHARS).lstrip(" ")[:ID_NAME_MAX].rstrip(" ")
+    return name if any(c.isascii() and c.isalpha() for c in name) else ""
+
+
+class NamedID(IDToken):
+    __slots__ = ("name",)
+
+    def __new__(cls, name:str):
+        clean = sanitize_id_name(name)
+        if not clean:
+            raise ValueError(f"invalid ID name {name!r}")
+        obj = object.__new__(cls)
+        object.__setattr__(obj, "name", clean)
+        return obj
+
+    def __reduce__(self):
+        return (type(self), (self.name,))
+
+    def __setattr__(self, name, value):
+        raise TypeError("NamedID is immutable")
+
+    def __eq__(self, other):
+        return type(other) is NamedID and other.name == self.name
+
+    def __hash__(self):
+        return hash((NamedID, self.name))
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __repr__(self):
+        return f"<NamedID '{self.name}'>"
+
+    def __copy__(self):
+        return self
+
+    def __deepcopy__(self, memo):
+        return self
+
 
 @dataclass
 class LabelID:
@@ -117,6 +167,28 @@ class IDType(IntEnum):
     # gmdkit types
     LABEL = 2002
     GENERIC = 2001
+
+    def to_named_type(self) -> NamedGroupsType:
+        return NAMED_GROUP_TYPES.get(self, NamedGroupsType(int(self)))
+
+    @classmethod
+    def from_named_type(cls, named_type:NamedGroupsType) -> Self:
+        named_type = NamedGroupsType(named_type)
+        return NAMED_GROUP_TYPES_INV.get(named_type) or cls(int(named_type))
+
+
+NAMED_GROUP_TYPES = {
+    IDType.GROUP_ID: NamedGroupsType.GROUP_ID,
+    IDType.ITEM_ID: NamedGroupsType.ITEM_ID,
+    IDType.COLLISION_ID: NamedGroupsType.COLLISION_ID,
+    IDType.TIMER_ID: NamedGroupsType.TIMER_ID,
+    IDType.EFFECT_ID: NamedGroupsType.EFFECT_ID,
+    IDType.CONTROL_ID: NamedGroupsType.CONTROL_ID,
+    IDType.GRADIENT_ID: NamedGroupsType.GRADIENT_ID,
+    IDType.ENTER_CHANNEL: NamedGroupsType.ENTER_CHANNEL,
+    }
+
+NAMED_GROUP_TYPES_INV = {v: k for k, v in NAMED_GROUP_TYPES.items()}
 
 
 class IDActions(IntFlag):

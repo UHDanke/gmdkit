@@ -1,5 +1,8 @@
 __all__ = (
     "AutoID",
+    "IDToken",
+    "NamedID",
+    "sanitize_id_name",
     "IDType",
     "IDActions",
     "Identifier",
@@ -15,12 +18,15 @@ __all__ = (
     "remap_objects_build_helper",
     "combine_objects",
     "resolve_auto_ids",
-    "assign_auto_ids"
+    "assign_auto_ids",
+    "assign_named_ids",
+    "resolve_named_ids",
+    "combine_named_groups"
     )
 
 
 from .types import (
-    AutoID, 
+    AutoID, IDToken, NamedID, sanitize_id_name,
     IDType, IDActions, 
     )
 from .classes import (
@@ -37,5 +43,8 @@ from .functions import (
     remap_objects_build_helper,
     combine_objects,
     resolve_auto_ids,
-    assign_auto_ids
+    assign_auto_ids,
+    assign_named_ids,
+    resolve_named_ids,
+    combine_named_groups
     )

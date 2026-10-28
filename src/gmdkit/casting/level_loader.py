@@ -13,8 +13,8 @@ from gmdkit.models.prop.controls import LevelControls
 from gmdkit.models.prop.editor_stats import EditorStats
 from gmdkit.serialization.classes import DictField, FieldMetaclass, AliasAttr
 from gmdkit.serialization.mixins import PlistLoaderMixin
-from gmdkit.serialization.functions import decompress_string, compress_string
 from gmdkit.serialization.helpers import serial_field, lazy_field, base64_field, encoded_field
+from gmdkit.utils.functions import create_uid
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
     
@@ -251,7 +251,7 @@ class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):
         default=enums.ToggleCBS.DEFAULT,
     )
     
-    autobackup_id: str = DictField(key="k126")
+    autobackup_id: str = DictField(key="k126", default_factory=lambda: create_uid(length=16))
     
     last_autobackup_time: int = DictField(key="k127", default=0)
     

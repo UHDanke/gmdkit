@@ -8,7 +8,8 @@ from functools import lru_cache
 from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.classes import BaseInterface
-from gmdkit.remapping.types import IDType, IDActions, AutoID
+from gmdkit.utils.typing import MISSING
+from gmdkit.remapping.types import IDType, IDActions, IDToken
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
@@ -138,7 +139,7 @@ class IdentifierList:
 
             for v in vals:
 
-                if in_range and (type(v) is AutoID or not (low <= v <= high)):
+                if in_range and (isinstance(v, IDToken) or not (low <= v <= high)):
                     continue
 
                 result.add(v)
@@ -247,7 +248,7 @@ class IDRule:
             return False
         return True
 
-    def get_id(self, intf: BaseInterface) -> Optional[Identifier]:
+    def get_id(self, intf: BaseInterface, include_unset: bool = True) -> Optional[Identifier]:
         schema = type(intf)
         val = getattr(intf, self.field)
         has_default = bool(self.when_unset)
@@ -258,7 +259,7 @@ class IDRule:
                 if fb is not None:
                     val = fb
             if not val:
-                unset = self.when_unset
+                unset = self.when_unset if include_unset else False
                 if callable(unset):
                     unset = unset(intf)
                 if not unset:
@@ -308,6 +309,8 @@ class RuleHandler:
     rules: dict[type[BaseInterface], dict[IDRule, None]] = dc_field(default_factory=dict)
     groups: Optional[list[Sequence]] = None
     _chains: dict = dc_field(default_factory=dict, repr=False, compare=False)
+    _rule_cache: dict = dc_field(default_factory=dict, repr=False, compare=False)
+    _skip_cache: dict = dc_field(default_factory=dict, repr=False, compare=False)
 
     def __post_init__(self):
         self.rules = {k: dict.fromkeys(v) for k, v in self.rules.items()}
@@ -326,7 +329,42 @@ class RuleHandler:
         return chain
 
     def rules_for(self, schema: type[BaseInterface]) -> tuple[IDRule, ...]:
-        return tuple(self.chain_for(schema))
+        rules = self._rule_cache.get(schema)
+        if rules is None:
+            rules = self._rule_cache[schema] = tuple(self.chain_for(schema))
+        return rules
+
+    def skip_keys_for(
+            self,
+            obj_type: type,
+            schema: type[BaseInterface],
+            include_unset: bool = True
+            ) -> Optional[frozenset]:
+        cache_key = (obj_type, schema, include_unset)
+        if cache_key in self._skip_cache:
+            return self._skip_cache[cache_key]
+
+        defaults = getattr(obj_type, "_DEFAULT_CHAIN", {})
+        keys = set()
+        result = None
+
+        for rule in self.rules_for(schema):
+            if rule.fallback is not None or (include_unset and rule.when_unset):
+                break
+            key = rule.key_for(schema)
+            default = defaults.get(key)
+            if default is not None:
+                if default.factory is not None:
+                    if default.pass_kwargs or default.factory():
+                        break
+                elif default.value is not MISSING and default.value:
+                    break
+            keys.add(key)
+        else:
+            result = frozenset(keys)
+
+        self._skip_cache[cache_key] = result
+        return result
 
     def register(self, interface: type[BaseInterface], rule: IDRule) -> IDRule:
         try:
@@ -335,6 +373,9 @@ class RuleHandler:
             raise AttributeError(
                 f"{interface.__name__} has no field {rule.field!r}") from None
         self._own(interface)[rule] = None
+        self._chains.clear()
+        self._rule_cache.clear()
+        self._skip_cache.clear()
         return rule
 
     def register_rule(
@@ -393,34 +434,38 @@ class RuleHandler:
 
         return new
 
-    def fetch_ids(self, obj:Object) -> tuple[Identifier, ...]:
+    def fetch_ids(self, obj:Object, include_unset:bool=True) -> tuple[Identifier, ...]:
         schema = type(obj).get_schema(obj.current_id)
         rules = self.rules_for(schema)
         if not rules:
             return ()
+        keys = self.skip_keys_for(type(obj), schema, include_unset)
+        if keys is not None and keys.isdisjoint(obj.keys()):
+            return ()
         intf = schema(obj)
-        return tuple(i for r in rules if (i := r.get_id(intf)) is not None)
+        return tuple(i for r in rules if (i := r.get_id(intf, include_unset)) is not None)
 
     def compile_ids(
             self,
             source: ObjectList|Level,
             by_type:bool=False,
-            type_groups:Optional[Sequence[set]]=None
+            type_groups:Optional[Sequence[set]]=None,
+            include_unset:bool=True
             ) -> IdentifierList|dict[Sequence[IDType]|IDType,IdentifierList]:
 
         result = []
         type_groups = self.groups if type_groups is None else type_groups
 
         if hasattr(source, "start"):
-            result.extend(self.fetch_ids(source.start))
+            result.extend(self.fetch_ids(source.start, include_unset))
 
         if hasattr(source, "objects"):
             for obj in source.objects:
-                result.extend(self.fetch_ids(obj))
+                result.extend(self.fetch_ids(obj, include_unset))
 
         else:
             for obj in source:
-                result.extend(self.fetch_ids(obj))
+                result.extend(self.fetch_ids(obj, include_unset))
 
         if by_type:
             return IdentifierList.group_by_type(result, type_groups)
