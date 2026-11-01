@@ -2,7 +2,7 @@
 from typing import Self
 
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
 

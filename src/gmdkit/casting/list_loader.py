@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.type_cast import decode_text, encode_text, to_bool
 from gmdkit.models.prop.list import IntList
 from gmdkit.models.level import LevelMapping

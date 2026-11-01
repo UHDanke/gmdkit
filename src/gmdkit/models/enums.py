@@ -539,6 +539,29 @@ class ArrowDir(EnumClass):
             cls.RIGHT: cls.LEFT,
         }
         return opposites.get(self, cls.NONE)
+    
+    @classmethod
+    def normalize_orientation(cls, rotation:float, flip_x:bool=False, flip_y:bool=False):
+        rotation = round(rotation%360/90)
+        
+        match rotation:
+            case 0:
+                h = cls.RIGHT
+                v = cls.DOWN
+            case 1:
+                h = cls.DOWN
+                v = cls.LEFT
+            case 2:
+                h = cls.LEFT
+                v = cls.UP
+            case 3:
+                h = cls.UP
+                v = cls.RIGHT
+        
+        h = h.flip() if flip_x else h
+        v = v.flip() if flip_y else v
+        
+        return h,v
 
 class AdvFollowInit(EnumClass):
     INIT = 0

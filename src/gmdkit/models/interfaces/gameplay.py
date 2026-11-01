@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.models.interfaces.base import EffectObject, StartSettings, Field, register_id
 from gmdkit.models.interfaces.animated import SpinningObject
 
@@ -19,6 +19,7 @@ class ReverseObject(EffectObject):
                 return False
             return True
         return False
+
 
 class PadObject(ReverseObject):
     pass

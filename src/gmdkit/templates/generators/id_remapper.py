@@ -4,8 +4,7 @@ from typing import Sequence, Optional
 # Package Imports
 from gmdkit.remapping.types import AutoID
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.utils import enums
-from gmdkit.models import interfaces
+from gmdkit.models import interfaces, enums
 
 
 def generate_id_remapper(

@@ -3,7 +3,7 @@ from typing import Self
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DictDecoderMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.serialization.type_cast import to_bool,from_bool,from_float, decode_text, encode_text

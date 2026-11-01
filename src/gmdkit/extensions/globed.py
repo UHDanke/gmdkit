@@ -6,8 +6,8 @@ from os import PathLike
 
 # Package Imports
 from gmdkit.models.object import Object, ObjectList
-from gmdkit.models import interfaces
-from gmdkit.utils import enums
+from gmdkit.models import interfaces, enums
+
 
 MAGIC = b'\xc4\x19\x7b\xfa'
 PREFIX = "GLOBED_SCRIPT"

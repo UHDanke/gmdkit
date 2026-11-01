@@ -2,7 +2,7 @@
 from typing import Self
 
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.models.prop.color import HSV, Color
 from gmdkit.models.object import Object
 from gmdkit.serialization.classes import BaseInterface

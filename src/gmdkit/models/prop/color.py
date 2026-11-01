@@ -5,7 +5,7 @@ from typing import Optional, Sequence, Self
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import DataclassDecoderMixin, ArrayDecoderMixin, DelimiterMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
-from gmdkit.utils.enums import TargetPlayer
+from gmdkit.models.enums import TargetPlayer
 
 @dataclass_decoder(slots=True, separator='a', from_array=True)
 class HSV(DataclassDecoderMixin):

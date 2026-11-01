@@ -1,6 +1,6 @@
 # Package Imports
 from gmdkit.models.prop.list import IntList
-from gmdkit.utils.enums import GameEvents
+from gmdkit.models.enums import GameEvents
 
 class EventList(IntList[GameEvents]):
     

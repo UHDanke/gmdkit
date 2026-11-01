@@ -6,7 +6,7 @@ from typing import ClassVar, get_type_hints, Optional, Self
 
 # Package Imports
 from gmdkit.utils.functions import typed_cache
-from gmdkit.utils.enums import NamedGroupsType
+from gmdkit.models.enums import NamedGroupsType
 
 
 class IDToken:

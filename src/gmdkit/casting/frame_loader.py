@@ -4,7 +4,7 @@ from collections import ChainMap
 from typing import Optional
 
 # Package Imports
-from gmdkit.utils.enums import GameObjectType, ZLayer, ObjectPropertyFlag
+from gmdkit.models.enums import GameObjectType, ZLayer, ObjectPropertyFlag
 from gmdkit.serialization.classes import FieldInterface, InterfaceMetaclass
 
 

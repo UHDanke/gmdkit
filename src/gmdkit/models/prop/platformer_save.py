@@ -2,7 +2,7 @@
 from typing import Optional
 
 # Package Imports
-from gmdkit.utils.enums import Easing, GameEvents
+from gmdkit.models.enums import Easing, GameEvents
 from gmdkit.utils.types import ListClass, DictClass
 from gmdkit.serialization.mixins import CompressFileMixin
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder

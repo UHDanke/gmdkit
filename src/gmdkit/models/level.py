@@ -16,7 +16,7 @@ from gmdkit.serialization.mixins import (
 from gmdkit.serialization.functions import (
     kv_wrap, args_wrap
 )
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.casting.level_loader import FieldLoaderMixin
 from gmdkit.models.interfaces import LevelSettings
 from gmdkit.constants.paths.save import AUTOBACKUPS_PATH

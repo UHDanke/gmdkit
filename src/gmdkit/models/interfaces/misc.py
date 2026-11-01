@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.utils.typing import ANY
 from gmdkit.models.interfaces.base import (
     TriggerObject, BaseObject, Field, register_id

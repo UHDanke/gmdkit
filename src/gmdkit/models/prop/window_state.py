@@ -2,7 +2,7 @@
 from typing import Any, Optional
 
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 
 
 class WindowStateField:

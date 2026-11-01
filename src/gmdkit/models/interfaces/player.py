@@ -1,7 +1,6 @@
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
-from gmdkit.utils.functions import normalize_orientation
 
 
 class CheckpointTrigger(TriggerObject):
@@ -47,7 +46,7 @@ class GameplayArrow(TriggerObject):
         if r % 90:
             x_pos, y_neg = enums.ArrowDir.RIGHT, enums.ArrowDir.DOWN
         else:
-            x_pos, y_neg = normalize_orientation(r, bool(self.flip_x), bool(self.flip_y))
+            x_pos, y_neg = enums.ArrowDir.normalize_orientation(r, bool(self.flip_x), bool(self.flip_y))
         self.dir_x_pos = x_pos
         self.dir_y_neg = y_neg
         return x_pos, y_neg
@@ -64,7 +63,7 @@ class GameplayArrow(TriggerObject):
             transforms = sorted(
                 ((r, fx, fy) for r in (0, 90, 180, 270) for fx in (False, True) for fy in (False, True)),
                 key=lambda t: (t[1] + t[2], t[0]))
-            r, fx, fy = next(t for t in transforms if normalize_orientation(*t) == (x_pos, y_neg))
+            r, fx, fy = next(t for t in transforms if enums.ArrowDir.normalize_orientation(*t) == (x_pos, y_neg))
             old = self.hitbox_rect if self.touch_trigger else None
             self.rotation = r
             self.skew_x = 0

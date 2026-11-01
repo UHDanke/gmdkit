@@ -15,7 +15,7 @@ from gmdkit.serialization.mixins import (
     DefaultPathMixin
     )
 from gmdkit.utils.types import ListClass
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.constants.paths.save import MUSIC_LIBRARY_PATH
 from gmdkit.serialization.type_cast import decode_text, encode_text
 

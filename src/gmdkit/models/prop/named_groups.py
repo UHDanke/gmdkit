@@ -2,7 +2,7 @@
 from gmdkit.serialization.mixins import DictDecoderMixin
 from gmdkit.utils.types import DictClass
 from gmdkit.models.prop.groups import IDList 
-from gmdkit.utils import enums
+from gmdkit.models import enums
 
 class NameDict(DictDecoderMixin,DictClass[int,str]):
     SEPARATOR = "^"

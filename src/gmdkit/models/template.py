@@ -17,8 +17,8 @@ from gmdkit.serialization.functions import (
     set_field, get_field
 )
 from gmdkit.models.object import Object, ObjectGroup
-from gmdkit.utils.enums import ArrowDir
-from gmdkit.utils.functions import get_enum_values, normalize_orientation, typed_cache
+from gmdkit.models.enums import ArrowDir
+from gmdkit.utils.functions import get_enum_values, typed_cache
 from gmdkit.serialization.classes import FieldMetaclass, DictField
 from gmdkit.models import interfaces
 
@@ -151,7 +151,7 @@ class TemplateType(Enum):
         
         if obj_id == 2895: return cls.SQUARE
         
-        x_dir,y_dir = normalize_orientation(intf.rotation,intf.flip_x,intf.flip_y)
+        x_dir,y_dir = ArrowDir.normalize_orientation(intf.rotation,intf.flip_x,intf.flip_y)
 
         if obj_id == 2896:
             match (x_dir,y_dir):

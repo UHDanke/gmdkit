@@ -5,7 +5,7 @@ from dataclasses import MISSING
 
 # Package Imports
 from gmdkit.utils.types import ListClass
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.serialization.type_cast import to_bool, from_bool
 from gmdkit.serialization.mixins import PlistBoolMapMixin, DataclassDecoderMixin, DelimiterMixin

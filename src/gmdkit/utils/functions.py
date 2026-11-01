@@ -7,9 +7,6 @@ from inspect import signature
 import random
 import string as strlib
 
-# Package Imports (only gmdkit.utils is allowed)
-from gmdkit.utils.enums import ArrowDir
-
 P = ParamSpec("P")
 R = TypeVar("R")
 
@@ -28,30 +25,6 @@ def get_enum_values(cls):
 @typed_cache(maxsize=256)
 def cached_type_hints(cls):
     return get_type_hints(cls)
-
-@typed_cache(maxsize=256)
-def normalize_orientation(rotation:float, flip_x:bool=False, flip_y:bool=False):
-    rotation = round(rotation%360/90)
-    
-    match rotation:
-        case 0:
-            h = ArrowDir.RIGHT
-            v = ArrowDir.DOWN
-        case 1:
-            h = ArrowDir.DOWN
-            v = ArrowDir.LEFT
-        case 2:
-            h = ArrowDir.LEFT
-            v = ArrowDir.UP
-        case 3:
-            h = ArrowDir.UP
-            v = ArrowDir.RIGHT
-    
-    h = h.flip() if flip_x else h
-    v = v.flip() if flip_y else v
-    
-    return h,v
-
 
 def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     """
@@ -89,7 +62,6 @@ def filter_kwargs(*functions:Callable, **kwargs) -> list[Callable]:
     
     return result
 
-
 def node_matrix(scale_x: float, scale_y: float, rotation_x: float, rotation_y: float,
                 flip_x: bool = False, flip_y: bool = False) -> tuple[float, float, float, float]:
     if flip_x:
@@ -105,14 +77,12 @@ def node_matrix(scale_x: float, scale_y: float, rotation_x: float, rotation_y: f
         math.cos(radians_x) * scale_y,
     )
 
-
 def transform_corners(half_w: float, half_h: float, center: tuple[float, float],
                       matrix: tuple[float, float, float, float]) -> list[tuple[float, float]]:
     a, b, c, d = matrix
     cx, cy = center
     return [(cx + a * px + c * py, cy + b * px + d * py)
             for px, py in ((-half_w, -half_h), (half_w, -half_h), (half_w, half_h), (-half_w, half_h))]
-
 
 def bounds(points: list[tuple[float, float]]) -> tuple[float, float, float, float]:
     xs = [p[0] for p in points]

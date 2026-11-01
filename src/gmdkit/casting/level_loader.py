@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.models.object import Object, ObjectList, ObjectStringLazy
 from gmdkit.models.prop.replay import ReplayStringLazy
 from gmdkit.models.prop.platformer_save import PlatformerCheckpointLazy

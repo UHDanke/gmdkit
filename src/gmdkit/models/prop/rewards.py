@@ -1,7 +1,7 @@
 from typing import Any
 
 from gmdkit.utils.types import DictClass, ListClass
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.functions import kv_wrap
 from gmdkit.serialization.mixins import PlistDecoderMixin, PlistLoaderMixin
 from gmdkit.serialization.classes import DictField, FieldMetaclass

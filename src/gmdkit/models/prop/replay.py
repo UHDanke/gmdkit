@@ -1,6 +1,3 @@
-# Imports
-from typing import Any
-
 # Package Imports
 from gmdkit.utils.types import ListClass
 from gmdkit.serialization.mixins import (
@@ -10,7 +7,7 @@ from gmdkit.serialization.mixins import (
     FilePathMixin,
     CompressFileMixin
     )
-from gmdkit.utils.enums import ReplayEventID
+from gmdkit.models.enums import ReplayEventID
 from gmdkit.serialization.functions import dataclass_decoder, field_decoder
 from gmdkit.serialization.classes import LazyString
 from gmdkit.serialization.type_cast import to_string

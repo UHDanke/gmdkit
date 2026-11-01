@@ -3,7 +3,7 @@ import math
 from typing import Optional
 
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.utils.functions import node_matrix, transform_corners, bounds
 from gmdkit.serialization.classes import AliasField, BaseInterface
 from gmdkit.casting.object_loader import FieldLoaderMixin

@@ -25,7 +25,7 @@ from gmdkit.models.keybinds import KeybindDict
 from gmdkit.models.prop.window_state import WindowState
 from gmdkit.models.prop.editor_sfx import EditorSFXString, EditorSoundConfig, FavoriteSoundConfigs, MySoundConfigs
 from gmdkit.serialization.type_cast import to_bool
-from gmdkit.utils import enums
+from gmdkit.models import enums
 
 
 class FieldLoaderMixin(PlistLoaderMixin, metaclass=FieldMetaclass):

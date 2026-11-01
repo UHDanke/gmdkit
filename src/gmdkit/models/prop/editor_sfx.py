@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 # Package Imports
 from gmdkit.utils.types import ListClass, DictClass
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.mixins import (
     ArrayDecoderMixin, CompressFileMixin, DataclassDecoderMixin, DelimiterMixin, DictDecoderMixin, PlistLoaderMixin
     )

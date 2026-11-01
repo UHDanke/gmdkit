@@ -4,8 +4,7 @@ from typing import Optional
 
 # Package Imports
 from gmdkit.models.object import Object
-from gmdkit.models import interfaces
-from gmdkit.utils import enums
+from gmdkit.models import interfaces, enums
 
 
 def scale_position(

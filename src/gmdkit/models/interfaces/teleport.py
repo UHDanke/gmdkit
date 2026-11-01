@@ -1,5 +1,5 @@
 # Package Imports
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.classes import BaseInterface
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 from gmdkit.models.interfaces.gameplay import OrbObject, PortalObject

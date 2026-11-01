@@ -24,8 +24,8 @@ from . import extensions
 from . import functions
 from . import models
 from . import remapping
-from .utils import typing, enums
-from .models import template
+from .utils import typing
+from .models import template, enums
 from .models.level import Level, LevelList
 from .models.level_pack import LevelPack, LevelPackList
 from .models.object import Object, ObjectList

@@ -1,6 +1,6 @@
+# Package Imports
 from gmdkit.utils.typing import MISSING
-
-from gmdkit.utils import enums
+from gmdkit.models import enums
 from gmdkit.serialization.type_cast import (
     to_bool, from_bool,
     from_float,
