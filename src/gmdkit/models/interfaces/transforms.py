@@ -1,3 +1,6 @@
+# Imports
+from typing import Self
+
 # Package Imports
 from gmdkit.utils import enums
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
@@ -60,6 +63,34 @@ class MoveTrigger(TriggerObject):
     target_distance: float = Field(396)
     dynamic_mode: bool = Field(397)
     silent: bool = Field(544)
+    
+    def move_by(self, dx: float, dy: float, t: float = 0) -> Self:
+        """Move by a relative distance (dx, dy) over duration t."""
+        self.move_x = dx
+        self.move_y = dy
+        self.duration = t
+        self.direction_mode = False
+        self.target_mode = False
+        return self
+
+    def move_to(self, target: int, target_pos: int, t: float) -> Self:
+        """Sets to target mode (move to the target's location)."""
+        self.target_id = target
+        self.target_pos = target_pos
+        self.duration = t
+        self.target_mode = True
+        self.direction_mode = False
+        return self
+    
+    def move_towards(self, target: int, target_dir: int, distance: float, t: float) -> Self:
+        """Sets to direction mode (move towards another group with distance)."""
+        self.target_id = target
+        self.target_pos = target_dir
+        self.target_distance = distance
+        self.duration = t
+        self.direction_mode = True
+        self.target_mode = False
+        return self
 
 
 class RotateTrigger(TriggerObject):

@@ -7,6 +7,8 @@ __all__ = (
     "IDActions",
     "Identifier",
     "IdentifierList",
+    "IDResult",
+    "IDGroup",
     "IDRule",
     "RuleHandler",
     "rules",
@@ -27,10 +29,10 @@ __all__ = (
 
 from .types import (
     AutoID, IDToken, NamedID, sanitize_id_name,
-    IDType, IDActions, 
+    IDType, IDActions, IDGroup,
     )
 from .classes import (
-    Identifier, IdentifierList, 
+    Identifier, IdentifierList, IDResult,
     IDRule, RuleHandler,
     )
 from . import rules

@@ -1,4 +1,5 @@
 # Package Imports
+from gmdkit.utils import enums
 from gmdkit.models.interfaces.base import EffectObject, StartSettings, Field, register_id
 from gmdkit.models.interfaces.animated import SpinningObject
 
@@ -7,12 +8,24 @@ class GameplayObject(EffectObject):
     disable_multi_activate: bool = Field(444)
 
 
-class PadObject(GameplayObject):
+class ReverseObject(EffectObject):
     reverse: bool = Field(117)
+    
+    @property
+    def reverse_mode(self):
+        if self.reverse:
+            if self.no_touch:
+                self.editor_preview = False
+                return False
+            return True
+        return False
+
+class PadObject(ReverseObject):
+    pass
 
 
-class OrbObject(GameplayObject):
-    reverse: bool = Field(117)
+class OrbObject(ReverseObject):
+    pass
     
     
 class DashOrbObject(OrbObject):
@@ -32,7 +45,34 @@ class PortalObject(GameplayObject):
 
 
 class GamemodePortalObject(PortalObject):
-    pass
+    free_mode: bool = Field(111)
+    edit_settings: bool = Field(112)
+    camera_easing: float = Field(113)
+    camera_padding: float = Field(114)
+    disable_grid_snap: float = Field(370)
+
+
+class SpeedPortalObject(PortalObject):
+    
+    @property
+    def speed(self) -> enums.Speed:
+        match self.obj_id:
+            case enums.ObjectID.PORTAL_SPEED_SLOW:
+                return enums.Speed.SLOW
+            case enums.ObjectID.PORTAL_SPEED_NORMAL:
+                return enums.Speed.NORMAL
+            case enums.ObjectID.PORTAL_SPEED_FAST:
+                return enums.Speed.FAST
+            case enums.ObjectID.PORTAL_SPEED_VERY_FAST:
+                return enums.Speed.VERY_FAST
+            case enums.ObjectID.PORTAL_SUPER_FAST:
+                return enums.Speed.SUPER_FAST
+            case _:
+                raise ValueError("target object is not a speed change")
+    
+    @property
+    def speed_value(self) -> float:
+        return self.speed.speed_value
 
 
 class ToggleBlock(GameplayObject):
@@ -86,11 +126,6 @@ register_id(45, PortalObject)  # Orange Mirror Portal
 register_id(46, PortalObject)  # Blue Mirror Portal
 register_id(99, PortalObject)  # Green Size Portal
 register_id(101, PortalObject)  # Pink Size Portal
-register_id(200, PortalObject)  # Yellow Slow Speed Portal
-register_id(201, PortalObject)  # Blue Normal Speed Portal
-register_id(202, PortalObject)  # Green Fast Speed Portal
-register_id(203, PortalObject)  # Pink Fast Speed Portal
-register_id(1334, PortalObject)  # Red Fast Speed Portal
 register_id(2926, PortalObject)  # Green Gravity Portal
 
 # PadObject
@@ -125,6 +160,13 @@ register_id(3645, ForceBlock)  # Force Circle
 
 # StartPosition
 register_id(31, StartPosition)  # Start Position
+
+# SpeedPortalObject
+register_id(200, SpeedPortalObject)  # Yellow Slow Speed Portal
+register_id(201, SpeedPortalObject)  # Blue Normal Speed Portal
+register_id(202, SpeedPortalObject)  # Green Fast Speed Portal
+register_id(203, SpeedPortalObject)  # Pink Fast Speed Portal
+register_id(1334, SpeedPortalObject)  # Red Fast Speed Portal
 
 # ToggleBlock
 register_id(1594, ToggleBlock)  # Toggle Orb

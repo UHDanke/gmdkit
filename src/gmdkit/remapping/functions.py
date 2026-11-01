@@ -3,8 +3,8 @@ import copy
 from typing import Optional, Sequence
 
 # Package Imports
-from gmdkit.remapping.types import IDType, IDToken, AutoID, NamedID
-from gmdkit.remapping.classes import RuleHandler
+from gmdkit.remapping.types import IDType, IDGroup, IDToken, AutoID, NamedID, ID_NAME_CHARS, ID_NAME_MAX
+from gmdkit.remapping.classes import RuleHandler, IDResult
 from gmdkit.remapping.rules import (
     COPY_ID_HANDLER, REGROUP_ID_HANDLER, BASE_ID_HANDLER, NAMED_ID_HANDLER
     )
@@ -14,20 +14,18 @@ from gmdkit.models.object import ObjectList
 from gmdkit.models import interfaces
 from gmdkit.models.prop.named_groups import NameDict, NamedIDList
 
-IDGroup = IDType|Sequence[IDType]
-IDRemaps = dict[IDGroup,dict[int,int]]
-CompiledIDs = dict
+IDKey = IDType|IDGroup|Sequence[IDType]
+IDRemaps = dict[IDKey,dict[int,int]]
 
 DEFAULT_EXCLUDE = {IDType.ANY:{0}}
 NAMED_ORDER_MAX = 500
 
 def offset_object_ids(
-        source:ObjectList|Level,
+        source:ObjectList|Level|IDResult,
         id_offset:Optional[dict]=None,
         exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[IDGroup]]=None,
-        ids:Optional[CompiledIDs]=None
+        groups:Optional[Sequence[IDKey]]=None
         ) -> IDRemaps:
 
     exclude_ids = exclude_ids or {}
@@ -37,8 +35,10 @@ def offset_object_ids(
 
     remapped = {}
 
-    if ids is None:
-        ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    if isinstance(source, IDResult):
+        ids = source if groups is None else source.with_groups(groups)
+    else:
+        ids = rules.compile_ids(source, type_groups=groups)
 
     for k,v in ids.items():
         try:
@@ -70,15 +70,14 @@ def offset_object_ids(
 
 
 def reassign_object_ids(
-        source:ObjectList|Level,
+        source:ObjectList|Level|IDResult,
         exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         id_ranges:Optional[dict]=None,
         reassign_all:bool=False,
         override_fixed:bool=False,
         reassign_auto:bool=False,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[IDGroup]]=None,
-        ids:Optional[CompiledIDs]=None
+        groups:Optional[Sequence[IDKey]]=None
         ) -> IDRemaps:
 
     exclude_ids = exclude_ids or {}
@@ -88,8 +87,10 @@ def reassign_object_ids(
 
     remapped = {}
 
-    if ids is None:
-        ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    if isinstance(source, IDResult):
+        ids = source if groups is None else source.with_groups(groups)
+    else:
+        ids = rules.compile_ids(source, type_groups=groups)
 
     for k, v in ids.items():
         try:
@@ -146,12 +147,11 @@ def reassign_object_ids(
 
 
 def resolve_auto_ids(
-        source:ObjectList|Level,
+        source:ObjectList|Level|IDResult,
         id_ranges:Optional[dict]=None,
         exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[IDGroup]]=None,
-        ids:Optional[CompiledIDs]=None
+        groups:Optional[Sequence[IDKey]]=None
         ) -> IDRemaps:
     
     exclude_ids = exclude_ids or {}
@@ -161,8 +161,10 @@ def resolve_auto_ids(
 
     remapped = {}
 
-    if ids is None:
-        ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    if isinstance(source, IDResult):
+        ids = source if groups is None else source.with_groups(groups)
+    else:
+        ids = rules.compile_ids(source, type_groups=groups)
 
     for k, v in ids.items():
         try:
@@ -210,12 +212,11 @@ def resolve_auto_ids(
 
 
 def assign_auto_ids(
-        source:ObjectList|Level,
+        source:ObjectList|Level|IDResult,
         exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         override_fixed:bool=False,
         rules:RuleHandler=BASE_ID_HANDLER,
-        groups:Optional[Sequence[IDGroup]]=None,
-        ids:Optional[CompiledIDs]=None
+        groups:Optional[Sequence[IDKey]]=None
         ) -> IDRemaps:
 
     exclude_ids = exclude_ids or {}
@@ -223,8 +224,10 @@ def assign_auto_ids(
 
     remapped = {}
 
-    if ids is None:
-        ids = rules.compile_ids(source, by_type=True, type_groups=groups)
+    if isinstance(source, IDResult):
+        ids = source if groups is None else source.with_groups(groups)
+    else:
+        ids = rules.compile_ids(source, type_groups=groups)
 
     for k, v in ids.items():
         try:
@@ -282,7 +285,7 @@ def remap_objects(
     for s in sources:
         s = copy.deepcopy(s)
         result.append(s)
-        ids = rules.compile_ids(s, by_type=True, type_groups=groups)
+        ids = rules.compile_ids(s, type_groups=groups)
 
         for k, v in ids.items():
             ig = ig_dict.setdefault(k, set(ig_all))
@@ -453,17 +456,25 @@ def combine_named_groups(
 
 
 def assign_named_ids(
-        source:Level,
-        rules:RuleHandler=NAMED_ID_HANDLER,
-        ids:Optional[CompiledIDs]=None
+        source:Level|IDResult,
+        prefix:str="",
+        rules:RuleHandler=NAMED_ID_HANDLER
         ) -> IDRemaps:
 
-    named = source.start.require_interface(interfaces.LevelSettings).named_groups
+    if not set(prefix) <= ID_NAME_CHARS:
+        raise ValueError(f"prefix {prefix!r} contains characters the game strips from names")
+
+    level = source.source if isinstance(source, IDResult) else source
+    if not hasattr(level, "start"):
+        raise TypeError("named IDs need a Level, or an IDResult compiled from one")
+    named = level.start.require_interface(interfaces.LevelSettings).named_groups
     if not named:
         return {}
 
-    if ids is None:
-        ids = rules.compile_ids(source, by_type=True, type_groups=(), include_unset=False)
+    if isinstance(source, IDResult):
+        ids = source.with_groups(())
+    else:
+        ids = rules.compile_ids(source, type_groups=(), include_unset=False)
 
     remapped = {}
 
@@ -473,7 +484,13 @@ def assign_named_ids(
         names = named.get(k.to_named_type())
         if not names: continue
 
-        kv_map = {i: NamedID(names[i]) for i in v.get_ids() if i in names}
+        kv_map = {}
+        for i in v.get_ids():
+            if i not in names: continue
+            name = prefix + names[i]
+            if len(name) > ID_NAME_MAX:
+                raise ValueError(f"prefixed name {name!r} is longer than {ID_NAME_MAX} characters")
+            kv_map[i] = NamedID(name)
         if not kv_map: continue
 
         v.remap_objects(kv_map)
@@ -483,21 +500,25 @@ def assign_named_ids(
 
 
 def resolve_named_ids(
-        source:Level,
+        source:Level|IDResult,
         exclude_ids:Optional[dict]=DEFAULT_EXCLUDE,
         register:bool=True,
-        rules:RuleHandler=NAMED_ID_HANDLER,
-        ids:Optional[CompiledIDs]=None
+        rules:RuleHandler=NAMED_ID_HANDLER
         ) -> IDRemaps:
 
     exclude_ids = exclude_ids or {}
     ig_all = exclude_ids.get(IDType.ANY, set())
-    settings = source.start.require_interface(interfaces.LevelSettings)
+    level = source.source if isinstance(source, IDResult) else source
+    if not hasattr(level, "start"):
+        raise TypeError("named IDs need a Level, or an IDResult compiled from one")
+    settings = level.start.require_interface(interfaces.LevelSettings)
     named = settings.named_groups
     order = settings.named_groups_order
 
-    if ids is None:
-        ids = rules.compile_ids(source, by_type=True, type_groups=(), include_unset=False)
+    if isinstance(source, IDResult):
+        ids = source.with_groups(())
+    else:
+        ids = rules.compile_ids(source, type_groups=(), include_unset=False)
 
     remapped = {}
 

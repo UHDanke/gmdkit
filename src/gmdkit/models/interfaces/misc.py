@@ -167,7 +167,6 @@ register_id(1612, TriggerObject)  # Hide Player Trigger
 register_id(1613, TriggerObject)  # Show Player Trigger
 register_id(1818, TriggerObject)  # Background Effect On Trigger
 register_id(1819, TriggerObject)  # Background Effect Off Trigger
-register_id(1917, TriggerObject)  # Reverse Trigger
 
 # Template
 register_id(2895, Template)  # Smart Template Square

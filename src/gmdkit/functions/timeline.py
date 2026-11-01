@@ -24,12 +24,19 @@ EDGE_ALWAYS = {200, 201, 202, 203, 1334, 2902}
 EDGE_NEVER = {36, 84, 141, 1022, 1330, 1333, 1594, 1704, 1751, 3027}
 CAN_REVERSE = {35, 36, 67, 84, 140, 141, 1022, 1330, 1332, 1333, 3004, 3005, 3027}
 REVERSE_KEY = 117
+TPS = 480
+TICK_EPS = 1e-6
 
 BoxSize = Union[dict[int, tuple[float, float]], Callable[[Object], Optional[tuple[float, float]]], None]
 
 
 def speed_value(speed_type: int) -> float:
     return SPEED_VALUES.get(int(speed_type), SPEED.NORMAL)
+
+def ticks_to_cover(dist: float, step: float) -> int:
+    if dist <= 0:
+        return 0
+    return max(0, math.ceil(dist / step - TICK_EPS))
 
 def _base(obj: Object) -> interfaces.BaseObject:
     return obj.require_interface(interfaces.BaseObject)
@@ -184,10 +191,10 @@ def collect_timeline_objects(
         teleport_target: Optional[Callable[[Object, int], Optional[tuple[float, float]]]] = None,
         ) -> list[TimelineObject]:
     objects = list(objects)
-    by_group: dict[int, Object] = {}
+    by_group: dict[object, Object] = {}
     for o in objects:
         for g in _base(o).groups:
-            by_group.setdefault(int(g), o)
+            by_group.setdefault(g, o)
 
     items: list[TimelineObject] = []
     for uid, o in enumerate(objects):
@@ -197,7 +204,7 @@ def collect_timeline_objects(
         it = TimelineObject(o, uid, speed_kind(o), intf.get_positions(), int(intf.channel), int(intf.order))
         if it.kind == TELEPORT:
             tp = o.require_interface(TeleportSettings, None)
-            target = int(getattr(tp, 'target_id', 0) or 0)
+            target = getattr(tp, "target_id", 0) or 0
             dest = teleport_target(o, target) if teleport_target else None
             if dest is None:
                 t = by_group.get(target)
@@ -234,12 +241,29 @@ def collect_timeline_objects(
 
 
 @dataclass
+class TimelineToken:
+    kind: str = ""
+    index: int = 0
+    tick: int = 0
+    state: Optional[dict] = None
+    max_order: dict = field(default_factory=dict)
+
+    def save(self, kind: str, index: int, tick: int, state: dict, max_order: Optional[dict] = None):
+        self.kind = kind
+        self.index = index
+        self.tick = tick
+        self.state = dict(state)
+        self.max_order = dict(max_order or {})
+
+
+@dataclass
 class Timeline:
     objects: list[TimelineObject] = field(default_factory=list)
     start_speed: int = 0
     platformer: bool = False
     ignore_timewarp: bool = False
     include_song: bool = False
+    tps: int = TPS
 
     @classmethod
     def from_objects(cls, objects: Iterable[Object], start_speed: int = 0, platformer: bool = False, **kw):
@@ -304,67 +328,122 @@ class Timeline:
     def _start(self) -> dict:
         return dict(x=0.0, y=0.0, vert=False, rev=False, mod=1.0, speed=speed_value(self.start_speed), channel=0)
 
-    def time_for_pos(self, x: float, y: float = 0.0, channel: int = 0, order: int = 0) -> float:
+    def _tick_step(self, st: dict) -> float:
+        return st['speed'] * st['mod'] / self.tps
+
+    @staticmethod
+    def _direction(st: dict) -> int:
+        return -1 if st['rev'] != st['vert'] else 1
+
+    def _pass(self, it: TimelineObject, st: dict, n: int, step: float, dist: float, dx: float, dy: float):
+        sign = self._direction(st)
+        over = n * step - dist
+        ox, oy = (0.0, sign * over) if st['vert'] else (sign * over, 0.0)
+        old_vert = st['vert']
+        jump = self._effect(it, st)
+        self._advance(st, old_vert, dx, dy, jump)
+        st['x'] += ox
+        st['y'] += oy
+
+    @staticmethod
+    def _behind(st: dict, x: float, y: float) -> bool:
+        if not st['vert']:
+            return x > st['x'] if st['rev'] else x < st['x']
+        return y < st['y'] if st['rev'] else y > st['y']
+
+    def tick_for_pos(self, x: float, y: float = 0.0, channel: int = 0, order: int = 0,
+                     token: Optional[TimelineToken] = None) -> int:
         if x <= 0:
-            return 0.0
+            return 0
         if self.platformer:
-            return x / PLATFORMER_SPEED
+            return ticks_to_cover(x, PLATFORMER_SPEED / self.tps)
         st = self._start()
         if not self.objects:
-            return x / st['speed']
-        t = 0.0
+            return ticks_to_cover(x, self._tick_step(st))
+        begin, tick = 0, 0
         max_order: dict[int, int] = {}
-        for it in self.objects:
+        if (token is not None and token.kind == "pos" and token.state is not None
+                and not self._behind(token.state, x, y)):
+            begin, tick = token.index, token.tick
+            st, max_order = dict(token.state), dict(token.max_order)
+        for i in range(begin, len(self.objects)):
+            it = self.objects[i]
             if it.kind == SONG and not self.include_song:
                 continue
-            seg_speed = st['speed'] * st['mod']
+            if token is not None:
+                token.save("pos", i, tick, st, max_order)
+            step = self._tick_step(st)
             prev = max_order.get(st['channel'], 0)
             if prev < it.order:
                 max_order[st['channel']] = it.order
             px, py = it.position
             dist, dx, dy = self._step(st, px, py)
+            n = ticks_to_cover(dist, step)
             if ((st['channel'] == channel or channel == -1)
                     and (order < 1 or max_order.get(st['channel'], 0) >= order or prev == order)):
+                travel = self._direction(st) * n * step
                 if not st['vert']:
-                    if min(st['x'], px) <= x <= max(st['x'], px):
-                        return t + abs(st['x'] - x) / seg_speed
-                elif min(st['y'], py) <= y <= max(st['y'], py):
-                    return t + abs(st['y'] - y) / seg_speed
-            t += dist / seg_speed
-            old_vert = st['vert']
-            jump = self._effect(it, st)
-            self._advance(st, old_vert, dx, dy, jump)
+                    a, q, b = st['x'], x, st['x'] + travel
+                    end = px
+                else:
+                    a, q, b = st['y'], y, st['y'] + travel
+                    end = py
+                if min(a, b, end) <= q <= max(a, b, end):
+                    return tick + ticks_to_cover(abs(a - q), step)
+            tick += n
+            self._pass(it, st, n, step, dist, dx, dy)
+        if token is not None:
+            token.save("pos", len(self.objects), tick, st, max_order)
         rest = (st['y'] - y) if st['vert'] else (st['x'] - x)
-        return t + abs(rest) / (st['speed'] * st['mod'])
+        return tick + ticks_to_cover(abs(rest), self._tick_step(st))
 
-    def pos_for_time(self, time: float) -> tuple[float, float]:
+    def time_for_pos(self, x: float, y: float = 0.0, channel: int = 0, order: int = 0,
+                     token: Optional[TimelineToken] = None) -> float:
+        return self.tick_for_pos(x, y, channel, order, token) / self.tps
+
+    def tick_for_obj(self, obj: Object, token: Optional[TimelineToken] = None) -> int:
+        x, y = _base(obj).get_positions()
+        intf = _effect_intf(obj)
+        if intf is None:
+            return self.tick_for_pos(x, y, token=token)
+        return self.tick_for_pos(x, y, int(intf.channel), int(intf.order), token)
+
+    def time_for_obj(self, obj: Object, token: Optional[TimelineToken] = None) -> float:
+        return self.tick_for_obj(obj, token) / self.tps
+
+    def pos_for_tick(self, tick: int, token: Optional[TimelineToken] = None) -> tuple[float, float]:
         if self.platformer or not self.objects:
             sp = PLATFORMER_SPEED if self.platformer else speed_value(self.start_speed)
-            return (time * sp, 0.0)
+            return (tick * sp / self.tps, 0.0)
         st = self._start()
-        elapsed = 0.0
+        begin, elapsed = 0, 0
+        if token is not None and token.kind == "tick" and token.state is not None and token.tick <= tick:
+            begin, elapsed, st = token.index, token.tick, dict(token.state)
 
-        def move(remaining):
-            d = remaining * st['speed'] * st['mod']
-            if st['rev'] != st['vert']:
-                d = -d
+        def move(ticks):
+            d = self._direction(st) * ticks * self._tick_step(st)
             if st['vert']:
-                st['y'] += d
-            else:
-                st['x'] += d
-            return (st['x'], st['y'])
+                return (st['x'], st['y'] + d)
+            return (st['x'] + d, st['y'])
 
-        for it in self.objects:
+        for i in range(begin, len(self.objects)):
+            it = self.objects[i]
+            if token is not None:
+                token.save("tick", i, elapsed, st)
+            step = self._tick_step(st)
             px, py = it.position
             if it.channel == st['channel']:
                 dist, dx, dy = self._step(st, px, py)
             else:
                 dist, dx, dy = 0.0, 0.0, 0.0
-            end = elapsed + dist / (st['speed'] * st['mod'])
-            if time <= end:
-                return move(time - elapsed)
-            old_vert = st['vert']
-            jump = self._effect(it, st)
-            self._advance(st, old_vert, dx, dy, jump)
-            elapsed = end
-        return move(time - elapsed)
+            n = ticks_to_cover(dist, step)
+            if tick <= elapsed + n:
+                return move(tick - elapsed)
+            self._pass(it, st, n, step, dist, dx, dy)
+            elapsed += n
+        if token is not None:
+            token.save("tick", len(self.objects), elapsed, st)
+        return move(tick - elapsed)
+
+    def pos_for_time(self, time: float, token: Optional[TimelineToken] = None) -> tuple[float, float]:
+        return self.pos_for_tick(math.floor(time * self.tps + TICK_EPS), token)

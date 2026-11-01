@@ -94,7 +94,7 @@ def create_lvl_color_triggers(
 
 
 def set_used_colors(lvl:Level):
-    used = remapping.rules.COLOR_ID_HANDLER.compile_ids(lvl).filter_values(reference=True).get_ids()
+    used = remapping.rules.COLOR_ID_HANDLER.compile_ids(lvl).all.filter_values(reference=True).get_ids()
     intf = lvl.start.require_interface(interfaces.LevelSettings)
     intf.colors.set_defaults(*used)
 
@@ -104,7 +104,7 @@ def free_unused_colors(lvl:Level, ignore_ids:dict):
 
     rules = remapping.rules.BASE_ID_HANDLER.compile_rules(id_types=(remapping.IDType.COLOR_ID,))
 
-    ids = rules.compile_ids(lvl.objects, by_type=False).filter_values(fixed=False)
+    ids = rules.compile_ids(lvl.objects).all.filter_values(fixed=False)
     id_base = ids.filter_values(reference=False).get_ids()
     id_ref = ids.filter_values(reference=True).get_ids()
     unused = id_base - id_ref - ignore_ids

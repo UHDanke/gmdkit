@@ -1,6 +1,6 @@
 # Package Imports
 from enum import IntEnum, IntFlag
-
+from gmdkit.constants.game import speed as SPEED_CONST
 
 class EnumClass(IntEnum):
     
@@ -675,6 +675,23 @@ class Speed(EnumClass):
     FAST = 2
     VERY_FAST = 3
     SUPER_FAST = 4
+    
+    @property
+    def speed_value(self):
+        cls = type(self)
+        match self:
+            case cls.SLOW:
+                return SPEED_CONST.SLOW
+            case cls.NORMAL:
+                return SPEED_CONST.NORMAL
+            case cls.FAST:
+                return SPEED_CONST.FAST
+            case cls.VERY_FAST:
+                return SPEED_CONST.VERY_FAST
+            case cls.SUPER_FAST:
+                return SPEED_CONST.SUPER_FAST
+            case _:
+                return SPEED_CONST.NORMAL
 
 class LevelDifficulty(EnumClass):
     NA = -1

@@ -59,6 +59,12 @@ class StartSettings(BaseInterface):
     custom_sfx_mapping_creator: int = Field('kA61')
     custom_sfx_shared_folders: CustomSFXFolderIDList = Field('kA62')
     mirror_mode: bool = Field("kA63")
+    
+    @property
+    def speed_value(self) -> float:
+        if self.platformer_mode:
+            return enums.Speed.NORMAL.speed_value
+        return self.speed.speed_value
  
 class LevelSettings(StartSettings):
     legacy_audio_track: enums.OfficialSongs = Field("kA1")

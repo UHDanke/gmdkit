@@ -9,7 +9,7 @@ from gmdkit.models.level import Level
 from gmdkit.models.object import Object, ObjectList
 from gmdkit.serialization.classes import BaseInterface
 from gmdkit.utils.typing import MISSING
-from gmdkit.remapping.types import IDType, IDActions, IDToken
+from gmdkit.remapping.types import IDType, IDActions, IDToken, IDGroup
 
 ID_MIN = -2147483648
 ID_MAX =  2147483647
@@ -178,35 +178,83 @@ class IdentifierList:
 
         return new
 
-    @staticmethod
-    def group_by_type(
-            identifiers: Sequence[Identifier],
-            type_groups: Sequence[IDType | Sequence[IDType]] | None = None,
+
+class IDResult:
+
+    def __init__(
+            self,
+            identifiers: IdentifierList | Sequence[Identifier] = (),
+            groups: Optional[Sequence[IDType | IDGroup | Sequence[IDType]]] = None,
+            source: Optional[ObjectList | Level] = None,
             ):
 
-        id_dict: dict[IDType, list[Identifier]] = {}
-        for i in identifiers:
-            id_dict.setdefault(i.id_type, []).append(i)
+        self.source = source
+        self.all = identifiers if isinstance(identifiers, IdentifierList) else IdentifierList(values=identifiers)
+        self.groups = tuple(groups) if groups else ()
+        self.cache = {}
 
-        if type_groups is None:
-            return {k: IdentifierList(values=v) for k, v in id_dict.items()}
+        by_type: dict[IDType, list[Identifier]] = {}
+        for i in self.all.values:
+            by_type.setdefault(i.id_type, []).append(i)
+        self.by_type = {k: IdentifierList(values=v) for k, v in by_type.items()}
 
-        seen: set[IDType] = set()
-        result: dict[IDType | tuple[IDType, ...], list[Identifier]] = {}
+    @staticmethod
+    def members(key: IDType | IDGroup | Sequence[IDType]) -> tuple[IDType, ...]:
+        if isinstance(key, IDType):
+            return (key,)
+        return tuple(dict.fromkeys(key))
 
-        for k in type_groups:
-            if isinstance(k, IDType):  # single type, not a group
-                seen.add(k)
-                result[k] = id_dict.get(k, [])
-            else:
-                key = tuple(k)
-                seen.update(key)
-                result[key] = [v for t in key for v in id_dict.get(t, [])]
+    @property
+    def types(self) -> set[IDType]:
+        return set(self.by_type)
 
-        for k in id_dict.keys() - seen:
-            result[k] = id_dict[k]
+    def __getitem__(self, key: IDType | IDGroup | Sequence[IDType]) -> IdentifierList:
+        if isinstance(key, IDType):
+            found = self.by_type.get(key)
+            return found if found is not None else IdentifierList()
 
-        return {k: IdentifierList(values=v) for k, v in result.items()}
+        members = self.members(key)
+        cache_key = frozenset(members)
+        found = self.cache.get(cache_key)
+        if found is None:
+            values = [i for t in members if t in self.by_type for i in self.by_type[t].values]
+            found = self.cache[cache_key] = IdentifierList(values=values)
+        return found
+
+    def get(self, key, default=None) -> Optional[IdentifierList]:
+        return self[key] if key in self else default
+
+    def __contains__(self, key) -> bool:
+        return any(t in self.by_type for t in self.members(key))
+
+    def keys(self) -> list[IDType | IDGroup | tuple[IDType, ...]]:
+        seen = set()
+        keys = []
+        for group in self.groups:
+            key = group if isinstance(group, (IDType, IDGroup)) else tuple(group)
+            keys.append(key)
+            seen.update(self.members(key))
+        keys.extend(t for t in self.by_type if t not in seen)
+        return keys
+
+    def items(self) -> list[tuple[IDType | IDGroup | tuple[IDType, ...], IdentifierList]]:
+        return [(k, self[k]) for k in self.keys()]
+
+    def values(self) -> list[IdentifierList]:
+        return [self[k] for k in self.keys()]
+
+    def __iter__(self):
+        return iter(self.keys())
+
+    def __len__(self) -> int:
+        return len(self.keys())
+
+    def with_groups(self, groups: Optional[Sequence[IDType | IDGroup | Sequence[IDType]]]) -> Self:
+        return type(self)(self.all, groups, self.source)
+
+    def __repr__(self) -> str:
+        counts = ", ".join(f"{k!r}: {len(v.values)}" for k, v in self.by_type.items())
+        return f"IDResult({counts})"
 
 
 @lru_cache(maxsize=None)
@@ -448,10 +496,9 @@ class RuleHandler:
     def compile_ids(
             self,
             source: ObjectList|Level,
-            by_type:bool=False,
-            type_groups:Optional[Sequence[set]]=None,
+            type_groups:Optional[Sequence[IDType|IDGroup|Sequence[IDType]]]=None,
             include_unset:bool=True
-            ) -> IdentifierList|dict[Sequence[IDType]|IDType,IdentifierList]:
+            ) -> IDResult:
 
         result = []
         type_groups = self.groups if type_groups is None else type_groups
@@ -467,7 +514,4 @@ class RuleHandler:
             for obj in source:
                 result.extend(self.fetch_ids(obj, include_unset))
 
-        if by_type:
-            return IdentifierList.group_by_type(result, type_groups)
-
-        return IdentifierList(values=result)
+        return IDResult(result, type_groups, source)

@@ -5,6 +5,7 @@ from typing import Self
 from gmdkit.utils import enums
 from gmdkit.models.prop.color import HSV, Color
 from gmdkit.models.object import Object
+from gmdkit.serialization.classes import BaseInterface
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
 
 
@@ -13,10 +14,32 @@ class AnimateTrigger(TriggerObject):
     animation_id: int = Field(76)
 
 
-class ColorTrigger(TriggerObject):
+class ColorInterface(BaseInterface):
     red: int = Field(7)
     green: int = Field(8)
     blue: int = Field(9)
+    
+    def set_rgb(self, r: int, g: int, b: int, duration: float = 0) -> Self:
+        """Set red, green, blue and duration in one call."""
+        self.red = r
+        self.green = g
+        self.blue = b
+        self.duration = duration
+        return self
+
+    def set_hex(self, hex_str: str, duration: float = 0) -> Self:
+        """Parse a hex string like '#FF8800' and set red/green/blue and duration."""
+        hex_str = hex_str.lstrip('#')
+        if len(hex_str) != 6:
+            raise ValueError(f"Invalid hex string: {hex_str!r}")
+        self.red   = int(hex_str[0:2], 16)
+        self.green = int(hex_str[2:4], 16)
+        self.blue  = int(hex_str[4:6], 16)
+        self.duration = duration
+        return self
+
+
+class ColorTrigger(ColorInterface,TriggerObject):
     duration: float = Field(10)
     tint_ground: bool = Field(14)
     player_1: bool = Field(15)
@@ -73,10 +96,7 @@ class ColorTrigger(TriggerObject):
         return color
     
 
-class PulseTrigger(TriggerObject):
-    red: int = Field(7)
-    green: int = Field(8)
-    blue: int = Field(9)
+class PulseTrigger(ColorInterface,TriggerObject):
     fade_in: float = Field(45)
     hold: float = Field(46)
     fade_out: float = Field(47)

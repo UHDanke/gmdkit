@@ -1,6 +1,7 @@
 # Package Imports
 from gmdkit.utils import enums
 from gmdkit.models.interfaces.base import TriggerObject, Field, register_id
+from gmdkit.utils.functions import normalize_orientation
 
 
 class CheckpointTrigger(TriggerObject):
@@ -37,6 +38,84 @@ class GameplayArrow(TriggerObject):
     velocity_mod_y: float = Field(583)
     override_velocity: bool = Field(584)
     dont_slide: bool = Field(585)
+    
+    def update_dir(self) -> tuple[enums.ArrowDir, enums.ArrowDir]:
+        rotation = self.rotation
+        if rotation == 0 and (self.skew_x or self.skew_y):
+            rotation = self.skew_x
+        r = int(rotation) % 360
+        if r % 90:
+            x_pos, y_neg = enums.ArrowDir.RIGHT, enums.ArrowDir.DOWN
+        else:
+            x_pos, y_neg = normalize_orientation(r, bool(self.flip_x), bool(self.flip_y))
+        self.dir_x_pos = x_pos
+        self.dir_y_neg = y_neg
+        return x_pos, y_neg
+
+    def set_dir(self, rotated: bool, reverse: bool, gravity: bool):
+        if rotated:
+            x_pos, y_neg = enums.ArrowDir.DOWN, enums.ArrowDir.LEFT
+        else:
+            x_pos, y_neg = enums.ArrowDir.RIGHT, enums.ArrowDir.DOWN
+        x_pos = x_pos.flip() if reverse else x_pos
+        y_neg = y_neg.flip() if gravity else y_neg
+
+        if self.update_dir() != (x_pos, y_neg):
+            transforms = sorted(
+                ((r, fx, fy) for r in (0, 90, 180, 270) for fx in (False, True) for fy in (False, True)),
+                key=lambda t: (t[1] + t[2], t[0]))
+            r, fx, fy = next(t for t in transforms if normalize_orientation(*t) == (x_pos, y_neg))
+            old = self.hitbox_rect if self.touch_trigger else None
+            self.rotation = r
+            self.skew_x = 0
+            self.skew_y = 0
+            self.flip_x = fx
+            self.flip_y = fy
+            if old is not None:
+                self.scale_x = 1
+                self.scale_y = 1
+                new = self.hitbox_rect
+                if r in (90, 270):
+                    self.scale_x = round(old[3] / new[3], 3)
+                    self.scale_y = round(old[2] / new[2], 3)
+                else:
+                    self.scale_x = round(old[2] / new[2], 3)
+                    self.scale_y = round(old[3] / new[3], 3)
+
+        self.dir_x_pos = x_pos
+        self.dir_y_neg = y_neg
+
+    @property
+    def rotate_mode(self) -> bool:
+        return self.dir_y_neg in (enums.ArrowDir.LEFT, enums.ArrowDir.RIGHT)
+
+    @rotate_mode.setter
+    def rotate_mode(self, value: bool):
+        self.set_dir(value, self.reverse, self.gravity)
+
+    @property
+    def reverse_mode(self) -> bool:
+        return self.dir_x_pos in (enums.ArrowDir.UP, enums.ArrowDir.LEFT)
+
+    @reverse_mode.setter
+    def reverse_mode(self, value: bool):
+        self.set_dir(self.rotated, value, self.gravity)
+
+    @property
+    def flip_gravity(self) -> bool:
+        flipped = enums.ArrowDir.RIGHT if self.rotated else enums.ArrowDir.UP
+        return self.dir_y_neg == flipped
+
+    @flip_gravity.setter
+    def flip_gravity(self, value: bool):
+        self.set_dir(self.rotated, self.reverse, value)
+
+
+class ReverseTrigger(TriggerObject):
+    
+    @property
+    def reverse_mode(self) -> bool:
+        return True
 
 
 class GravityTrigger(TriggerObject):
@@ -90,6 +169,9 @@ register_id(1931, EndWallTrigger)  # End Wall Trigger
 
 # GameplayArrow
 register_id(2900, GameplayArrow)  # Gameplay Rotation Trigger
+
+# ReverseTrigger
+register_id(1917, ReverseTrigger)  # Reverse Trigger
 
 # GravityTrigger
 register_id(2066, GravityTrigger)  # Gravity Trigger
