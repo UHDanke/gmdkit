@@ -244,8 +244,11 @@ def validate_dict_node(node:ET.Element, is_array:bool=False, encoder_key:Optiona
 
 
 def get_plist_root(node:ET.Element) -> ET.Element:
+    if node.tag in ("d", "dict"):
+        return node
+
     if node.tag != "plist":
-        raise ValueError(f"expected root node to be <plist>, got <{node.tag}> instead")
+        raise ValueError(f"expected root node to be <plist>, <d> or <dict>, got <{node.tag}> instead")
 
     root = node.find("dict")
 
@@ -256,8 +259,7 @@ def get_plist_root(node:ET.Element) -> ET.Element:
 
 
 def from_plist_string(string: str) -> dict:
-    tree = ET.fromstring(string)
-    return read_plist(tree.find("dict"))
+    return read_plist(get_plist_root(ET.fromstring(string)))
 
 
 def to_plist_string(data:[dict,list]) -> str:
@@ -269,9 +271,7 @@ def to_plist_string(data:[dict,list]) -> str:
 
 
 def from_plist_file(path: PathString) -> dict:
-    tree = ET.parse(path)
-    root = tree.getroot()
-    return read_plist(root.find("dict"))
+    return read_plist(get_plist_root(ET.parse(path).getroot()))
 
 
 def to_plist_file(data: Any, path: PathString):
